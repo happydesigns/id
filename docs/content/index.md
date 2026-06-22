@@ -17,7 +17,7 @@ Create brand guides that become usable Nuxt brand layers. Keep apps focused on c
   :::u-button
   ---
   size: xl
-  to: /getting-started
+  to: /getting-started/introduction
   trailing-icon: i-lucide-arrow-right
   ---
   Get started
