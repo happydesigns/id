@@ -3,15 +3,6 @@ import { createNuxtUiAppConfig, defineBrandTheme } from '@happydesigns/id'
 const defaultTheme = defineBrandTheme({
   name: 'app-theme',
   label: 'App Theme',
-  semanticColors: {
-    primary: 'blue',
-    secondary: 'slate',
-    success: 'green',
-    info: 'sky',
-    warning: 'amber',
-    error: 'red',
-    neutral: 'slate'
-  },
   cssVariables: {
     light: {
       '--ui-bg': 'white',
@@ -24,6 +15,17 @@ const defaultTheme = defineBrandTheme({
       '--ui-text': '#E2E8F0',
       '--ui-text-highlighted': 'white',
       '--ui-border': '#1E293B'
+    }
+  },
+  ui: {
+    colors: {
+      primary: 'blue',
+      secondary: 'slate',
+      success: 'green',
+      info: 'sky',
+      warning: 'amber',
+      error: 'red',
+      neutral: 'slate'
     }
   }
 })

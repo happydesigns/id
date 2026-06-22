@@ -10,7 +10,7 @@ Reusable identity system for brand guides, Nuxt UI defaults, and Nuxt brand laye
 - A neutral Nuxt UI baseline through `nuxtUiBrandTheme` and `idBrandGuide`.
 - Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
 - CSS variable generation for light and dark themes.
-- Nuxt UI app-config helpers for semantic colors and component defaults.
+- Nuxt UI app-config helpers for `ui.colors` and component defaults.
 - A Nuxt layer and module for applying identity runtime behavior.
 - Starter templates for brand layers and themed apps.
 - Docus documentation for brand-guide authors and Nuxt developers.

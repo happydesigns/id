@@ -1,18 +1,29 @@
 import { defineBrandTheme, nuxtUiBrandTheme } from '../src'
 
+const editorialColors = {
+  primary: 'orange',
+  secondary: 'teal',
+  success: 'emerald',
+  info: 'cyan',
+  warning: 'amber',
+  error: 'rose',
+  neutral: 'stone'
+}
+
+const studioColors = {
+  primary: 'teal',
+  secondary: 'rose',
+  success: 'emerald',
+  info: 'cyan',
+  warning: 'amber',
+  error: 'red',
+  neutral: 'zinc'
+}
+
 export const editorialBrandTheme = defineBrandTheme({
   name: 'editorial',
   label: 'Editorial',
   description: 'A crisp editorial fixture with warm paper surfaces, serif typography, tighter radius, and quieter controls.',
-  semanticColors: {
-    primary: 'orange',
-    secondary: 'teal',
-    success: 'emerald',
-    info: 'cyan',
-    warning: 'amber',
-    error: 'rose',
-    neutral: 'stone'
-  },
   typography: {
     sans: 'ui-serif, Georgia, Cambria, Times New Roman, Times, serif',
     mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
@@ -52,6 +63,7 @@ export const editorialBrandTheme = defineBrandTheme({
     }
   },
   ui: {
+    colors: editorialColors,
     button: {
       slots: {
         base: 'rounded-sm font-semibold tracking-wide'
@@ -80,15 +92,6 @@ export const studioBrandTheme = defineBrandTheme({
   name: 'studio',
   label: 'Studio',
   description: 'A polished studio fixture with cool glassy surfaces, rounded controls, and a high-contrast teal system.',
-  semanticColors: {
-    primary: 'teal',
-    secondary: 'rose',
-    success: 'emerald',
-    info: 'cyan',
-    warning: 'amber',
-    error: 'red',
-    neutral: 'zinc'
-  },
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
     mono: 'JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
@@ -128,6 +131,7 @@ export const studioBrandTheme = defineBrandTheme({
     }
   },
   ui: {
+    colors: studioColors,
     button: {
       slots: {
         base: 'rounded-xl font-semibold shadow-sm shadow-primary/10'

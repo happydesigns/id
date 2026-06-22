@@ -78,12 +78,11 @@ export const brandThemeSchema = z.object({
   name: z.string().min(1).regex(/^[a-z0-9][a-z0-9-]*$/, 'Theme names must be kebab-case'),
   label: z.string().min(1),
   description: z.string().optional(),
-  semanticColors: semanticColorsSchema.optional(),
   cssVariables: cssVariablesSchema.optional(),
   typography: typographySchema.optional(),
   ui: z.record(z.string().min(1), z.unknown()).optional()
-}).refine(value => Boolean(value.semanticColors || value.cssVariables || value.typography || value.ui), {
-  message: 'A theme must define semanticColors, cssVariables, typography, or ui'
+}).refine(value => Boolean(value.cssVariables || value.typography || value.ui), {
+  message: 'A theme must define cssVariables, typography, or ui'
 })
 
 export const brandGuideSchema = z.object({

@@ -104,7 +104,7 @@ description: id should feel like a small layer on top of Nuxt UI, not a competin
     app.config.ts first
 
     #description
-    Use Nuxt UI semantic colors, slots, variants, compound variants, and default variants before adding custom wrappers.
+    Use Nuxt UI `ui.colors`, slots, variants, compound variants, and default variants before adding custom wrappers.
     ::::
 
     ::::u-page-card{icon="i-lucide-braces" to="/reference/api"}

@@ -27,6 +27,10 @@ export type NuxtUiColorRole =
 
 export type BrandSemanticColors = Partial<Record<NuxtUiColorRole, string>>
 
+export type BrandThemeUi = Record<string, unknown> & {
+  colors?: BrandSemanticColors
+}
+
 export type BrandCssVariables = {
   light?: Record<string, string>
   dark?: Record<string, string>
@@ -120,10 +124,9 @@ export type BrandTheme = {
   name: string
   label: string
   description?: string
-  semanticColors?: BrandSemanticColors
   cssVariables?: BrandCssVariables
   typography?: BrandTypography
-  ui?: Record<string, unknown>
+  ui?: BrandThemeUi
 }
 
 export type ThemeMode = 'light' | 'dark'

@@ -6,10 +6,7 @@ export type NuxtUiAppConfig = {
 }
 
 export function createNuxtUiAppConfig(theme: BrandTheme): NuxtUiAppConfig {
-  const ui = {
-    ...(theme.ui ?? {}),
-    ...(theme.semanticColors ? { colors: theme.semanticColors } : {})
-  }
+  const ui = theme.ui ?? {}
 
   return { ui: ui as NonNullable<AppConfigInput['ui']> }
 }

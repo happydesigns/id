@@ -1,6 +1,17 @@
 import { defineBrandGuide, defineBrandTheme } from '../../src'
 
+const happydesignsColors = {
+  primary: 'coral',
+  secondary: 'petrol',
+  success: 'seafoam',
+  info: 'plum',
+  warning: 'butter',
+  error: 'rose',
+  neutral: 'sand'
+}
+
 const sharedUiDefaults = {
+  colors: happydesignsColors,
   button: {
     slots: {
       base: 'rounded-sm font-medium'
@@ -73,15 +84,6 @@ export const happydesignsBrandTheme = defineBrandTheme({
   name: 'happydesigns',
   label: 'happydesigns',
   description: 'Warm happydesigns runtime theme adapted from the current brand guide.',
-  semanticColors: {
-    primary: 'coral',
-    secondary: 'petrol',
-    success: 'seafoam',
-    info: 'plum',
-    warning: 'butter',
-    error: 'rose',
-    neutral: 'sand'
-  },
   typography: {
     sans: '"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif',
     mono: '"Geist Mono", "SFMono-Regular", ui-monospace, monospace'
@@ -144,7 +146,7 @@ export const happydesignsBrandGuide = defineBrandGuide({
   packageName: '@happydesigns/brand',
   title: 'happydesigns',
   description: 'Runtime-ready happydesigns identity source used by the id documentation until the standalone brand layer exports the same contract.',
-  semanticColors: happydesignsBrandTheme.semanticColors,
+  semanticColors: happydesignsColors,
   cssVariables: happydesignsBrandTheme.cssVariables,
   typography: happydesignsBrandTheme.typography,
   ui: happydesignsBrandTheme.ui,

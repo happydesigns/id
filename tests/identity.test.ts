@@ -29,9 +29,11 @@ describe('brand theme contract', () => {
     const theme = defineBrandTheme({
       name: 'client-brand',
       label: 'Client Brand',
-      semanticColors: {
-        primary: 'blue',
-        neutral: 'slate'
+      ui: {
+        colors: {
+          primary: 'blue',
+          neutral: 'slate'
+        }
       }
     })
 
@@ -49,8 +51,10 @@ describe('brand theme contract', () => {
     expect(() => validateBrandTheme({
       name: 'Client Brand',
       label: 'Client Brand',
-      semanticColors: {
-        primary: 'blue'
+      ui: {
+        colors: {
+          primary: 'blue'
+        }
       }
     })).toThrow(BrandValidationError)
   })
@@ -149,7 +153,7 @@ describe('css generation', () => {
 })
 
 describe('nuxt ui app config generation', () => {
-  it('maps semantic colors to ui.colors', () => {
+  it('keeps Nuxt UI colors in ui.colors', () => {
     const config = createNuxtUiAppConfig(editorialBrandTheme)
 
     expect(config.ui).toMatchObject({
@@ -202,6 +206,7 @@ describe('brand theme lists', () => {
     for (const theme of testBrandThemes) {
       expect(theme.cssVariables?.light?.['--ui-bg']).toBeTruthy()
       expect(theme.cssVariables?.dark?.['--ui-bg']).toBeTruthy()
+      expect(theme.ui?.colors).toBeTruthy()
       expect(theme.ui?.button).toBeTruthy()
       expect(theme.ui?.card).toBeTruthy()
     }
@@ -226,7 +231,7 @@ describe('brand theme lists', () => {
 
   it('keeps the local happydesigns theme runtime-safe and reversible', () => {
     expect(happydesignsBrandTheme.name).toBe('happydesigns')
-    expect(happydesignsBrandTheme.semanticColors?.primary).toBe('coral')
+    expect(happydesignsBrandTheme.ui?.colors?.primary).toBe('coral')
     expect(happydesignsBrandTheme.cssVariables?.light?.['--ui-bg']).toBe('#FAF7F2')
     expect(happydesignsBrandTheme.cssVariables?.dark?.['--ui-bg']).toBe('#242423')
     expect(happydesignsBrandTheme.ui?.button).toBeTruthy()

@@ -1,6 +1,17 @@
 import { defineBrandGuide, defineBrandTheme } from './validation'
 
+const nuxtUiColors = {
+  primary: 'green',
+  secondary: 'blue',
+  success: 'green',
+  info: 'sky',
+  warning: 'amber',
+  error: 'red',
+  neutral: 'slate'
+}
+
 const nuxtUiComponentDefaults = {
+  colors: nuxtUiColors,
   button: {
     slots: {
       base: 'rounded-md font-medium'
@@ -62,15 +73,6 @@ export const nuxtUiBrandTheme = defineBrandTheme({
   name: 'nuxt-ui',
   label: 'Nuxt UI',
   description: 'A default Nuxt UI baseline with standard semantic colors, radius, surfaces, and component defaults.',
-  semanticColors: {
-    primary: 'green',
-    secondary: 'blue',
-    success: 'green',
-    info: 'sky',
-    warning: 'amber',
-    error: 'red',
-    neutral: 'slate'
-  },
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
     mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
@@ -119,7 +121,7 @@ export const idBrandGuide = defineBrandGuide({
   packageName: '@happydesigns/id',
   title: 'happydesigns id',
   description: 'A Nuxt UI identity baseline for brand layers, token-driven app config, and runtime-safe theme mechanics.',
-  semanticColors: nuxtUiBrandTheme.semanticColors,
+  semanticColors: nuxtUiColors,
   cssVariables: nuxtUiBrandTheme.cssVariables,
   typography: nuxtUiBrandTheme.typography,
   ui: nuxtUiBrandTheme.ui,

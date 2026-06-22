@@ -1,17 +1,18 @@
 import { defineBrandGuide, defineBrandTheme } from '@happydesigns/id'
 
+const brandColors = {
+  primary: 'brand',
+  secondary: 'slate',
+  success: 'green',
+  info: 'sky',
+  warning: 'amber',
+  error: 'red',
+  neutral: 'slate'
+}
+
 export const brandTheme = defineBrandTheme({
   name: 'example-brand',
   label: 'Example Brand',
-  semanticColors: {
-    primary: 'brand',
-    secondary: 'slate',
-    success: 'green',
-    info: 'sky',
-    warning: 'amber',
-    error: 'red',
-    neutral: 'slate'
-  },
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
     mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
@@ -34,6 +35,9 @@ export const brandTheme = defineBrandTheme({
       '--ui-text-highlighted': 'white',
       '--ui-border': '#1E293B'
     }
+  },
+  ui: {
+    colors: brandColors
   }
 })
 
@@ -42,7 +46,7 @@ export const brandGuide = defineBrandGuide({
   packageName: '@example/brand',
   title: 'Example Brand',
   description: 'A reusable Nuxt UI brand layer.',
-  semanticColors: brandTheme.semanticColors,
+  semanticColors: brandColors,
   cssVariables: brandTheme.cssVariables,
   typography: brandTheme.typography,
   usage: {

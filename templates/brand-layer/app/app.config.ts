@@ -1,5 +1,5 @@
 import { createNuxtUiAppConfig } from '@happydesigns/id'
-import { brandGuide, brandTheme } from '../brand.config'
+import { brandGuide, brandTheme } from '../brand'
 
 const nuxtUiConfig = createNuxtUiAppConfig(brandTheme)
 
