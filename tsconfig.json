@@ -16,6 +16,7 @@
     "app/plugins/**/*.ts",
     "app/types/**/*.d.ts",
     "src/**/*.ts",
+    "themes/**/*.ts",
     "tests/**/*.ts",
     "module.ts",
     "nuxt.config.ts",

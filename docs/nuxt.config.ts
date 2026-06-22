@@ -1,8 +1,18 @@
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineNuxtConfig } from 'nuxt/config'
+
+const currentDir = dirname(fileURLToPath(import.meta.url))
 
 export default defineNuxtConfig({
   extends: ['docus'],
-  modules: ['./modules/docus-css-dev'],
+  modules: [
+    resolve(currentDir, '../module.ts'),
+    './modules/docus-css-dev'
+  ],
+  css: [
+    resolve(currentDir, '../themes/happydesigns/tokens.css')
+  ],
   compatibilityDate: 'latest',
   vite: {
     optimizeDeps: {

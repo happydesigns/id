@@ -2,6 +2,11 @@ import type { BrandCssVariables, BrandTheme, ThemeCssOptions, ThemeMode } from '
 
 const DEFAULT_LIGHT_SELECTOR = ':root'
 const DEFAULT_DARK_SELECTOR = '.dark'
+const appliedCssVariableNames = new WeakMap<HTMLElement, Set<string>>()
+
+type ApplyCssVariablesOptions = {
+  clearPrevious?: boolean
+}
 
 function normalizeCssVariableName(name: string) {
   return name.startsWith('--') ? name : `--${name}`
@@ -59,9 +64,27 @@ export function createThemeCssVars(theme: BrandTheme, options: ThemeCssOptions =
 
 export function applyCssVariables(
   target: HTMLElement,
-  variables: Record<string, string> = {}
+  variables: Record<string, string> = {},
+  options: ApplyCssVariablesOptions = {}
 ) {
-  for (const [name, value] of Object.entries(variables)) {
-    target.style.setProperty(normalizeCssVariableName(name), value)
+  const normalizedVariables = Object.fromEntries(
+    Object.entries(variables).map(([name, value]) => [normalizeCssVariableName(name), value])
+  )
+  const nextVariableNames = new Set(Object.keys(normalizedVariables))
+
+  if (options.clearPrevious) {
+    const previousVariableNames = appliedCssVariableNames.get(target) ?? new Set()
+
+    for (const name of previousVariableNames) {
+      if (!nextVariableNames.has(name)) {
+        target.style.removeProperty(name)
+      }
+    }
+
+    appliedCssVariableNames.set(target, nextVariableNames)
+  }
+
+  for (const [name, value] of Object.entries(normalizedVariables)) {
+    target.style.setProperty(name, value)
   }
 }

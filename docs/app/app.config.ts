@@ -1,3 +1,14 @@
+import {
+  createNuxtUiAppConfig,
+  nuxtUiBrandTheme
+} from '../../src'
+import {
+  happydesignsBrandGuide,
+  happydesignsBrandTheme
+} from '../../themes/happydesigns'
+
+const nuxtUiAppConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
+
 export default defineAppConfig({
   seo: {
     title: 'happydesigns id',
@@ -21,16 +32,16 @@ export default defineAppConfig({
     floatingInput: false,
     explainWithAi: false
   },
+  id: {
+    name: 'happydesigns-id-docs',
+    theme: nuxtUiBrandTheme,
+    defaultTheme: nuxtUiBrandTheme.name,
+    themes: [
+      happydesignsBrandTheme
+    ],
+    guide: happydesignsBrandGuide
+  },
   ui: {
-    colors: {
-      primary: 'green',
-      secondary: 'slate',
-      neutral: 'slate'
-    },
-    button: {
-      defaultVariants: {
-        color: 'primary'
-      }
-    }
+    ...nuxtUiAppConfig.ui
   }
 })

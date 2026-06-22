@@ -19,6 +19,10 @@ import {
   studioBrandTheme,
   testBrandThemes
 } from './fixtures'
+import {
+  happydesignsBrandGuide,
+  happydesignsBrandTheme
+} from '../themes/happydesigns'
 
 describe('brand theme contract', () => {
   it('accepts a valid theme', () => {
@@ -117,6 +121,12 @@ describe('brand guide contract', () => {
     expect(idBrandGuide.semanticColors?.primary).toBe('green')
     expect(idBrandGuide.usage?.avoid).toContain('domain behavior')
   })
+
+  it('ships a local happydesigns guide as the future brand package boundary', () => {
+    expect(happydesignsBrandGuide.packageName).toBe('@happydesigns/brand')
+    expect(happydesignsBrandGuide.semanticColors?.primary).toBe('coral')
+    expect(happydesignsBrandGuide.usage?.useFor).toContain('brand-layer migration work')
+  })
 })
 
 describe('css generation', () => {
@@ -213,6 +223,15 @@ describe('brand theme lists', () => {
     expect(themes.map(theme => theme.name)).toEqual(['studio', 'nuxt-ui', 'editorial'])
     expect(themes[0]?.label).toBe('Studio')
   })
+
+  it('keeps the local happydesigns theme runtime-safe and reversible', () => {
+    expect(happydesignsBrandTheme.name).toBe('happydesigns')
+    expect(happydesignsBrandTheme.semanticColors?.primary).toBe('coral')
+    expect(happydesignsBrandTheme.cssVariables?.light?.['--ui-bg']).toBe('#FAF7F2')
+    expect(happydesignsBrandTheme.cssVariables?.dark?.['--ui-bg']).toBe('#242423')
+    expect(happydesignsBrandTheme.ui?.button).toBeTruthy()
+    expect(happydesignsBrandTheme.ui?.card).toBeTruthy()
+  })
 })
 
 describe('runtime theme application', () => {
@@ -222,6 +241,9 @@ describe('runtime theme application', () => {
       style: {
         setProperty(name: string, value: string) {
           style.set(name, value)
+        },
+        removeProperty(name: string) {
+          style.delete(name)
         }
       }
     } as HTMLElement
@@ -250,6 +272,9 @@ describe('runtime theme application', () => {
       style: {
         setProperty(name: string, value: string) {
           style.set(name, value)
+        },
+        removeProperty(name: string) {
+          style.delete(name)
         }
       }
     } as HTMLElement
@@ -269,6 +294,9 @@ describe('runtime theme application', () => {
       style: {
         setProperty(name: string, value: string) {
           style.set(name, value)
+        },
+        removeProperty(name: string) {
+          style.delete(name)
         }
       }
     } as HTMLElement
@@ -281,5 +309,32 @@ describe('runtime theme application', () => {
     expect(neutralBrandTheme).toBe(nuxtUiBrandTheme)
     expect(style.get('--ui-text-highlighted')).toBe('#020617')
     expect(style.get('--ui-text-muted')).toBe('#64748B')
+  })
+
+  it('removes stale inline css variables when switching back to the Nuxt UI theme', () => {
+    const style = new Map<string, string>()
+    const target = {
+      style: {
+        setProperty(name: string, value: string) {
+          style.set(name, value)
+        },
+        removeProperty(name: string) {
+          style.delete(name)
+        }
+      }
+    } as HTMLElement
+
+    applyBrandTheme(happydesignsBrandTheme, {
+      target
+    })
+    expect(style.get('--ui-primary')).toBe('#F28564')
+
+    applyBrandTheme(nuxtUiBrandTheme, {
+      target
+    })
+
+    expect(style.get('--ui-bg')).toBe('white')
+    expect(style.has('--ui-primary')).toBe(false)
+    expect(style.has('--hd-text-body')).toBe(false)
   })
 })

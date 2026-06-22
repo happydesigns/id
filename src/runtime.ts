@@ -18,6 +18,8 @@ export function applyBrandTheme(theme: BrandTheme, options: ApplyBrandThemeOptio
     applyCssVariables(options.target, {
       ...typographyVariables,
       ...cssVariables
+    }, {
+      clearPrevious: true
     })
   }
 
