@@ -1,0 +1,21 @@
+import { sampleBrandGuide, sampleThemes } from '../../src/examples'
+
+export default defineAppConfig({
+  id: {
+    defaultTheme: 'neutral',
+    themes: sampleThemes,
+    guide: sampleBrandGuide
+  },
+  header: {
+    title: '@happydesigns/id'
+  },
+  ui: {
+    colors: sampleThemes[0].semanticColors,
+    button: {
+      defaultVariants: {
+        color: 'primary',
+        variant: 'solid'
+      }
+    }
+  }
+})
