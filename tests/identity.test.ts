@@ -9,7 +9,10 @@ import {
   defineBrandTheme,
   editorialBrandTheme,
   neutralBrandTheme,
+  nuxtUiBrandTheme,
   normalizeBrandThemes,
+  sampleThemes,
+  studioBrandTheme,
   validateBrandTheme
 } from '../src'
 
@@ -93,13 +96,31 @@ describe('nuxt ui app config generation', () => {
       }
     })
   })
+
+  it('keeps component defaults in generated app config', () => {
+    const config = createNuxtUiAppConfig(studioBrandTheme)
+
+    expect(config.ui).toMatchObject({
+      button: {
+        defaultVariants: {
+          color: 'primary',
+          variant: 'solid'
+        }
+      },
+      card: {
+        slots: {
+          root: expect.stringContaining('rounded-xl')
+        }
+      }
+    })
+  })
 })
 
 describe('brand theme lists', () => {
   it('dedupes merged app-config themes by name with the latest theme winning', () => {
     const customNeutral = defineBrandTheme({
       ...neutralBrandTheme,
-      label: 'Custom Neutral'
+      label: 'Custom Nuxt UI'
     })
 
     const themes = normalizeBrandThemes([
@@ -108,8 +129,19 @@ describe('brand theme lists', () => {
       editorialBrandTheme
     ])
 
-    expect(themes.map(theme => theme.name)).toEqual(['neutral', 'editorial'])
-    expect(themes[0]?.label).toBe('Custom Neutral')
+    expect(themes.map(theme => theme.name)).toEqual(['nuxt-ui', 'editorial'])
+    expect(themes[0]?.label).toBe('Custom Nuxt UI')
+  })
+
+  it('ships sample themes with light and dark tokens plus component defaults', () => {
+    expect(sampleThemes.map(theme => theme.name)).toEqual(['nuxt-ui', 'editorial', 'studio'])
+
+    for (const theme of sampleThemes) {
+      expect(theme.cssVariables?.light?.['--ui-bg']).toBeTruthy()
+      expect(theme.cssVariables?.dark?.['--ui-bg']).toBeTruthy()
+      expect(theme.ui?.button).toBeTruthy()
+      expect(theme.ui?.card).toBeTruthy()
+    }
   })
 })
 
@@ -176,6 +208,7 @@ describe('runtime theme application', () => {
     })
 
     expect(style.get('--ui-bg')).toBe('white')
+    expect(neutralBrandTheme).toBe(nuxtUiBrandTheme)
     expect(style.get('--ui-text-highlighted')).toBe('#020617')
     expect(style.get('--ui-text-muted')).toBe('#64748B')
   })

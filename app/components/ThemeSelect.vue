@@ -24,6 +24,7 @@ const selectedTheme = computed<string>({
     value-key="value"
     label-key="label"
     placeholder="Select theme"
-    class="min-w-44"
+    aria-label="Theme"
+    class="w-36 sm:w-44"
   />
 </template>

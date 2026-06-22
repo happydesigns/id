@@ -1,14 +1,14 @@
-import { neutralBrandTheme } from '../src/examples'
+import { nuxtUiBrandTheme } from '../src/examples'
 
 export default defineAppConfig({
   id: {
-    defaultTheme: neutralBrandTheme.name,
+    defaultTheme: nuxtUiBrandTheme.name,
     themes: [
-      neutralBrandTheme
+      nuxtUiBrandTheme
     ]
   },
   ui: {
-    colors: neutralBrandTheme.semanticColors,
+    colors: nuxtUiBrandTheme.semanticColors,
     button: {
       defaultVariants: {
         color: 'primary',

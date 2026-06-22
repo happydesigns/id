@@ -6,8 +6,10 @@ export {
 export {
   editorialBrandTheme,
   neutralBrandTheme,
+  nuxtUiBrandTheme,
   sampleBrandGuide,
-  sampleThemes
+  sampleThemes,
+  studioBrandTheme
 } from './examples'
 export { createNuxtUiAppConfig } from './nuxt-ui'
 export { applyBrandTheme } from './runtime'

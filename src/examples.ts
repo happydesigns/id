@@ -1,12 +1,70 @@
 import { defineBrandGuide, defineBrandTheme } from './validation'
 
-export const neutralBrandTheme = defineBrandTheme({
-  name: 'neutral',
-  label: 'Neutral',
-  description: 'A quiet neutral baseline for brand-neutral Nuxt UI applications.',
+const nuxtUiComponentDefaults = {
+  button: {
+    slots: {
+      base: 'rounded-md font-medium'
+    },
+    defaultVariants: {
+      color: 'primary',
+      variant: 'solid',
+      size: 'md'
+    }
+  },
+  card: {
+    slots: {
+      root: 'rounded-lg shadow-none',
+      header: 'p-4 sm:px-6',
+      body: 'p-4 sm:p-6',
+      footer: 'p-4 sm:px-6'
+    },
+    defaultVariants: {
+      variant: 'outline'
+    }
+  },
+  input: {
+    slots: {
+      base: 'rounded-md'
+    },
+    defaultVariants: {
+      color: 'primary',
+      variant: 'outline',
+      size: 'md'
+    }
+  },
+  badge: {
+    slots: {
+      base: 'rounded-md font-medium'
+    },
+    defaultVariants: {
+      color: 'primary',
+      variant: 'subtle',
+      size: 'md'
+    }
+  },
+  alert: {
+    slots: {
+      root: 'rounded-lg'
+    },
+    defaultVariants: {
+      variant: 'subtle'
+    }
+  },
+  table: {
+    slots: {
+      th: 'font-semibold text-muted',
+      td: 'text-default'
+    }
+  }
+}
+
+export const nuxtUiBrandTheme = defineBrandTheme({
+  name: 'nuxt-ui',
+  label: 'Nuxt UI',
+  description: 'A default Nuxt UI baseline with standard semantic colors, radius, surfaces, and component defaults.',
   semanticColors: {
-    primary: 'blue',
-    secondary: 'slate',
+    primary: 'green',
+    secondary: 'blue',
     success: 'green',
     info: 'sky',
     warning: 'amber',
@@ -31,12 +89,13 @@ export const neutralBrandTheme = defineBrandTheme({
       '--ui-text-inverted': 'white',
       '--ui-border': '#E2E8F0',
       '--ui-border-muted': '#F1F5F9',
+      '--ui-border-accented': '#CBD5E1',
       '--ui-radius': '0.375rem'
     },
     dark: {
       '--ui-bg': '#020617',
       '--ui-bg-muted': '#0F172A',
-      '--ui-bg-elevated': '#0F172A',
+      '--ui-bg-elevated': '#111827',
       '--ui-bg-accented': '#1E293B',
       '--ui-bg-inverted': 'white',
       '--ui-text': '#E2E8F0',
@@ -45,32 +104,24 @@ export const neutralBrandTheme = defineBrandTheme({
       '--ui-text-dimmed': '#64748B',
       '--ui-text-inverted': '#020617',
       '--ui-border': '#1E293B',
-      '--ui-border-muted': '#0F172A'
+      '--ui-border-muted': '#0F172A',
+      '--ui-border-accented': '#334155',
+      '--ui-radius': '0.375rem'
     }
   },
-  ui: {
-    button: {
-      defaultVariants: {
-        color: 'primary',
-        variant: 'solid'
-      }
-    },
-    card: {
-      slots: {
-        root: 'rounded-lg shadow-none'
-      }
-    }
-  }
+  ui: nuxtUiComponentDefaults
 })
+
+export const neutralBrandTheme = nuxtUiBrandTheme
 
 export const editorialBrandTheme = defineBrandTheme({
   name: 'editorial',
   label: 'Editorial',
-  description: 'A warmer editorial sample theme that demonstrates runtime CSS variable switching.',
+  description: 'A crisp editorial theme with warm paper surfaces, serif typography, tighter radius, and quieter controls.',
   semanticColors: {
     primary: 'orange',
     secondary: 'teal',
-    success: 'green',
+    success: 'emerald',
     info: 'cyan',
     warning: 'amber',
     error: 'rose',
@@ -84,7 +135,7 @@ export const editorialBrandTheme = defineBrandTheme({
     light: {
       '--ui-bg': '#FFFCF7',
       '--ui-bg-muted': '#F7EFE4',
-      '--ui-bg-elevated': '#F2E6D6',
+      '--ui-bg-elevated': '#FFF8ED',
       '--ui-bg-accented': '#E5D3BF',
       '--ui-bg-inverted': '#211B16',
       '--ui-text': '#43382F',
@@ -94,6 +145,7 @@ export const editorialBrandTheme = defineBrandTheme({
       '--ui-text-inverted': '#FFFCF7',
       '--ui-border': '#D8C5B0',
       '--ui-border-muted': '#E8DACB',
+      '--ui-border-accented': '#C7A98A',
       '--ui-radius': '0.25rem'
     },
     dark: {
@@ -108,19 +160,175 @@ export const editorialBrandTheme = defineBrandTheme({
       '--ui-text-dimmed': '#A48F7C',
       '--ui-text-inverted': '#211B16',
       '--ui-border': '#4A3F35',
-      '--ui-border-muted': '#352D25'
+      '--ui-border-muted': '#352D25',
+      '--ui-border-accented': '#6A5849',
+      '--ui-radius': '0.25rem'
     }
   },
   ui: {
     button: {
+      slots: {
+        base: 'rounded-sm font-semibold tracking-wide'
+      },
       defaultVariants: {
         color: 'primary',
-        variant: 'solid'
+        variant: 'solid',
+        size: 'md'
       }
     },
     card: {
       slots: {
-        root: 'rounded-sm shadow-none'
+        root: 'rounded-sm shadow-none',
+        header: 'px-5 py-4',
+        body: 'px-5 py-5',
+        footer: 'px-5 py-4'
+      },
+      defaultVariants: {
+        variant: 'subtle'
+      }
+    },
+    input: {
+      slots: {
+        base: 'rounded-sm bg-default'
+      },
+      defaultVariants: {
+        color: 'primary',
+        variant: 'subtle',
+        size: 'md'
+      }
+    },
+    badge: {
+      slots: {
+        base: 'rounded-sm font-semibold uppercase tracking-wide'
+      },
+      defaultVariants: {
+        color: 'primary',
+        variant: 'subtle',
+        size: 'sm'
+      }
+    },
+    alert: {
+      slots: {
+        root: 'rounded-sm ring-1 ring-current/10'
+      },
+      defaultVariants: {
+        variant: 'subtle'
+      }
+    },
+    table: {
+      slots: {
+        th: 'font-semibold uppercase tracking-wide text-dimmed',
+        td: 'text-default'
+      }
+    }
+  }
+})
+
+export const studioBrandTheme = defineBrandTheme({
+  name: 'studio',
+  label: 'Studio',
+  description: 'A polished studio theme with cool glassy surfaces, rounded controls, and a high-contrast teal system.',
+  semanticColors: {
+    primary: 'teal',
+    secondary: 'rose',
+    success: 'emerald',
+    info: 'cyan',
+    warning: 'amber',
+    error: 'red',
+    neutral: 'zinc'
+  },
+  typography: {
+    sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
+    mono: 'JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+  },
+  cssVariables: {
+    light: {
+      '--ui-bg': '#F6F8FB',
+      '--ui-bg-muted': '#EAF7F4',
+      '--ui-bg-elevated': '#FFFFFF',
+      '--ui-bg-accented': '#D7F0EA',
+      '--ui-bg-inverted': '#061412',
+      '--ui-text': '#223532',
+      '--ui-text-highlighted': '#061412',
+      '--ui-text-muted': '#5B746F',
+      '--ui-text-dimmed': '#8FA6A1',
+      '--ui-text-inverted': '#F6F8FB',
+      '--ui-border': '#C6DED8',
+      '--ui-border-muted': '#DDEAE7',
+      '--ui-border-accented': '#8CC8BC',
+      '--ui-radius': '0.75rem'
+    },
+    dark: {
+      '--ui-bg': '#071412',
+      '--ui-bg-muted': '#0D211E',
+      '--ui-bg-elevated': '#12302B',
+      '--ui-bg-accented': '#1D4D44',
+      '--ui-bg-inverted': '#F6F8FB',
+      '--ui-text': '#DDEBE8',
+      '--ui-text-highlighted': '#FFFFFF',
+      '--ui-text-muted': '#A7C4BE',
+      '--ui-text-dimmed': '#73968F',
+      '--ui-text-inverted': '#071412',
+      '--ui-border': '#28655B',
+      '--ui-border-muted': '#173A34',
+      '--ui-border-accented': '#38A692',
+      '--ui-radius': '0.75rem'
+    }
+  },
+  ui: {
+    button: {
+      slots: {
+        base: 'rounded-xl font-semibold shadow-sm shadow-primary/10'
+      },
+      defaultVariants: {
+        color: 'primary',
+        variant: 'solid',
+        size: 'md'
+      }
+    },
+    card: {
+      slots: {
+        root: 'rounded-xl bg-default/80 shadow-lg shadow-primary/5 ring ring-default backdrop-blur',
+        header: 'px-5 py-4',
+        body: 'px-5 py-5',
+        footer: 'px-5 py-4'
+      },
+      defaultVariants: {
+        variant: 'outline'
+      }
+    },
+    input: {
+      slots: {
+        base: 'rounded-xl bg-default/90'
+      },
+      defaultVariants: {
+        color: 'primary',
+        variant: 'outline',
+        size: 'md'
+      }
+    },
+    badge: {
+      slots: {
+        base: 'rounded-full font-semibold'
+      },
+      defaultVariants: {
+        color: 'primary',
+        variant: 'soft',
+        size: 'md'
+      }
+    },
+    alert: {
+      slots: {
+        root: 'rounded-xl bg-elevated/80 ring ring-default'
+      },
+      defaultVariants: {
+        variant: 'subtle'
+      }
+    },
+    table: {
+      slots: {
+        th: 'font-semibold text-muted',
+        td: 'text-default'
       }
     }
   }
@@ -133,21 +341,27 @@ export const sampleBrandGuide = defineBrandGuide({
   description: 'A complete sample brand guide used to demonstrate the @happydesigns/id contract.',
   palette: {
     brand: {
-      50: '#FFF7ED',
-      500: '#F97316',
-      950: '#431407'
+      50: '#ECFDF5',
+      500: '#14B8A6',
+      950: '#042F2E'
+    },
+    accent: {
+      50: '#FFF1F2',
+      500: '#F43F5E',
+      950: '#4C0519'
     },
     neutral: {
-      50: '#FAFAF9',
-      500: '#78716C',
-      950: '#1C1917'
+      50: '#FAFAFA',
+      500: '#71717A',
+      950: '#09090B'
     }
   },
-  semanticColors: editorialBrandTheme.semanticColors,
-  cssVariables: editorialBrandTheme.cssVariables,
-  typography: editorialBrandTheme.typography,
+  semanticColors: studioBrandTheme.semanticColors,
+  cssVariables: studioBrandTheme.cssVariables,
+  typography: studioBrandTheme.typography,
+  ui: studioBrandTheme.ui,
   voice: {
-    attributes: ['clear', 'direct', 'warm'],
+    attributes: ['clear', 'direct', 'polished'],
     dos: ['Name the user action directly.', 'Explain identity decisions through reusable rules.'],
     donts: ['Do not hide product behavior behind brand language.']
   },
@@ -155,12 +369,17 @@ export const sampleBrandGuide = defineBrandGuide({
     {
       family: 'Actions',
       components: ['UButton', 'UBadge', 'UDropdownMenu'],
-      status: 'documented'
+      status: 'verified'
     },
     {
       family: 'Forms',
       components: ['UInput', 'UTextarea', 'USelect', 'UCheckbox'],
-      status: 'tokenized'
+      status: 'verified'
+    },
+    {
+      family: 'Surfaces',
+      components: ['UCard', 'UAlert', 'UTable', 'UHeader'],
+      status: 'verified'
     }
   ],
   usage: {
@@ -171,6 +390,7 @@ export const sampleBrandGuide = defineBrandGuide({
 })
 
 export const sampleThemes = [
-  neutralBrandTheme,
-  editorialBrandTheme
+  nuxtUiBrandTheme,
+  editorialBrandTheme,
+  studioBrandTheme
 ]

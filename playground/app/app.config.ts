@@ -2,7 +2,7 @@ import { sampleBrandGuide, sampleThemes } from '../../src/examples'
 
 export default defineAppConfig({
   id: {
-    defaultTheme: 'neutral',
+    defaultTheme: 'nuxt-ui',
     themes: sampleThemes,
     guide: sampleBrandGuide
   },
