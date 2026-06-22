@@ -16,6 +16,7 @@
     "app/plugins/**/*.ts",
     "app/types/**/*.d.ts",
     "src/**/*.ts",
+    "templates/**/*.vue",
     "themes/**/*.ts",
     "tests/**/*.ts",
     "module.ts",
