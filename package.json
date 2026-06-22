@@ -16,6 +16,7 @@
     ".": "./src/index.ts",
     "./module": "./module.ts",
     "./nuxt": "./nuxt.config.ts",
+    "./defaults": "./src/defaults.ts",
     "./schema": "./src/schema.ts",
     "./examples": "./src/examples.ts"
   },

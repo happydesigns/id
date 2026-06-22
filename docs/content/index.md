@@ -75,7 +75,7 @@ description: Use a full brand layer when the brand owns assets, app shell, docs 
   Optional runtime themes
 
   #description
-  Switch CSS variables and Nuxt UI app-config defaults quickly when all required classes, components, and assets already ship with the app.
+  Switch CSS variables and Nuxt UI app-config defaults quickly when an app intentionally ships more than one stable theme.
   :::
 
   :::u-page-feature
@@ -123,7 +123,7 @@ description: id should feel like a small layer on top of Nuxt UI, not a competin
     Typed contracts
 
     #description
-    Define brand guides and a primary brand theme with TypeScript helpers and validation at the package boundary.
+    Define brand guides and a primary brand theme with TypeScript helpers, starting from the included Nuxt UI baseline when that is enough.
     ::::
 
     ::::u-page-card{icon="i-lucide-terminal" to="/guides/templates"}

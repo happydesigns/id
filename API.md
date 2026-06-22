@@ -16,6 +16,8 @@ The root package exports:
 - `normalizeBrandThemes(themes?)`
 - `resolveBrandThemes(config?)`
 - `applyBrandTheme(theme, options?)`
+- `nuxtUiBrandTheme`
+- `idBrandGuide`
 - brand-guide and brand-theme types
 
 ## Nuxt Layer

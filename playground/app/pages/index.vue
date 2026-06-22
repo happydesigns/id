@@ -6,7 +6,7 @@ defineOptions({
 const brandTheme = useBrandTheme()
 
 const formState = reactive({
-  name: 'Sample Brand',
+  name: 'happydesigns id',
   email: 'hello@example.com',
   approved: true
 })
@@ -84,8 +84,8 @@ const rows = [
         <UMain>
           <UPageHero
             headline="@happydesigns/id"
-            title="Nuxt UI identity runtime"
-            description="Switch already shipped brand themes while the page keeps using standard Nuxt UI components, semantic utilities, app config, and light or dark color mode."
+            title="Nuxt UI identity baseline"
+            description="Inspect the default @happydesigns/id baseline using standard Nuxt UI components, semantic utilities, app config, and light or dark color mode."
           >
             <template #links>
               <UButton
@@ -106,8 +106,8 @@ const rows = [
           </UPageHero>
 
           <UPageSection
-            title="Runtime theme surface"
-            description="The same Nuxt UI markup responds to CSS variables, app-config defaults, and color mode."
+            title="Identity surface"
+            description="Standard Nuxt UI markup responds to the shipped CSS variables, app-config defaults, and color mode."
           >
             <UPageGrid>
               <UPageCard
@@ -185,7 +185,7 @@ const rows = [
 
                   <UCheckbox
                     v-model="formState.approved"
-                    label="Approved for runtime switching"
+                    label="Token-driven through app config"
                   />
                 </UForm>
               </UPageCard>
@@ -204,8 +204,8 @@ const rows = [
                   <UAlert
                     color="warning"
                     variant="subtle"
-                    title="Runtime limit"
-                    description="Uncompiled classes and custom components still need a build-time layer."
+                    title="Brand layer boundary"
+                    description="Assets, layouts, and custom components still belong in a build-time brand layer."
                   />
                 </div>
               </UPageCard>
@@ -214,7 +214,7 @@ const rows = [
 
           <UPageSection
             title="Component defaults"
-            description="Theme packs can also tune stable Nuxt UI component defaults through app config."
+            description="The shipped baseline keeps component defaults close to Nuxt UI while making brand-layer overrides explicit."
           >
             <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
               <UCard>
@@ -272,7 +272,7 @@ const rows = [
 
                 <div class="space-y-4">
                   <p class="text-sm text-muted">
-                    A brand layer can replace this with logos, layouts, and richer primitives. A runtime theme should only adjust stable values.
+                    A brand layer can replace this with logos, layouts, and richer primitives. The default baseline stays neutral and token-driven.
                   </p>
 
                   <div class="rounded-lg border border-default bg-default p-4">

@@ -19,6 +19,7 @@ const selectedTheme = computed<string>({
 
 <template>
   <USelect
+    v-if="items.length > 1"
     v-model="selectedTheme"
     :items="items"
     value-key="value"

@@ -7,15 +7,18 @@ import {
   createThemeCssVars,
   defineBrandGuide,
   defineBrandTheme,
-  editorialBrandTheme,
+  idBrandGuide,
   neutralBrandTheme,
   nuxtUiBrandTheme,
   normalizeBrandThemes,
   resolveBrandThemes,
-  sampleThemes,
-  studioBrandTheme,
   validateBrandTheme
 } from '../src'
+import {
+  editorialBrandTheme,
+  studioBrandTheme,
+  testBrandThemes
+} from './fixtures'
 
 describe('brand theme contract', () => {
   it('accepts a valid theme', () => {
@@ -64,6 +67,12 @@ describe('brand guide contract', () => {
     })
 
     expect(guide.usage?.avoid).toContain('domain behavior')
+  })
+
+  it('ships an id brand guide for the default Nuxt UI baseline', () => {
+    expect(idBrandGuide.name).toBe('happydesigns-id')
+    expect(idBrandGuide.semanticColors?.primary).toBe('green')
+    expect(idBrandGuide.usage?.avoid).toContain('domain behavior')
   })
 })
 
@@ -134,10 +143,10 @@ describe('brand theme lists', () => {
     expect(themes[0]?.label).toBe('Custom Nuxt UI')
   })
 
-  it('ships sample themes with light and dark tokens plus component defaults', () => {
-    expect(sampleThemes.map(theme => theme.name)).toEqual(['nuxt-ui', 'editorial', 'studio'])
+  it('keeps theme fixtures covered with light and dark tokens plus component defaults', () => {
+    expect(testBrandThemes.map(theme => theme.name)).toEqual(['nuxt-ui', 'editorial', 'studio'])
 
-    for (const theme of sampleThemes) {
+    for (const theme of testBrandThemes) {
       expect(theme.cssVariables?.light?.['--ui-bg']).toBeTruthy()
       expect(theme.cssVariables?.dark?.['--ui-bg']).toBeTruthy()
       expect(theme.ui?.button).toBeTruthy()

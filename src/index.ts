@@ -4,13 +4,10 @@ export {
   createThemeCssVars
 } from './css'
 export {
-  editorialBrandTheme,
+  idBrandGuide,
   neutralBrandTheme,
-  nuxtUiBrandTheme,
-  sampleBrandGuide,
-  sampleThemes,
-  studioBrandTheme
-} from './examples'
+  nuxtUiBrandTheme
+} from './defaults'
 export { createNuxtUiAppConfig } from './nuxt-ui'
 export { applyBrandTheme } from './runtime'
 export { brandGuideSchema, brandThemeSchema } from './schema'

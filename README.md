@@ -7,6 +7,7 @@ Reusable identity system for brand guides, Nuxt UI defaults, and Nuxt brand laye
 ## What it provides
 
 - Typed brand-guide and primary brand-theme contracts.
+- A neutral Nuxt UI baseline through `nuxtUiBrandTheme` and `idBrandGuide`.
 - Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
 - CSS variable generation for light and dark themes.
 - Nuxt UI app-config helpers for semantic colors and component defaults.
@@ -46,6 +47,8 @@ export default defineNuxtConfig({
 - Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
 - A primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
 - Optional runtime theme lists for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
+
+The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes.
 
 Runtime themes are intentionally lightweight. They do not load arbitrary remote Vue components, uncompiled Tailwind classes, domain behavior, credentials, APIs, or server runtime changes.
 
