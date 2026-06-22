@@ -1,9 +1,28 @@
-import { defineNuxtPlugin, useHead } from '#imports'
+import { defineNuxtPlugin, useHead, watch } from '#imports'
 import { createThemeCssVars } from '../../src'
 import { useBrandTheme } from '../composables/useBrandTheme'
 
 export default defineNuxtPlugin(() => {
   const brandTheme = useBrandTheme()
+
+  function updateThemeStyleElement(theme: NonNullable<typeof brandTheme.currentTheme.value>) {
+    const styleElement = document.getElementById('happydesigns-id-theme')
+
+    if (styleElement) {
+      styleElement.textContent = createThemeCssVars(theme)
+    }
+  }
+
+  function syncClientTheme() {
+    const theme = brandTheme.currentTheme.value
+
+    if (!theme) {
+      return
+    }
+
+    brandTheme.applyTheme(theme)
+    updateThemeStyleElement(theme)
+  }
 
   if (brandTheme.currentTheme.value) {
     if (import.meta.server) {
@@ -18,7 +37,12 @@ export default defineNuxtPlugin(() => {
     }
 
     if (import.meta.client) {
-      brandTheme.setTheme(brandTheme.currentTheme.value.name)
+      watch(() => brandTheme.currentTheme.value, syncClientTheme, { immediate: true })
+
+      new MutationObserver(syncClientTheme).observe(document.documentElement, {
+        attributeFilter: ['class'],
+        attributes: true
+      })
     }
   }
 

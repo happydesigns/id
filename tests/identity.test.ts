@@ -160,4 +160,23 @@ describe('runtime theme application', () => {
     expect(style.get('--ui-bg')).toBe('#211B16')
     expect(style.get('--font-sans')).toContain('Georgia')
   })
+
+  it('applies visible neutral surface text tokens', () => {
+    const style = new Map<string, string>()
+    const target = {
+      style: {
+        setProperty(name: string, value: string) {
+          style.set(name, value)
+        }
+      }
+    } as HTMLElement
+
+    applyBrandTheme(neutralBrandTheme, {
+      target
+    })
+
+    expect(style.get('--ui-bg')).toBe('white')
+    expect(style.get('--ui-text-highlighted')).toBe('#020617')
+    expect(style.get('--ui-text-muted')).toBe('#64748B')
+  })
 })

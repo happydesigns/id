@@ -10,7 +10,7 @@ const items = computed(() => brandTheme.themes.value.map(theme => ({
 })))
 
 const selectedTheme = computed<string>({
-  get: () => brandTheme.currentName.value,
+  get: () => brandTheme.selectedName.value,
   set: (value) => {
     brandTheme.setTheme(value)
   }
@@ -23,6 +23,7 @@ const selectedTheme = computed<string>({
     :items="items"
     value-key="value"
     label-key="label"
+    placeholder="Select theme"
     class="min-w-44"
   />
 </template>

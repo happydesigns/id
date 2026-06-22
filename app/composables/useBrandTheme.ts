@@ -16,6 +16,10 @@ function resolveInitialThemeName(config: IdentityAppConfig) {
   return config.id?.defaultTheme ?? themes[0]?.name ?? ''
 }
 
+function resolveTheme(themes: BrandTheme[], name: string) {
+  return themes.find(theme => theme.name === name) ?? themes[0]
+}
+
 function resolveDocumentMode() {
   return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
 }
@@ -25,7 +29,8 @@ export function useBrandTheme() {
   const currentName = useState<string>('happydesigns:id:theme', () => resolveInitialThemeName(appConfig))
 
   const themes = computed(() => getThemeList(appConfig))
-  const currentTheme = computed(() => themes.value.find(theme => theme.name === currentName.value))
+  const currentTheme = computed(() => resolveTheme(themes.value, currentName.value))
+  const selectedName = computed(() => currentTheme.value?.name ?? '')
 
   function setTheme(name: string) {
     const theme = themes.value.find(item => item.name === name)
@@ -66,6 +71,7 @@ export function useBrandTheme() {
   return {
     themes,
     currentName,
+    selectedName,
     currentTheme,
     setTheme,
     applyTheme

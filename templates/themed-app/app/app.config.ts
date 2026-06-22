@@ -15,15 +15,15 @@ const defaultTheme = defineBrandTheme({
   cssVariables: {
     light: {
       '--ui-bg': 'white',
-      '--ui-text': 'var(--ui-color-slate-700)',
-      '--ui-text-highlighted': 'var(--ui-color-slate-950)',
-      '--ui-border': 'var(--ui-color-slate-200)'
+      '--ui-text': '#334155',
+      '--ui-text-highlighted': '#020617',
+      '--ui-border': '#E2E8F0'
     },
     dark: {
-      '--ui-bg': 'var(--ui-color-slate-950)',
-      '--ui-text': 'var(--ui-color-slate-200)',
+      '--ui-bg': '#020617',
+      '--ui-text': '#E2E8F0',
       '--ui-text-highlighted': 'white',
-      '--ui-border': 'var(--ui-color-slate-800)'
+      '--ui-border': '#1E293B'
     }
   }
 })
