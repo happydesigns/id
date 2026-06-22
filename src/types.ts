@@ -46,11 +46,24 @@ export type BrandAsset = {
   alt?: string
 }
 
+export type BrandLogoRole =
+  | 'logo'
+  | 'wordmark'
+  | 'wordmarkInverse'
+  | 'symbol'
+  | 'symbolInverse'
+  | 'mark'
+  | 'appIcon'
+  | (string & {})
+
 export type BrandLogoSet = {
+  [role: string]: BrandAsset | undefined
+  logo?: BrandAsset
   wordmark?: BrandAsset
   wordmarkInverse?: BrandAsset
   symbol?: BrandAsset
   symbolInverse?: BrandAsset
+  mark?: BrandAsset
   appIcon?: BrandAsset
 }
 

@@ -20,6 +20,7 @@ export type {
   BrandComponentCoverage,
   BrandCssVariables,
   BrandGuide,
+  BrandLogoRole,
   BrandLogoSet,
   BrandPalette,
   BrandRuntimeConfig,

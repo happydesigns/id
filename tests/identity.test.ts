@@ -69,6 +69,49 @@ describe('brand guide contract', () => {
     expect(guide.usage?.avoid).toContain('domain behavior')
   })
 
+  it('accepts arbitrary logo roles and validates their assets', () => {
+    const guide = defineBrandGuide({
+      name: 'client-brand',
+      title: 'Client Brand',
+      description: 'A documented identity system.',
+      assets: {
+        logos: {
+          crest: {
+            name: 'Client crest',
+            src: '/brand/crest.svg',
+            role: 'crest',
+            alt: 'Client Brand'
+          },
+          'partner-lockup': {
+            name: 'Partner lockup',
+            src: '/brand/partner-lockup.svg',
+            role: 'partner-lockup'
+          }
+        }
+      }
+    })
+
+    expect(guide.assets?.logos?.crest?.src).toBe('/brand/crest.svg')
+    expect(guide.assets?.logos?.['partner-lockup']?.role).toBe('partner-lockup')
+  })
+
+  it('rejects invalid assets behind custom logo roles', () => {
+    expect(() => defineBrandGuide({
+      name: 'client-brand',
+      title: 'Client Brand',
+      description: 'A documented identity system.',
+      assets: {
+        logos: {
+          crest: {
+            name: 'Client crest',
+            src: '',
+            role: 'crest'
+          }
+        }
+      }
+    })).toThrow(BrandValidationError)
+  })
+
   it('ships an id brand guide for the default Nuxt UI baseline', () => {
     expect(idBrandGuide.name).toBe('happydesigns-id')
     expect(idBrandGuide.semanticColors?.primary).toBe('green')

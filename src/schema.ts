@@ -23,13 +23,7 @@ const assetSchema = z.object({
   alt: z.string().optional()
 })
 
-const logoSetSchema = z.object({
-  wordmark: assetSchema.optional(),
-  wordmarkInverse: assetSchema.optional(),
-  symbol: assetSchema.optional(),
-  symbolInverse: assetSchema.optional(),
-  appIcon: assetSchema.optional()
-})
+const logoSetSchema = z.record(z.string().min(1), assetSchema)
 
 const colorScaleSchema = z.object({
   50: z.string().min(1).optional(),
