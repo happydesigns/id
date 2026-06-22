@@ -4,7 +4,7 @@ export default defineAppConfig({
     description: 'Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for Nuxt projects.'
   },
   header: {
-    title: 'happydesigns id'
+    title: '@happydesigns/id'
   },
   navigation: {
     sub: 'header'
@@ -23,7 +23,7 @@ export default defineAppConfig({
   },
   ui: {
     colors: {
-      primary: 'blue',
+      primary: 'green',
       secondary: 'slate',
       neutral: 'slate'
     },
