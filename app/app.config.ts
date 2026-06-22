@@ -1,24 +1,11 @@
-import { nuxtUiBrandTheme } from '../src/examples'
+import { createNuxtUiAppConfig, nuxtUiBrandTheme } from '../src'
+
+const nuxtUiConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
 
 export default defineAppConfig({
   id: {
-    defaultTheme: nuxtUiBrandTheme.name,
-    themes: [
-      nuxtUiBrandTheme
-    ]
+    name: 'happydesigns-id',
+    theme: nuxtUiBrandTheme
   },
-  ui: {
-    colors: nuxtUiBrandTheme.semanticColors,
-    button: {
-      defaultVariants: {
-        color: 'primary',
-        variant: 'solid'
-      }
-    },
-    card: {
-      slots: {
-        root: 'rounded-lg shadow-none'
-      }
-    }
-  }
+  ui: nuxtUiConfig.ui
 })

@@ -1,23 +1,13 @@
+import { createNuxtUiAppConfig } from '@happydesigns/id'
 import { brandGuide, brandTheme } from '../brand.config'
+
+const nuxtUiConfig = createNuxtUiAppConfig(brandTheme)
 
 export default defineAppConfig({
   id: {
-    defaultTheme: brandTheme.name,
-    themes: [brandTheme],
+    name: brandTheme.name,
+    theme: brandTheme,
     guide: brandGuide
   },
-  ui: {
-    colors: brandTheme.semanticColors,
-    button: {
-      defaultVariants: {
-        color: 'primary',
-        variant: 'solid'
-      }
-    },
-    card: {
-      slots: {
-        root: 'rounded-md shadow-none'
-      }
-    }
-  }
+  ui: nuxtUiConfig.ui
 })

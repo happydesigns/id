@@ -1,4 +1,4 @@
-import { defineBrandTheme } from '@happydesigns/id'
+import { createNuxtUiAppConfig, defineBrandTheme } from '@happydesigns/id'
 
 const defaultTheme = defineBrandTheme({
   name: 'app-theme',
@@ -28,12 +28,12 @@ const defaultTheme = defineBrandTheme({
   }
 })
 
+const nuxtUiConfig = createNuxtUiAppConfig(defaultTheme)
+
 export default defineAppConfig({
   id: {
-    defaultTheme: defaultTheme.name,
-    themes: [defaultTheme]
+    name: defaultTheme.name,
+    theme: defaultTheme
   },
-  ui: {
-    colors: defaultTheme.semanticColors
-  }
+  ui: nuxtUiConfig.ui
 })

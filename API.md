@@ -14,12 +14,13 @@ The root package exports:
 - `createThemeCssDeclarations(theme, mode?)`
 - `createNuxtUiAppConfig(theme)`
 - `normalizeBrandThemes(themes?)`
+- `resolveBrandThemes(config?)`
 - `applyBrandTheme(theme, options?)`
-- brand-guide and theme-pack types
+- brand-guide and brand-theme types
 
 ## Nuxt Layer
 
-Use the layer when a project wants the default identity runtime:
+Use the layer when a brand repository wants the default identity runtime:
 
 ```ts [nuxt.config.ts]
 export default defineNuxtConfig({
@@ -35,26 +36,25 @@ Use the module when a project wants explicit module options:
 export default defineNuxtConfig({
   modules: ['@happydesigns/id/module'],
   id: {
-    defaultTheme: 'client',
-    themes: []
+    name: 'client'
   }
 })
 ```
 
 ## App Config Contract
 
-Runtime themes are provided through app config:
+Brand layers expose their public identity contract through app config:
 
 ```ts [app.config.ts]
 export default defineAppConfig({
   id: {
-    defaultTheme: 'client',
-    themes: []
+    name: 'client',
+    theme: clientTheme
   }
 })
 ```
 
-The runtime reads `id.themes`, applies CSS variables to the document root, and updates Nuxt UI app config with the selected theme.
+The runtime reads `id.theme`, applies CSS variables to the document root, and can update Nuxt UI app config with the selected theme. Apps that intentionally ship a runtime picker may also provide `id.themes[]` and `id.defaultTheme`.
 
 ## Stability
 

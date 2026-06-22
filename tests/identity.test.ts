@@ -11,6 +11,7 @@ import {
   neutralBrandTheme,
   nuxtUiBrandTheme,
   normalizeBrandThemes,
+  resolveBrandThemes,
   sampleThemes,
   studioBrandTheme,
   validateBrandTheme
@@ -142,6 +143,23 @@ describe('brand theme lists', () => {
       expect(theme.ui?.button).toBeTruthy()
       expect(theme.ui?.card).toBeTruthy()
     }
+  })
+
+  it('uses id.theme as the primary brand theme before optional runtime themes', () => {
+    const themes = resolveBrandThemes({
+      theme: studioBrandTheme,
+      themes: [
+        nuxtUiBrandTheme,
+        editorialBrandTheme,
+        {
+          ...studioBrandTheme,
+          label: 'Duplicate Studio'
+        }
+      ]
+    })
+
+    expect(themes.map(theme => theme.name)).toEqual(['studio', 'nuxt-ui', 'editorial'])
+    expect(themes[0]?.label).toBe('Studio')
   })
 })
 

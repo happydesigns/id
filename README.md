@@ -1,12 +1,12 @@
 # @happydesigns/id
 
-Reusable identity system for brand guides, Nuxt UI theme packs, and Nuxt brand layers.
+Reusable identity system for brand guides, Nuxt UI defaults, and Nuxt brand layers.
 
 `@happydesigns/id` defines how a brand is described, validated, documented, and applied to Nuxt projects. It is the reusable identity mechanism between `@happydesigns/ui` and concrete brand layers such as `@happydesigns/brand`.
 
 ## What it provides
 
-- Typed brand-guide and theme-pack contracts.
+- Typed brand-guide and primary brand-theme contracts.
 - Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
 - CSS variable generation for light and dark themes.
 - Nuxt UI app-config helpers for semantic colors and component defaults.
@@ -20,7 +20,7 @@ Reusable identity system for brand guides, Nuxt UI theme packs, and Nuxt brand l
 pnpm add @happydesigns/id
 ```
 
-Use the Nuxt layer when a project wants the default identity runtime:
+Use the Nuxt layer when a brand repository wants the default identity runtime:
 
 ```ts [nuxt.config.ts]
 export default defineNuxtConfig({
@@ -34,18 +34,18 @@ Use the module when a project wants explicit module options:
 export default defineNuxtConfig({
   modules: ['@happydesigns/id/module'],
   id: {
-    defaultTheme: 'client',
-    themes: []
+    name: 'client'
   }
 })
 ```
 
 ## Branding model
 
-`id` supports two complementary paths:
+`id` supports a brand-layer-first model:
 
 - Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
-- Runtime theme packs for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
+- A primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
+- Optional runtime theme lists for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
 
 Runtime themes are intentionally lightweight. They do not load arbitrary remote Vue components, uncompiled Tailwind classes, domain behavior, credentials, APIs, or server runtime changes.
 

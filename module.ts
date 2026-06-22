@@ -11,10 +11,7 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt: '>=4.0.0'
     }
   },
-  defaults: {
-    defaultTheme: undefined,
-    themes: []
-  },
+  defaults: {},
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
     const existing = (nuxt.options.appConfig.id ?? {}) as BrandRuntimeConfig
@@ -22,6 +19,8 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.appConfig.id = {
       ...options,
       ...existing,
+      name: existing.name ?? options.name,
+      theme: existing.theme ?? options.theme,
       defaultTheme: existing.defaultTheme ?? options.defaultTheme,
       themes: existing.themes ?? options.themes,
       guide: existing.guide ?? options.guide

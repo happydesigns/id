@@ -14,7 +14,7 @@ export {
 export { createNuxtUiAppConfig } from './nuxt-ui'
 export { applyBrandTheme } from './runtime'
 export { brandGuideSchema, brandThemeSchema } from './schema'
-export { normalizeBrandThemes } from './themes'
+export { normalizeBrandThemes, resolveBrandThemes } from './themes'
 export type {
   ApplyBrandThemeOptions,
   BrandAsset,

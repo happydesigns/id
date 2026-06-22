@@ -1,6 +1,6 @@
 ---
 title: happydesigns id
-description: Build brand guides, Nuxt UI theme packs, and Nuxt brand layers without moving product behavior into branding.
+description: Build brand layers and typed identity contracts for neutral Nuxt UI applications.
 ---
 
 ::u-page-hero
@@ -11,7 +11,7 @@ Identity system for Nuxt UI
 happydesigns id
 
 #description
-Create brand guides that become usable Nuxt layers and runtime theme packs. Keep apps focused on content and behavior while identity stays token-driven, documented, and reusable.
+Create brand guides that become usable Nuxt brand layers. Keep apps focused on content and behavior while identity stays token-driven, documented, and reusable.
 
 #links
   :::u-button
@@ -50,8 +50,8 @@ Create brand guides that become usable Nuxt layers and runtime theme packs. Keep
 ::u-page-section
 ---
 headline: Product model
-title: One identity contract, two application paths
-description: Use a full brand layer when the brand owns assets and composition. Use a runtime theme pack when the app only needs token and component-default switching.
+title: Brand layers first, runtime themes when useful
+description: Use a full brand layer when the brand owns assets, app shell, docs styling, or Nuxt UI defaults. Add runtime theme packs only for shipped token and component-default switching.
 ---
 #features
   :::u-page-feature
@@ -72,10 +72,10 @@ description: Use a full brand layer when the brand owns assets and composition. 
   to: /guides/runtime-themes
   ---
   #title
-  Runtime themes
+  Optional runtime themes
 
   #description
-  Switch CSS variables and Nuxt UI app-config defaults quickly when all required classes and components already ship with the app.
+  Switch CSS variables and Nuxt UI app-config defaults quickly when all required classes, components, and assets already ship with the app.
   :::
 
   :::u-page-feature
@@ -123,7 +123,7 @@ description: id should feel like a small layer on top of Nuxt UI, not a competin
     Typed contracts
 
     #description
-    Define brand guides and theme packs with TypeScript helpers and validation at the package boundary.
+    Define brand guides and a primary brand theme with TypeScript helpers and validation at the package boundary.
     ::::
 
     ::::u-page-card{icon="i-lucide-terminal" to="/guides/templates"}
@@ -138,8 +138,8 @@ description: id should feel like a small layer on top of Nuxt UI, not a competin
 
 ::u-page-section
 ---
-title: Start with the branding boundary, then choose the application path.
-description: If the brand owns components or assets, build a layer. If it only owns tokens and defaults, use a runtime theme pack.
+title: Start with the branding boundary, then choose the smallest runtime surface.
+description: Default to a brand layer. Add runtime themes only for preview, tenant picker, or editor workflows that do not need new files at runtime.
 ---
 #links
   :::u-button

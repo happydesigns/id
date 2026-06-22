@@ -11,7 +11,7 @@ const { currentTheme } = useBrandTheme()
     <UMain>
       <UPageHero
         title="Themed Nuxt UI app"
-        description="Runtime theme packs keep brand decisions central while the app stays focused on its own content."
+        description="A local primary brand theme keeps visual decisions central while the app stays focused on its own content."
       >
         <template #links>
           <IdThemeSelect />

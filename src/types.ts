@@ -128,6 +128,8 @@ export type ApplyBrandThemeOptions = {
 }
 
 export type BrandRuntimeConfig = {
+  name?: string
+  theme?: BrandTheme
   defaultTheme?: string
   themes?: BrandTheme[]
   guide?: BrandGuide

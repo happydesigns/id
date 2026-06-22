@@ -85,7 +85,7 @@ const rows = [
           <UPageHero
             headline="@happydesigns/id"
             title="Nuxt UI identity runtime"
-            description="Switch theme packs while the page keeps using standard Nuxt UI components, semantic utilities, app config, and light or dark color mode."
+            description="Switch already shipped brand themes while the page keeps using standard Nuxt UI components, semantic utilities, app config, and light or dark color mode."
           >
             <template #links>
               <UButton
