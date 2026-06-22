@@ -1,0 +1,64 @@
+{
+  "name": "@happydesigns/id",
+  "type": "module",
+  "version": "0.1.0",
+  "private": false,
+  "packageManager": "pnpm@10.33.0",
+  "author": "happydesigns",
+  "description": "Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for happydesigns projects.",
+  "homepage": "https://id.happydesigns.de",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/happydesigns/id.git"
+  },
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./module": "./module.ts",
+    "./nuxt": "./nuxt.config.ts",
+    "./schema": "./src/schema.ts",
+    "./examples": "./src/examples.ts"
+  },
+  "main": "./src/index.ts",
+  "files": [
+    "app",
+    "src",
+    "templates",
+    "module.ts",
+    "nuxt.config.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "nuxt dev playground",
+    "build": "nuxt build playground",
+    "preview": "nuxt preview playground",
+    "docs": "nuxt dev docs",
+    "docs:build": "nuxt build docs",
+    "docs:preview": "nuxt preview docs",
+    "prepare": "nuxt prepare && nuxt prepare playground && nuxt prepare docs",
+    "typecheck": "nuxt typecheck playground && nuxt typecheck docs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^4.4.2",
+    "@nuxt/ui": "^4.8.0",
+    "nuxt": "^4.4.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.102",
+    "@iconify-json/simple-icons": "^1.2.78",
+    "@nuxt/eslint": "^1.15.2",
+    "@vue/compiler-sfc": "^3.5.31",
+    "docus": "^5.12.2",
+    "eslint": "^10.2.0",
+    "typescript": "^6.0.3",
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16",
+    "vue-tsc": "^3.2.6"
+  }
+}
