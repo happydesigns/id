@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { updateAppConfig, useAppConfig, useState } from '#imports'
-import { applyBrandTheme as applyBrandThemeCore, createNuxtUiAppConfig } from '../../src'
+import { applyBrandTheme as applyBrandThemeCore, createNuxtUiAppConfig, normalizeBrandThemes } from '../../src'
 import type { BrandRuntimeConfig, BrandTheme } from '../../src'
 
 type IdentityAppConfig = {
@@ -8,7 +8,7 @@ type IdentityAppConfig = {
 }
 
 function getThemeList(config: IdentityAppConfig) {
-  return config.id?.themes ?? []
+  return normalizeBrandThemes(config.id?.themes ?? [])
 }
 
 function resolveInitialThemeName(config: IdentityAppConfig) {

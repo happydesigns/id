@@ -13,6 +13,7 @@ The root package exports:
 - `createThemeCssVars(theme, options?)`
 - `createThemeCssDeclarations(theme, mode?)`
 - `createNuxtUiAppConfig(theme)`
+- `normalizeBrandThemes(themes?)`
 - `applyBrandTheme(theme, options?)`
 - brand-guide and theme-pack types
 

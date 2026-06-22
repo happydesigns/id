@@ -8,6 +8,8 @@ import {
   defineBrandGuide,
   defineBrandTheme,
   editorialBrandTheme,
+  neutralBrandTheme,
+  normalizeBrandThemes,
   validateBrandTheme
 } from '../src'
 
@@ -90,6 +92,24 @@ describe('nuxt ui app config generation', () => {
         neutral: 'stone'
       }
     })
+  })
+})
+
+describe('brand theme lists', () => {
+  it('dedupes merged app-config themes by name with the latest theme winning', () => {
+    const customNeutral = defineBrandTheme({
+      ...neutralBrandTheme,
+      label: 'Custom Neutral'
+    })
+
+    const themes = normalizeBrandThemes([
+      neutralBrandTheme,
+      customNeutral,
+      editorialBrandTheme
+    ])
+
+    expect(themes.map(theme => theme.name)).toEqual(['neutral', 'editorial'])
+    expect(themes[0]?.label).toBe('Custom Neutral')
   })
 })
 

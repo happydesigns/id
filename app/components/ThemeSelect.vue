@@ -9,20 +9,20 @@ const items = computed(() => brandTheme.themes.value.map(theme => ({
   value: theme.name
 })))
 
-function updateTheme(value: string | number | boolean | Record<string, unknown> | undefined) {
-  if (typeof value === 'string') {
+const selectedTheme = computed<string>({
+  get: () => brandTheme.currentName.value,
+  set: (value) => {
     brandTheme.setTheme(value)
   }
-}
+})
 </script>
 
 <template>
   <USelect
-    :model-value="brandTheme.currentName.value"
+    v-model="selectedTheme"
     :items="items"
     value-key="value"
     label-key="label"
     class="min-w-44"
-    @update:model-value="updateTheme"
   />
 </template>
