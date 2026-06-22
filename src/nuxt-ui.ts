@@ -1,18 +1,15 @@
+import type { AppConfigInput } from 'nuxt/schema'
 import type { BrandTheme } from './types'
 
-function cleanObject<T extends Record<string, unknown>>(value: T): T {
-  return Object.fromEntries(
-    Object.entries(value).filter(([, item]) => item !== undefined)
-  ) as T
+export type NuxtUiAppConfig = {
+  ui: NonNullable<AppConfigInput['ui']>
 }
 
-export function createNuxtUiAppConfig(theme: BrandTheme) {
+export function createNuxtUiAppConfig(theme: BrandTheme): NuxtUiAppConfig {
   const ui = {
     ...(theme.ui ?? {}),
     ...(theme.semanticColors ? { colors: theme.semanticColors } : {})
   }
 
-  return cleanObject({
-    ui: Object.keys(ui).length > 0 ? ui : undefined
-  })
+  return { ui: ui as NonNullable<AppConfigInput['ui']> }
 }
