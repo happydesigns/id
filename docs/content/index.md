@@ -26,17 +26,6 @@ Create brand guides that become usable Nuxt brand layers. Keep apps focused on c
   :::u-button
   ---
   color: neutral
-  size: xl
-  to: /guides/nuxt-ui-mapping
-  variant: outline
-  trailing-icon: i-lucide-palette
-  ---
-  Nuxt UI mapping
-  :::
-
-  :::u-button
-  ---
-  color: neutral
   icon: i-simple-icons-github
   size: xl
   target: _blank
