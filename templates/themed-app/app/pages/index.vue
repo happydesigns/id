@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useBrandTheme } from '#imports'
+
 defineOptions({
   name: 'ThemedAppHomePage'
 })
