@@ -37,6 +37,7 @@ export default defineNuxtPlugin(() => {
     }
 
     if (import.meta.client) {
+      brandTheme.restorePersistedTheme()
       watch(() => brandTheme.currentTheme.value, syncClientTheme, { immediate: true })
 
       new MutationObserver(syncClientTheme).observe(document.documentElement, {
