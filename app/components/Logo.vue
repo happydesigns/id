@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useAppConfig } from '#imports'
+import { computed, useAppConfig } from '#imports'
 import type { BrandRuntimeConfig } from '../../src'
 
 const props = withDefaults(defineProps<{

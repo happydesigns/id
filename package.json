@@ -38,7 +38,7 @@
     "docs:build": "nuxt build docs",
     "docs:preview": "nuxt preview docs",
     "prepare": "nuxt prepare && nuxt prepare playground && nuxt prepare docs",
-    "typecheck": "nuxt typecheck playground && nuxt typecheck docs",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json && nuxt typecheck playground && nuxt typecheck docs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run"

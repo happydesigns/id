@@ -1,5 +1,4 @@
-import { computed } from 'vue'
-import { updateAppConfig, useAppConfig, useState } from '#imports'
+import { computed, updateAppConfig, useAppConfig, useState } from '#imports'
 import { applyBrandTheme as applyBrandThemeCore, createNuxtUiAppConfig, normalizeBrandThemes } from '../../src'
 import type { BrandRuntimeConfig, BrandTheme } from '../../src'
 
