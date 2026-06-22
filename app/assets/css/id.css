@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme static {
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-id-ink: #111827;
+  --color-id-paper: #ffffff;
+  --color-id-muted: #f8fafc;
+}
+
+:root {
+  --id-focus-ring: var(--ui-primary);
+  --id-swatch-size: 2.25rem;
+  --id-brand-preview-grid: color-mix(in srgb, var(--ui-border) 55%, transparent);
+}
+
+.dark {
+  --id-brand-preview-grid: color-mix(in srgb, var(--ui-border) 72%, transparent);
+}
+
+.id-brand-preview-grid {
+  background-image:
+    linear-gradient(var(--id-brand-preview-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--id-brand-preview-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.id-runtime-surface {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
