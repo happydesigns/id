@@ -13,12 +13,20 @@ The root package exports:
 - `createThemeCssVars(theme, options?)`
 - `createThemeCssDeclarations(theme, mode?)`
 - `createNuxtUiAppConfig(theme)`
+- `collectBrandAssets(guide)`
+- `selectBrandAsset(entries, selection?)`
 - `normalizeBrandThemes(themes?)`
 - `resolveBrandThemes(config?)`
 - `applyBrandTheme(theme, options?)`
 - `nuxtUiBrandTheme`
 - `idBrandGuide`
 - brand-guide and brand-theme types
+
+Explicit theme package exports:
+
+- `@happydesigns/id/themes/nuxt-ui`
+- `@happydesigns/id/themes/happydesigns`
+- `@happydesigns/id/themes/happydesigns/tokens.css`
 
 ## Nuxt Layer
 
@@ -38,10 +46,13 @@ Use the module when a project wants explicit module options:
 export default defineNuxtConfig({
   modules: ['@happydesigns/id/module'],
   id: {
-    name: 'client'
+    name: 'client',
+    componentPrefix: 'Id'
   }
 })
 ```
+
+The default component prefix is `Id`. Set `componentPrefix` only when the host app already owns names such as `IdLogo`, `IdThemeSelect`, or `IdColorModeButton`.
 
 ## App Config Contract
 
@@ -58,7 +69,7 @@ export default defineAppConfig({
 
 The runtime reads `id.theme`, applies CSS variables to the document root, and can update Nuxt UI app config with the selected theme. Apps that intentionally ship a runtime picker may also provide `id.themes[]` and `id.defaultTheme`.
 
-`id.guide.assets.logos` is an open role map. `logo`, `wordmark`, `symbol`, `mark`, and `appIcon` are useful conventions, not requirements. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."` or provide their own brand-specific component.
+`id.guide.assets.logos` is an open role map. `logo`, `wordmark`, `symbol`, `mark`, and `appIcon` are useful conventions, not requirements. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."`, use `useBrandAssets()`, or provide their own brand-specific component.
 
 ## Stability
 

@@ -1,4 +1,4 @@
-import { defineNuxtPlugin, useHead, watch } from '#imports'
+import { defineNuxtPlugin, onNuxtReady, useHead, watch } from '#imports'
 import { createThemeCssVars } from '../../src'
 import { useBrandTheme } from '../composables/useBrandTheme'
 
@@ -37,8 +37,11 @@ export default defineNuxtPlugin(() => {
     }
 
     if (import.meta.client) {
-      brandTheme.restorePersistedTheme()
       watch(() => brandTheme.currentTheme.value, syncClientTheme, { immediate: true })
+
+      onNuxtReady(() => {
+        brandTheme.restorePersistedTheme()
+      })
 
       new MutationObserver(syncClientTheme).observe(document.documentElement, {
         attributeFilter: ['class'],

@@ -150,3 +150,7 @@ export type BrandRuntimeConfig = {
   themes?: BrandTheme[]
   guide?: BrandGuide
 }
+
+export type BrandModuleOptions = BrandRuntimeConfig & {
+  componentPrefix?: string
+}

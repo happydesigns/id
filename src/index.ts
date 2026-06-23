@@ -1,4 +1,13 @@
 export {
+  collectBrandAssets,
+  defaultBrandAssetRoles,
+  selectBrandAsset
+} from './assets'
+export type {
+  BrandAssetEntry,
+  BrandAssetSelection
+} from './assets'
+export {
   applyCssVariables,
   createThemeCssDeclarations,
   createThemeCssVars
@@ -22,6 +31,7 @@ export type {
   BrandGuide,
   BrandLogoRole,
   BrandLogoSet,
+  BrandModuleOptions,
   BrandPalette,
   BrandRuntimeConfig,
   BrandSemanticColors,

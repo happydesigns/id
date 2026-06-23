@@ -1,7 +1,7 @@
 import { addComponentsDir, addImportsDir, addPlugin, addTypeTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
-import type { BrandRuntimeConfig } from './src'
+import type { BrandModuleOptions, BrandRuntimeConfig } from './src'
 
-export type ModuleOptions = BrandRuntimeConfig
+export type ModuleOptions = BrandModuleOptions
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -14,16 +14,17 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {},
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
+    const { componentPrefix = 'Id', ...runtimeOptions } = options
     const existing = (nuxt.options.appConfig.id ?? {}) as BrandRuntimeConfig
 
     nuxt.options.appConfig.id = {
-      ...options,
+      ...runtimeOptions,
       ...existing,
-      name: existing.name ?? options.name,
-      theme: existing.theme ?? options.theme,
-      defaultTheme: existing.defaultTheme ?? options.defaultTheme,
-      themes: existing.themes ?? options.themes,
-      guide: existing.guide ?? options.guide
+      name: existing.name ?? runtimeOptions.name,
+      theme: existing.theme ?? runtimeOptions.theme,
+      defaultTheme: existing.defaultTheme ?? runtimeOptions.defaultTheme,
+      themes: existing.themes ?? runtimeOptions.themes,
+      guide: existing.guide ?? runtimeOptions.guide
     }
 
     nuxt.options.css.push(resolver.resolve('./app/assets/css/id.css'))
@@ -33,7 +34,7 @@ export default defineNuxtModule<ModuleOptions>({
     addComponentsDir({
       path: resolver.resolve('./app/components'),
       pathPrefix: false,
-      prefix: 'Id'
+      prefix: componentPrefix
     })
 
     addTypeTemplate({

@@ -8,6 +8,7 @@ Reusable identity system for brand guides, Nuxt UI defaults, and Nuxt brand laye
 
 - Typed brand-guide and primary brand-theme contracts.
 - A neutral Nuxt UI baseline through `nuxtUiBrandTheme` and `idBrandGuide`.
+- Explicit theme exports for `@happydesigns/id/themes/nuxt-ui` and the local `@happydesigns/id/themes/happydesigns` migration theme.
 - Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
 - CSS variable generation for light and dark themes.
 - Nuxt UI app-config helpers for `ui.colors` and component defaults.
@@ -35,10 +36,13 @@ Use the module when a project wants explicit module options:
 export default defineNuxtConfig({
   modules: ['@happydesigns/id/module'],
   id: {
-    name: 'client'
+    name: 'client',
+    componentPrefix: 'Id'
   }
 })
 ```
+
+The layer export uses the standard `Id` component prefix. The module can register the same runtime components under another global prefix when a host app needs to avoid naming collisions.
 
 ## Branding model
 
@@ -46,6 +50,7 @@ export default defineNuxtConfig({
 
 - Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
 - A primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
+- A reusable brand source file such as `brand.ts` for package-owned identity data that is then wired into Nuxt through `app.config.ts`.
 - Optional runtime theme lists for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
 
 The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes.
@@ -57,6 +62,7 @@ Runtime themes are intentionally lightweight. They do not load arbitrary remote 
 ```bash
 pnpm install
 pnpm prepare
+pnpm build:package
 pnpm dev
 pnpm docs
 pnpm test
@@ -65,6 +71,8 @@ pnpm lint
 ```
 
 `pnpm dev` starts the playground app. `pnpm docs` starts the Docus documentation.
+
+`pnpm build:package` creates the publishable `dist/` package output and copies the Nuxt layer runtime files used by the package exports.
 
 ## Documentation
 

@@ -19,6 +19,7 @@ This file defines the technical structure for `@happydesigns/id`: contracts, run
 | `src/` | Brand-guide types, validation, CSS variable generation, app-config helpers, brand-theme utilities. | Vue component state, routing, assets, app-specific copy. |
 | `app/` | Reusable Nuxt layer runtime, composables, plugin, neutral CSS defaults, identity UI helpers. | Concrete customer assets, domain behavior, server APIs. |
 | `module.ts` | Optional Nuxt module integration, module options, runtime registration. | Brand-specific visual decisions. |
+| `themes/` | Shipped reference themes such as the Nuxt UI baseline and local happydesigns migration theme. | Product-specific behavior or private customer configuration. |
 | `templates/` | Starter projects for brand layers and themed apps. | Generated project state or private credentials. |
 | `playground/` | Visual QA for runtime themes and layer behavior. | Product documentation source of truth. |
 | `docs/` | Docus documentation for identity concepts and usage. | Source-derived implementation facts that should be generated or tested. |
@@ -31,6 +32,10 @@ Full brand layers are the default for deployable branded products. They can own 
 
 Each brand layer should expose one primary `id.theme` through `app.config.ts`. Runtime theme lists are for switching visual roles without rebuild overhead. They can own CSS variables, Nuxt UI semantic color mappings, typography variables, and component default variants that use stable compiled classes.
 
+Reusable brand repositories should keep identity data in a normal source file such as `brand.ts` and wire that data into Nuxt through `app.config.ts`. This keeps Nuxt's app-config model as the integration point without making Nuxt config the only place where a brand guide can be authored, tested, or exported.
+
+The layer export registers identity components with the `Id` prefix. The module accepts a build-time `componentPrefix` option when an app needs the same runtime helpers under another global prefix.
+
 ## Runtime Limits
 
 Runtime themes cannot guarantee:
@@ -41,6 +46,10 @@ Runtime themes cannot guarantee:
 - custom Vue components that are not already bundled
 - logos or fonts that were not shipped or configured
 - server behavior, APIs, credentials, authorization, or domain rules
+
+## Package Boundary
+
+The npm package publishes built JavaScript and declarations from `dist/` for the TypeScript API, theme subpaths, and Nuxt module. The Nuxt layer export stays as `nuxt.config.ts`, matching Docus-style layer packages where Nuxt loads the layer source directly. Runtime layer files are shipped both as source for the layer and copied into `dist/app` for the built module.
 
 ## Dependency Direction
 

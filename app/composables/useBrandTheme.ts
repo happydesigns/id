@@ -54,7 +54,7 @@ function persistThemeName(config: IdentityAppConfig, themeName: string) {
 
 function resolveInitialThemeName(config: IdentityAppConfig) {
   const themes = getThemeList(config)
-  return readPersistedThemeName(config, themes) ?? config.id?.defaultTheme ?? config.id?.theme?.name ?? themes[0]?.name ?? ''
+  return config.id?.defaultTheme ?? config.id?.theme?.name ?? themes[0]?.name ?? ''
 }
 
 function resolveTheme(themes: BrandTheme[], name: string) {

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   BrandValidationError,
   applyBrandTheme,
+  collectBrandAssets,
   createNuxtUiAppConfig,
   createThemeCssDeclarations,
   createThemeCssVars,
@@ -12,6 +13,7 @@ import {
   nuxtUiBrandTheme,
   normalizeBrandThemes,
   resolveBrandThemes,
+  selectBrandAsset,
   validateBrandTheme
 } from '../src'
 import {
@@ -118,6 +120,42 @@ describe('brand guide contract', () => {
         }
       }
     })).toThrow(BrandValidationError)
+  })
+
+  it('selects brand assets from arbitrary role maps with media-aware fallback', () => {
+    const guide = defineBrandGuide({
+      name: 'client-brand',
+      title: 'Client Brand',
+      description: 'A documented identity system.',
+      assets: {
+        logos: {
+          crest: {
+            name: 'Client crest',
+            src: '/brand/crest.svg',
+            role: 'crest'
+          },
+          signature: {
+            name: 'Client signature',
+            src: '/brand/signature-dark.svg',
+            role: 'signature',
+            media: 'dark'
+          }
+        },
+        files: [
+          {
+            name: 'Fallback lockup',
+            src: '/brand/lockup.svg',
+            role: 'lockup',
+            media: 'any'
+          }
+        ]
+      }
+    })
+    const assets = collectBrandAssets(guide)
+
+    expect(selectBrandAsset(assets, { role: 'signature', media: 'dark' })?.src).toBe('/brand/signature-dark.svg')
+    expect(selectBrandAsset(assets, { role: 'signature', media: 'light' })?.src).toBe('/brand/signature-dark.svg')
+    expect(selectBrandAsset(assets, { fallbackRoles: ['lockup'] })?.src).toBe('/brand/lockup.svg')
   })
 
   it('ships an id brand guide for the default Nuxt UI baseline', () => {

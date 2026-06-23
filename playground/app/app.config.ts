@@ -1,4 +1,5 @@
-import { createNuxtUiAppConfig, idBrandGuide, nuxtUiBrandTheme } from '../../src'
+import { createNuxtUiAppConfig, idBrandGuide } from '../../src'
+import { nuxtUiBrandTheme } from '../../themes/nuxt-ui'
 
 const nuxtUiConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
 

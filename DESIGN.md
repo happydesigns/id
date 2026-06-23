@@ -11,6 +11,7 @@ Use Nuxt UI as the default component and theme system.
 - Use CSS variables for surfaces, text, borders, radius, container width, and typography.
 - Keep local component styling small and semantic.
 - Prefer real Nuxt UI examples in documentation and playground surfaces.
+- Keep `id` runtime components globally prefixed. The default prefix is `Id`; apps can choose another prefix through the module when needed.
 
 ## Brand Guide First
 
@@ -27,6 +28,8 @@ The brand guide should describe:
 - voice and copy rules
 - component coverage status
 - usage limits
+
+Store reusable brand data in a normal source file such as `brand.ts` when a brand repository needs to export, test, or reuse it. Use `app.config.ts` to expose the public Nuxt runtime contract.
 
 ## Runtime Theme Discipline
 

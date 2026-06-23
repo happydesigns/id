@@ -13,20 +13,48 @@
   },
   "license": "MIT",
   "exports": {
-    ".": "./src/index.ts",
-    "./module": "./module.ts",
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./module": {
+      "types": "./dist/module.d.ts",
+      "import": "./dist/module.js"
+    },
     "./nuxt": "./nuxt.config.ts",
-    "./defaults": "./src/defaults.ts",
-    "./schema": "./src/schema.ts",
-    "./examples": "./src/examples.ts"
+    "./defaults": {
+      "types": "./dist/src/defaults.d.ts",
+      "import": "./dist/src/defaults.js"
+    },
+    "./schema": {
+      "types": "./dist/src/schema.d.ts",
+      "import": "./dist/src/schema.js"
+    },
+    "./examples": {
+      "types": "./dist/src/examples.d.ts",
+      "import": "./dist/src/examples.js"
+    },
+    "./themes/nuxt-ui": {
+      "types": "./dist/themes/nuxt-ui/index.d.ts",
+      "import": "./dist/themes/nuxt-ui/index.js"
+    },
+    "./themes/happydesigns": {
+      "types": "./dist/themes/happydesigns/index.d.ts",
+      "import": "./dist/themes/happydesigns/index.js"
+    },
+    "./themes/happydesigns/tokens.css": "./dist/themes/happydesigns/tokens.css"
   },
-  "main": "./src/index.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "files": [
+    "dist",
     "app",
     "src",
+    "themes",
     "templates",
-    "module.ts",
-    "nuxt.config.ts"
+    "nuxt.config.ts",
+    "README.md",
+    "LICENSE"
   ],
   "publishConfig": {
     "access": "public"
@@ -34,11 +62,13 @@
   "scripts": {
     "dev": "nuxt dev playground",
     "build": "nuxt build playground",
+    "build:package": "node scripts/build-package.mjs",
     "preview": "nuxt preview playground",
     "docs": "nuxt dev docs",
     "docs:build": "nuxt build docs",
     "docs:preview": "nuxt preview docs",
-    "prepare": "nuxt prepare && nuxt prepare playground && nuxt prepare docs && nuxt prepare templates/brand-layer && nuxt prepare templates/themed-app",
+    "prepare": "pnpm build:package && nuxt prepare && nuxt prepare playground && nuxt prepare docs && nuxt prepare templates/brand-layer && nuxt prepare templates/themed-app",
+    "prepack": "pnpm build:package && pnpm test && pnpm typecheck",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && nuxt typecheck playground && nuxt typecheck docs && nuxt typecheck templates/brand-layer && nuxt typecheck templates/themed-app",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
