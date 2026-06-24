@@ -21,7 +21,7 @@
       "types": "./dist/module.d.ts",
       "import": "./dist/module.js"
     },
-    "./nuxt": "./nuxt.layer.config.ts",
+    "./nuxt": "./nuxt.layer.config.mjs",
     "./defaults": {
       "types": "./dist/src/defaults.d.ts",
       "import": "./dist/src/defaults.js"
@@ -51,8 +51,20 @@
     "app",
     "src",
     "themes",
-    "templates",
+    "templates/brand-layer/app",
+    "templates/brand-layer/public",
+    "templates/brand-layer/brand.ts",
+    "templates/brand-layer/nuxt.config.ts",
+    "templates/brand-layer/package.json",
+    "templates/brand-layer/README.md",
+    "templates/brand-layer/tsconfig.json",
+    "templates/themed-app/app",
+    "templates/themed-app/nuxt.config.ts",
+    "templates/themed-app/package.json",
+    "templates/themed-app/README.md",
+    "templates/themed-app/tsconfig.json",
     "nuxt.layer.config.ts",
+    "nuxt.layer.config.mjs",
     "README.md",
     "LICENSE"
   ],

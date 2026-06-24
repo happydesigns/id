@@ -20,8 +20,12 @@ describe('starter templates', () => {
       files: string[]
     }
 
-    expect(packageJson.exports['./nuxt']).toBe('./nuxt.layer.config.ts')
+    expect(packageJson.exports['./nuxt']).toBe('./nuxt.layer.config.mjs')
     expect(packageJson.files).toContain('nuxt.layer.config.ts')
+    expect(packageJson.files).toContain('nuxt.layer.config.mjs')
+    expect(packageJson.files).not.toContain('templates')
+    expect(packageJson.files).toContain('templates/brand-layer/app')
+    expect(packageJson.files).toContain('templates/themed-app/app')
     expect(packageJson.files).not.toContain('nuxt.config.ts')
   })
 
