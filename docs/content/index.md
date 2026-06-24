@@ -115,7 +115,7 @@ description: id should feel like a small layer on top of Nuxt UI, not a competin
     Define brand guides and a primary brand theme with TypeScript helpers, starting from the included Nuxt UI baseline when that is enough.
     ::::
 
-    ::::u-page-card{icon="i-lucide-terminal" to="/guides/templates"}
+    ::::u-page-card{icon="i-lucide-terminal" to="/guides/starters"}
     #title
     Starters
 
