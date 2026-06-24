@@ -1,6 +1,6 @@
 # Design Direction
 
-`@happydesigns/id` is not one visual identity. It is the system that makes visual identities durable, inspectable, and usable in Nuxt projects.
+`@happydesigns/id` is not one visual identity. It is the Nuxt UI foundation that makes brand-guide decisions durable, inspectable, documented, and usable as Nuxt layers.
 
 ## Nuxt UI First
 
@@ -30,6 +30,8 @@ The brand guide should describe:
 - usage limits
 
 Store reusable brand data in a normal source file such as `brand.ts` when a brand repository needs to export, test, or reuse it. Use `app.config.ts` to expose the public Nuxt runtime contract.
+
+Concrete brand packages own their doctrine. For example, `@happydesigns/brand` owns final happydesigns copy, logo rules, palette meaning, asset choices, and voice. `id` may ship demonstration themes, but those examples should teach the foundation rather than become the public brand source of truth.
 
 ## Runtime Theme Discipline
 

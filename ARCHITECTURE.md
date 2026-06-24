@@ -1,6 +1,6 @@
 # Architecture
 
-This file defines the technical structure for `@happydesigns/id`: contracts, runtime theming, Nuxt integration, templates, and documentation.
+This file defines the technical structure for `@happydesigns/id`: Nuxt UI brand-guide contracts, runtime theming, Nuxt integration, starters, and documentation.
 
 ## Principles
 
@@ -19,7 +19,9 @@ This file defines the technical structure for `@happydesigns/id`: contracts, run
 | `src/` | Brand-guide types, validation, CSS variable generation, app-config helpers, brand-theme utilities. | Vue component state, routing, assets, app-specific copy. |
 | `app/` | Reusable Nuxt layer runtime, composables, plugin, neutral CSS defaults, identity UI helpers. | Concrete customer assets, domain behavior, server APIs. |
 | `module.ts` | Optional Nuxt module integration, module options, runtime registration. | Brand-specific visual decisions. |
-| `themes/` | Shipped reference themes such as the Nuxt UI baseline and local happydesigns migration theme. | Product-specific behavior or private customer configuration. |
+| `nuxt.layer.config.ts` | Public Nuxt layer export for consumers extending `@happydesigns/id/nuxt`. | Repository-only tooling such as lint modules. |
+| `nuxt.config.ts` | Development config for this repository, importing the public layer and adding local tooling. | Public layer behavior. |
+| `themes/` | Shipped reference themes such as the Nuxt UI baseline and a local happydesigns demonstration theme. | Canonical brand doctrine, product-specific behavior, or private customer configuration. |
 | `templates/` | Starter projects for brand layers and themed apps. | Generated project state or private credentials. |
 | `playground/` | Visual QA for runtime themes and layer behavior. | Product documentation source of truth. |
 | `docs/` | Docus documentation for identity concepts and usage. | Source-derived implementation facts that should be generated or tested. |
@@ -49,7 +51,11 @@ Runtime themes cannot guarantee:
 
 ## Package Boundary
 
-The npm package publishes built JavaScript and declarations from `dist/` for the TypeScript API, theme subpaths, and Nuxt module. The Nuxt layer export stays as `nuxt.config.ts`, matching Docus-style layer packages where Nuxt loads the layer source directly. Runtime layer files are shipped both as source for the layer and copied into `dist/app` for the built module.
+The npm package publishes built JavaScript and declarations from `dist/` for the TypeScript API, theme subpaths, and Nuxt module. The Nuxt layer export stays as `nuxt.layer.config.ts`, matching Docus-style layer packages where Nuxt loads the layer source directly. Runtime layer files are shipped both as source for the layer and copied into `dist/app` for the built module.
+
+`nuxt.config.ts` is intentionally a repository-development config. It imports the public layer config and can add `@nuxt/eslint` and other local tooling because it is not the `./nuxt` package export. Consumers extending `@happydesigns/id/nuxt` inherit the public layer only: Nuxt UI, `Id` components, identity CSS, and the current layer compatibility defaults.
+
+Consuming apps should set their own `compatibilityDate` in their app config. Nuxt merges the app config on top of extended layers, so an explicit app-level date remains the controlling deployment contract. The layer keeps `compatibilityDate: 'latest'` for local development and starters that intentionally follow current Nuxt behavior.
 
 ## Dependency Direction
 

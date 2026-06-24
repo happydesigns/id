@@ -1,6 +1,6 @@
 # API
 
-This file describes the public API direction for `@happydesigns/id`.
+This file describes the public API direction for `@happydesigns/id`, the Nuxt UI brand-guide foundation used by brand layers such as `@happydesigns/brand`.
 
 ## TypeScript API
 
@@ -28,6 +28,8 @@ Explicit theme package exports:
 - `@happydesigns/id/themes/happydesigns`
 - `@happydesigns/id/themes/happydesigns/tokens.css`
 
+The `nuxt-ui` theme is the standard baseline. The `happydesigns` theme is a demonstration and migration reference for these docs until the `@happydesigns/brand` package exports the canonical happydesigns contract.
+
 ## Nuxt Layer
 
 Use the layer when a brand repository wants the default identity runtime:
@@ -37,6 +39,8 @@ export default defineNuxtConfig({
   extends: ['@happydesigns/id/nuxt']
 })
 ```
+
+The `./nuxt` export points at the public layer config, not the repository's development `nuxt.config.ts`. It intentionally does not include repo-only modules such as `@nuxt/eslint`.
 
 ## Nuxt Module
 

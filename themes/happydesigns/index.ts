@@ -83,7 +83,7 @@ const sharedUiDefaults = {
 export const happydesignsBrandTheme = defineBrandTheme({
   name: 'happydesigns',
   label: 'happydesigns',
-  description: 'Warm happydesigns runtime theme adapted from the current brand guide.',
+  description: 'Demonstration runtime theme adapted from current happydesigns brand-layer work.',
   typography: {
     sans: '"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif',
     mono: '"Geist Mono", "SFMono-Regular", ui-monospace, monospace'
@@ -145,13 +145,13 @@ export const happydesignsBrandGuide = defineBrandGuide({
   name: 'happydesigns',
   packageName: '@happydesigns/brand',
   title: 'happydesigns',
-  description: 'Runtime-ready happydesigns identity source used by the id documentation until the standalone brand layer exports the same contract.',
+  description: 'Demonstration identity contract used by the id documentation until @happydesigns/brand exports the canonical guide and theme.',
   semanticColors: happydesignsColors,
   cssVariables: happydesignsBrandTheme.cssVariables,
   typography: happydesignsBrandTheme.typography,
   ui: happydesignsBrandTheme.ui,
   usage: {
-    useFor: ['happydesigns documentation', 'Nuxt UI runtime previews', 'brand-layer migration work'],
-    avoid: ['domain behavior', 'authorization', 'runtime credentials']
+    useFor: ['Nuxt UI runtime previews', 'brand-layer migration work', 'id documentation demos'],
+    avoid: ['canonical happydesigns doctrine', 'domain behavior', 'authorization', 'runtime credentials']
   }
 })
