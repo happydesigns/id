@@ -21,7 +21,7 @@
       "types": "./dist/module.d.ts",
       "import": "./dist/module.js"
     },
-    "./nuxt": "./nuxt.config.ts",
+    "./nuxt": "./nuxt.layer.config.ts",
     "./defaults": {
       "types": "./dist/src/defaults.d.ts",
       "import": "./dist/src/defaults.js"
@@ -52,7 +52,7 @@
     "src",
     "themes",
     "templates",
-    "nuxt.config.ts",
+    "nuxt.layer.config.ts",
     "README.md",
     "LICENSE"
   ],

@@ -19,6 +19,7 @@
     "themes/**/*.ts",
     "tests/**/*.ts",
     "module.ts",
+    "nuxt.layer.config.ts",
     "nuxt.config.ts",
     "vitest.config.ts"
   ]
