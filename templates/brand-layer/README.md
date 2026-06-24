@@ -1,4 +1,4 @@
-# Brand layer template
+# Brand layer starter
 
 Starter for a Nuxt UI brand layer powered by `@happydesigns/id`.
 
@@ -19,4 +19,4 @@ export default defineNuxtConfig({
 })
 ```
 
-This template is for full build-time branding: assets, metadata, CSS variables, Nuxt UI defaults, and optional brand primitives.
+This starter is for full build-time branding: assets, metadata, CSS variables, Nuxt UI defaults, and optional brand primitives.

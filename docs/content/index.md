@@ -117,10 +117,10 @@ description: id should feel like a small layer on top of Nuxt UI, not a competin
 
     ::::u-page-card{icon="i-lucide-terminal" to="/guides/templates"}
     #title
-    Starter templates
+    Starters
 
     #description
-    Start a brand layer or themed app with giget instead of assembling boilerplate by hand.
+    Start a Nuxt UI brand layer or themed app with giget instead of assembling boilerplate by hand.
     ::::
   :::
 ::
