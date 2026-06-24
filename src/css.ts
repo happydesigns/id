@@ -1,8 +1,8 @@
-import type { BrandCssVariables, BrandTheme, ThemeCssOptions, ThemeMode } from './types'
+import type { BrandCssVariables, BrandTheme, BrandThemeStyleTarget, ThemeCssOptions, ThemeMode } from './types'
 
 const DEFAULT_LIGHT_SELECTOR = ':root'
 const DEFAULT_DARK_SELECTOR = '.dark'
-const appliedCssVariableNames = new WeakMap<HTMLElement, Set<string>>()
+const appliedCssVariableNames = new WeakMap<BrandThemeStyleTarget, Set<string>>()
 
 type ApplyCssVariablesOptions = {
   clearPrevious?: boolean
@@ -63,7 +63,7 @@ export function createThemeCssVars(theme: BrandTheme, options: ThemeCssOptions =
 }
 
 export function applyCssVariables(
-  target: HTMLElement,
+  target: BrandThemeStyleTarget,
   variables: Record<string, string> = {},
   options: ApplyCssVariablesOptions = {}
 ) {

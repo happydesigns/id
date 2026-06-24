@@ -137,8 +137,15 @@ export type ThemeCssOptions = {
   includeTypography?: boolean
 }
 
+export type BrandThemeStyleTarget = {
+  style: {
+    setProperty: (name: string, value: string) => void
+    removeProperty: (name: string) => void
+  }
+}
+
 export type ApplyBrandThemeOptions = {
-  target?: HTMLElement | null
+  target?: BrandThemeStyleTarget | null
   mode?: ThemeMode
   updateAppConfig?: (config: Record<string, unknown>) => void
 }
