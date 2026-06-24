@@ -14,6 +14,17 @@ function expectTemplateFile(template: string, file: string) {
 }
 
 describe('starter templates', () => {
+  it('keeps the package nuxt export on the consumer-safe layer config', () => {
+    const packageJson = JSON.parse(readFileSync(join(rootDir, 'package.json'), 'utf8')) as {
+      exports: Record<string, unknown>
+      files: string[]
+    }
+
+    expect(packageJson.exports['./nuxt']).toBe('./nuxt.layer.config.ts')
+    expect(packageJson.files).toContain('nuxt.layer.config.ts')
+    expect(packageJson.files).not.toContain('nuxt.config.ts')
+  })
+
   it('keeps the brand-layer template shaped like an external brand repo', () => {
     expectTemplateFile('brand-layer', 'brand.ts')
     expectTemplateFile('brand-layer', 'app/app.config.ts')
