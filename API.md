@@ -18,6 +18,7 @@ The root package exports:
 - `normalizeBrandThemes(themes?)`
 - `resolveBrandThemes(config?)`
 - `parseDocsLinks(input?)`
+- `createLayerInstallSnippets(options)`
 - `applyBrandTheme(theme, options?)`
 - `nuxtUiBrandTheme`
 - `idBrandGuide`
@@ -43,7 +44,7 @@ export default defineNuxtConfig({
 
 The `./nuxt` export points at the public layer config, not the repository's development `nuxt.config.ts`. It intentionally does not include repo-only modules such as `@nuxt/eslint`.
 
-The layer also ships small brand-neutral documentation helpers. `IdNuxtUiDocsLink` renders compact links to Nuxt UI documentation from typed link data or the MDC-friendly `Label|url; Label|url` string syntax. `IdExampleFrame` provides the standard example surface for brand-guide demos while keeping the actual example content in the brand layer.
+The layer also ships small brand-neutral documentation helpers. `IdNuxtUiDocsLink` renders compact links to Nuxt UI documentation from typed link data or the MDC-friendly `Label|url; Label|url` string syntax. `IdExampleFrame` provides the standard example surface for brand-guide demos while keeping the actual example content in the brand layer. `IdLayerInstall` renders a neutral install surface for a brand package and its Nuxt `extends` snippet.
 
 ## Nuxt Module
 

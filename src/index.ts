@@ -19,6 +19,16 @@ export {
 } from './defaults'
 export { parseDocsLinks } from './docs-links'
 export type { DocsLink } from './docs-links'
+export {
+  createLayerInstallSnippets,
+  layerInstallCommands,
+  layerInstallPackageManagers
+} from './layer-install'
+export type {
+  LayerInstallOptions,
+  LayerInstallPackageManager,
+  LayerInstallSnippets
+} from './layer-install'
 export { createNuxtUiAppConfig } from './nuxt-ui'
 export { applyBrandTheme } from './runtime'
 export { brandGuideSchema, brandThemeSchema } from './schema'
