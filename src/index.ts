@@ -13,6 +13,17 @@ export {
   createThemeCssVars
 } from './css'
 export {
+  componentCoverageStatuses,
+  componentCoverageStatusMeta,
+  normalizeComponentCoverage,
+  summarizeComponentCoverage
+} from './component-coverage'
+export type {
+  ComponentCoverageStatus,
+  ComponentCoverageStatusMeta,
+  ComponentCoverageSummary
+} from './component-coverage'
+export {
   idBrandGuide,
   neutralBrandTheme,
   nuxtUiBrandTheme
