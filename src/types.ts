@@ -88,6 +88,27 @@ export type BrandComponentCoverage = {
   notes?: string
 }
 
+export type BrandGuideSectionInput = {
+  slug: string
+  title: string
+  description: string
+  summary?: string
+  eyebrow?: string
+  icon?: string
+  to?: string
+  anchors?: readonly string[]
+}
+
+export type BrandGuideSection = Omit<BrandGuideSectionInput, 'anchors'> & {
+  anchors?: string[]
+}
+
+export type BrandGuideDocsSection = {
+  title: string
+  description: string
+  to: string
+}
+
 export type BrandGuide = {
   name: string
   packageName?: string
@@ -111,11 +132,7 @@ export type BrandGuide = {
     runtimeLimits?: string[]
   }
   docs?: {
-    sections?: {
-      title: string
-      description: string
-      to: string
-    }[]
+    sections?: BrandGuideDocsSection[]
   }
   ui?: Record<string, unknown>
 }

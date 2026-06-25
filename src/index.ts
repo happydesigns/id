@@ -40,6 +40,14 @@ export type {
   LayerInstallPackageManager,
   LayerInstallSnippets
 } from './layer-install'
+export {
+  createGuideDocsSections,
+  createGuideSectionPath,
+  defineGuideSections,
+  findGuideSection,
+  normalizeGuideSections
+} from './guide-sections'
+export type { GuideSectionPathOptions } from './guide-sections'
 export { createNuxtUiAppConfig } from './nuxt-ui'
 export { applyBrandTheme } from './runtime'
 export { brandGuideSchema, brandThemeSchema } from './schema'
@@ -52,6 +60,9 @@ export type {
   BrandComponentCoverage,
   BrandCssVariables,
   BrandGuide,
+  BrandGuideDocsSection,
+  BrandGuideSection,
+  BrandGuideSectionInput,
   BrandLogoRole,
   BrandLogoSet,
   BrandModuleOptions,
