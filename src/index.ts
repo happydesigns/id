@@ -17,6 +17,8 @@ export {
   neutralBrandTheme,
   nuxtUiBrandTheme
 } from './defaults'
+export { parseDocsLinks } from './docs-links'
+export type { DocsLink } from './docs-links'
 export { createNuxtUiAppConfig } from './nuxt-ui'
 export { applyBrandTheme } from './runtime'
 export { brandGuideSchema, brandThemeSchema } from './schema'
