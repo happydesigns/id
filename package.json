@@ -77,7 +77,7 @@
     "build:package": "node scripts/build-package.mjs",
     "preview": "nuxt preview playground",
     "docs": "nuxt dev docs",
-    "docs:build": "nuxt build docs",
+    "docs:build": "nuxt generate docs",
     "docs:preview": "nuxt preview docs",
     "prepare": "pnpm build:package && nuxt prepare && nuxt prepare playground && nuxt prepare docs && nuxt prepare templates/brand-layer && nuxt prepare templates/themed-app",
     "prepack": "pnpm build:package && pnpm test && pnpm typecheck",
