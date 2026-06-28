@@ -195,6 +195,11 @@ describe('brand guide contract', () => {
     const assets = collectBrandAssets({
       assets: {
         logos: {
+          logo: {
+            name: 'Client logo',
+            src: '/brand/logo.svg',
+            role: 'logo'
+          },
           wordmark: {
             name: 'Client wordmark',
             src: '/brand/wordmark.svg',
@@ -209,7 +214,7 @@ describe('brand guide contract', () => {
       }
     })
 
-    expect(selectBrandAsset(assets, { media: 'light' })?.src).toBe('/brand/wordmark.svg')
+    expect(selectBrandAsset(assets, { media: 'light' })?.src).toBe('/brand/logo.svg')
     expect(selectBrandAsset(assets, { media: 'dark' })?.src).toBe('/brand/wordmark-inverse.svg')
   })
 

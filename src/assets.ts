@@ -18,7 +18,7 @@ export type BrandAssetSelection = {
 
 export const defaultBrandAssetRoles = ['logo', 'wordmark', 'symbol', 'mark', 'appIcon', 'wordmarkInverse', 'symbolInverse'] as const
 
-const darkBrandAssetRoles = ['logo', 'wordmarkInverse', 'symbolInverse', 'wordmark', 'symbol', 'mark', 'appIcon'] as const
+const darkBrandAssetRoles = ['wordmarkInverse', 'symbolInverse', 'logo', 'wordmark', 'symbol', 'mark', 'appIcon'] as const
 
 function defaultFallbackRoles(media?: BrandAsset['media']) {
   return [...(media === 'dark' ? darkBrandAssetRoles : defaultBrandAssetRoles)]
