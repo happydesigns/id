@@ -45,6 +45,9 @@ describe('starter templates', () => {
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain('brandIdentity.logoAssetPaths.logo')
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain('const brandAssets')
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain("role: 'appIcon'")
+    expect(readTemplateFile('brand-layer', 'brand.ts')).toContain("media: 'any'")
+    expect(readTemplateFile('brand-layer', 'brand.ts')).toContain("alt: 'Example Brand'")
+    expect(readTemplateFile('brand-layer', 'app/components/Logo.vue')).toContain('<IdLogo')
   })
 
   it('keeps the themed-app template direct and Nuxt UI based', () => {

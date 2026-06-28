@@ -5,12 +5,12 @@ defineOptions({
 </script>
 
 <template>
-  <span class="flex h-6 items-center gap-2 text-sm font-semibold leading-5 text-highlighted">
-    <span class="flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
-      <span class="size-3 rounded-full bg-primary" />
-    </span>
-    <span class="flex h-5 items-center truncate">
-      Example Brand
-    </span>
+  <span class="inline-flex h-6 items-center text-sm font-semibold leading-5 text-highlighted">
+    <IdLogo
+      role="logo"
+      alt="Example Brand"
+      label="Example Brand"
+      class="h-5 max-w-32"
+    />
   </span>
 </template>

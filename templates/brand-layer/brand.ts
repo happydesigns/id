@@ -25,13 +25,17 @@ const brandAssets = [
     name: 'Example Brand logo',
     role: 'logo',
     path: brandIdentity.logoAssetPaths.logo,
-    usage: 'Primary logo for headers and brand-owned surfaces.'
+    usage: 'Primary logo for headers and brand-owned surfaces.',
+    media: 'any',
+    alt: 'Example Brand'
   },
   {
     name: 'Example Brand app icon',
     role: 'appIcon',
     path: brandIdentity.logoAssetPaths.appIcon,
-    usage: 'Favicon, touch icon, and square app contexts.'
+    usage: 'Favicon, touch icon, and square app contexts.',
+    media: 'any',
+    alt: 'Example Brand app icon'
   }
 ] as const
 
