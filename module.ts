@@ -77,7 +77,7 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     addTypeTemplate({
-      filename: 'types/happydesigns-id.d.ts',
+      filename: 'types/id-app-config.d.ts',
       getContents: () => [
         'import type { BrandRuntimeConfig } from \'@happydesigns/id\'',
         '',
