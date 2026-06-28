@@ -1,3 +1,5 @@
+import type { AppConfigInput } from 'nuxt/schema'
+
 export type BrandColorShade =
   | 50
   | 100
@@ -164,7 +166,11 @@ export type BrandThemeStyleTarget = {
 export type ApplyBrandThemeOptions = {
   target?: BrandThemeStyleTarget | null
   mode?: ThemeMode
-  updateAppConfig?: (config: Record<string, unknown>) => void
+  updateAppConfig?: (config: NuxtUiAppConfig) => void
+}
+
+export type NuxtUiAppConfig = {
+  ui: NonNullable<AppConfigInput['ui']>
 }
 
 export type BrandRuntimeConfig = {

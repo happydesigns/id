@@ -79,6 +79,7 @@ export type {
   BrandTheme,
   BrandTypography,
   BrandVoice,
+  NuxtUiAppConfig,
   NuxtUiColorRole,
   ThemeCssOptions,
   ThemeMode
