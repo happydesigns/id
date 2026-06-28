@@ -18,6 +18,7 @@ function expectTemplateFile(template: string, file: string) {
 }
 
 type PackageJson = {
+  scripts?: Record<string, string>
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
 }
@@ -98,6 +99,8 @@ describe('starter templates', () => {
       expect(templatePackage.dependencies?.nuxt).toBe(rootPackage.dependencies?.nuxt)
       expect(templatePackage.devDependencies?.typescript).toBe(rootPackage.devDependencies?.typescript)
       expect(templatePackage.devDependencies?.['vue-tsc']).toBe(rootPackage.devDependencies?.['vue-tsc'])
+      expect(templatePackage.scripts?.typecheck).toBe('nuxt typecheck')
+      expect(templatePackage.scripts?.verify).toBe('pnpm typecheck')
     }
   })
 })
