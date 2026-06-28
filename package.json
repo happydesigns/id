@@ -88,17 +88,17 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@nuxt/kit": "^4.4.2",
-    "@nuxt/ui": "^4.8.0",
-    "nuxt": "^4.4.2",
-    "zod": "^4.3.6"
+    "@nuxt/kit": "^4.4.8",
+    "@nuxt/ui": "^4.9.0",
+    "nuxt": "^4.4.8",
+    "zod": "^4.4.3"
   },
   "peerDependencies": {
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.102",
-    "@iconify-json/simple-icons": "^1.2.78",
+    "@iconify-json/lucide": "^1.2.114",
+    "@iconify-json/simple-icons": "^1.2.86",
     "@nuxt/eslint": "^1.15.2",
     "@vue/compiler-sfc": "^3.5.31",
     "docus": "^5.12.2",
