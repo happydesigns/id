@@ -21,6 +21,9 @@ describe('starter templates', () => {
     }
 
     expect(packageJson.exports['./nuxt']).toBe('./nuxt.layer.config.mjs')
+    expect(packageJson.exports['./themes/sample-brand']).toBeTruthy()
+    expect(packageJson.exports['./themes/sample-brand/tokens.css']).toBe('./dist/themes/sample-brand/tokens.css')
+    expect(packageJson.exports).not.toHaveProperty('./themes/happydesigns')
     expect(packageJson.files).toContain('nuxt.layer.config.ts')
     expect(packageJson.files).toContain('nuxt.layer.config.mjs')
     expect(packageJson.files).not.toContain('templates')
