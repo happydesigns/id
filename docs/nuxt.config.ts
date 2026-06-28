@@ -15,11 +15,6 @@ export default defineNuxtConfig({
     resolve(currentDir, '../themes/happydesigns/tokens.css')
   ],
   compatibilityDate: 'latest',
-  vite: {
-    optimizeDeps: {
-      include: []
-    }
-  },
   llms: {
     domain: 'https://id.happydesigns.de',
     title: 'happydesigns id',
