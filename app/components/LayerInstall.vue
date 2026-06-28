@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { CodeToTokenTransformStream } from '@shikijs/stream'
-import { ShikiStreamRenderer } from '@shikijs/stream/vue'
+import { ShikiCachedRenderer } from '@shikijs/stream/vue'
 import { computed, nextTick, ref, useColorMode, watch } from '#imports'
 import {
   createLayerInstallSnippets,
@@ -34,41 +33,60 @@ const highlighter = await useLayerInstallHighlighter()
 const codeTheme = computed(() => colorMode.value === 'dark' ? 'material-theme-palenight' : 'material-theme-lighter')
 const isInstallHighlighted = ref(false)
 const isNuxtConfigHighlighted = ref(false)
+const installHighlight = ref()
+const nuxtConfigHighlight = ref()
+let installRevealRun = 0
+let nuxtConfigRevealRun = 0
 const prosePreUi = {
   copy: 'hidden sm:inline-flex'
 }
 
-function createCodeStream(code: string, lang: string) {
-  return new ReadableStream<string>({
-    start(controller) {
-      controller.enqueue(code)
-      controller.close()
-    }
-  }).pipeThrough(new CodeToTokenTransformStream({
-    highlighter,
-    lang,
-    theme: codeTheme.value
-  }))
+function queueFrame(callback: () => void) {
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(callback)
+    return
+  }
+
+  setTimeout(callback, 0)
 }
 
-const installCodeStream = computed(() => createCodeStream(snippets.value.installCommand, 'bash'))
-const nuxtConfigCodeStream = computed(() => createCodeStream(snippets.value.nuxtConfig, 'ts'))
-
-async function revealInstallHighlight() {
+async function revealInstallHighlight(run = ++installRevealRun) {
   await nextTick()
-  isInstallHighlighted.value = true
+
+  if (run !== installRevealRun) {
+    return
+  }
+
+  if (installHighlight.value?.$el?.textContent?.trim()) {
+    isInstallHighlighted.value = true
+    return
+  }
+
+  queueFrame(() => revealInstallHighlight(run))
 }
 
-async function revealNuxtConfigHighlight() {
+async function revealNuxtConfigHighlight(run = ++nuxtConfigRevealRun) {
   await nextTick()
-  isNuxtConfigHighlighted.value = true
+
+  if (run !== nuxtConfigRevealRun) {
+    return
+  }
+
+  if (nuxtConfigHighlight.value?.$el?.textContent?.trim()) {
+    isNuxtConfigHighlighted.value = true
+    return
+  }
+
+  queueFrame(() => revealNuxtConfigHighlight(run))
 }
 
 watch([() => snippets.value.installCommand, codeTheme], () => {
+  installRevealRun += 1
   isInstallHighlighted.value = false
 })
 
 watch([() => snippets.value.nuxtConfig, codeTheme], () => {
+  nuxtConfigRevealRun += 1
   isNuxtConfigHighlighted.value = false
 })
 </script>
@@ -101,10 +119,14 @@ watch([() => snippets.value.nuxtConfig, codeTheme], () => {
           :ui="prosePreUi"
         >
           <code v-if="!isInstallHighlighted">{{ snippets.installCommand }}</code>
-          <ShikiStreamRenderer
+          <ShikiCachedRenderer
             v-show="isInstallHighlighted"
+            ref="installHighlight"
             :key="`install-${snippets.packageManager}-${codeTheme}`"
-            :stream="installCodeStream"
+            :highlighter="highlighter"
+            :code="snippets.installCommand"
+            lang="bash"
+            :theme="codeTheme"
             @stream-start="revealInstallHighlight"
           />
         </ProsePre>
@@ -116,10 +138,14 @@ watch([() => snippets.value.nuxtConfig, codeTheme], () => {
           :ui="prosePreUi"
         >
           <code v-if="!isNuxtConfigHighlighted">{{ snippets.nuxtConfig }}</code>
-          <ShikiStreamRenderer
+          <ShikiCachedRenderer
             v-show="isNuxtConfigHighlighted"
+            ref="nuxtConfigHighlight"
             :key="`config-${snippets.layer}-${codeTheme}`"
-            :stream="nuxtConfigCodeStream"
+            :highlighter="highlighter"
+            :code="snippets.nuxtConfig"
+            lang="ts"
+            :theme="codeTheme"
             @stream-start="revealNuxtConfigHighlight"
           />
         </ProsePre>
