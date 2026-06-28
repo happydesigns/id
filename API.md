@@ -7,8 +7,10 @@ This file describes the public API direction for `@happydesigns/id`, the Nuxt UI
 The root package exports:
 
 - `defineBrandGuide(guide)`
+- `defineBrandIdentity(identity)`
 - `defineBrandTheme(theme)`
 - `validateBrandGuide(guide)`
+- `validateBrandIdentity(identity)`
 - `validateBrandTheme(theme)`
 - `createThemeCssVars(theme, options?)`
 - `createThemeCssDeclarations(theme, mode?)`

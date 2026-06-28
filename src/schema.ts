@@ -74,6 +74,14 @@ const docsSchema = z.object({
   })).optional()
 })
 
+export const brandIdentitySchema = z.object({
+  name: z.string().min(1).regex(/^[a-z0-9][a-z0-9-]*$/, 'Brand identity names must be kebab-case'),
+  packageName: z.string().min(1).optional(),
+  claim: z.string().min(1).optional(),
+  logoAssetPaths: z.record(z.string().min(1), z.string().min(1)).optional(),
+  colors: paletteSchema.optional()
+}).passthrough()
+
 export const brandThemeSchema = z.object({
   name: z.string().min(1).regex(/^[a-z0-9][a-z0-9-]*$/, 'Theme names must be kebab-case'),
   label: z.string().min(1),
@@ -107,5 +115,6 @@ export const brandGuideSchema = z.object({
   ui: z.record(z.string().min(1), z.unknown()).optional()
 })
 
+export type BrandIdentitySchema = z.infer<typeof brandIdentitySchema>
 export type BrandThemeSchema = z.infer<typeof brandThemeSchema>
 export type BrandGuideSchema = z.infer<typeof brandGuideSchema>

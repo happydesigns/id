@@ -57,7 +57,7 @@ export {
   createBrandThemeCookieName,
   createBrandThemeStateKey
 } from './runtime'
-export { brandGuideSchema, brandThemeSchema } from './schema'
+export { brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
 export { normalizeBrandThemes, resolveBrandThemes } from './themes'
 export type {
   ApplyBrandThemeOptions,
@@ -66,10 +66,17 @@ export type {
   BrandColorShade,
   BrandComponentCoverage,
   BrandCssVariables,
+  BrandGuideAssetEntry,
+  BrandGuideColorEntry,
+  BrandGuideComponentEntry,
+  BrandGuideContent,
   BrandGuide,
   BrandGuideDocsSection,
+  BrandGuideFontEntry,
+  BrandGuidePrinciple,
   BrandGuideSection,
   BrandGuideSectionInput,
+  BrandIdentity,
   BrandLogoRole,
   BrandLogoSet,
   BrandModuleOptions,
@@ -86,8 +93,10 @@ export type {
 } from './types'
 export {
   BrandValidationError,
+  defineBrandIdentity,
   defineBrandGuide,
   defineBrandTheme,
+  validateBrandIdentity,
   validateBrandGuide,
   validateBrandTheme
 } from './validation'

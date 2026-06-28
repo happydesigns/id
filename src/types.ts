@@ -90,6 +90,17 @@ export type BrandComponentCoverage = {
   notes?: string
 }
 
+export type BrandIdentity<
+  TLogoAssetPaths extends Record<string, string> = Record<string, string>,
+  TColors extends BrandPalette = BrandPalette
+> = {
+  name: string
+  packageName?: string
+  claim?: string
+  logoAssetPaths?: TLogoAssetPaths
+  colors?: TColors
+}
+
 export type BrandGuideSectionInput = {
   slug: string
   title: string
@@ -109,6 +120,56 @@ export type BrandGuideDocsSection = {
   title: string
   description: string
   to: string
+}
+
+export type BrandGuideColorEntry = {
+  name: string
+  token: string
+  hex: string
+  role: string
+  usage: string
+}
+
+export type BrandGuideFontEntry = {
+  name: string
+  role: string
+  stack: string
+  sample: string
+  notes: string
+}
+
+export type BrandGuideComponentEntry = {
+  name: string
+  purpose: string
+  guidance: string
+}
+
+export type BrandGuidePrinciple = {
+  title: string
+  description: string
+  icon: string
+}
+
+export type BrandGuideAssetEntry = {
+  name: string
+  role: string
+  path: string
+  usage: string
+}
+
+export type BrandGuideContent<TBrand = BrandIdentity> = {
+  brand: TBrand
+  principles: BrandGuidePrinciple[]
+  sections: readonly BrandGuideSectionInput[]
+  colors: BrandGuideColorEntry[]
+  fonts: BrandGuideFontEntry[]
+  components: BrandGuideComponentEntry[]
+  voice: {
+    attributes: string[]
+    dos: string[]
+    donts: string[]
+  }
+  assets: BrandGuideAssetEntry[]
 }
 
 export type BrandGuide = {

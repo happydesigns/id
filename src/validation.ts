@@ -1,5 +1,5 @@
-import { brandGuideSchema, brandThemeSchema } from './schema'
-import type { BrandGuide, BrandTheme } from './types'
+import { brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
+import type { BrandGuide, BrandIdentity, BrandTheme } from './types'
 
 export class BrandValidationError extends Error {
   constructor(message: string, readonly issues: string[]) {
@@ -26,6 +26,17 @@ export function validateBrandTheme(theme: unknown): BrandTheme {
   return result.data as BrandTheme
 }
 
+export function validateBrandIdentity(identity: unknown): BrandIdentity {
+  const result = brandIdentitySchema.safeParse(identity)
+
+  if (!result.success) {
+    const issues = formatIssues(result.error.issues)
+    throw new BrandValidationError('Invalid brand identity', issues)
+  }
+
+  return result.data as BrandIdentity
+}
+
 export function validateBrandGuide(guide: unknown): BrandGuide {
   const result = brandGuideSchema.safeParse(guide)
 
@@ -40,6 +51,11 @@ export function validateBrandGuide(guide: unknown): BrandGuide {
 export function defineBrandTheme<const T extends BrandTheme>(theme: T): T {
   validateBrandTheme(theme)
   return theme
+}
+
+export function defineBrandIdentity<const T extends BrandIdentity>(identity: T): T {
+  validateBrandIdentity(identity)
+  return identity
 }
 
 export function defineBrandGuide<const T extends BrandGuide>(guide: T): T {

@@ -11,6 +11,7 @@ import {
   createNuxtUiAppConfig,
   createThemeCssDeclarations,
   createThemeCssVars,
+  defineBrandIdentity,
   defineBrandGuide,
   defineBrandTheme,
   idBrandGuide,
@@ -19,6 +20,7 @@ import {
   normalizeBrandThemes,
   resolveBrandThemes,
   selectBrandAsset,
+  validateBrandIdentity,
   validateBrandTheme
 } from '../src'
 import {
@@ -30,6 +32,30 @@ import {
   happydesignsBrandGuide,
   happydesignsBrandTheme
 } from '../themes/happydesigns'
+
+describe('brand identity contract', () => {
+  it('accepts a raw brand identity source object', () => {
+    const identity = defineBrandIdentity({
+      name: 'client-brand',
+      packageName: '@client/brand',
+      claim: 'Clear systems for practical teams.',
+      logoAssetPaths: {
+        wordmark: '/logos/client-wordmark.svg'
+      },
+      colors: {
+        blue: '#155EEF'
+      }
+    })
+
+    expect(identity.logoAssetPaths.wordmark).toBe('/logos/client-wordmark.svg')
+  })
+
+  it('rejects non-kebab-case identity names', () => {
+    expect(() => validateBrandIdentity({
+      name: 'Client Brand'
+    })).toThrow(BrandValidationError)
+  })
+})
 
 describe('brand theme contract', () => {
   it('accepts a valid theme', () => {
