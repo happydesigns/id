@@ -66,9 +66,7 @@ pnpm prepare
 pnpm build:package
 pnpm dev
 pnpm docs
-pnpm test
-pnpm typecheck
-pnpm lint
+pnpm verify
 ```
 
 `pnpm dev` starts the playground app. `pnpm docs` starts the Docus documentation.

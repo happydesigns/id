@@ -84,7 +84,8 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && nuxt typecheck playground && nuxt typecheck docs && nuxt typecheck templates/brand-layer && nuxt typecheck templates/themed-app",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify": "pnpm lint && pnpm test && pnpm typecheck"
   },
   "dependencies": {
     "@nuxt/kit": "^4.4.8",
