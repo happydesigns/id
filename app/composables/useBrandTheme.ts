@@ -1,26 +1,17 @@
 import { computed, updateAppConfig, useAppConfig, useCookie, useState } from '#imports'
-import { applyBrandTheme as applyBrandThemeCore, createNuxtUiAppConfig, resolveBrandThemes } from '../../src'
+import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createNuxtUiAppConfig, resolveBrandThemes } from '../../src'
 import type { BrandRuntimeConfig, BrandTheme } from '../../src'
 
 type IdentityAppConfig = {
   id?: BrandRuntimeConfig
 }
 
-const THEME_COOKIE_PREFIX = 'happydesigns-id-theme'
-
 function getThemeList(config: IdentityAppConfig) {
   return resolveBrandThemes(config.id)
 }
 
-function slugifyCookiePart(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '') || 'default'
-}
-
 function getThemeCookieKey(config: IdentityAppConfig) {
-  return `${THEME_COOKIE_PREFIX}-${slugifyCookiePart(config.id?.name ?? 'default')}`
+  return createBrandThemeCookieName(config.id?.name)
 }
 
 function useThemeCookie(config: IdentityAppConfig) {

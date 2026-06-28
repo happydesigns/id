@@ -49,7 +49,12 @@ export {
 } from './guide-sections'
 export type { GuideSectionPathOptions } from './guide-sections'
 export { createNuxtUiAppConfig } from './nuxt-ui'
-export { applyBrandTheme } from './runtime'
+export {
+  applyBrandTheme,
+  brandThemeCookiePrefix,
+  brandThemeStyleElementId,
+  createBrandThemeCookieName
+} from './runtime'
 export { brandGuideSchema, brandThemeSchema } from './schema'
 export { normalizeBrandThemes, resolveBrandThemes } from './themes'
 export type {

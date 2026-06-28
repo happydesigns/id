@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import {
   BrandValidationError,
   applyBrandTheme,
+  brandThemeCookiePrefix,
+  brandThemeStyleElementId,
   collectBrandAssets,
+  createBrandThemeCookieName,
   createNuxtUiAppConfig,
   createThemeCssDeclarations,
   createThemeCssVars,
@@ -278,6 +281,13 @@ describe('brand theme lists', () => {
 })
 
 describe('runtime theme application', () => {
+  it('uses brand-neutral runtime identifiers', () => {
+    expect(brandThemeCookiePrefix).toBe('id-theme')
+    expect(brandThemeStyleElementId).toBe('id-theme-vars')
+    expect(createBrandThemeCookieName('Client Brand Docs')).toBe('id-theme-client-brand-docs')
+    expect(createBrandThemeCookieName('')).toBe('id-theme-default')
+  })
+
   it('applies css variables and emits app config', () => {
     const style = new Map<string, string>()
     const target = {

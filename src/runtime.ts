@@ -3,6 +3,20 @@ import { createNuxtUiAppConfig } from './nuxt-ui'
 import type { ApplyBrandThemeOptions, BrandTheme } from './types'
 import { validateBrandTheme } from './validation'
 
+export const brandThemeCookiePrefix = 'id-theme'
+export const brandThemeStyleElementId = 'id-theme-vars'
+
+function slugifyRuntimeIdentifier(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'default'
+}
+
+export function createBrandThemeCookieName(appName = 'default') {
+  return `${brandThemeCookiePrefix}-${slugifyRuntimeIdentifier(appName)}`
+}
+
 export function applyBrandTheme(theme: BrandTheme, options: ApplyBrandThemeOptions = {}) {
   const validatedTheme = validateBrandTheme(theme)
   const mode = options.mode ?? 'light'
