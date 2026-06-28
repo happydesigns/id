@@ -1,7 +1,43 @@
 import { addComponentsDir, addImportsDir, addPlugin, addTypeTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
+import type { Nuxt } from 'nuxt/schema'
 import type { BrandModuleOptions, BrandRuntimeConfig } from './src'
 
 export type ModuleOptions = BrandModuleOptions
+
+type RuntimeMdcOptions = {
+  highlight?: {
+    noApiRoute?: boolean
+  }
+}
+
+function applyRuntimeCompatibility(nuxt: Nuxt) {
+  const options = nuxt.options as Nuxt['options'] & {
+    mdc?: RuntimeMdcOptions
+  }
+
+  options.mdc = {
+    ...options.mdc,
+    highlight: {
+      ...options.mdc?.highlight,
+      noApiRoute: false
+    }
+  }
+
+  options.vite.optimizeDeps ??= {}
+  options.vite.optimizeDeps.include ??= []
+}
+
+function applyDocusTemplateCompatibility(nuxt: Nuxt) {
+  nuxt.hook('modules:done', () => {
+    const template = nuxt.options.build.templates.find((candidate) => {
+      return candidate.filename === 'docus.css'
+    })
+
+    if (template) {
+      template.write = true
+    }
+  })
+}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -16,6 +52,9 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
     const { componentPrefix = 'Id', ...runtimeOptions } = options
     const existing = (nuxt.options.appConfig.id ?? {}) as BrandRuntimeConfig
+
+    applyRuntimeCompatibility(nuxt)
+    applyDocusTemplateCompatibility(nuxt)
 
     nuxt.options.appConfig.id = {
       ...runtimeOptions,

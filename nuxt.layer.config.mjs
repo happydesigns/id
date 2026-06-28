@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { defineNuxtConfig } from 'nuxt/config'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
-const docusTemplateCssModule = resolve(currentDir, './modules/docus-template-css.mjs')
+const runtimeCompatModule = resolve(currentDir, './modules/runtime-compat.mjs')
 
 export default defineNuxtConfig({
   $meta: {
@@ -12,7 +12,7 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/ui',
-    docusTemplateCssModule
+    runtimeCompatModule
   ],
 
   components: [
@@ -26,18 +26,6 @@ export default defineNuxtConfig({
   css: [
     resolve(currentDir, './app/assets/css/id.css')
   ],
-
-  mdc: {
-    highlight: {
-      noApiRoute: false
-    }
-  },
-
-  vite: {
-    optimizeDeps: {
-      include: []
-    }
-  },
 
   compatibilityDate: 'latest'
 })
