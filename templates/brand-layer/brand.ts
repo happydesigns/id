@@ -1,4 +1,14 @@
-import { defineBrandGuide, defineBrandTheme } from '@happydesigns/id'
+import { defineBrandGuide, defineBrandIdentity, defineBrandTheme } from '@happydesigns/id'
+
+export const brandIdentity = defineBrandIdentity({
+  name: 'example-brand',
+  packageName: '@example/brand',
+  claim: 'A reusable Nuxt UI brand layer.',
+  logoAssetPaths: {
+    logo: '/favicon.svg',
+    appIcon: '/favicon.svg'
+  }
+})
 
 const brandColors = {
   primary: 'brand',
@@ -11,7 +21,7 @@ const brandColors = {
 }
 
 export const brandTheme = defineBrandTheme({
-  name: 'example-brand',
+  name: brandIdentity.name,
   label: 'Example Brand',
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
@@ -42,21 +52,21 @@ export const brandTheme = defineBrandTheme({
 })
 
 export const brandGuide = defineBrandGuide({
-  name: 'example-brand',
-  packageName: '@example/brand',
+  name: brandIdentity.name,
+  packageName: brandIdentity.packageName,
   title: 'Example Brand',
-  description: 'A reusable Nuxt UI brand layer.',
+  description: brandIdentity.claim,
   assets: {
     logos: {
       logo: {
         name: 'Example Brand logo',
-        src: '/favicon.svg',
+        src: brandIdentity.logoAssetPaths.logo,
         role: 'logo',
         alt: 'Example Brand'
       },
       appIcon: {
         name: 'Example Brand app icon',
-        src: '/favicon.svg',
+        src: brandIdentity.logoAssetPaths.appIcon,
         role: 'appIcon',
         alt: 'Example Brand'
       }
