@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CodeToTokenTransformStream } from '@shikijs/stream'
 import { ShikiStreamRenderer } from '@shikijs/stream/vue'
-import { computed, useColorMode } from '#imports'
+import { computed, nextTick, ref, useColorMode, watch } from '#imports'
 import {
   createLayerInstallSnippets,
   type LayerInstallPackageManager
@@ -32,6 +32,8 @@ const snippets = computed(() => createLayerInstallSnippets({
 const colorMode = useColorMode() as { value: string }
 const highlighter = await useLayerInstallHighlighter()
 const codeTheme = computed(() => colorMode.value === 'dark' ? 'material-theme-palenight' : 'material-theme-lighter')
+const isInstallHighlighted = ref(false)
+const isNuxtConfigHighlighted = ref(false)
 const prosePreUi = {
   copy: 'hidden sm:inline-flex'
 }
@@ -51,6 +53,24 @@ function createCodeStream(code: string, lang: string) {
 
 const installCodeStream = computed(() => createCodeStream(snippets.value.installCommand, 'bash'))
 const nuxtConfigCodeStream = computed(() => createCodeStream(snippets.value.nuxtConfig, 'ts'))
+
+async function revealInstallHighlight() {
+  await nextTick()
+  isInstallHighlighted.value = true
+}
+
+async function revealNuxtConfigHighlight() {
+  await nextTick()
+  isNuxtConfigHighlighted.value = true
+}
+
+watch([() => snippets.value.installCommand, codeTheme], () => {
+  isInstallHighlighted.value = false
+})
+
+watch([() => snippets.value.nuxtConfig, codeTheme], () => {
+  isNuxtConfigHighlighted.value = false
+})
 </script>
 
 <template>
@@ -80,9 +100,12 @@ const nuxtConfigCodeStream = computed(() => createCodeStream(snippets.value.nuxt
           :filename="snippets.packageManager"
           :ui="prosePreUi"
         >
+          <code v-if="!isInstallHighlighted">{{ snippets.installCommand }}</code>
           <ShikiStreamRenderer
+            v-show="isInstallHighlighted"
             :key="`install-${snippets.packageManager}-${codeTheme}`"
             :stream="installCodeStream"
+            @stream-start="revealInstallHighlight"
           />
         </ProsePre>
 
@@ -92,9 +115,12 @@ const nuxtConfigCodeStream = computed(() => createCodeStream(snippets.value.nuxt
           filename="nuxt.config.ts"
           :ui="prosePreUi"
         >
+          <code v-if="!isNuxtConfigHighlighted">{{ snippets.nuxtConfig }}</code>
           <ShikiStreamRenderer
+            v-show="isNuxtConfigHighlighted"
             :key="`config-${snippets.layer}-${codeTheme}`"
             :stream="nuxtConfigCodeStream"
+            @stream-start="revealNuxtConfigHighlight"
           />
         </ProsePre>
       </ProseCodeGroup>
