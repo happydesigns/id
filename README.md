@@ -6,7 +6,7 @@ Reusable identity system for Nuxt UI brand guides, Nuxt UI defaults, and Nuxt br
 
 ## What it provides
 
-- Typed brand-guide and primary brand-theme contracts.
+- Typed brand identity, brand-guide, and primary brand-theme contracts.
 - A neutral Nuxt UI baseline through `nuxtUiBrandTheme` and `idBrandGuide`.
 - Explicit theme exports for `@happydesigns/id/themes/nuxt-ui` and the local `@happydesigns/id/themes/happydesigns` demonstration theme.
 - Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
@@ -51,7 +51,7 @@ The layer export uses the standard `Id` component prefix. The module can registe
 
 - Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
 - A primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
-- A reusable brand source file such as `brand.ts` for package-owned identity data that is then wired into Nuxt through `app.config.ts`.
+- A reusable brand source file such as `brand.ts` for package-owned identity data, with theme and guide exports wired into Nuxt through `app.config.ts`.
 - Optional runtime theme lists for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
 
 The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes. The local happydesigns theme demonstrates the reusable contracts; `@happydesigns/brand` owns the final public happydesigns guide, assets, logo doctrine, palette meaning, and voice.
