@@ -52,8 +52,10 @@ export { createNuxtUiAppConfig } from './nuxt-ui'
 export {
   applyBrandTheme,
   brandThemeCookiePrefix,
+  brandThemeStatePrefix,
   brandThemeStyleElementId,
-  createBrandThemeCookieName
+  createBrandThemeCookieName,
+  createBrandThemeStateKey
 } from './runtime'
 export { brandGuideSchema, brandThemeSchema } from './schema'
 export { normalizeBrandThemes, resolveBrandThemes } from './themes'

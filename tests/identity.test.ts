@@ -3,9 +3,11 @@ import {
   BrandValidationError,
   applyBrandTheme,
   brandThemeCookiePrefix,
+  brandThemeStatePrefix,
   brandThemeStyleElementId,
   collectBrandAssets,
   createBrandThemeCookieName,
+  createBrandThemeStateKey,
   createNuxtUiAppConfig,
   createThemeCssDeclarations,
   createThemeCssVars,
@@ -283,9 +285,12 @@ describe('brand theme lists', () => {
 describe('runtime theme application', () => {
   it('uses brand-neutral runtime identifiers', () => {
     expect(brandThemeCookiePrefix).toBe('id-theme')
+    expect(brandThemeStatePrefix).toBe('id-theme-state')
     expect(brandThemeStyleElementId).toBe('id-theme-vars')
     expect(createBrandThemeCookieName('Client Brand Docs')).toBe('id-theme-client-brand-docs')
+    expect(createBrandThemeStateKey('Client Brand Docs')).toBe('id-theme-state:client-brand-docs')
     expect(createBrandThemeCookieName('')).toBe('id-theme-default')
+    expect(createBrandThemeStateKey('')).toBe('id-theme-state:default')
   })
 
   it('applies css variables and emits app config', () => {

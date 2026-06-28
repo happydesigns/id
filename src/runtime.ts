@@ -4,6 +4,7 @@ import type { ApplyBrandThemeOptions, BrandTheme } from './types'
 import { validateBrandTheme } from './validation'
 
 export const brandThemeCookiePrefix = 'id-theme'
+export const brandThemeStatePrefix = 'id-theme-state'
 export const brandThemeStyleElementId = 'id-theme-vars'
 
 function slugifyRuntimeIdentifier(value: string) {
@@ -15,6 +16,10 @@ function slugifyRuntimeIdentifier(value: string) {
 
 export function createBrandThemeCookieName(appName = 'default') {
   return `${brandThemeCookiePrefix}-${slugifyRuntimeIdentifier(appName)}`
+}
+
+export function createBrandThemeStateKey(appName = 'default') {
+  return `${brandThemeStatePrefix}:${slugifyRuntimeIdentifier(appName)}`
 }
 
 export function applyBrandTheme(theme: BrandTheme, options: ApplyBrandThemeOptions = {}) {

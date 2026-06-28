@@ -1,5 +1,5 @@
 import { computed, updateAppConfig, useAppConfig, useCookie, useState } from '#imports'
-import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createNuxtUiAppConfig, resolveBrandThemes } from '../../src'
+import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createBrandThemeStateKey, createNuxtUiAppConfig, resolveBrandThemes } from '../../src'
 import type { BrandRuntimeConfig, BrandTheme } from '../../src'
 
 type IdentityAppConfig = {
@@ -62,7 +62,7 @@ type SetThemeOptions = {
 
 export function useBrandTheme() {
   const appConfig = useAppConfig() as IdentityAppConfig
-  const currentName = useState<string>('happydesigns:id:theme', () => resolveInitialThemeName(appConfig))
+  const currentName = useState<string>(createBrandThemeStateKey(appConfig.id?.name), () => resolveInitialThemeName(appConfig))
 
   const themes = computed(() => getThemeList(appConfig))
   const currentTheme = computed(() => resolveTheme(themes.value, currentName.value))
