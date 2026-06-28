@@ -3,12 +3,13 @@ import { fileURLToPath } from 'node:url'
 import { defineNuxtConfig } from 'nuxt/config'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
+const docusTemplateCssModule = resolve(currentDir, '../modules/docus-template-css.mjs')
 
 export default defineNuxtConfig({
   extends: ['docus'],
   modules: [
     resolve(currentDir, '../module.ts'),
-    './modules/docus-css-dev'
+    docusTemplateCssModule
   ],
   css: [
     resolve(currentDir, '../themes/happydesigns/tokens.css')

@@ -50,6 +50,7 @@
     "dist",
     "app",
     "src",
+    "modules",
     "themes",
     "templates/brand-layer/app",
     "templates/brand-layer/public",

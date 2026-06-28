@@ -2,7 +2,6 @@
 import { computed } from '#imports'
 import {
   createLayerInstallSnippets,
-  layerInstallCommands,
   type LayerInstallPackageManager
 } from '../../src/layer-install'
 
@@ -27,7 +26,15 @@ const snippets = computed(() => createLayerInstallSnippets({
   packageManager: props.packageManager
 }))
 
-const managerCommand = computed(() => layerInstallCommands[snippets.value.packageManager])
+const codeGroup = computed(() => snippets.value.codeGroup ?? `::code-group
+\`\`\`bash [${snippets.value.packageManager}]
+${snippets.value.installCommand}
+\`\`\`
+
+\`\`\`ts [nuxt.config.ts]
+${snippets.value.nuxtConfig}
+\`\`\`
+::`)
 </script>
 
 <template>
@@ -49,15 +56,12 @@ const managerCommand = computed(() => layerInstallCommands[snippets.value.packag
       />
     </div>
 
-    <div class="overflow-hidden rounded-sm border border-default bg-inverted text-inverted">
-      <div class="border-b border-default bg-default/10 px-4 py-2 font-mono text-xs text-dimmed">
-        {{ snippets.packageManager }}
-      </div>
-      <pre class="overflow-x-auto p-4 text-sm leading-6"><code><span class="text-warning">{{ managerCommand }}</span> <span class="text-success">{{ snippets.packageName }}</span></code></pre>
-      <div class="border-y border-default bg-default/10 px-4 py-2 font-mono text-xs text-dimmed">
-        nuxt.config.ts
-      </div>
-      <pre class="overflow-x-auto p-4 text-sm leading-6"><code><span class="line block"><span class="text-info">export</span> default <span class="text-primary">defineNuxtConfig</span>({</span><span class="line block">  extends: [<span class="text-success">'{{ snippets.layer }}'</span>]</span><span class="line block">})</span></code></pre>
-    </div>
+    <slot :snippets="snippets">
+      <MDC
+        :value="codeGroup"
+        :tag="false"
+        :cache-key="`id-layer-install-${snippets.packageName}-${snippets.packageManager}`"
+      />
+    </slot>
   </div>
 </template>
