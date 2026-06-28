@@ -57,10 +57,10 @@ describe('layer install snippets', () => {
     }).layer).toBe('@client/brand')
   })
 
-  it('reuses a synchronous Shiki highlighter for runtime prose code', () => {
-    const highlighter = useLayerInstallHighlighter()
+  it('reuses a Shiki highlighter for runtime prose code', async () => {
+    const highlighter = await useLayerInstallHighlighter()
 
-    expect(useLayerInstallHighlighter()).toBe(highlighter)
+    await expect(useLayerInstallHighlighter()).resolves.toBe(highlighter)
     expect(highlighter.getLoadedLanguages()).toEqual(expect.arrayContaining(['bash', 'ts']))
     expect(highlighter.getLoadedThemes()).toEqual(expect.arrayContaining([
       'material-theme-lighter',
