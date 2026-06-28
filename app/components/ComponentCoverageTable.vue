@@ -9,9 +9,11 @@ import type { BrandComponentCoverage, BrandRuntimeConfig } from '../../src'
 
 const props = withDefaults(defineProps<{
   items?: BrandComponentCoverage[]
+  caption?: string
   emptyText?: string
 }>(), {
   items: undefined,
+  caption: 'Component coverage',
   emptyText: 'No component coverage entries are configured yet.'
 })
 
@@ -30,6 +32,9 @@ function statusMeta(status: ComponentCoverageStatus) {
   <div class="not-prose my-6 overflow-hidden rounded-sm border border-default bg-default">
     <div v-if="coverageItems.length" class="overflow-x-auto">
       <table class="min-w-full divide-y divide-default text-left text-sm">
+        <caption class="sr-only">
+          {{ caption }}
+        </caption>
         <thead class="bg-muted/60 text-xs uppercase text-muted">
           <tr>
             <th scope="col" class="px-4 py-3 font-medium">
@@ -79,7 +84,7 @@ function statusMeta(status: ComponentCoverageStatus) {
         </tbody>
       </table>
     </div>
-    <p v-else class="px-4 py-5 text-sm text-muted">
+    <p v-else role="status" class="px-4 py-5 text-sm text-muted">
       {{ emptyText }}
     </p>
   </div>
