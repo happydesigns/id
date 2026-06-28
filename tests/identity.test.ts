@@ -191,6 +191,28 @@ describe('brand guide contract', () => {
     expect(selectBrandAsset(assets, { fallbackRoles: ['lockup'] })?.src).toBe('/brand/lockup.svg')
   })
 
+  it('prefers inverse logo roles for dark media fallback', () => {
+    const assets = collectBrandAssets({
+      assets: {
+        logos: {
+          wordmark: {
+            name: 'Client wordmark',
+            src: '/brand/wordmark.svg',
+            role: 'wordmark'
+          },
+          wordmarkInverse: {
+            name: 'Client inverse wordmark',
+            src: '/brand/wordmark-inverse.svg',
+            role: 'wordmarkInverse'
+          }
+        }
+      }
+    })
+
+    expect(selectBrandAsset(assets, { media: 'light' })?.src).toBe('/brand/wordmark.svg')
+    expect(selectBrandAsset(assets, { media: 'dark' })?.src).toBe('/brand/wordmark-inverse.svg')
+  })
+
   it('maps guide asset entries into logo maps and file assets', () => {
     const entries = [
       {

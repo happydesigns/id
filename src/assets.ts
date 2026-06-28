@@ -16,7 +16,13 @@ export type BrandAssetSelection = {
   fallbackRoles?: string[]
 }
 
-export const defaultBrandAssetRoles = ['logo', 'wordmark', 'symbol', 'mark', 'appIcon'] as const
+export const defaultBrandAssetRoles = ['logo', 'wordmark', 'symbol', 'mark', 'appIcon', 'wordmarkInverse', 'symbolInverse'] as const
+
+const darkBrandAssetRoles = ['logo', 'wordmarkInverse', 'symbolInverse', 'wordmark', 'symbol', 'mark', 'appIcon'] as const
+
+function defaultFallbackRoles(media?: BrandAsset['media']) {
+  return [...(media === 'dark' ? darkBrandAssetRoles : defaultBrandAssetRoles)]
+}
 
 export function createBrandAsset(
   entry: BrandGuideAssetEntry,
@@ -60,14 +66,20 @@ function matchesRole(entry: BrandAssetEntry, role: string) {
 
 function selectFromEntries(entries: BrandAssetEntry[], selection: BrandAssetSelection = {}) {
   const requestedRole = selection.role ?? selection.variant
-  const fallbackRoles = selection.fallbackRoles ?? [...defaultBrandAssetRoles]
+  const fallbackRoles = selection.fallbackRoles ?? defaultFallbackRoles(selection.media)
 
   if (requestedRole) {
     return entries.find(entry => matchesRole(entry, requestedRole))?.asset
   }
 
-  return entries.find(entry => fallbackRoles.includes(entry.role) || fallbackRoles.includes(entry.asset.role))?.asset
-    ?? entries[0]?.asset
+  for (const role of fallbackRoles) {
+    const asset = entries.find(entry => matchesRole(entry, role))?.asset
+    if (asset) {
+      return asset
+    }
+  }
+
+  return entries[0]?.asset
 }
 
 export function collectBrandAssets(guide?: Pick<BrandGuide, 'assets'> | null): BrandAssetEntry[] {
