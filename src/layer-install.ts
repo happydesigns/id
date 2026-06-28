@@ -26,7 +26,12 @@ export const layerInstallCommands: Record<LayerInstallPackageManager, string> = 
 
 export function createLayerInstallSnippets(options: LayerInstallOptions): LayerInstallSnippets {
   const packageName = options.packageName.trim()
-  const layer = (options.layer ?? packageName).trim()
+
+  if (!packageName) {
+    throw new Error('Layer install packageName is required.')
+  }
+
+  const layer = options.layer?.trim() || packageName
   const packageManager = options.packageManager ?? 'pnpm'
 
   const installCommand = `${layerInstallCommands[packageManager]} ${packageName}`

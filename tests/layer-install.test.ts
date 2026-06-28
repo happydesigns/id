@@ -55,4 +55,17 @@ export default defineNuxtConfig({
       installCommand: 'npm install @client/brand'
     })
   })
+
+  it('rejects an empty package name', () => {
+    expect(() => createLayerInstallSnippets({
+      packageName: '  '
+    })).toThrow('Layer install packageName is required.')
+  })
+
+  it('falls back to the package name for a blank layer override', () => {
+    expect(createLayerInstallSnippets({
+      packageName: '@client/brand',
+      layer: '  '
+    }).layer).toBe('@client/brand')
+  })
 })
