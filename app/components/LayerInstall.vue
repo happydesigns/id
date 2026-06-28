@@ -25,16 +25,6 @@ const snippets = computed(() => createLayerInstallSnippets({
   layer: props.layer,
   packageManager: props.packageManager
 }))
-
-const codeGroup = computed(() => snippets.value.codeGroup ?? `::code-group
-\`\`\`bash [${snippets.value.packageManager}]
-${snippets.value.installCommand}
-\`\`\`
-
-\`\`\`ts [nuxt.config.ts]
-${snippets.value.nuxtConfig}
-\`\`\`
-::`)
 </script>
 
 <template>
@@ -58,7 +48,7 @@ ${snippets.value.nuxtConfig}
 
     <slot :snippets="snippets">
       <MDC
-        :value="codeGroup"
+        :value="snippets.codeGroup"
         :tag="false"
         :cache-key="`id-layer-install-${snippets.packageName}-${snippets.packageManager}`"
       />
