@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@happydesigns/id": "^0.1.0",
-    "@nuxt/ui": "^4.8.0",
-    "nuxt": "^4.4.2",
+    "@nuxt/ui": "^4.9.0",
+    "nuxt": "^4.4.8",
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {

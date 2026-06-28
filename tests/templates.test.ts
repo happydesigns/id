@@ -9,8 +9,17 @@ function readTemplateFile(template: string, file: string) {
   return readFileSync(join(rootDir, 'templates', template, file), 'utf8')
 }
 
+function readJson<T>(file: string): T {
+  return JSON.parse(readFileSync(join(rootDir, file), 'utf8')) as T
+}
+
 function expectTemplateFile(template: string, file: string) {
   expect(statSync(join(rootDir, 'templates', template, file)).isFile()).toBe(true)
+}
+
+type PackageJson = {
+  dependencies?: Record<string, string>
+  devDependencies?: Record<string, string>
 }
 
 describe('starter templates', () => {
@@ -77,5 +86,18 @@ describe('starter templates', () => {
     expect(readTemplateFile('themed-app', 'app/pages/index.vue')).toContain('rel="noopener noreferrer"')
     expect(readTemplateFile('themed-app', 'app/pages/index.vue')).not.toContain('<UApp>')
     expect(readTemplateFile('themed-app', 'app/pages/index.vue')).not.toContain('#imports')
+  })
+
+  it('keeps starter runtime dependencies aligned with the validated workspace stack', () => {
+    const rootPackage = readJson<PackageJson>('package.json')
+
+    for (const template of ['brand-layer', 'themed-app']) {
+      const templatePackage = readJson<PackageJson>(`templates/${template}/package.json`)
+
+      expect(templatePackage.dependencies?.['@nuxt/ui']).toBe(rootPackage.dependencies?.['@nuxt/ui'])
+      expect(templatePackage.dependencies?.nuxt).toBe(rootPackage.dependencies?.nuxt)
+      expect(templatePackage.devDependencies?.typescript).toBe(rootPackage.devDependencies?.typescript)
+      expect(templatePackage.devDependencies?.['vue-tsc']).toBe(rootPackage.devDependencies?.['vue-tsc'])
+    }
   })
 })
