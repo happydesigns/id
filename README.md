@@ -54,7 +54,7 @@ The layer export uses the standard `Id` component prefix. The module can registe
 - A reusable brand source file such as `brand.ts` for package-owned identity data that is then wired into Nuxt through `app.config.ts`.
 - Optional runtime theme lists for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
 
-The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes. The local happydesigns theme is a reference for migration work; `@happydesigns/brand` owns the final public happydesigns guide, assets, logo doctrine, palette meaning, and voice.
+The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes. The local happydesigns theme demonstrates the reusable contracts; `@happydesigns/brand` owns the final public happydesigns guide, assets, logo doctrine, palette meaning, and voice.
 
 Runtime themes are intentionally lightweight. They do not load arbitrary remote Vue components, uncompiled Tailwind classes, domain behavior, credentials, APIs, or server runtime changes.
 

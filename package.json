@@ -5,7 +5,7 @@
   "private": false,
   "packageManager": "pnpm@10.33.0",
   "author": "happydesigns",
-  "description": "Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for happydesigns projects.",
+  "description": "Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for Nuxt projects.",
   "homepage": "https://id.happydesigns.de",
   "repository": {
     "type": "git",

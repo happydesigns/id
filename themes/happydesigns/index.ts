@@ -83,7 +83,7 @@ const sharedUiDefaults = {
 export const happydesignsBrandTheme = defineBrandTheme({
   name: 'happydesigns',
   label: 'happydesigns',
-  description: 'Demonstration runtime theme adapted from current happydesigns brand-layer work.',
+  description: 'Demonstration runtime theme for id documentation examples.',
   typography: {
     sans: '"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif',
     mono: '"Geist Mono", "SFMono-Regular", ui-monospace, monospace'

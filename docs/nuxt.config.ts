@@ -23,6 +23,6 @@ export default defineNuxtConfig({
   llms: {
     domain: 'https://id.happydesigns.de',
     title: 'happydesigns id',
-    description: 'Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for happydesigns projects.'
+    description: 'Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for Nuxt projects.'
   }
 })
