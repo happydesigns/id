@@ -155,6 +155,8 @@ export type BrandGuideAssetEntry = {
   role: string
   path: string
   usage: string
+  media?: BrandAsset['media']
+  alt?: string
 }
 
 export type BrandGuideContent<TBrand = BrandIdentity> = {

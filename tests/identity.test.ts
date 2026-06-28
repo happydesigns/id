@@ -203,7 +203,9 @@ describe('brand guide contract', () => {
         name: 'Client signature',
         role: 'signature',
         path: '/brand/signature.svg',
-        usage: 'Footer signature.'
+        usage: 'Footer signature.',
+        media: 'dark' as const,
+        alt: 'Client signature for dark surfaces'
       }
     ]
 
@@ -213,8 +215,10 @@ describe('brand guide contract', () => {
     })
 
     expect(logos.wordmark?.src).toBe('/brand/wordmark.svg')
-    expect(logos.signature?.alt).toBe('Client signature')
+    expect(logos.signature?.alt).toBe('Client signature for dark surfaces')
+    expect(logos.signature?.media).toBe('dark')
     expect(assets.logos?.wordmark?.alt).toBe('Client wordmark asset')
+    expect(assets.logos?.signature?.alt).toBe('Client signature for dark surfaces')
     expect(assets.files?.map(asset => asset.role)).toEqual(['wordmark', 'signature'])
   })
 

@@ -26,7 +26,8 @@ export function createBrandAsset(
     name: entry.name,
     src: entry.path,
     role: entry.role,
-    alt: options.alt?.(entry) ?? entry.name
+    media: entry.media,
+    alt: entry.alt ?? options.alt?.(entry) ?? entry.name
   }
 }
 
