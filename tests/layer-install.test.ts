@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { useLayerInstallHighlighter } from '../app/composables/useLayerInstallHighlighter'
 import { createLayerInstallSnippets } from '../src'
 
 describe('layer install snippets', () => {
@@ -54,5 +55,20 @@ describe('layer install snippets', () => {
       packageName: '@client/brand',
       layer: '  '
     }).layer).toBe('@client/brand')
+  })
+
+  it('reuses a synchronous Shiki highlighter for runtime prose code', () => {
+    const highlighter = useLayerInstallHighlighter()
+
+    expect(useLayerInstallHighlighter()).toBe(highlighter)
+    expect(highlighter.getLoadedLanguages()).toEqual(expect.arrayContaining(['bash', 'ts']))
+    expect(highlighter.getLoadedThemes()).toEqual(expect.arrayContaining([
+      'material-theme-lighter',
+      'material-theme-palenight'
+    ]))
+    expect(highlighter.codeToTokens('pnpm add @client/brand', {
+      lang: 'bash',
+      theme: 'material-theme-lighter'
+    }).tokens[0]?.length).toBeGreaterThan(1)
   })
 })

@@ -1,24 +1,25 @@
-import { createHighlighterCore } from '@shikijs/core'
+import { createHighlighterCoreSync } from '@shikijs/core'
 import type { HighlighterCore } from '@shikijs/core'
 import { createJavaScriptRegexEngine } from '@shikijs/engine-javascript'
+import bash from '@shikijs/langs/bash'
+import typescript from '@shikijs/langs/typescript'
+import materialThemeLighter from '@shikijs/themes/material-theme-lighter'
+import materialThemePalenight from '@shikijs/themes/material-theme-palenight'
 
 let highlighter: HighlighterCore | null = null
-let highlighterPromise: Promise<HighlighterCore> | null = null
 
-export async function useLayerInstallHighlighter(): Promise<HighlighterCore> {
-  highlighterPromise ||= createHighlighterCore({
+export function useLayerInstallHighlighter(): HighlighterCore {
+  highlighter ||= createHighlighterCoreSync({
     langs: [
-      import('@shikijs/langs/bash'),
-      import('@shikijs/langs/typescript')
+      ...bash,
+      ...typescript
     ],
     themes: [
-      import('@shikijs/themes/material-theme-lighter'),
-      import('@shikijs/themes/material-theme-palenight')
+      materialThemeLighter,
+      materialThemePalenight
     ],
     engine: createJavaScriptRegexEngine()
   })
-
-  highlighter ||= await highlighterPromise
 
   return highlighter
 }

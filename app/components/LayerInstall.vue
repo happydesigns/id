@@ -29,7 +29,7 @@ const snippets = computed(() => createLayerInstallSnippets({
 }))
 
 const colorMode = useColorMode() as { value: string }
-const highlighter = await useLayerInstallHighlighter()
+const highlighter = useLayerInstallHighlighter()
 const codeTheme = computed(() => colorMode.value === 'dark' ? 'material-theme-palenight' : 'material-theme-lighter')
 const prosePreUi = {
   copy: 'hidden sm:inline-flex'
