@@ -76,7 +76,7 @@ export default defineNuxtConfig({
 })
 ```
 
-The default component prefix is `Id`. Set `componentPrefix` only when the host app already owns names such as `IdLogo`, `IdThemeSelect`, or `IdColorModeButton`. The module applies the same runtime compatibility defaults as the layer, including MDC runtime highlighting for install code groups and the Docus generated-CSS template write flag when Docus is present.
+The default component prefix is `Id`. Set `componentPrefix` only when the host app already owns names such as `IdLogo`, `IdThemeSelect`, or `IdColorModeButton`. The module applies the same MDC runtime highlighting default as the layer for install code groups.
 
 ## App Config Contract
 

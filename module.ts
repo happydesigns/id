@@ -27,18 +27,6 @@ function applyRuntimeCompatibility(nuxt: Nuxt) {
   options.vite.optimizeDeps.include ??= []
 }
 
-function applyDocusTemplateCompatibility(nuxt: Nuxt) {
-  nuxt.hook('modules:done', () => {
-    const template = nuxt.options.build.templates.find((candidate) => {
-      return candidate.filename === 'docus.css'
-    })
-
-    if (template) {
-      template.write = true
-    }
-  })
-}
-
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: '@happydesigns/id',
@@ -54,7 +42,6 @@ export default defineNuxtModule<ModuleOptions>({
     const existing = (nuxt.options.appConfig.id ?? {}) as BrandRuntimeConfig
 
     applyRuntimeCompatibility(nuxt)
-    applyDocusTemplateCompatibility(nuxt)
 
     nuxt.options.appConfig.id = {
       ...runtimeOptions,

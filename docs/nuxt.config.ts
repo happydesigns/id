@@ -3,13 +3,11 @@ import { fileURLToPath } from 'node:url'
 import { defineNuxtConfig } from 'nuxt/config'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
-const runtimeCompatModule = resolve(currentDir, '../modules/runtime-compat.mjs')
 
 export default defineNuxtConfig({
   extends: ['docus'],
   modules: [
-    resolve(currentDir, '../module.ts'),
-    runtimeCompatModule
+    resolve(currentDir, '../module.ts')
   ],
   css: [
     resolve(currentDir, '../themes/happydesigns/tokens.css')

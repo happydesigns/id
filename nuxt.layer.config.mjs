@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { defineNuxtConfig } from 'nuxt/config'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
-const runtimeCompatModule = resolve(currentDir, './modules/runtime-compat.mjs')
+const mdcHighlightModule = resolve(currentDir, './modules/mdc-highlight.mjs')
 
 export default defineNuxtConfig({
   $meta: {
@@ -12,7 +12,7 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/ui',
-    runtimeCompatModule
+    mdcHighlightModule
   ],
 
   components: [
