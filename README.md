@@ -13,6 +13,7 @@ Reusable identity system for Nuxt UI brand guides, Nuxt UI defaults, and Nuxt br
 - CSS variable generation for light and dark themes.
 - Nuxt UI app-config helpers for `ui.colors` and component defaults.
 - A Nuxt layer and module for applying identity runtime behavior.
+- Brand-guide helper components for docs links, example frames, install snippets, and component coverage.
 - Starters for brand layers and themed apps.
 - Docus documentation for brand-guide authors and Nuxt developers.
 

@@ -51,7 +51,9 @@ export default defineNuxtConfig({
 
 The `./nuxt` export points at the public layer config, not the repository's development `nuxt.config.ts`. It intentionally does not include repo-only modules such as `@nuxt/eslint`.
 
-The layer also ships small brand-neutral documentation helpers. `IdNuxtUiDocsLink` renders compact links to Nuxt UI documentation from typed link data or the MDC-friendly `Label|url; Label|url` string syntax. `IdExampleFrame` provides the standard example surface for brand-guide demos while keeping the actual example content in the brand layer. `IdLayerInstall` renders a neutral install surface for a brand package and its Nuxt `extends` snippet. `IdComponentCoverageTable` renders `id.guide.componentCoverage` without owning the actual brand coverage decisions.
+`createLayerInstallSnippets()` returns plain install and `nuxt.config.ts` strings plus an MDC `::code-group` source string for standard Docus/Nuxt UI prose rendering.
+
+The layer also ships small brand-neutral documentation helpers. `IdNuxtUiDocsLink` renders compact links to Nuxt UI documentation from typed link data or the MDC-friendly `Label|url; Label|url` string syntax. `IdExampleFrame` provides the standard example surface for brand-guide demos while keeping the actual example content in the brand layer. `IdLayerInstall` renders a neutral install surface for a brand package and its Nuxt `extends` snippet through the standard MDC prose pipeline. `IdComponentCoverageTable` renders `id.guide.componentCoverage` without owning the actual brand coverage decisions.
 
 Guide-section helpers such as `defineGuideSections()` and `createGuideDocsSections()` keep section metadata in a brand-owned source file while mapping it to the smaller `id.guide.docs.sections` navigation shape.
 
