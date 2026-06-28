@@ -37,7 +37,7 @@ Explicit theme package exports:
 - `@happydesigns/id/themes/happydesigns`
 - `@happydesigns/id/themes/happydesigns/tokens.css`
 
-The `nuxt-ui` theme is the standard baseline. The `happydesigns` theme is a demonstration and migration reference for these docs until the `@happydesigns/brand` package exports the canonical happydesigns contract.
+The `nuxt-ui` theme is the standard baseline. The `happydesigns` theme is a local demonstration for these docs; `@happydesigns/brand` owns the canonical happydesigns guide, assets, and doctrine.
 
 ## Nuxt Layer
 

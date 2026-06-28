@@ -145,7 +145,7 @@ export const happydesignsBrandGuide = defineBrandGuide({
   name: 'happydesigns',
   packageName: '@happydesigns/brand',
   title: 'happydesigns',
-  description: 'Demonstration identity contract used by the id documentation until @happydesigns/brand exports the canonical guide and theme.',
+  description: 'Demonstration identity contract used by the id documentation; @happydesigns/brand owns the canonical guide and theme.',
   semanticColors: happydesignsColors,
   cssVariables: happydesignsBrandTheme.cssVariables,
   typography: happydesignsBrandTheme.typography,
