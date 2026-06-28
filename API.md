@@ -6,39 +6,50 @@ This file describes the public API direction for `@happydesigns/id`, the Nuxt UI
 
 The root package exports:
 
-- `defineBrandGuide(guide)`
-- `defineBrandIdentity(identity)`
-- `defineBrandTheme(theme)`
-- `validateBrandGuide(guide)`
-- `validateBrandIdentity(identity)`
-- `validateBrandTheme(theme)`
-- `createThemeCssVars(theme, options?)`
-- `createThemeCssDeclarations(theme, mode?)`
-- `createNuxtUiAppConfig(theme)`
-- `createBrandAsset(entry)`
-- `createBrandLogoSet(entries)`
-- `createBrandGuideAssets(entries)`
-- `collectBrandAssets(guide)`
-- `selectBrandAsset(entries, selection?)`
-- `normalizeBrandThemes(themes?)`
-- `resolveBrandThemes(config?)`
-- `resolveBrandThemeName(config?, themes?)`
-- `parseDocsLinks(input?)`
-- `createLayerInstallSnippets(options)`
-- `defineGuideSections(sections)`
-- `normalizeGuideSections(sections?)`
-- `createGuideDocsSections(sections?, options?)`
-- `createGuideSectionPath(section, options?)`
-- `findGuideSection(sections?, slug)`
-- `normalizeComponentCoverage(items?)`
-- `summarizeComponentCoverage(items?)`
-- `applyBrandTheme(theme, options?)`
-- `createBrandThemeCookieName(appName?)`
-- `createBrandThemeStateKey(appName?)`
+- `defineBrandGuide`
+- `defineBrandIdentity`
+- `defineBrandTheme`
+- `validateBrandGuide`
+- `validateBrandIdentity`
+- `validateBrandTheme`
+- `BrandValidationError`
+- `brandGuideSchema`
+- `brandIdentitySchema`
+- `brandThemeSchema`
+- `createThemeCssVars`
+- `createThemeCssDeclarations`
+- `applyCssVariables`
+- `createNuxtUiAppConfig`
+- `createBrandAsset`
+- `createBrandLogoSet`
+- `createBrandGuideAssets`
+- `defaultBrandAssetRoles`
+- `collectBrandAssets`
+- `selectBrandAsset`
+- `normalizeBrandThemes`
+- `resolveBrandThemes`
+- `resolveBrandThemeName`
+- `parseDocsLinks`
+- `createLayerInstallSnippets`
+- `layerInstallCommands`
+- `layerInstallPackageManagers`
+- `defineGuideSections`
+- `normalizeGuideSections`
+- `createGuideDocsSections`
+- `createGuideSectionPath`
+- `findGuideSection`
+- `componentCoverageStatuses`
+- `componentCoverageStatusMeta`
+- `normalizeComponentCoverage`
+- `summarizeComponentCoverage`
+- `applyBrandTheme`
+- `createBrandThemeCookieName`
+- `createBrandThemeStateKey`
 - `brandThemeCookiePrefix`
 - `brandThemeStatePrefix`
 - `brandThemeStyleElementId`
 - `nuxtUiBrandTheme`
+- `neutralBrandTheme`
 - `idBrandGuide`
 - brand-guide and brand-theme types
 
