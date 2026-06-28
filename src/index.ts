@@ -1,10 +1,14 @@
 export {
   collectBrandAssets,
+  createBrandAsset,
+  createBrandGuideAssets,
+  createBrandLogoSet,
   defaultBrandAssetRoles,
   selectBrandAsset
 } from './assets'
 export type {
   BrandAssetEntry,
+  BrandGuideAssetMappingOptions,
   BrandAssetSelection
 } from './assets'
 export {

@@ -15,6 +15,9 @@ The root package exports:
 - `createThemeCssVars(theme, options?)`
 - `createThemeCssDeclarations(theme, mode?)`
 - `createNuxtUiAppConfig(theme)`
+- `createBrandAsset(entry)`
+- `createBrandLogoSet(entries)`
+- `createBrandGuideAssets(entries)`
 - `collectBrandAssets(guide)`
 - `selectBrandAsset(entries, selection?)`
 - `normalizeBrandThemes(themes?)`

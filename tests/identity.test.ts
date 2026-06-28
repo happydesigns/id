@@ -6,6 +6,8 @@ import {
   brandThemeStatePrefix,
   brandThemeStyleElementId,
   collectBrandAssets,
+  createBrandGuideAssets,
+  createBrandLogoSet,
   createBrandThemeCookieName,
   createBrandThemeStateKey,
   createNuxtUiAppConfig,
@@ -187,6 +189,33 @@ describe('brand guide contract', () => {
     expect(selectBrandAsset(assets, { role: 'signature', media: 'dark' })?.src).toBe('/brand/signature-dark.svg')
     expect(selectBrandAsset(assets, { role: 'signature', media: 'light' })?.src).toBe('/brand/signature-dark.svg')
     expect(selectBrandAsset(assets, { fallbackRoles: ['lockup'] })?.src).toBe('/brand/lockup.svg')
+  })
+
+  it('maps guide asset entries into logo maps and file assets', () => {
+    const entries = [
+      {
+        name: 'Client wordmark',
+        role: 'wordmark',
+        path: '/brand/wordmark.svg',
+        usage: 'Primary navigation identity.'
+      },
+      {
+        name: 'Client signature',
+        role: 'signature',
+        path: '/brand/signature.svg',
+        usage: 'Footer signature.'
+      }
+    ]
+
+    const logos = createBrandLogoSet(entries)
+    const assets = createBrandGuideAssets(entries, {
+      alt: entry => `${entry.name} asset`
+    })
+
+    expect(logos.wordmark?.src).toBe('/brand/wordmark.svg')
+    expect(logos.signature?.alt).toBe('Client signature')
+    expect(assets.logos?.wordmark?.alt).toBe('Client wordmark asset')
+    expect(assets.files?.map(asset => asset.role)).toEqual(['wordmark', 'signature'])
   })
 
   it('ships an id brand guide for the default Nuxt UI baseline', () => {

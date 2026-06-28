@@ -1,8 +1,12 @@
-import type { BrandAsset, BrandGuide } from './types'
+import type { BrandAsset, BrandGuide, BrandGuideAssetEntry, BrandLogoSet } from './types'
 
 export type BrandAssetEntry = {
   role: string
   asset: BrandAsset
+}
+
+export type BrandGuideAssetMappingOptions = {
+  alt?: (entry: BrandGuideAssetEntry) => string | undefined
 }
 
 export type BrandAssetSelection = {
@@ -13,6 +17,37 @@ export type BrandAssetSelection = {
 }
 
 export const defaultBrandAssetRoles = ['logo', 'wordmark', 'symbol', 'mark', 'appIcon'] as const
+
+export function createBrandAsset(
+  entry: BrandGuideAssetEntry,
+  options: BrandGuideAssetMappingOptions = {}
+): BrandAsset {
+  return {
+    name: entry.name,
+    src: entry.path,
+    role: entry.role,
+    alt: options.alt?.(entry) ?? entry.name
+  }
+}
+
+export function createBrandLogoSet(
+  entries: readonly BrandGuideAssetEntry[],
+  options: BrandGuideAssetMappingOptions = {}
+): BrandLogoSet {
+  return Object.fromEntries(
+    entries.map(entry => [entry.role, createBrandAsset(entry, options)])
+  ) as BrandLogoSet
+}
+
+export function createBrandGuideAssets(
+  entries: readonly BrandGuideAssetEntry[],
+  options: BrandGuideAssetMappingOptions = {}
+): NonNullable<BrandGuide['assets']> {
+  return {
+    logos: createBrandLogoSet(entries, options),
+    files: entries.map(entry => createBrandAsset(entry, options))
+  }
+}
 
 function matchesMedia(asset: BrandAsset, media?: BrandAsset['media']) {
   return !media || !asset.media || asset.media === 'any' || asset.media === media
