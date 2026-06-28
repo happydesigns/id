@@ -10,7 +10,7 @@ export default defineNuxtConfig({
     resolve(currentDir, '../module.ts')
   ],
   css: [
-    resolve(currentDir, '../themes/happydesigns/tokens.css')
+    resolve(currentDir, '../themes/sample-brand/tokens.css')
   ],
   compatibilityDate: 'latest',
   llms: {

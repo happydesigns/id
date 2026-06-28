@@ -44,10 +44,10 @@ The root package exports:
 Explicit theme package exports:
 
 - `@happydesigns/id/themes/nuxt-ui`
-- `@happydesigns/id/themes/happydesigns`
-- `@happydesigns/id/themes/happydesigns/tokens.css`
+- `@happydesigns/id/themes/sample-brand`
+- `@happydesigns/id/themes/sample-brand/tokens.css`
 
-The `nuxt-ui` theme is the standard baseline. The `happydesigns` theme is a local demonstration for these docs; `@happydesigns/brand` owns the canonical happydesigns guide, assets, and doctrine.
+The `nuxt-ui` theme is the standard baseline. The `sample-brand` theme is a neutral local demonstration for these docs; `@happydesigns/brand` owns the canonical happydesigns guide, assets, and doctrine.
 
 ## Nuxt Layer
 

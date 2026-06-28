@@ -31,9 +31,9 @@ import {
   testBrandThemes
 } from './fixtures'
 import {
-  happydesignsBrandGuide,
-  happydesignsBrandTheme
-} from '../themes/happydesigns'
+  sampleBrandGuide,
+  sampleBrandTheme
+} from '../themes/sample-brand'
 
 describe('brand identity contract', () => {
   it('accepts a raw brand identity source object', () => {
@@ -250,10 +250,10 @@ describe('brand guide contract', () => {
     expect(idBrandGuide.usage?.avoid).toContain('domain behavior')
   })
 
-  it('ships a local happydesigns guide as a documentation demo boundary', () => {
-    expect(happydesignsBrandGuide.packageName).toBe('@happydesigns/brand')
-    expect(happydesignsBrandGuide.semanticColors?.primary).toBe('coral')
-    expect(happydesignsBrandGuide.usage?.useFor).toContain('contract demonstrations')
+  it('ships a neutral sample guide as a documentation demo boundary', () => {
+    expect(sampleBrandGuide.packageName).toBe('@example/brand')
+    expect(sampleBrandGuide.semanticColors?.primary).toBe('sample')
+    expect(sampleBrandGuide.usage?.useFor).toContain('contract demonstrations')
   })
 })
 
@@ -353,13 +353,13 @@ describe('brand theme lists', () => {
     expect(themes[0]?.label).toBe('Studio')
   })
 
-  it('keeps the local happydesigns theme runtime-safe and reversible', () => {
-    expect(happydesignsBrandTheme.name).toBe('happydesigns')
-    expect(happydesignsBrandTheme.ui?.colors?.primary).toBe('coral')
-    expect(happydesignsBrandTheme.cssVariables?.light?.['--ui-bg']).toBe('#FAF7F2')
-    expect(happydesignsBrandTheme.cssVariables?.dark?.['--ui-bg']).toBe('#242423')
-    expect(happydesignsBrandTheme.ui?.button).toBeTruthy()
-    expect(happydesignsBrandTheme.ui?.card).toBeTruthy()
+  it('keeps the sample brand theme runtime-safe and reversible', () => {
+    expect(sampleBrandTheme.name).toBe('sample-brand')
+    expect(sampleBrandTheme.ui?.colors?.primary).toBe('sample')
+    expect(sampleBrandTheme.cssVariables?.light?.['--ui-bg']).toBe('white')
+    expect(sampleBrandTheme.cssVariables?.dark?.['--ui-bg']).toBe('#0F172A')
+    expect(sampleBrandTheme.ui?.button).toBeTruthy()
+    expect(sampleBrandTheme.ui?.card).toBeTruthy()
   })
 })
 
@@ -463,10 +463,10 @@ describe('runtime theme application', () => {
       }
     } as HTMLElement
 
-    applyBrandTheme(happydesignsBrandTheme, {
+    applyBrandTheme(sampleBrandTheme, {
       target
     })
-    expect(style.get('--ui-primary')).toBe('#F28564')
+    expect(style.get('--ui-primary')).toBe('#2563EB')
 
     applyBrandTheme(nuxtUiBrandTheme, {
       target
@@ -474,6 +474,6 @@ describe('runtime theme application', () => {
 
     expect(style.get('--ui-bg')).toBe('white')
     expect(style.has('--ui-primary')).toBe(false)
-    expect(style.has('--hd-text-body')).toBe(false)
+    expect(style.has('--sample-surface-accent')).toBe(false)
   })
 })

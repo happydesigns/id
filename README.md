@@ -8,7 +8,7 @@ Reusable identity system for Nuxt UI brand guides, Nuxt UI defaults, and Nuxt br
 
 - Typed brand identity, brand-guide, and primary brand-theme contracts.
 - A neutral Nuxt UI baseline through `nuxtUiBrandTheme` and `idBrandGuide`.
-- Explicit theme exports for `@happydesigns/id/themes/nuxt-ui` and the local `@happydesigns/id/themes/happydesigns` demonstration theme.
+- Explicit theme exports for `@happydesigns/id/themes/nuxt-ui` and the neutral `@happydesigns/id/themes/sample-brand` reference theme.
 - Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
 - CSS variable generation for light and dark themes.
 - Nuxt UI app-config helpers for `ui.colors` and component defaults.
@@ -54,7 +54,7 @@ The layer export uses the standard `Id` component prefix. The module can registe
 - A reusable brand source file such as `brand.ts` for package-owned identity data, with theme and guide exports wired into Nuxt through `app.config.ts`.
 - Optional runtime theme lists for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
 
-The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes. The local happydesigns theme demonstrates the reusable contracts; `@happydesigns/brand` owns the final public happydesigns guide, assets, logo doctrine, palette meaning, and voice.
+The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes. The sample brand theme demonstrates the reusable contracts without carrying doctrine from a real brand; `@happydesigns/brand` owns the final public happydesigns guide, assets, logo doctrine, palette meaning, and voice.
 
 Runtime themes are intentionally lightweight. They do not load arbitrary remote Vue components, uncompiled Tailwind classes, domain behavior, credentials, APIs, or server runtime changes.
 

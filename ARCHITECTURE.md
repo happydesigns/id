@@ -21,7 +21,7 @@ This file defines the technical structure for `@happydesigns/id`: Nuxt UI brand-
 | `module.ts` | Optional Nuxt module integration, module options, runtime registration. | Brand-specific visual decisions. |
 | `nuxt.layer.config.ts` | Public Nuxt layer export for consumers extending `@happydesigns/id/nuxt`. | Repository-only tooling such as lint modules. |
 | `nuxt.config.ts` | Development config for this repository, importing the public layer and adding local tooling. | Public layer behavior. |
-| `themes/` | Shipped reference themes such as the Nuxt UI baseline and a local happydesigns demonstration theme. | Canonical brand doctrine, product-specific behavior, or private customer configuration. |
+| `themes/` | Shipped reference themes such as the Nuxt UI baseline and a neutral sample brand demonstration theme. | Canonical brand doctrine, product-specific behavior, or private customer configuration. |
 | `templates/` | Starter projects for brand layers and themed apps. | Generated project state or private credentials. |
 | `playground/` | Visual QA for runtime themes and layer behavior. | Product documentation source of truth. |
 | `docs/` | Docus documentation for identity concepts and usage. | Source-derived implementation facts that should be generated or tested. |
