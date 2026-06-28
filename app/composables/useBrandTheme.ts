@@ -1,6 +1,6 @@
 import { computed, updateAppConfig, useAppConfig, useCookie, useState } from '#imports'
 import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createBrandThemeStateKey, createNuxtUiAppConfig, resolveBrandThemes } from '../../src'
-import type { BrandRuntimeConfig, BrandTheme } from '../../src'
+import type { BrandRuntimeConfig, BrandTheme, NuxtUiAppConfig } from '../../src'
 
 type IdentityAppConfig = {
   id?: BrandRuntimeConfig
@@ -60,6 +60,10 @@ type SetThemeOptions = {
   persist?: boolean
 }
 
+function updateNuxtUiAppConfig(config: NuxtUiAppConfig) {
+  updateAppConfig(config as Parameters<typeof updateAppConfig>[0])
+}
+
 export function useBrandTheme() {
   const appConfig = useAppConfig() as IdentityAppConfig
   const currentName = useState<string>(createBrandThemeStateKey(appConfig.id?.name), () => resolveInitialThemeName(appConfig))
@@ -79,10 +83,10 @@ export function useBrandTheme() {
       applyBrandThemeCore(theme, {
         mode: resolveDocumentMode(),
         target: document.documentElement,
-        updateAppConfig
+        updateAppConfig: updateNuxtUiAppConfig
       })
     } else {
-      updateAppConfig(createNuxtUiAppConfig(theme))
+      updateNuxtUiAppConfig(createNuxtUiAppConfig(theme))
     }
 
     currentName.value = theme.name
@@ -99,10 +103,10 @@ export function useBrandTheme() {
       applyBrandThemeCore(theme, {
         mode: resolveDocumentMode(),
         target: document.documentElement,
-        updateAppConfig
+        updateAppConfig: updateNuxtUiAppConfig
       })
     } else {
-      updateAppConfig(createNuxtUiAppConfig(theme))
+      updateNuxtUiAppConfig(createNuxtUiAppConfig(theme))
     }
 
     currentName.value = theme.name
