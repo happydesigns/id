@@ -14,13 +14,9 @@ const links = [
 </script>
 
 <template>
-  <UApp>
-    <UMain>
-      <UPageHero
-        title="Example Brand"
-        description="A Nuxt UI brand layer powered by @happydesigns/id."
-        :links="links"
-      />
-    </UMain>
-  </UApp>
+  <UPageHero
+    title="Example Brand"
+    description="A Nuxt UI brand layer powered by @happydesigns/id."
+    :links="links"
+  />
 </template>
