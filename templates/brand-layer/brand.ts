@@ -1,4 +1,4 @@
-import { defineBrandGuide, defineBrandIdentity, defineBrandTheme } from '@happydesigns/id'
+import { createBrandGuideAssets, defineBrandGuide, defineBrandIdentity, defineBrandTheme } from '@happydesigns/id'
 
 export const brandIdentity = defineBrandIdentity({
   name: 'example-brand',
@@ -19,6 +19,21 @@ const brandColors = {
   error: 'red',
   neutral: 'slate'
 }
+
+const brandAssets = [
+  {
+    name: 'Example Brand logo',
+    role: 'logo',
+    path: brandIdentity.logoAssetPaths.logo,
+    usage: 'Primary logo for headers and brand-owned surfaces.'
+  },
+  {
+    name: 'Example Brand app icon',
+    role: 'appIcon',
+    path: brandIdentity.logoAssetPaths.appIcon,
+    usage: 'Favicon, touch icon, and square app contexts.'
+  }
+] as const
 
 export const brandTheme = defineBrandTheme({
   name: brandIdentity.name,
@@ -56,22 +71,7 @@ export const brandGuide = defineBrandGuide({
   packageName: brandIdentity.packageName,
   title: 'Example Brand',
   description: brandIdentity.claim,
-  assets: {
-    logos: {
-      logo: {
-        name: 'Example Brand logo',
-        src: brandIdentity.logoAssetPaths.logo,
-        role: 'logo',
-        alt: 'Example Brand'
-      },
-      appIcon: {
-        name: 'Example Brand app icon',
-        src: brandIdentity.logoAssetPaths.appIcon,
-        role: 'appIcon',
-        alt: 'Example Brand'
-      }
-    }
-  },
+  assets: createBrandGuideAssets(brandAssets),
   semanticColors: brandColors,
   cssVariables: brandTheme.cssVariables,
   typography: brandTheme.typography,
