@@ -53,7 +53,7 @@ Runtime themes cannot guarantee:
 
 The npm package publishes built JavaScript and declarations from `dist/` for the TypeScript API, theme subpaths, and Nuxt module. The Nuxt layer export stays as `nuxt.layer.config.ts`, matching Docus-style layer packages where Nuxt loads the layer source directly. Runtime layer files are shipped both as source for the layer and copied into `dist/app` for the built module.
 
-`nuxt.config.ts` is intentionally a repository-development config. It imports the public layer config and can add `@nuxt/eslint` and other local tooling because it is not the `./nuxt` package export. Consumers extending `@happydesigns/id/nuxt` inherit the public layer only: Nuxt UI, `Id` components, identity CSS, and the MDC highlighting setting used by install code groups. Docus-specific CSS generation remains owned by Docus.
+`nuxt.config.ts` is intentionally a repository-development config. It imports the public layer config and can add `@nuxt/eslint` and other local tooling because it is not the `./nuxt` package export. Consumers extending `@happydesigns/id/nuxt` inherit the public layer only: Nuxt UI, `Id` components, identity CSS, and brand-guide runtime helpers. Docus-specific CSS generation and markdown highlighting remain owned by Docus.
 
 Consuming apps should set their own `compatibilityDate` in their app config. Nuxt merges the app config on top of extended layers, so an explicit app-level date remains the controlling deployment contract. The layer keeps `compatibilityDate: 'latest'` for local development and starters that intentionally follow current Nuxt behavior.
 

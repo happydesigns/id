@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed } from '#imports'
+import { ShikiCachedRenderer } from '@shikijs/stream/vue'
+import { computed, useColorMode } from '#imports'
 import {
   createLayerInstallSnippets,
   type LayerInstallPackageManager
 } from '../../src/layer-install'
+import { useLayerInstallHighlighter } from '../composables/useLayerInstallHighlighter'
 
 const props = withDefaults(defineProps<{
   packageName: string
@@ -25,6 +27,10 @@ const snippets = computed(() => createLayerInstallSnippets({
   layer: props.layer,
   packageManager: props.packageManager
 }))
+
+const colorMode = useColorMode() as { value: string }
+const highlighter = await useLayerInstallHighlighter()
+const codeTheme = computed(() => colorMode.value === 'dark' ? 'material-theme-palenight' : 'material-theme-lighter')
 </script>
 
 <template>
@@ -47,11 +53,35 @@ const snippets = computed(() => createLayerInstallSnippets({
     </div>
 
     <slot :snippets="snippets">
-      <MDC
-        :value="snippets.codeGroup"
-        :tag="false"
-        :cache-key="`id-layer-install-${snippets.packageName}-${snippets.packageManager}`"
-      />
+      <ProseCodeGroup>
+        <ProsePre
+          :code="snippets.installCommand"
+          language="bash"
+          :filename="snippets.packageManager"
+        >
+          <ShikiCachedRenderer
+            :key="`install-${snippets.packageManager}-${codeTheme}`"
+            :highlighter="highlighter"
+            :code="snippets.installCommand"
+            lang="bash"
+            :theme="codeTheme"
+          />
+        </ProsePre>
+
+        <ProsePre
+          :code="snippets.nuxtConfig"
+          language="ts"
+          filename="nuxt.config.ts"
+        >
+          <ShikiCachedRenderer
+            :key="`config-${snippets.layer}-${codeTheme}`"
+            :highlighter="highlighter"
+            :code="snippets.nuxtConfig"
+            lang="ts"
+            :theme="codeTheme"
+          />
+        </ProsePre>
+      </ProseCodeGroup>
     </slot>
   </div>
 </template>

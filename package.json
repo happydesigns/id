@@ -50,7 +50,6 @@
     "dist",
     "app",
     "src",
-    "modules",
     "themes",
     "templates/brand-layer/app",
     "templates/brand-layer/public",
@@ -90,6 +89,11 @@
   "dependencies": {
     "@nuxt/kit": "^4.4.8",
     "@nuxt/ui": "^4.9.0",
+    "@shikijs/core": "^4.2.0",
+    "@shikijs/engine-javascript": "^4.2.0",
+    "@shikijs/langs": "^4.2.0",
+    "@shikijs/stream": "^4.2.0",
+    "@shikijs/themes": "^4.2.0",
     "nuxt": "^4.4.8",
     "zod": "^4.4.3"
   },

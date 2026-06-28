@@ -14,7 +14,6 @@ export type LayerInstallSnippets = {
   packageManager: LayerInstallPackageManager
   installCommand: string
   nuxtConfig: string
-  codeGroup: string
 }
 
 export const layerInstallCommands: Record<LayerInstallPackageManager, string> = {
@@ -44,15 +43,6 @@ export function createLayerInstallSnippets(options: LayerInstallOptions): LayerI
     layer,
     packageManager,
     installCommand,
-    nuxtConfig,
-    codeGroup: `::code-group
-\`\`\`bash [${packageManager}]
-${installCommand}
-\`\`\`
-
-\`\`\`ts [nuxt.config.ts]
-${nuxtConfig}
-\`\`\`
-::`
+    nuxtConfig
   }
 }
