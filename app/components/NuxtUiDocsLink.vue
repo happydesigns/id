@@ -28,7 +28,7 @@ const getLabel = (link: DocsLink) => link.label || props.label
       trailing-icon="i-lucide-external-link"
       :to="link.to"
       target="_blank"
-      rel="noreferrer"
+      rel="noopener noreferrer"
       :aria-label="`Open ${getLabel(link)} in Nuxt UI docs`"
     />
   </div>
