@@ -22,3 +22,21 @@ export function resolveBrandThemes(config: Pick<BrandRuntimeConfig, 'theme' | 't
     ...additionalThemes.filter(theme => theme.name !== config.theme?.name)
   ]
 }
+
+export function resolveBrandThemeName(
+  config: Pick<BrandRuntimeConfig, 'defaultTheme' | 'theme' | 'themes'> = {},
+  themes: readonly BrandTheme[] = resolveBrandThemes(config)
+): string {
+  const candidates = [
+    config.defaultTheme,
+    config.theme?.name
+  ].filter((name): name is string => Boolean(name))
+
+  for (const name of candidates) {
+    if (themes.some(theme => theme.name === name)) {
+      return name
+    }
+  }
+
+  return themes[0]?.name ?? ''
+}

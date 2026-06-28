@@ -22,6 +22,7 @@ The root package exports:
 - `selectBrandAsset(entries, selection?)`
 - `normalizeBrandThemes(themes?)`
 - `resolveBrandThemes(config?)`
+- `resolveBrandThemeName(config?, themes?)`
 - `parseDocsLinks(input?)`
 - `createLayerInstallSnippets(options)`
 - `defineGuideSections(sections)`

@@ -20,6 +20,7 @@ import {
   neutralBrandTheme,
   nuxtUiBrandTheme,
   normalizeBrandThemes,
+  resolveBrandThemeName,
   resolveBrandThemes,
   selectBrandAsset,
   validateBrandIdentity,
@@ -356,6 +357,26 @@ describe('brand theme lists', () => {
 
     expect(themes.map(theme => theme.name)).toEqual(['studio', 'nuxt-ui', 'editorial'])
     expect(themes[0]?.label).toBe('Studio')
+  })
+
+  it('resolves a valid initial runtime theme name', () => {
+    expect(resolveBrandThemeName({
+      defaultTheme: 'editorial',
+      theme: studioBrandTheme,
+      themes: [editorialBrandTheme]
+    })).toBe('editorial')
+  })
+
+  it('falls back when defaultTheme does not match a shipped theme', () => {
+    expect(resolveBrandThemeName({
+      defaultTheme: 'missing-theme',
+      theme: studioBrandTheme,
+      themes: [editorialBrandTheme]
+    })).toBe('studio')
+  })
+
+  it('returns an empty theme name for an empty runtime theme list', () => {
+    expect(resolveBrandThemeName()).toBe('')
   })
 
   it('keeps the sample brand theme runtime-safe and reversible', () => {

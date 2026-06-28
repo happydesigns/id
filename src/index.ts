@@ -62,7 +62,7 @@ export {
   createBrandThemeStateKey
 } from './runtime'
 export { brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
-export { normalizeBrandThemes, resolveBrandThemes } from './themes'
+export { normalizeBrandThemes, resolveBrandThemeName, resolveBrandThemes } from './themes'
 export type {
   ApplyBrandThemeOptions,
   BrandAsset,

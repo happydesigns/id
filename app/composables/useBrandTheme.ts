@@ -1,5 +1,5 @@
 import { computed, updateAppConfig, useAppConfig, useCookie, useState } from '#imports'
-import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createBrandThemeStateKey, createNuxtUiAppConfig, resolveBrandThemes } from '../../src'
+import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createBrandThemeStateKey, createNuxtUiAppConfig, resolveBrandThemeName, resolveBrandThemes } from '../../src'
 import type { BrandRuntimeConfig, BrandTheme, NuxtUiAppConfig } from '../../src'
 
 type IdentityAppConfig = {
@@ -45,7 +45,7 @@ function persistThemeName(config: IdentityAppConfig, themeName: string) {
 
 function resolveInitialThemeName(config: IdentityAppConfig) {
   const themes = getThemeList(config)
-  return config.id?.defaultTheme ?? config.id?.theme?.name ?? themes[0]?.name ?? ''
+  return resolveBrandThemeName(config.id, themes)
 }
 
 function resolveTheme(themes: BrandTheme[], name: string) {
