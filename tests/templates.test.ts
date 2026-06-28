@@ -36,7 +36,9 @@ describe('starter templates', () => {
   it('keeps the module path self-contained for direct app usage', () => {
     const moduleSource = readFileSync(join(rootDir, 'module.ts'), 'utf8')
 
-    expect(moduleSource).toContain("installModule('@nuxt/ui'")
+    expect(moduleSource).toContain('moduleDependencies')
+    expect(moduleSource).toContain("'@nuxt/ui'")
+    expect(moduleSource).not.toContain('installModule')
     expect(moduleSource).toContain('addComponentsDir')
     expect(moduleSource).toContain('addImportsDir')
   })

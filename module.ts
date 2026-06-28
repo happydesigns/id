@@ -1,4 +1,4 @@
-import { addComponentsDir, addImportsDir, addPlugin, addTypeTemplate, createResolver, defineNuxtModule, installModule } from '@nuxt/kit'
+import { addComponentsDir, addImportsDir, addPlugin, addTypeTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
 import type { BrandModuleOptions, BrandRuntimeConfig } from './src'
 
 export type ModuleOptions = BrandModuleOptions
@@ -11,13 +11,16 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt: '>=4.0.0'
     }
   },
+  moduleDependencies: {
+    '@nuxt/ui': {
+      version: '^4.0.0'
+    }
+  },
   defaults: {},
-  async setup(options, nuxt) {
+  setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
     const { componentPrefix = 'Id', ...runtimeOptions } = options
     const existing = (nuxt.options.appConfig.id ?? {}) as BrandRuntimeConfig
-
-    await installModule('@nuxt/ui', {}, nuxt)
 
     nuxt.options.appConfig.id = {
       ...runtimeOptions,
