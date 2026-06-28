@@ -151,7 +151,7 @@ export const happydesignsBrandGuide = defineBrandGuide({
   typography: happydesignsBrandTheme.typography,
   ui: happydesignsBrandTheme.ui,
   usage: {
-    useFor: ['Nuxt UI runtime previews', 'brand-layer migration work', 'id documentation demos'],
+    useFor: ['Nuxt UI runtime previews', 'contract demonstrations', 'id documentation demos'],
     avoid: ['canonical happydesigns doctrine', 'domain behavior', 'authorization', 'runtime credentials']
   }
 })

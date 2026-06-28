@@ -164,10 +164,10 @@ describe('brand guide contract', () => {
     expect(idBrandGuide.usage?.avoid).toContain('domain behavior')
   })
 
-  it('ships a local happydesigns guide as the future brand package boundary', () => {
+  it('ships a local happydesigns guide as a documentation demo boundary', () => {
     expect(happydesignsBrandGuide.packageName).toBe('@happydesigns/brand')
     expect(happydesignsBrandGuide.semanticColors?.primary).toBe('coral')
-    expect(happydesignsBrandGuide.usage?.useFor).toContain('brand-layer migration work')
+    expect(happydesignsBrandGuide.usage?.useFor).toContain('contract demonstrations')
   })
 })
 
