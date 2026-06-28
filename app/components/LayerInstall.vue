@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ShikiCachedRenderer } from '@shikijs/stream/vue'
+import { CodeToTokenTransformStream } from '@shikijs/stream'
+import { ShikiStreamRenderer } from '@shikijs/stream/vue'
 import { computed, useColorMode } from '#imports'
 import {
   createLayerInstallSnippets,
@@ -34,6 +35,22 @@ const codeTheme = computed(() => colorMode.value === 'dark' ? 'material-theme-pa
 const prosePreUi = {
   copy: 'hidden sm:inline-flex'
 }
+
+function createCodeStream(code: string, lang: string) {
+  return new ReadableStream<string>({
+    start(controller) {
+      controller.enqueue(code)
+      controller.close()
+    }
+  }).pipeThrough(new CodeToTokenTransformStream({
+    highlighter,
+    lang,
+    theme: codeTheme.value
+  }))
+}
+
+const installCodeStream = computed(() => createCodeStream(snippets.value.installCommand, 'bash'))
+const nuxtConfigCodeStream = computed(() => createCodeStream(snippets.value.nuxtConfig, 'ts'))
 </script>
 
 <template>
@@ -63,12 +80,9 @@ const prosePreUi = {
           :filename="snippets.packageManager"
           :ui="prosePreUi"
         >
-          <ShikiCachedRenderer
+          <ShikiStreamRenderer
             :key="`install-${snippets.packageManager}-${codeTheme}`"
-            :highlighter="highlighter"
-            :code="snippets.installCommand"
-            lang="bash"
-            :theme="codeTheme"
+            :stream="installCodeStream"
           />
         </ProsePre>
 
@@ -78,12 +92,9 @@ const prosePreUi = {
           filename="nuxt.config.ts"
           :ui="prosePreUi"
         >
-          <ShikiCachedRenderer
+          <ShikiStreamRenderer
             :key="`config-${snippets.layer}-${codeTheme}`"
-            :highlighter="highlighter"
-            :code="snippets.nuxtConfig"
-            lang="ts"
-            :theme="codeTheme"
+            :stream="nuxtConfigCodeStream"
           />
         </ProsePre>
       </ProseCodeGroup>
