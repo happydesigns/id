@@ -20,7 +20,7 @@ Reusable identity system for Nuxt UI brand guides, Nuxt UI defaults, and Nuxt br
 ## Install
 
 ```bash
-pnpm add @happydesigns/id
+pnpm add @happydesigns/id tailwindcss
 ```
 
 Use the Nuxt layer when a brand repository wants the default identity runtime:

@@ -91,8 +91,10 @@
     "@nuxt/kit": "^4.4.2",
     "@nuxt/ui": "^4.8.0",
     "nuxt": "^4.4.2",
-    "tailwindcss": "^4.3.1",
     "zod": "^4.3.6"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.102",
@@ -101,6 +103,7 @@
     "@vue/compiler-sfc": "^3.5.31",
     "docus": "^5.12.2",
     "eslint": "^10.2.0",
+    "tailwindcss": "^4.0.0",
     "typescript": "^6.0.3",
     "vite": "^7.3.0",
     "vitest": "^4.0.16",
