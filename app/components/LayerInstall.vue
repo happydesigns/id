@@ -31,6 +31,9 @@ const snippets = computed(() => createLayerInstallSnippets({
 const colorMode = useColorMode() as { value: string }
 const highlighter = await useLayerInstallHighlighter()
 const codeTheme = computed(() => colorMode.value === 'dark' ? 'material-theme-palenight' : 'material-theme-lighter')
+const prosePreUi = {
+  copy: 'hidden sm:inline-flex'
+}
 </script>
 
 <template>
@@ -58,6 +61,7 @@ const codeTheme = computed(() => colorMode.value === 'dark' ? 'material-theme-pa
           :code="snippets.installCommand"
           language="bash"
           :filename="snippets.packageManager"
+          :ui="prosePreUi"
         >
           <ShikiCachedRenderer
             :key="`install-${snippets.packageManager}-${codeTheme}`"
@@ -72,6 +76,7 @@ const codeTheme = computed(() => colorMode.value === 'dark' ? 'material-theme-pa
           :code="snippets.nuxtConfig"
           language="ts"
           filename="nuxt.config.ts"
+          :ui="prosePreUi"
         >
           <ShikiCachedRenderer
             :key="`config-${snippets.layer}-${codeTheme}`"
