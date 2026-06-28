@@ -17,6 +17,7 @@ const { currentTheme } = useBrandTheme()
         <UButton
           to="https://id.happydesigns.de"
           target="_blank"
+          rel="noopener noreferrer"
           trailing-icon="i-lucide-arrow-right"
         >
           Read the docs
