@@ -113,6 +113,30 @@ describe('brand guide contract', () => {
     expect(guide.usage?.avoid).toContain('domain behavior')
   })
 
+  it('accepts structured voice examples', () => {
+    const guide = defineBrandGuide({
+      name: 'client-brand',
+      title: 'Client Brand',
+      description: 'A documented identity system.',
+      voice: {
+        attributes: ['Clear'],
+        dos: ['Name the action.'],
+        donts: ['Do not obscure the task.'],
+        examples: [
+          {
+            label: 'Button',
+            text: 'Save changes'
+          }
+        ]
+      }
+    })
+
+    expect(guide.voice?.examples?.[0]).toEqual({
+      label: 'Button',
+      text: 'Save changes'
+    })
+  })
+
   it('accepts arbitrary logo roles and validates their assets', () => {
     const guide = defineBrandGuide({
       name: 'client-brand',

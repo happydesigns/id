@@ -166,7 +166,7 @@ export type BrandGuideContent<TBrand = BrandIdentity> = {
   colors: BrandGuideColorEntry[]
   fonts: BrandGuideFontEntry[]
   components: BrandGuideComponentEntry[]
-  voice: {
+  voice: BrandVoice & {
     attributes: string[]
     dos: string[]
     donts: string[]
