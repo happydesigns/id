@@ -37,6 +37,8 @@ describe('starter templates', () => {
     expect(readTemplateFile('brand-layer', 'app/app.config.ts')).toContain("from '../brand'")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("extends: ['@happydesigns/id/nuxt']")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("prefix: 'Brand'")
+    expect(readTemplateFile('brand-layer', 'brand.ts')).toContain('logos:')
+    expect(readTemplateFile('brand-layer', 'brand.ts')).toContain("role: 'appIcon'")
   })
 
   it('keeps the themed-app template direct and Nuxt UI based', () => {

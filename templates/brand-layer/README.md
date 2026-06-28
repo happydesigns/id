@@ -19,4 +19,4 @@ export default defineNuxtConfig({
 })
 ```
 
-This starter is for full build-time branding: assets, metadata, CSS variables, Nuxt UI defaults, and optional brand primitives.
+This starter is for full build-time branding: assets, metadata, CSS variables, Nuxt UI defaults, and optional brand primitives. Replace the placeholder logo entries in `brand.ts` with stable roles from the real brand system.

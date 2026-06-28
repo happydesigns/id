@@ -46,6 +46,22 @@ export const brandGuide = defineBrandGuide({
   packageName: '@example/brand',
   title: 'Example Brand',
   description: 'A reusable Nuxt UI brand layer.',
+  assets: {
+    logos: {
+      logo: {
+        name: 'Example Brand logo',
+        src: '/favicon.svg',
+        role: 'logo',
+        alt: 'Example Brand'
+      },
+      appIcon: {
+        name: 'Example Brand app icon',
+        src: '/favicon.svg',
+        role: 'appIcon',
+        alt: 'Example Brand'
+      }
+    }
+  },
   semanticColors: brandColors,
   cssVariables: brandTheme.cssVariables,
   typography: brandTheme.typography,
