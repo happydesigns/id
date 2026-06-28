@@ -27,6 +27,9 @@ The root package exports:
 - `normalizeComponentCoverage(items?)`
 - `summarizeComponentCoverage(items?)`
 - `applyBrandTheme(theme, options?)`
+- `createBrandThemeCookieName(appName?)`
+- `brandThemeCookiePrefix`
+- `brandThemeStyleElementId`
 - `nuxtUiBrandTheme`
 - `idBrandGuide`
 - brand-guide and brand-theme types
@@ -86,7 +89,7 @@ export default defineAppConfig({
 })
 ```
 
-The runtime reads `id.theme`, applies CSS variables to the document root, and can update Nuxt UI app config with the selected theme. Apps that intentionally ship a runtime picker may also provide `id.themes[]` and `id.defaultTheme`.
+The runtime reads `id.theme`, applies CSS variables to the document root, and can update Nuxt UI app config with the selected theme. Apps that intentionally ship a runtime picker may also provide `id.themes[]` and `id.defaultTheme`. `createBrandThemeCookieName()` exposes the scoped cookie naming convention used by `IdThemeSelect`.
 
 `id.guide.assets.logos` is an open role map. `logo`, `wordmark`, `symbol`, `mark`, and `appIcon` are useful conventions, not requirements. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."`, use `useBrandAssets()`, or provide their own brand-specific component.
 
