@@ -27,6 +27,7 @@ describe('starter templates', () => {
     expect(packageJson.files).toContain('templates/brand-layer/app')
     expect(packageJson.files).toContain('templates/themed-app/app')
     expect(packageJson.files).not.toContain('nuxt.config.ts')
+    expect(packageJson.files).not.toContain('modules')
   })
 
   it('keeps the brand-layer template shaped like an external brand repo', () => {
