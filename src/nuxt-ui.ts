@@ -1,12 +1,7 @@
-import type { AppConfigInput } from 'nuxt/schema'
-import type { BrandTheme } from './types'
-
-export type NuxtUiAppConfig = {
-  ui: NonNullable<AppConfigInput['ui']>
-}
+import type { BrandTheme, NuxtUiAppConfig } from './types'
 
 export function createNuxtUiAppConfig(theme: BrandTheme): NuxtUiAppConfig {
   const ui = theme.ui ?? {}
 
-  return { ui: ui as NonNullable<AppConfigInput['ui']> }
+  return { ui: ui as NuxtUiAppConfig['ui'] }
 }

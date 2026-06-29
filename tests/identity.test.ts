@@ -2,18 +2,28 @@ import { describe, expect, it } from 'vitest'
 import {
   BrandValidationError,
   applyBrandTheme,
+  brandThemeCookiePrefix,
+  brandThemeStatePrefix,
+  brandThemeStyleElementId,
   collectBrandAssets,
+  createBrandGuideAssets,
+  createBrandLogoSet,
+  createBrandThemeCookieName,
+  createBrandThemeStateKey,
   createNuxtUiAppConfig,
   createThemeCssDeclarations,
   createThemeCssVars,
+  defineBrandIdentity,
   defineBrandGuide,
   defineBrandTheme,
   idBrandGuide,
   neutralBrandTheme,
   nuxtUiBrandTheme,
   normalizeBrandThemes,
+  resolveBrandThemeName,
   resolveBrandThemes,
   selectBrandAsset,
+  validateBrandIdentity,
   validateBrandTheme
 } from '../src'
 import {
@@ -22,9 +32,33 @@ import {
   testBrandThemes
 } from './fixtures'
 import {
-  happydesignsBrandGuide,
-  happydesignsBrandTheme
-} from '../themes/happydesigns'
+  sampleBrandGuide,
+  sampleBrandTheme
+} from '../themes/sample-brand'
+
+describe('brand identity contract', () => {
+  it('accepts a raw brand identity source object', () => {
+    const identity = defineBrandIdentity({
+      name: 'client-brand',
+      packageName: '@client/brand',
+      claim: 'Clear systems for practical teams.',
+      logoAssetPaths: {
+        wordmark: '/logos/client-wordmark.svg'
+      },
+      colors: {
+        blue: '#155EEF'
+      }
+    })
+
+    expect(identity.logoAssetPaths.wordmark).toBe('/logos/client-wordmark.svg')
+  })
+
+  it('rejects non-kebab-case identity names', () => {
+    expect(() => validateBrandIdentity({
+      name: 'Client Brand'
+    })).toThrow(BrandValidationError)
+  })
+})
 
 describe('brand theme contract', () => {
   it('accepts a valid theme', () => {
@@ -77,6 +111,30 @@ describe('brand guide contract', () => {
     })
 
     expect(guide.usage?.avoid).toContain('domain behavior')
+  })
+
+  it('accepts structured voice examples', () => {
+    const guide = defineBrandGuide({
+      name: 'client-brand',
+      title: 'Client Brand',
+      description: 'A documented identity system.',
+      voice: {
+        attributes: ['Clear'],
+        dos: ['Name the action.'],
+        donts: ['Do not obscure the task.'],
+        examples: [
+          {
+            label: 'Button',
+            text: 'Save changes'
+          }
+        ]
+      }
+    })
+
+    expect(guide.voice?.examples?.[0]).toEqual({
+      label: 'Button',
+      text: 'Save changes'
+    })
   })
 
   it('accepts arbitrary logo roles and validates their assets', () => {
@@ -158,16 +216,74 @@ describe('brand guide contract', () => {
     expect(selectBrandAsset(assets, { fallbackRoles: ['lockup'] })?.src).toBe('/brand/lockup.svg')
   })
 
+  it('prefers inverse logo roles for dark media fallback', () => {
+    const assets = collectBrandAssets({
+      assets: {
+        logos: {
+          logo: {
+            name: 'Client logo',
+            src: '/brand/logo.svg',
+            role: 'logo'
+          },
+          wordmark: {
+            name: 'Client wordmark',
+            src: '/brand/wordmark.svg',
+            role: 'wordmark'
+          },
+          wordmarkInverse: {
+            name: 'Client inverse wordmark',
+            src: '/brand/wordmark-inverse.svg',
+            role: 'wordmarkInverse'
+          }
+        }
+      }
+    })
+
+    expect(selectBrandAsset(assets, { media: 'light' })?.src).toBe('/brand/logo.svg')
+    expect(selectBrandAsset(assets, { media: 'dark' })?.src).toBe('/brand/wordmark-inverse.svg')
+  })
+
+  it('maps guide asset entries into logo maps and file assets', () => {
+    const entries = [
+      {
+        name: 'Client wordmark',
+        role: 'wordmark',
+        path: '/brand/wordmark.svg',
+        usage: 'Primary navigation identity.'
+      },
+      {
+        name: 'Client signature',
+        role: 'signature',
+        path: '/brand/signature.svg',
+        usage: 'Footer signature.',
+        media: 'dark' as const,
+        alt: 'Client signature for dark surfaces'
+      }
+    ]
+
+    const logos = createBrandLogoSet(entries)
+    const assets = createBrandGuideAssets(entries, {
+      alt: entry => `${entry.name} asset`
+    })
+
+    expect(logos.wordmark?.src).toBe('/brand/wordmark.svg')
+    expect(logos.signature?.alt).toBe('Client signature for dark surfaces')
+    expect(logos.signature?.media).toBe('dark')
+    expect(assets.logos?.wordmark?.alt).toBe('Client wordmark asset')
+    expect(assets.logos?.signature?.alt).toBe('Client signature for dark surfaces')
+    expect(assets.files?.map(asset => asset.role)).toEqual(['wordmark', 'signature'])
+  })
+
   it('ships an id brand guide for the default Nuxt UI baseline', () => {
     expect(idBrandGuide.name).toBe('happydesigns-id')
     expect(idBrandGuide.semanticColors?.primary).toBe('green')
     expect(idBrandGuide.usage?.avoid).toContain('domain behavior')
   })
 
-  it('ships a local happydesigns guide as the future brand package boundary', () => {
-    expect(happydesignsBrandGuide.packageName).toBe('@happydesigns/brand')
-    expect(happydesignsBrandGuide.semanticColors?.primary).toBe('coral')
-    expect(happydesignsBrandGuide.usage?.useFor).toContain('brand-layer migration work')
+  it('ships a neutral sample guide as a documentation demo boundary', () => {
+    expect(sampleBrandGuide.packageName).toBe('@example/brand')
+    expect(sampleBrandGuide.semanticColors?.primary).toBe('sample')
+    expect(sampleBrandGuide.usage?.useFor).toContain('contract demonstrations')
   })
 })
 
@@ -267,17 +383,47 @@ describe('brand theme lists', () => {
     expect(themes[0]?.label).toBe('Studio')
   })
 
-  it('keeps the local happydesigns theme runtime-safe and reversible', () => {
-    expect(happydesignsBrandTheme.name).toBe('happydesigns')
-    expect(happydesignsBrandTheme.ui?.colors?.primary).toBe('coral')
-    expect(happydesignsBrandTheme.cssVariables?.light?.['--ui-bg']).toBe('#FAF7F2')
-    expect(happydesignsBrandTheme.cssVariables?.dark?.['--ui-bg']).toBe('#242423')
-    expect(happydesignsBrandTheme.ui?.button).toBeTruthy()
-    expect(happydesignsBrandTheme.ui?.card).toBeTruthy()
+  it('resolves a valid initial runtime theme name', () => {
+    expect(resolveBrandThemeName({
+      defaultTheme: 'editorial',
+      theme: studioBrandTheme,
+      themes: [editorialBrandTheme]
+    })).toBe('editorial')
+  })
+
+  it('falls back when defaultTheme does not match a shipped theme', () => {
+    expect(resolveBrandThemeName({
+      defaultTheme: 'missing-theme',
+      theme: studioBrandTheme,
+      themes: [editorialBrandTheme]
+    })).toBe('studio')
+  })
+
+  it('returns an empty theme name for an empty runtime theme list', () => {
+    expect(resolveBrandThemeName()).toBe('')
+  })
+
+  it('keeps the sample brand theme runtime-safe and reversible', () => {
+    expect(sampleBrandTheme.name).toBe('sample-brand')
+    expect(sampleBrandTheme.ui?.colors?.primary).toBe('sample')
+    expect(sampleBrandTheme.cssVariables?.light?.['--ui-bg']).toBe('white')
+    expect(sampleBrandTheme.cssVariables?.dark?.['--ui-bg']).toBe('#0F172A')
+    expect(sampleBrandTheme.ui?.button).toBeTruthy()
+    expect(sampleBrandTheme.ui?.card).toBeTruthy()
   })
 })
 
 describe('runtime theme application', () => {
+  it('uses brand-neutral runtime identifiers', () => {
+    expect(brandThemeCookiePrefix).toBe('id-theme')
+    expect(brandThemeStatePrefix).toBe('id-theme-state')
+    expect(brandThemeStyleElementId).toBe('id-theme-vars')
+    expect(createBrandThemeCookieName('Client Brand Docs')).toBe('id-theme-client-brand-docs')
+    expect(createBrandThemeStateKey('Client Brand Docs')).toBe('id-theme-state:client-brand-docs')
+    expect(createBrandThemeCookieName('')).toBe('id-theme-default')
+    expect(createBrandThemeStateKey('')).toBe('id-theme-state:default')
+  })
+
   it('applies css variables and emits app config', () => {
     const style = new Map<string, string>()
     const target = {
@@ -367,10 +513,10 @@ describe('runtime theme application', () => {
       }
     } as HTMLElement
 
-    applyBrandTheme(happydesignsBrandTheme, {
+    applyBrandTheme(sampleBrandTheme, {
       target
     })
-    expect(style.get('--ui-primary')).toBe('#F28564')
+    expect(style.get('--ui-primary')).toBe('#2563EB')
 
     applyBrandTheme(nuxtUiBrandTheme, {
       target
@@ -378,6 +524,6 @@ describe('runtime theme application', () => {
 
     expect(style.get('--ui-bg')).toBe('white')
     expect(style.has('--ui-primary')).toBe(false)
-    expect(style.has('--hd-text-body')).toBe(false)
+    expect(style.has('--sample-surface-accent')).toBe(false)
   })
 })

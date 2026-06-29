@@ -3,9 +3,9 @@
   "type": "module",
   "version": "0.1.0",
   "private": false,
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@11.9.0",
   "author": "happydesigns",
-  "description": "Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for happydesigns projects.",
+  "description": "Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for Nuxt projects.",
   "homepage": "https://id.happydesigns.de",
   "repository": {
     "type": "git",
@@ -38,11 +38,11 @@
       "types": "./dist/themes/nuxt-ui/index.d.ts",
       "import": "./dist/themes/nuxt-ui/index.js"
     },
-    "./themes/happydesigns": {
-      "types": "./dist/themes/happydesigns/index.d.ts",
-      "import": "./dist/themes/happydesigns/index.js"
+    "./themes/sample-brand": {
+      "types": "./dist/themes/sample-brand/index.d.ts",
+      "import": "./dist/themes/sample-brand/index.js"
     },
-    "./themes/happydesigns/tokens.css": "./dist/themes/happydesigns/tokens.css"
+    "./themes/sample-brand/tokens.css": "./dist/themes/sample-brand/tokens.css"
   },
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
@@ -77,31 +77,35 @@
     "build:package": "node scripts/build-package.mjs",
     "preview": "nuxt preview playground",
     "docs": "nuxt dev docs",
-    "docs:build": "nuxt build docs",
+    "docs:build": "nuxt generate docs",
     "docs:preview": "nuxt preview docs",
     "prepare": "pnpm build:package && nuxt prepare && nuxt prepare playground && nuxt prepare docs && nuxt prepare templates/brand-layer && nuxt prepare templates/themed-app",
     "prepack": "pnpm build:package && pnpm test && pnpm typecheck",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && nuxt typecheck playground && nuxt typecheck docs && nuxt typecheck templates/brand-layer && nuxt typecheck templates/themed-app",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify": "pnpm lint && pnpm test && pnpm typecheck"
   },
   "dependencies": {
-    "@nuxt/kit": "^4.4.2",
-    "@nuxt/ui": "^4.8.0",
-    "nuxt": "^4.4.2",
-    "zod": "^4.3.6"
+    "@nuxt/kit": "^4.4.8",
+    "@nuxt/ui": "^4.9.0",
+    "nuxt": "^4.4.8",
+    "zod": "^4.4.3"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.102",
-    "@iconify-json/simple-icons": "^1.2.78",
-    "@nuxt/eslint": "^1.15.2",
-    "@vue/compiler-sfc": "^3.5.31",
-    "docus": "^5.12.2",
-    "eslint": "^10.2.0",
+    "@iconify-json/lucide": "^1.2.114",
+    "@iconify-json/simple-icons": "^1.2.87",
+    "@nuxt/eslint": "^1.16.0",
+    "@vue/compiler-sfc": "^3.5.39",
+    "docus": "^5.12.3",
+    "eslint": "^10.6.0",
+    "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
-    "vite": "^7.3.0",
-    "vitest": "^4.0.16",
-    "vue-tsc": "^3.2.6"
+    "vitest": "^4.1.9",
+    "vue-tsc": "^3.3.5"
   }
 }

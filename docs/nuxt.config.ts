@@ -7,21 +7,15 @@ const currentDir = dirname(fileURLToPath(import.meta.url))
 export default defineNuxtConfig({
   extends: ['docus'],
   modules: [
-    resolve(currentDir, '../module.ts'),
-    './modules/docus-css-dev'
+    resolve(currentDir, '../module.ts')
   ],
   css: [
-    resolve(currentDir, '../themes/happydesigns/tokens.css')
+    resolve(currentDir, '../themes/sample-brand/tokens.css')
   ],
   compatibilityDate: 'latest',
-  vite: {
-    optimizeDeps: {
-      include: []
-    }
-  },
   llms: {
     domain: 'https://id.happydesigns.de',
     title: 'happydesigns id',
-    description: 'Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for happydesigns projects.'
+    description: 'Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for Nuxt projects.'
   }
 })

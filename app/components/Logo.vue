@@ -1,29 +1,40 @@
 <script setup lang="ts">
-import { computed } from '#imports'
+import { computed, useColorMode } from '#imports'
 import { useBrandAssets } from '../composables/useBrandAssets'
 import type { BrandAsset } from '../../src'
+
+type LogoMedia = BrandAsset['media'] | 'auto'
 
 const props = withDefaults(defineProps<{
   role?: string
   variant?: string
-  media?: BrandAsset['media']
+  media?: LogoMedia
   alt?: string
   label?: string
 }>(), {
   role: undefined,
   variant: undefined,
-  media: undefined,
+  media: 'auto',
   alt: undefined,
   label: undefined
 })
 
 const brandAssets = useBrandAssets()
+const colorMode = useColorMode() as { value: string }
+
+const resolvedMedia = computed<BrandAsset['media'] | undefined>(() => {
+  if (props.media !== 'auto') {
+    return props.media
+  }
+
+  return colorMode.value === 'dark' ? 'dark' : 'light'
+})
 
 const logo = computed(() => {
   return brandAssets.resolveAsset({
     role: props.role,
     variant: props.variant,
-    media: props.media
+    media: resolvedMedia.value
   })
 })
 

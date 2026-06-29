@@ -1,0 +1,16 @@
+@theme static {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+
+  --color-sample-50: #EFF6FF;
+  --color-sample-100: #DBEAFE;
+  --color-sample-200: #BFDBFE;
+  --color-sample-300: #93C5FD;
+  --color-sample-400: #60A5FA;
+  --color-sample-500: #3B82F6;
+  --color-sample-600: #2563EB;
+  --color-sample-700: #1D4ED8;
+  --color-sample-800: #1E40AF;
+  --color-sample-900: #1E3A8A;
+  --color-sample-950: #172554;
+}

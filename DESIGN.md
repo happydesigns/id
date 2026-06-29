@@ -31,7 +31,7 @@ The brand guide should describe:
 
 Store reusable brand data in a normal source file such as `brand.ts` when a brand repository needs to export, test, or reuse it. Use `app.config.ts` to expose the public Nuxt runtime contract.
 
-Concrete brand packages own their doctrine. For example, `@happydesigns/brand` owns final happydesigns copy, logo rules, palette meaning, asset choices, and voice. `id` may ship demonstration themes, but those examples should teach the foundation rather than become the public brand source of truth.
+Concrete brand packages own their doctrine. For example, `@happydesigns/brand` owns final happydesigns copy, logo rules, palette meaning, asset choices, and voice. `id` may ship neutral demonstration themes, but those examples should teach the foundation rather than smuggle a real brand source of truth into the reusable layer.
 
 ## Runtime Theme Discipline
 

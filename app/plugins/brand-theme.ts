@@ -1,12 +1,12 @@
 import { defineNuxtPlugin, onNuxtReady, useHead, watch } from '#imports'
-import { createThemeCssVars } from '../../src'
+import { brandThemeStyleElementId, createThemeCssVars } from '../../src'
 import { useBrandTheme } from '../composables/useBrandTheme'
 
 export default defineNuxtPlugin(() => {
   const brandTheme = useBrandTheme()
 
   function updateThemeStyleElement(theme: NonNullable<typeof brandTheme.currentTheme.value>) {
-    const styleElement = document.getElementById('happydesigns-id-theme')
+    const styleElement = document.getElementById(brandThemeStyleElementId)
 
     if (styleElement) {
       styleElement.textContent = createThemeCssVars(theme)
@@ -29,7 +29,7 @@ export default defineNuxtPlugin(() => {
       useHead({
         style: [
           {
-            id: 'happydesigns-id-theme',
+            id: brandThemeStyleElementId,
             innerHTML: createThemeCssVars(brandTheme.currentTheme.value)
           }
         ]

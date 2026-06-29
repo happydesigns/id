@@ -6,29 +6,60 @@ This file describes the public API direction for `@happydesigns/id`, the Nuxt UI
 
 The root package exports:
 
-- `defineBrandGuide(guide)`
-- `defineBrandTheme(theme)`
-- `validateBrandGuide(guide)`
-- `validateBrandTheme(theme)`
-- `createThemeCssVars(theme, options?)`
-- `createThemeCssDeclarations(theme, mode?)`
-- `createNuxtUiAppConfig(theme)`
-- `collectBrandAssets(guide)`
-- `selectBrandAsset(entries, selection?)`
-- `normalizeBrandThemes(themes?)`
-- `resolveBrandThemes(config?)`
-- `applyBrandTheme(theme, options?)`
+- `defineBrandGuide`
+- `defineBrandIdentity`
+- `defineBrandTheme`
+- `validateBrandGuide`
+- `validateBrandIdentity`
+- `validateBrandTheme`
+- `BrandValidationError`
+- `brandGuideSchema`
+- `brandIdentitySchema`
+- `brandThemeSchema`
+- `createThemeCssVars`
+- `createThemeCssDeclarations`
+- `applyCssVariables`
+- `createNuxtUiAppConfig`
+- `createBrandAsset`
+- `createBrandLogoSet`
+- `createBrandGuideAssets`
+- `defaultBrandAssetRoles`
+- `collectBrandAssets`
+- `selectBrandAsset`
+- `normalizeBrandThemes`
+- `resolveBrandThemes`
+- `resolveBrandThemeName`
+- `parseDocsLinks`
+- `createLayerInstallSnippets`
+- `layerInstallCommands`
+- `layerInstallPackageManagers`
+- `defineGuideSections`
+- `normalizeGuideSections`
+- `createGuideDocsSections`
+- `createGuideSectionPath`
+- `findGuideSection`
+- `componentCoverageStatuses`
+- `componentCoverageStatusMeta`
+- `normalizeComponentCoverage`
+- `summarizeComponentCoverage`
+- `applyBrandTheme`
+- `createBrandThemeCookieName`
+- `createBrandThemeStateKey`
+- `brandThemeCookiePrefix`
+- `brandThemeStatePrefix`
+- `brandThemeStyleElementId`
 - `nuxtUiBrandTheme`
+- `neutralBrandTheme`
 - `idBrandGuide`
 - brand-guide and brand-theme types
 
 Explicit theme package exports:
 
 - `@happydesigns/id/themes/nuxt-ui`
-- `@happydesigns/id/themes/happydesigns`
-- `@happydesigns/id/themes/happydesigns/tokens.css`
+- `@happydesigns/id/themes/sample-brand`
+- `@happydesigns/id/themes/sample-brand/tokens.css`
 
-The `nuxt-ui` theme is the standard baseline. The `happydesigns` theme is a demonstration and migration reference for these docs until the `@happydesigns/brand` package exports the canonical happydesigns contract.
+The `nuxt-ui` theme is the standard baseline. The `sample-brand` theme is a neutral local demonstration for these docs; `@happydesigns/brand` owns the canonical happydesigns guide, assets, and doctrine.
 
 ## Nuxt Layer
 
@@ -41,6 +72,12 @@ export default defineNuxtConfig({
 ```
 
 The `./nuxt` export points at the public layer config, not the repository's development `nuxt.config.ts`. It intentionally does not include repo-only modules such as `@nuxt/eslint`.
+
+`createLayerInstallSnippets()` returns plain install and `nuxt.config.ts` strings. `IdLayerInstall` renders those strings through Nuxt UI's standard prose code-group and pre components.
+
+The layer also ships small brand-neutral documentation helpers. `IdNuxtUiDocsLink` renders compact links to Nuxt UI documentation from typed link data or the MDC-friendly `Label|url; Label|url` string syntax. `IdExampleFrame` provides the standard example surface for brand-guide demos while keeping the actual example content in the brand layer. `IdLayerInstall` renders a neutral install surface for a brand package and its Nuxt `extends` snippet through Nuxt UI prose components. `IdComponentCoverageTable` renders `id.guide.componentCoverage` without owning the actual brand coverage decisions.
+
+Guide-section helpers such as `defineGuideSections()` and `createGuideDocsSections()` keep section metadata in a brand-owned source file while mapping it to the smaller `id.guide.docs.sections` navigation shape.
 
 ## Nuxt Module
 
@@ -71,9 +108,9 @@ export default defineAppConfig({
 })
 ```
 
-The runtime reads `id.theme`, applies CSS variables to the document root, and can update Nuxt UI app config with the selected theme. Apps that intentionally ship a runtime picker may also provide `id.themes[]` and `id.defaultTheme`.
+The runtime reads `id.theme`, applies CSS variables to the document root, and can update Nuxt UI app config with the selected theme. Apps that intentionally ship a runtime picker may also provide `id.themes[]` and `id.defaultTheme`. `createBrandThemeStateKey()` and `createBrandThemeCookieName()` expose the scoped Nuxt state and cookie naming conventions used by `IdThemeSelect`.
 
-`id.guide.assets.logos` is an open role map. `logo`, `wordmark`, `symbol`, `mark`, and `appIcon` are useful conventions, not requirements. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."`, use `useBrandAssets()`, or provide their own brand-specific component.
+`id.guide.assets.logos` is an open role map. `logo`, `wordmark`, `symbol`, `mark`, `appIcon`, `wordmarkInverse`, and `symbolInverse` are useful conventions, not requirements. `IdLogo` follows the active color mode by default, and dark-media fallback prefers the inverse roles before the light-surface roles. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."`, use `useBrandAssets()`, or provide their own brand-specific component.
 
 ## Stability
 

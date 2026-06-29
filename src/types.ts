@@ -1,3 +1,5 @@
+import type { AppConfigInput } from 'nuxt/schema'
+
 export type BrandColorShade =
   | 50
   | 100
@@ -88,6 +90,90 @@ export type BrandComponentCoverage = {
   notes?: string
 }
 
+export type BrandIdentity<
+  TLogoAssetPaths extends Record<string, string> = Record<string, string>,
+  TColors extends BrandPalette = BrandPalette
+> = {
+  name: string
+  packageName?: string
+  claim?: string
+  logoAssetPaths?: TLogoAssetPaths
+  colors?: TColors
+}
+
+export type BrandGuideSectionInput = {
+  slug: string
+  title: string
+  description: string
+  summary?: string
+  eyebrow?: string
+  icon?: string
+  to?: string
+  anchors?: readonly string[]
+}
+
+export type BrandGuideSection = Omit<BrandGuideSectionInput, 'anchors'> & {
+  anchors?: string[]
+}
+
+export type BrandGuideDocsSection = {
+  title: string
+  description: string
+  to: string
+}
+
+export type BrandGuideColorEntry = {
+  name: string
+  token: string
+  hex: string
+  role: string
+  usage: string
+}
+
+export type BrandGuideFontEntry = {
+  name: string
+  role: string
+  stack: string
+  sample: string
+  notes: string
+}
+
+export type BrandGuideComponentEntry = {
+  name: string
+  purpose: string
+  guidance: string
+}
+
+export type BrandGuidePrinciple = {
+  title: string
+  description: string
+  icon: string
+}
+
+export type BrandGuideAssetEntry = {
+  name: string
+  role: string
+  path: string
+  usage: string
+  media?: BrandAsset['media']
+  alt?: string
+}
+
+export type BrandGuideContent<TBrand = BrandIdentity> = {
+  brand: TBrand
+  principles: BrandGuidePrinciple[]
+  sections: readonly BrandGuideSectionInput[]
+  colors: BrandGuideColorEntry[]
+  fonts: BrandGuideFontEntry[]
+  components: BrandGuideComponentEntry[]
+  voice: BrandVoice & {
+    attributes: string[]
+    dos: string[]
+    donts: string[]
+  }
+  assets: BrandGuideAssetEntry[]
+}
+
 export type BrandGuide = {
   name: string
   packageName?: string
@@ -111,11 +197,7 @@ export type BrandGuide = {
     runtimeLimits?: string[]
   }
   docs?: {
-    sections?: {
-      title: string
-      description: string
-      to: string
-    }[]
+    sections?: BrandGuideDocsSection[]
   }
   ui?: Record<string, unknown>
 }
@@ -137,10 +219,21 @@ export type ThemeCssOptions = {
   includeTypography?: boolean
 }
 
+export type BrandThemeStyleTarget = {
+  style: {
+    setProperty: (name: string, value: string) => void
+    removeProperty: (name: string) => void
+  }
+}
+
 export type ApplyBrandThemeOptions = {
-  target?: HTMLElement | null
+  target?: BrandThemeStyleTarget | null
   mode?: ThemeMode
-  updateAppConfig?: (config: Record<string, unknown>) => void
+  updateAppConfig?: (config: NuxtUiAppConfig) => void
+}
+
+export type NuxtUiAppConfig = {
+  ui: NonNullable<AppConfigInput['ui']>
 }
 
 export type BrandRuntimeConfig = {

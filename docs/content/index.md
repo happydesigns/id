@@ -27,6 +27,7 @@ Create brand guides that become usable Nuxt brand layers. Keep apps focused on c
   ---
   color: neutral
   icon: i-simple-icons-github
+  rel: noopener noreferrer
   size: xl
   target: _blank
   to: https://github.com/happydesigns/id

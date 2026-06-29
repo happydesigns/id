@@ -11,6 +11,11 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt: '>=4.0.0'
     }
   },
+  moduleDependencies: {
+    '@nuxt/ui': {
+      version: '^4.0.0'
+    }
+  },
   defaults: {},
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -38,7 +43,7 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     addTypeTemplate({
-      filename: 'types/happydesigns-id.d.ts',
+      filename: 'types/id-app-config.d.ts',
       getContents: () => [
         'import type { BrandRuntimeConfig } from \'@happydesigns/id\'',
         '',

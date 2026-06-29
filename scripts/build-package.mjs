@@ -28,13 +28,22 @@ function copyRuntimeFiles() {
     recursive: true
   })
 
-  const tokenSource = join(rootDir, 'themes', 'happydesigns', 'tokens.css')
-  const tokenTarget = join(distDir, 'themes', 'happydesigns', 'tokens.css')
+  const themesDir = join(rootDir, 'themes')
 
-  mkdirSync(dirname(tokenTarget), {
-    recursive: true
-  })
-  copyFileSync(tokenSource, tokenTarget)
+  for (const themeDir of readdirSync(themesDir)) {
+    const tokenSource = join(themesDir, themeDir, 'tokens.css')
+
+    if (!existsSync(tokenSource)) {
+      continue
+    }
+
+    const tokenTarget = join(distDir, 'themes', themeDir, 'tokens.css')
+
+    mkdirSync(dirname(tokenTarget), {
+      recursive: true
+    })
+    copyFileSync(tokenSource, tokenTarget)
+  }
 }
 
 function listFiles(dir, files = []) {
