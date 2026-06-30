@@ -334,8 +334,8 @@ const pageAnchors = [
     </div>
   </div>
 
-  <div v-else-if="props.name === 'page-shell-pattern'" class="overflow-hidden rounded-sm border border-default">
-    <UHeader :ui="{ root: 'relative border-b border-default bg-default', container: 'h-14' }">
+  <div v-else-if="props.name === 'page-shell-pattern'" class="overflow-hidden rounded-sm border border-default bg-default">
+    <UHeader :ui="{ root: 'relative rounded-t-sm border-b border-default bg-default', container: 'h-14' }">
       <template #left>
         <span class="font-semibold text-highlighted">{{ props.context.copy.brandLabel }}</span>
       </template>
