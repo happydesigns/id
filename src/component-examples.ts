@@ -62,14 +62,45 @@ export type ComponentExampleContext = {
   packageName: string
   logoAlt: string
   assets: ComponentExampleAssets
+  assetPreviewSurfaces: ComponentExampleAssetPreviewSurfaces
   paths: ComponentExamplePaths
   copy: ComponentExampleCopy
 }
 
-export type ComponentExampleContextInput = Partial<Omit<ComponentExampleContext, 'assets' | 'paths' | 'copy'>> & {
+export type ComponentExamplePreviewSurface = {
+  background: string
+  color: string
+  border: string
+}
+
+export type ComponentExampleAssetPreviewSurfaces = {
+  light: ComponentExamplePreviewSurface
+  dark: ComponentExamplePreviewSurface
+}
+
+export type ComponentExampleAssetPreviewSurfaceInput = {
+  light?: Partial<ComponentExamplePreviewSurface>
+  dark?: Partial<ComponentExamplePreviewSurface>
+}
+
+export type ComponentExampleContextInput = Partial<Omit<ComponentExampleContext, 'assets' | 'assetPreviewSurfaces' | 'paths' | 'copy'>> & {
   assets?: Partial<ComponentExampleAssets>
+  assetPreviewSurfaces?: ComponentExampleAssetPreviewSurfaceInput
   paths?: Partial<ComponentExamplePaths>
   copy?: Partial<ComponentExampleCopy>
+}
+
+const defaultAssetPreviewSurfaces: ComponentExampleAssetPreviewSurfaces = {
+  light: {
+    background: '#ffffff',
+    color: '#111827',
+    border: 'rgba(17, 24, 39, 0.14)'
+  },
+  dark: {
+    background: '#111827',
+    color: '#ffffff',
+    border: 'rgba(255, 255, 255, 0.16)'
+  }
 }
 
 function defineGroup(
@@ -312,6 +343,16 @@ export function createComponentExampleContext(input: ComponentExampleContextInpu
     logoAlt: input.logoAlt ?? `${brandName} symbol`,
     assets: {
       ...input.assets
+    },
+    assetPreviewSurfaces: {
+      light: {
+        ...defaultAssetPreviewSurfaces.light,
+        ...input.assetPreviewSurfaces?.light
+      },
+      dark: {
+        ...defaultAssetPreviewSurfaces.dark,
+        ...input.assetPreviewSurfaces?.dark
+      }
     },
     paths: {
       docs: '/docs',

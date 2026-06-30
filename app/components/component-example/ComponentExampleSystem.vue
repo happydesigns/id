@@ -40,9 +40,16 @@ const scopedThemeProps = {
   }
 }
 
-const previewSurfaceClass = {
-  light: 'id-mode-asset-surface id-mode-asset-surface-light flex min-h-28 items-center justify-center rounded-sm border p-5',
-  dark: 'id-mode-asset-surface id-mode-asset-surface-dark flex min-h-28 items-center justify-center rounded-sm border p-5'
+const previewSurfaceClass = 'flex min-h-28 items-center justify-center rounded-sm border p-5'
+
+function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSurfaces']) {
+  const surface = props.context.assetPreviewSurfaces[mode]
+
+  return {
+    backgroundColor: surface.background,
+    borderColor: surface.border,
+    color: surface.color
+  }
 }
 </script>
 
@@ -76,7 +83,8 @@ const previewSurfaceClass = {
   <ClientOnly v-else-if="props.name === 'color-mode-image'">
     <div class="grid gap-3 rounded-sm border border-default bg-default p-4 sm:grid-cols-2">
       <div
-        :class="previewSurfaceClass.light"
+        :class="previewSurfaceClass"
+        :style="previewSurfaceStyle('light')"
       >
         <img
           v-if="props.context.assets.wordmark"
@@ -87,7 +95,8 @@ const previewSurfaceClass = {
         <span v-else class="font-semibold text-highlighted">{{ props.context.copy.brandLabel }}</span>
       </div>
       <div
-        :class="previewSurfaceClass.dark"
+        :class="previewSurfaceClass"
+        :style="previewSurfaceStyle('dark')"
       >
         <img
           v-if="props.context.assets.wordmarkInverse"
@@ -190,7 +199,8 @@ const previewSurfaceClass = {
         </p>
         <div class="grid gap-3 sm:grid-cols-2">
           <div
-            :class="previewSurfaceClass.light"
+            :class="previewSurfaceClass"
+            :style="previewSurfaceStyle('light')"
           >
             <img
               v-if="props.context.assets.wordmark"
@@ -201,7 +211,8 @@ const previewSurfaceClass = {
             <span v-else class="font-semibold text-highlighted">{{ props.context.copy.brandLabel }}</span>
           </div>
           <div
-            :class="previewSurfaceClass.dark"
+            :class="previewSurfaceClass"
+            :style="previewSurfaceStyle('dark')"
           >
             <img
               v-if="props.context.assets.wordmarkInverse"
@@ -219,7 +230,8 @@ const previewSurfaceClass = {
         </p>
         <div class="grid gap-3 sm:grid-cols-2">
           <div
-            :class="previewSurfaceClass.light"
+            :class="previewSurfaceClass"
+            :style="previewSurfaceStyle('light')"
           >
             <img
               v-if="props.context.assets.symbol"
@@ -234,7 +246,8 @@ const previewSurfaceClass = {
             />
           </div>
           <div
-            :class="previewSurfaceClass.dark"
+            :class="previewSurfaceClass"
+            :style="previewSurfaceStyle('dark')"
           >
             <img
               v-if="props.context.assets.symbol"
@@ -288,17 +301,3 @@ const previewSurfaceClass = {
     </ClientOnly>
   </div>
 </template>
-
-<style scoped>
-.id-mode-asset-surface-light {
-  border-color: #e2e8f0;
-  background: #ffffff;
-  color: #0f172a;
-}
-
-.id-mode-asset-surface-dark {
-  border-color: #334155;
-  background: #0f172a;
-  color: #f8fafc;
-}
-</style>
