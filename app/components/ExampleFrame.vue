@@ -8,7 +8,7 @@ const props = withDefaults(defineProps<{
 })
 
 const frameClass = computed(() => [
-  'not-prose my-5',
+  'not-prose isolate my-5',
   props.variant === 'plain'
     ? 'overflow-visible'
     : 'overflow-hidden rounded-sm border border-default bg-default p-4 sm:p-6'

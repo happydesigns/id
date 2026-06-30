@@ -34,7 +34,7 @@ const example = computed(() => getComponentExampleDefinition(props.name))
 const context = computed(() => createComponentExampleContext(props.context))
 
 const exampleClass = computed(() => [
-  props.frame === 'none' ? 'contents' : 'not-prose my-5',
+  props.frame === 'none' ? 'contents' : 'not-prose isolate my-5',
   props.frame === 'none' || ownSurfaceNames.has(props.name)
     ? 'overflow-visible'
     : 'overflow-hidden rounded-sm border border-default bg-default p-4 sm:p-6'
