@@ -60,6 +60,7 @@ export type ComponentExampleCopy = {
 export type ComponentExampleContext = {
   brandName: string
   packageName: string
+  accentColor: string
   logoAlt: string
   assets: ComponentExampleAssets
   assetPreviewSurfaces: ComponentExampleAssetPreviewSurfaces
@@ -340,6 +341,7 @@ export function createComponentExampleContext(input: ComponentExampleContextInpu
   return {
     brandName,
     packageName,
+    accentColor: input.accentColor ?? '#3B82F6',
     logoAlt: input.logoAlt ?? `${brandName} symbol`,
     assets: {
       ...input.assets

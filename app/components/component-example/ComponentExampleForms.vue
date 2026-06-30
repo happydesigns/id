@@ -20,7 +20,7 @@ const tags = ref(['accessible', 'durable'])
 const checks = ref(['borders', 'focus'])
 const rhythm = ref('balanced')
 const pin = ref(['2', '4', '2', '4'])
-const accent = ref('#3B82F6')
+const accent = ref(props.context.accentColor)
 const selectedSection = ref('components')
 
 const statusItems = ['Draft', 'Ready for review', 'Published']

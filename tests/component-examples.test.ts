@@ -42,6 +42,7 @@ describe('component examples', () => {
     expect(createComponentExampleContext({
       brandName: 'sample',
       packageName: '@sample/brand',
+      accentColor: '#F28564',
       assets: {
         symbol: '/logos/sample.svg'
       },
@@ -54,6 +55,7 @@ describe('component examples', () => {
     })).toMatchObject({
       brandName: 'sample',
       packageName: '@sample/brand',
+      accentColor: '#F28564',
       logoAlt: 'sample symbol',
       assets: {
         symbol: '/logos/sample.svg'
