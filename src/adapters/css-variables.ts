@@ -74,7 +74,7 @@ export const cssVariablesAdapter = defineBrandAdapter({
 
     if (options.includeRoles ?? true) {
       for (const [role, colorName] of Object.entries(brand.roles ?? {})) {
-        const color = brand.colors[colorName]
+        const color = brand.colors[colorName]!
 
         if (isColorScale(color)) {
           for (const shade of Object.keys(color)) {
