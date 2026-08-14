@@ -25,19 +25,7 @@ const assetSchema = z.object({
 
 const logoSetSchema = z.record(z.string().min(1), assetSchema)
 
-const colorScaleSchema = z.object({
-  50: z.string().min(1).optional(),
-  100: z.string().min(1).optional(),
-  200: z.string().min(1).optional(),
-  300: z.string().min(1).optional(),
-  400: z.string().min(1).optional(),
-  500: z.string().min(1).optional(),
-  600: z.string().min(1).optional(),
-  700: z.string().min(1).optional(),
-  800: z.string().min(1).optional(),
-  900: z.string().min(1).optional(),
-  950: z.string().min(1).optional()
-}).partial()
+const colorScaleSchema = z.record(z.string().regex(/^\d+$/, 'Color scale keys must be numeric'), z.string().min(1))
 
 const paletteSchema = z.record(z.string().min(1), z.union([z.string().min(1), colorScaleSchema]))
 
@@ -82,6 +70,22 @@ export const brandIdentitySchema = z.object({
   colors: paletteSchema.optional()
 }).passthrough()
 
+export const brandDefinitionSchema = brandIdentitySchema.extend({
+  colors: paletteSchema,
+  roles: z.record(z.string().min(1), z.string().min(1)).optional(),
+  typography: typographySchema.optional()
+}).superRefine((brand, context) => {
+  for (const [role, colorName] of Object.entries(brand.roles ?? {})) {
+    if (!(colorName in brand.colors)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['roles', role],
+        message: `Brand color "${colorName}" is not defined`
+      })
+    }
+  }
+})
+
 export const brandThemeSchema = z.object({
   name: z.string().min(1).regex(/^[a-z0-9][a-z0-9-]*$/, 'Theme names must be kebab-case'),
   label: z.string().min(1),
@@ -116,5 +120,6 @@ export const brandGuideSchema = z.object({
 })
 
 export type BrandIdentitySchema = z.infer<typeof brandIdentitySchema>
+export type BrandDefinitionSchema = z.infer<typeof brandDefinitionSchema>
 export type BrandThemeSchema = z.infer<typeof brandThemeSchema>
 export type BrandGuideSchema = z.infer<typeof brandGuideSchema>

@@ -29,6 +29,7 @@ export default defineNuxtModule<ModuleOptions>({
       theme: existing.theme ?? runtimeOptions.theme,
       defaultTheme: existing.defaultTheme ?? runtimeOptions.defaultTheme,
       themes: existing.themes ?? runtimeOptions.themes,
+      assets: existing.assets ?? runtimeOptions.assets,
       guide: existing.guide ?? runtimeOptions.guide
     }
 

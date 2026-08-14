@@ -12,10 +12,15 @@ export type BrandColorShade =
   | 800
   | 900
   | 950
+  | (number & {})
 
 export type BrandColorScale = Partial<Record<BrandColorShade, string>>
 
 export type BrandPalette = Record<string, string | BrandColorScale>
+
+export type BrandColorName<TColors extends BrandPalette = BrandPalette> = Extract<keyof TColors, string>
+
+export type BrandColorRoles<TColors extends BrandPalette = BrandPalette> = Record<string, BrandColorName<TColors>>
 
 export type NuxtUiColorRole =
   | 'primary'
@@ -99,6 +104,20 @@ export type BrandIdentity<
   claim?: string
   logoAssetPaths?: TLogoAssetPaths
   colors?: TColors
+}
+
+export type BrandDefinition<
+  TColors extends BrandPalette = BrandPalette,
+  TRoles extends BrandColorRoles<TColors> = BrandColorRoles<TColors>,
+  TLogoAssetPaths extends Record<string, string> = Record<string, string>
+> = {
+  name: string
+  packageName?: string
+  claim?: string
+  logoAssetPaths?: TLogoAssetPaths
+  colors: TColors
+  roles?: TRoles
+  typography?: BrandTypography
 }
 
 export type BrandGuideSectionInput = {
@@ -202,6 +221,8 @@ export type BrandGuide = {
   ui?: Record<string, unknown>
 }
 
+export type BrandAssets = NonNullable<BrandGuide['assets']>
+
 export type BrandTheme = {
   name: string
   label: string
@@ -236,13 +257,19 @@ export type NuxtUiAppConfig = {
   ui: NonNullable<AppConfigInput['ui']>
 }
 
-export type BrandRuntimeConfig = {
+export type BrandThemeRuntimeConfig = {
   name?: string
   theme?: BrandTheme
   defaultTheme?: string
   themes?: BrandTheme[]
+  assets?: BrandAssets
+}
+
+export type BrandGuideConfig = {
   guide?: BrandGuide
 }
+
+export type BrandRuntimeConfig = BrandThemeRuntimeConfig & BrandGuideConfig
 
 export type BrandModuleOptions = BrandRuntimeConfig & {
   componentPrefix?: string
