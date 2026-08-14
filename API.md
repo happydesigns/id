@@ -6,6 +6,12 @@ This file describes the public API direction for `@happydesigns/id`, the Nuxt UI
 
 The root package exports:
 
+- `defineBrand`
+- `validateBrandDefinition`
+- `brandDefinitionSchema`
+- `defineBrandAdapter`
+- `nuxtUiAdapter`
+- `cssVariablesAdapter`
 - `defineBrandGuide`
 - `defineBrandIdentity`
 - `defineBrandTheme`
@@ -52,6 +58,13 @@ The root package exports:
 - `neutralBrandTheme`
 - `idBrandGuide`
 - brand-guide and brand-theme types
+
+Adapter subpaths make target ownership explicit:
+
+- `@happydesigns/id/adapters/nuxt-ui`
+- `@happydesigns/id/adapters/css-variables`
+
+`BrandTheme` remains the runtime output consumed by the Nuxt integration. `BrandDefinition` is the neutral source. An adapter maps the latter to its target output; custom adapters are normal TypeScript modules and do not require registration.
 
 Explicit theme package exports:
 
@@ -110,7 +123,7 @@ export default defineAppConfig({
 
 The runtime reads `id.theme`, applies CSS variables to the document root, and can update Nuxt UI app config with the selected theme. Apps that intentionally ship a runtime picker may also provide `id.themes[]` and `id.defaultTheme`. `createBrandThemeStateKey()` and `createBrandThemeCookieName()` expose the scoped Nuxt state and cookie naming conventions used by `IdThemeSelect`.
 
-`id.guide.assets.logos` is an open role map. `logo`, `wordmark`, `symbol`, `mark`, `appIcon`, `wordmarkInverse`, and `symbolInverse` are useful conventions, not requirements. `IdLogo` follows the active color mode by default, and dark-media fallback prefers the inverse roles before the light-surface roles. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."`, use `useBrandAssets()`, or provide their own brand-specific component.
+`id.assets.logos` is the narrow runtime asset surface. `id.guide.assets` remains a compatibility fallback for guide applications. `logo`, `wordmark`, `symbol`, `mark`, `appIcon`, `wordmarkInverse`, and `symbolInverse` are useful conventions, not requirements. `IdLogo` follows the active color mode by default, and dark-media fallback prefers the inverse roles before the light-surface roles. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."`, use `useBrandAssets()`, or provide their own brand-specific component.
 
 ## Stability
 

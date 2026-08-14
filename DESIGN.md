@@ -7,6 +7,7 @@
 Use Nuxt UI as the default component and theme system.
 
 - Map raw brand palettes to Nuxt UI semantic roles.
+- Keep palette names and optional brand-owned roles independent from Nuxt UI; map them explicitly through the Nuxt UI adapter.
 - Configure shared component behavior in `app.config.ts`.
 - Use CSS variables for surfaces, text, borders, radius, container width, and typography.
 - Keep local component styling small and semantic.
@@ -43,6 +44,8 @@ Runtime switching should feel instant and predictable. Keep runtime themes limit
 - precompiled class strings
 
 Do not make runtime themes responsible for arbitrary layouts, unbundled components, or product behavior.
+
+Nuxt UI owns its normal color-mode behavior. Dark CSS-variable values are optional, targeted overrides. Do not force light mode or generate dark values when a brand omits them.
 
 ## Visual QA
 
