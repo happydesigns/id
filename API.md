@@ -9,6 +9,7 @@ The root package exports:
 - `defineBrand`
 - `validateBrandDefinition`
 - `brandDefinitionSchema`
+- `brandAssetsSchema`
 - `defineBrandAdapter`
 - `nuxtUiAdapter`
 - `cssVariablesAdapter`
@@ -64,7 +65,9 @@ Adapter subpaths make target ownership explicit:
 - `@happydesigns/id/adapters/nuxt-ui`
 - `@happydesigns/id/adapters/css-variables`
 
-`BrandTheme` remains the runtime output consumed by the Nuxt integration. `BrandDefinition` is the neutral source. An adapter maps the latter to its target output; custom adapters are normal TypeScript modules and do not require registration.
+`BrandTheme` remains the runtime output consumed by the Nuxt integration. `BrandDefinition` is the recommended neutral source for named colors, optional structured `BrandAssets`, free color roles, and open typography roles. `sans`, `mono`, and `display` provide editor suggestions; brands may add roles such as `editorial` or `numeric`. An adapter maps the definition to its target output, and custom adapters are normal TypeScript modules that do not require registration. `BrandIdentity` and `defineBrandIdentity()` retain the earlier `logoAssetPaths` shape for compatibility; new definitions should use structured assets instead.
+
+`NuxtUiColorRole` intentionally suggests Nuxt UI's current well-known roles while accepting additional strings. This keeps mappings explicit and forward-compatible when Nuxt UI or an integration adds a role.
 
 Explicit theme package exports:
 
@@ -123,7 +126,9 @@ export default defineAppConfig({
 
 The runtime reads `id.theme`, applies CSS variables to the document root, and can update Nuxt UI app config with the selected theme. Apps that intentionally ship a runtime picker may also provide `id.themes[]` and `id.defaultTheme`. `createBrandThemeStateKey()` and `createBrandThemeCookieName()` expose the scoped Nuxt state and cookie naming conventions used by `IdThemeSelect`.
 
-`id.assets.logos` is the narrow runtime asset surface. `id.guide.assets` remains a compatibility fallback for guide applications. `logo`, `wordmark`, `symbol`, `mark`, `appIcon`, `wordmarkInverse`, and `symbolInverse` are useful conventions, not requirements. `IdLogo` follows the active color mode by default, and dark-media fallback prefers the inverse roles before the light-surface roles. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."`, use `useBrandAssets()`, or provide their own brand-specific component.
+Use `BrandRuntimeOnlyConfig` for ordinary runtime configuration, `BrandGuideConfig` for guide-only data, and `BrandGuideAppConfig` when an app deliberately combines both. `BrandRuntimeConfig` remains the backward-compatible name for the combined shape.
+
+`BrandAssets` is independent from `BrandGuide` and may live directly on `BrandDefinition.assets` before being passed to `id.assets`. `id.guide.assets` remains a compatibility fallback for guide applications. `logo`, `wordmark`, `symbol`, `mark`, `appIcon`, `wordmarkInverse`, and `symbolInverse` are useful conventions, not requirements. `IdLogo` follows the active color mode by default, and dark-media fallback prefers the inverse roles before the light-surface roles. Concrete brand layers can define roles such as `crest`, `signature`, `seal`, or `partner-lockup` and either render them through `IdLogo role="..."`, use `useBrandAssets()`, or provide their own brand-specific component.
 
 ## Stability
 

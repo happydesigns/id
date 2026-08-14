@@ -19,7 +19,7 @@ export default defineNuxtConfig({
 })
 ```
 
-This starter is for full build-time branding: assets, metadata, CSS variables, Nuxt UI defaults, and optional brand primitives. Replace the placeholder `brandIdentity` and `brandAssets` entries in `brand.ts` with stable roles from the real brand system. The neutral definition is mapped through the Nuxt UI adapter; add other adapters as normal TypeScript modules when a second target needs the same brand data.
+This starter is for full build-time branding: assets, metadata, CSS variables, Nuxt UI defaults, and optional brand primitives. Replace the placeholder `brandIdentity` definition in `brand.ts`; it owns the structured runtime assets alongside the neutral colors and typography. The definition is mapped through the Nuxt UI adapter, and other adapters remain normal TypeScript modules when a second target needs the same brand data.
 
 Runtime app config receives only the theme and runtime assets. The exported `brandGuide` remains available for a dedicated guide application but is not shipped automatically to every consuming app.
 

@@ -85,7 +85,7 @@ export {
   createBrandThemeCookieName,
   createBrandThemeStateKey
 } from './runtime'
-export { brandDefinitionSchema, brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
+export { brandAssetsSchema, brandDefinitionSchema, brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
 export { normalizeBrandThemes, resolveBrandThemeName, resolveBrandThemes } from './themes'
 export type {
   ApplyBrandThemeOptions,
@@ -99,6 +99,7 @@ export type {
   BrandCssVariables,
   BrandDefinition,
   BrandGuideConfig,
+  BrandGuideAppConfig,
   BrandGuideAssetEntry,
   BrandGuideColorEntry,
   BrandGuideComponentEntry,
@@ -115,10 +116,11 @@ export type {
   BrandModuleOptions,
   BrandPalette,
   BrandRuntimeConfig,
+  BrandRuntimeOnlyConfig,
   BrandSemanticColors,
   BrandTheme,
-  BrandThemeRuntimeConfig,
   BrandTypography,
+  BrandTypographyRole,
   BrandVoice,
   NuxtUiAppConfig,
   NuxtUiColorRole,

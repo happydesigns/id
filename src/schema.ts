@@ -9,11 +9,7 @@ const cssVariablesSchema = z.object({
   message: 'At least one cssVariables mode is required'
 })
 
-const typographySchema = z.object({
-  sans: z.string().min(1).optional(),
-  mono: z.string().min(1).optional(),
-  display: z.string().min(1).optional()
-})
+const typographySchema = z.record(z.string().min(1), z.string().min(1))
 
 const assetSchema = z.object({
   name: z.string().min(1),
@@ -24,6 +20,11 @@ const assetSchema = z.object({
 })
 
 const logoSetSchema = z.record(z.string().min(1), assetSchema)
+
+export const brandAssetsSchema = z.object({
+  logos: logoSetSchema.optional(),
+  files: z.array(assetSchema).optional()
+})
 
 const colorScaleSchema = z.record(z.string().regex(/^\d+$/, 'Color scale keys must be numeric'), z.string().min(1))
 
@@ -62,19 +63,23 @@ const docsSchema = z.object({
   })).optional()
 })
 
-export const brandIdentitySchema = z.object({
+const brandMetadataSchema = z.object({
   name: z.string().min(1).regex(/^[a-z0-9][a-z0-9-]*$/, 'Brand identity names must be kebab-case'),
   packageName: z.string().min(1).optional(),
-  claim: z.string().min(1).optional(),
+  claim: z.string().min(1).optional()
+})
+
+export const brandIdentitySchema = brandMetadataSchema.extend({
   logoAssetPaths: z.record(z.string().min(1), z.string().min(1)).optional(),
   colors: paletteSchema.optional()
 }).passthrough()
 
-export const brandDefinitionSchema = brandIdentitySchema.extend({
+export const brandDefinitionSchema = brandMetadataSchema.extend({
   colors: paletteSchema,
   roles: z.record(z.string().min(1), z.string().min(1)).optional(),
-  typography: typographySchema.optional()
-}).superRefine((brand, context) => {
+  typography: typographySchema.optional(),
+  assets: brandAssetsSchema.optional()
+}).passthrough().superRefine((brand, context) => {
   for (const [role, colorName] of Object.entries(brand.roles ?? {})) {
     if (!(colorName in brand.colors)) {
       context.addIssue({
@@ -104,10 +109,7 @@ export const brandGuideSchema = z.object({
   description: z.string().min(1),
   homepage: z.string().url().optional(),
   repository: z.string().url().optional(),
-  assets: z.object({
-    logos: logoSetSchema.optional(),
-    files: z.array(assetSchema).optional()
-  }).optional(),
+  assets: brandAssetsSchema.optional(),
   palette: paletteSchema.optional(),
   semanticColors: semanticColorsSchema.optional(),
   cssVariables: cssVariablesSchema.optional(),
@@ -120,6 +122,7 @@ export const brandGuideSchema = z.object({
 })
 
 export type BrandIdentitySchema = z.infer<typeof brandIdentitySchema>
+export type BrandAssetsSchema = z.infer<typeof brandAssetsSchema>
 export type BrandDefinitionSchema = z.infer<typeof brandDefinitionSchema>
 export type BrandThemeSchema = z.infer<typeof brandThemeSchema>
 export type BrandGuideSchema = z.infer<typeof brandGuideSchema>

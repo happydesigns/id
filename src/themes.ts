@@ -1,4 +1,4 @@
-import type { BrandRuntimeConfig, BrandTheme } from './types'
+import type { BrandRuntimeOnlyConfig, BrandTheme } from './types'
 
 export function normalizeBrandThemes(themes: readonly BrandTheme[] = []): BrandTheme[] {
   const themesByName = new Map<string, BrandTheme>()
@@ -10,7 +10,7 @@ export function normalizeBrandThemes(themes: readonly BrandTheme[] = []): BrandT
   return Array.from(themesByName.values())
 }
 
-export function resolveBrandThemes(config: Pick<BrandRuntimeConfig, 'theme' | 'themes'> = {}): BrandTheme[] {
+export function resolveBrandThemes(config: Pick<BrandRuntimeOnlyConfig, 'theme' | 'themes'> = {}): BrandTheme[] {
   const additionalThemes = normalizeBrandThemes(config.themes ?? [])
 
   if (!config.theme) {
@@ -24,7 +24,7 @@ export function resolveBrandThemes(config: Pick<BrandRuntimeConfig, 'theme' | 't
 }
 
 export function resolveBrandThemeName(
-  config: Pick<BrandRuntimeConfig, 'defaultTheme' | 'theme' | 'themes'> = {},
+  config: Pick<BrandRuntimeOnlyConfig, 'defaultTheme' | 'theme' | 'themes'> = {},
   themes: readonly BrandTheme[] = resolveBrandThemes(config)
 ): string {
   const candidates = [

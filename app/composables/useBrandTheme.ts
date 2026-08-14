@@ -1,9 +1,9 @@
 import { computed, updateAppConfig, useAppConfig, useCookie, useState } from '#imports'
 import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createBrandThemeStateKey, createNuxtUiAppConfig, resolveBrandThemeName, resolveBrandThemes } from '../../src'
-import type { BrandRuntimeConfig, BrandTheme, NuxtUiAppConfig } from '../../src'
+import type { BrandRuntimeOnlyConfig, BrandTheme, NuxtUiAppConfig } from '../../src'
 
 type IdentityAppConfig = {
-  id?: BrandRuntimeConfig
+  id?: BrandRuntimeOnlyConfig
 }
 
 function getThemeList(config: IdentityAppConfig) {

@@ -1,9 +1,9 @@
 import { computed, useAppConfig } from '#imports'
 import { collectBrandAssets, selectBrandAsset } from '../../src'
-import type { BrandAssetSelection, BrandRuntimeConfig } from '../../src'
+import type { BrandAssetSelection, BrandGuideAppConfig } from '../../src'
 
 type IdentityAppConfig = {
-  id?: BrandRuntimeConfig
+  id?: BrandGuideAppConfig
 }
 
 export function useBrandAssets() {
@@ -11,7 +11,7 @@ export function useBrandAssets() {
 
   const guide = computed(() => appConfig.id?.guide)
   const assets = computed(() => appConfig.id?.assets ?? guide.value?.assets)
-  const entries = computed(() => collectBrandAssets({ assets: assets.value }))
+  const entries = computed(() => collectBrandAssets(assets.value))
   const brandLabel = computed(() => guide.value?.title ?? appConfig.id?.name ?? 'Brand')
 
   function resolveAsset(selection: BrandAssetSelection = {}) {

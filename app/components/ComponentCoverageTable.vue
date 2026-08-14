@@ -5,7 +5,7 @@ import {
   normalizeComponentCoverage,
   type ComponentCoverageStatus
 } from '../../src/component-coverage'
-import type { BrandComponentCoverage, BrandRuntimeConfig } from '../../src'
+import type { BrandComponentCoverage, BrandGuideConfig } from '../../src'
 
 const props = withDefaults(defineProps<{
   items?: BrandComponentCoverage[]
@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
   emptyText: 'No component coverage entries are configured yet.'
 })
 
-const appConfig = useAppConfig() as { id?: BrandRuntimeConfig }
+const appConfig = useAppConfig() as { id?: BrandGuideConfig }
 
 const coverageItems = computed(() => normalizeComponentCoverage(
   props.items ?? appConfig.id?.guide?.componentCoverage

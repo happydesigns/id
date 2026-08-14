@@ -51,7 +51,7 @@ The layer export uses the standard `Id` component prefix. The module can registe
 
 `id` supports a brand-layer-first model:
 
-- A neutral brand definition stores named colors, optional free roles, typography, and asset paths once.
+- A neutral brand definition stores named colors, optional free roles, freely named typography roles, and structured runtime assets once. `sans`, `mono`, and `display` are useful typography conventions, not a closed vocabulary.
 - Explicit adapters map those values to a target system. Nuxt UI is the maintained reference adapter; user adapters are ordinary TypeScript files or packages.
 - Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
 - A primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
@@ -63,6 +63,8 @@ The included baseline intentionally stays close to standard Nuxt UI. Brand repos
 Runtime themes are intentionally lightweight. They do not load arbitrary remote Vue components, uncompiled Tailwind classes, domain behavior, credentials, APIs, or server runtime changes.
 
 Nuxt UI keeps its normal color-mode behavior. A brand may provide targeted dark CSS-variable overrides, but `id` does not require, generate, or force a separate dark theme.
+
+Normal apps use the runtime-only `BrandRuntimeOnlyConfig`. Guide applications add `BrandGuideConfig` through `BrandGuideAppConfig`; the existing `BrandRuntimeConfig` name remains a compatibility alias for that combined shape.
 
 ## Development
 

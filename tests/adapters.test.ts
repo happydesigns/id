@@ -26,14 +26,27 @@ const brand = defineBrand({
     structure: 'sand'
   },
   typography: {
-    sans: 'Fixture Sans, sans-serif'
+    sans: 'Fixture Sans, sans-serif',
+    editorial: 'Fixture Serif, serif'
+  },
+  assets: {
+    logos: {
+      signature: {
+        name: 'Fixture signature',
+        src: '/brand/signature.svg',
+        role: 'signature',
+        media: 'any'
+      }
+    }
   }
 } as const)
 
 describe('brand definitions', () => {
-  it('keeps arbitrary color names, scale steps, and free roles', () => {
+  it('keeps arbitrary color names, scale steps, typography roles, free roles, and runtime assets', () => {
     expect(brand.colors.sand[150]).toBe('#F1ECE6')
     expect(brand.roles.signature).toBe('coral')
+    expect(brand.typography.editorial).toBe('Fixture Serif, serif')
+    expect(brand.assets.logos.signature.src).toBe('/brand/signature.svg')
   })
 
   it('rejects roles that reference undefined colors', () => {
@@ -47,15 +60,46 @@ describe('brand definitions', () => {
       }
     } as never)).toThrow(BrandValidationError)
   })
+
+  it('validates runtime assets without requiring a guide', () => {
+    expect(() => defineBrand({
+      name: 'invalid-assets',
+      colors: {
+        coral: '#F28564'
+      },
+      assets: {
+        logos: {
+          signature: {
+            name: 'Fixture signature',
+            src: '',
+            role: 'signature'
+          }
+        }
+      }
+    })).toThrow(BrandValidationError)
+  })
+
+  it('rejects empty custom typography stacks', () => {
+    expect(() => defineBrand({
+      name: 'invalid-typography',
+      colors: {
+        coral: '#F28564'
+      },
+      typography: {
+        editorial: ''
+      }
+    })).toThrow(BrandValidationError)
+  })
 })
 
 describe('Nuxt UI adapter', () => {
-  it('maps named brand colors and role values to Nuxt UI roles', () => {
+  it('maps brand colors to known and custom future Nuxt UI roles', () => {
     const theme = nuxtUiAdapter.transform(brand, {
       label: 'Adapter fixture',
       colors: {
         primary: brand.roles.signature,
-        neutral: brand.roles.structure
+        neutral: brand.roles.structure,
+        emphasis: 'graphite'
       },
       components: {
         button: {
@@ -69,7 +113,8 @@ describe('Nuxt UI adapter', () => {
     expect(theme.ui).toMatchObject({
       colors: {
         primary: 'coral',
-        neutral: 'sand'
+        neutral: 'sand',
+        emphasis: 'graphite'
       },
       button: {
         defaultVariants: {
@@ -77,6 +122,7 @@ describe('Nuxt UI adapter', () => {
         }
       }
     })
+    expect(theme.typography).toEqual(brand.typography)
   })
 
   it('leaves omitted target roles at Nuxt UI defaults', () => {
@@ -140,7 +186,8 @@ describe('CSS variables adapter', () => {
       '--client-color-sand-150': '#F1ECE6',
       '--client-color-graphite': '#242423',
       '--client-role-signature-500': 'var(--client-color-coral-500)',
-      '--client-font-sans': 'Fixture Sans, sans-serif'
+      '--client-font-sans': 'Fixture Sans, sans-serif',
+      '--client-font-editorial': 'Fixture Serif, serif'
     })
     expect(output.css).toContain('[data-brand="client"] {')
     expect(output.css).toContain('--client-color-sand-150: #F1ECE6;')

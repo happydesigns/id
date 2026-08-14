@@ -1,5 +1,5 @@
 import { addComponentsDir, addImportsDir, addPlugin, addTypeTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
-import type { BrandModuleOptions, BrandRuntimeConfig } from './src'
+import type { BrandGuideAppConfig, BrandModuleOptions } from './src'
 
 export type ModuleOptions = BrandModuleOptions
 
@@ -20,7 +20,7 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
     const { componentPrefix = 'Id', ...runtimeOptions } = options
-    const existing = (nuxt.options.appConfig.id ?? {}) as BrandRuntimeConfig
+    const existing = (nuxt.options.appConfig.id ?? {}) as BrandGuideAppConfig
 
     nuxt.options.appConfig.id = {
       ...runtimeOptions,
@@ -46,15 +46,15 @@ export default defineNuxtModule<ModuleOptions>({
     addTypeTemplate({
       filename: 'types/id-app-config.d.ts',
       getContents: () => [
-        'import type { BrandRuntimeConfig } from \'@happydesigns/id\'',
+        'import type { BrandGuideAppConfig } from \'@happydesigns/id\'',
         '',
         'declare module \'nuxt/schema\' {',
         '  interface AppConfigInput {',
-        '    id?: BrandRuntimeConfig',
+        '    id?: BrandGuideAppConfig',
         '  }',
         '',
         '  interface AppConfig {',
-        '    id?: BrandRuntimeConfig',
+        '    id?: BrandGuideAppConfig',
         '  }',
         '}',
         '',

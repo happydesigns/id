@@ -1,14 +1,10 @@
-import { createBrandGuideAssets, defineBrand, defineBrandGuide } from '@happydesigns/id'
+import { defineBrand, defineBrandGuide } from '@happydesigns/id'
 import { nuxtUiAdapter } from '@happydesigns/id/adapters/nuxt-ui'
 
 export const brandIdentity = defineBrand({
   name: 'example-brand',
   packageName: '@example/brand',
   claim: 'A reusable Nuxt UI brand layer.',
-  logoAssetPaths: {
-    logo: '/favicon.svg',
-    appIcon: '/favicon.svg'
-  },
   colors: {
     brand: {
       50: '#eff6ff',
@@ -28,6 +24,24 @@ export const brandIdentity = defineBrand({
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
     mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+  },
+  assets: {
+    logos: {
+      logo: {
+        name: 'Example Brand logo',
+        src: '/favicon.svg',
+        role: 'logo',
+        media: 'any',
+        alt: 'Example Brand'
+      },
+      appIcon: {
+        name: 'Example Brand app icon',
+        src: '/favicon.svg',
+        role: 'appIcon',
+        media: 'any',
+        alt: 'Example Brand app icon'
+      }
+    }
   }
 })
 
@@ -35,25 +49,6 @@ const brandColors = {
   primary: 'brand',
   neutral: 'slate'
 } as const
-
-const brandAssets = [
-  {
-    name: 'Example Brand logo',
-    role: 'logo',
-    path: brandIdentity.logoAssetPaths.logo,
-    usage: 'Primary logo for headers and brand-owned surfaces.',
-    media: 'any',
-    alt: 'Example Brand'
-  },
-  {
-    name: 'Example Brand app icon',
-    role: 'appIcon',
-    path: brandIdentity.logoAssetPaths.appIcon,
-    usage: 'Favicon, touch icon, and square app contexts.',
-    media: 'any',
-    alt: 'Example Brand app icon'
-  }
-] as const
 
 export const brandTheme = nuxtUiAdapter.transform(brandIdentity, {
   label: 'Example Brand',
@@ -79,7 +74,7 @@ export const brandTheme = nuxtUiAdapter.transform(brandIdentity, {
   }
 })
 
-export const brandRuntimeAssets = createBrandGuideAssets(brandAssets)
+export const brandRuntimeAssets = brandIdentity.assets
 
 export const brandGuide = defineBrandGuide({
   name: brandIdentity.name,

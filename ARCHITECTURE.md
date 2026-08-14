@@ -37,9 +37,11 @@ Each brand layer should expose one primary `id.theme` through `app.config.ts`. R
 
 Reusable brand repositories should keep identity data in a normal source file such as `brand.ts` and wire that data into Nuxt through `app.config.ts`. This keeps Nuxt's app-config model as the integration point without making Nuxt config the only place where a brand guide can be authored, tested, or exported.
 
-The neutral brand definition owns named colors, optional free-form role aliases, typography, and asset paths. Adapters own target roles and output. `id` maintains the Nuxt UI adapter and a small CSS-variable reference adapter; user adapters remain ordinary TypeScript modules. There is no adapter registry or discovery runtime.
+The neutral brand definition owns named colors, optional free-form role aliases, open typography roles, and optional structured runtime assets. `BrandAssets` is independent from guide content. Adapters own target roles and output. `id` maintains the Nuxt UI adapter and a small CSS-variable reference adapter; user adapters remain ordinary TypeScript modules. There is no adapter registry or discovery runtime.
 
 The existing `BrandTheme` contract is the output consumed by the Nuxt runtime. Guide content is optional documentation data, not a required adapter input. Runtime assets can be exposed through `id.assets` without shipping the complete guide.
+
+`BrandRuntimeOnlyConfig` describes the normal app surface. `BrandGuideConfig` adds documentation data, and `BrandGuideAppConfig` combines them for an actual guide app. `BrandRuntimeConfig` remains a compatibility alias for the previously combined public shape.
 
 The layer export registers identity components with the `Id` prefix. The module accepts a build-time `componentPrefix` option when an app needs the same runtime helpers under another global prefix.
 

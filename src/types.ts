@@ -43,11 +43,13 @@ export type BrandCssVariables = {
   dark?: Record<string, string>
 }
 
-export type BrandTypography = {
-  sans?: string
-  mono?: string
-  display?: string
-}
+export type BrandTypographyRole =
+  | 'sans'
+  | 'mono'
+  | 'display'
+  | (string & {})
+
+export type BrandTypography = Partial<Record<BrandTypographyRole, string>>
 
 export type BrandAsset = {
   name: string
@@ -76,6 +78,11 @@ export type BrandLogoSet = {
   symbolInverse?: BrandAsset
   mark?: BrandAsset
   appIcon?: BrandAsset
+}
+
+export type BrandAssets = {
+  logos?: BrandLogoSet
+  files?: readonly BrandAsset[]
 }
 
 export type BrandVoice = {
@@ -109,15 +116,15 @@ export type BrandIdentity<
 export type BrandDefinition<
   TColors extends BrandPalette = BrandPalette,
   TRoles extends BrandColorRoles<TColors> = BrandColorRoles<TColors>,
-  TLogoAssetPaths extends Record<string, string> = Record<string, string>
+  TAssets extends BrandAssets = BrandAssets
 > = {
   name: string
   packageName?: string
   claim?: string
-  logoAssetPaths?: TLogoAssetPaths
   colors: TColors
   roles?: TRoles
   typography?: BrandTypography
+  assets?: TAssets
 }
 
 export type BrandGuideSectionInput = {
@@ -200,10 +207,7 @@ export type BrandGuide = {
   description: string
   homepage?: string
   repository?: string
-  assets?: {
-    logos?: BrandLogoSet
-    files?: BrandAsset[]
-  }
+  assets?: BrandAssets
   palette?: BrandPalette
   semanticColors?: BrandSemanticColors
   cssVariables?: BrandCssVariables
@@ -220,8 +224,6 @@ export type BrandGuide = {
   }
   ui?: Record<string, unknown>
 }
-
-export type BrandAssets = NonNullable<BrandGuide['assets']>
 
 export type BrandTheme = {
   name: string
@@ -257,7 +259,7 @@ export type NuxtUiAppConfig = {
   ui: NonNullable<AppConfigInput['ui']>
 }
 
-export type BrandThemeRuntimeConfig = {
+export type BrandRuntimeOnlyConfig = {
   name?: string
   theme?: BrandTheme
   defaultTheme?: string
@@ -269,8 +271,11 @@ export type BrandGuideConfig = {
   guide?: BrandGuide
 }
 
-export type BrandRuntimeConfig = BrandThemeRuntimeConfig & BrandGuideConfig
+export type BrandGuideAppConfig = BrandRuntimeOnlyConfig & BrandGuideConfig
 
-export type BrandModuleOptions = BrandRuntimeConfig & {
+/** Backward-compatible combined app-config name. */
+export type BrandRuntimeConfig = BrandGuideAppConfig
+
+export type BrandModuleOptions = BrandGuideAppConfig & {
   componentPrefix?: string
 }
