@@ -1,4 +1,4 @@
-import { readFileSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -40,6 +40,7 @@ describe('starter templates', () => {
     expect(packageJson.files).toContain('nuxt.layer.config.mjs')
     expect(packageJson.files).not.toContain('templates')
     expect(packageJson.files).toContain('templates/brand-layer/app')
+    expect(packageJson.files).toContain('templates/brand-layer/docs')
     expect(packageJson.files).toContain('templates/themed-app/app')
     expect(packageJson.files).not.toContain('nuxt.config.ts')
     expect(packageJson.files).not.toContain('modules')
@@ -56,17 +57,22 @@ describe('starter templates', () => {
   })
 
   it('keeps the brand-layer template shaped like an external brand repo', () => {
-    expectTemplateFile('brand-layer', 'app/app.vue')
     expectTemplateFile('brand-layer', 'brand.ts')
     expectTemplateFile('brand-layer', 'app/app.config.ts')
     expectTemplateFile('brand-layer', 'nuxt.config.ts')
+    expectTemplateFile('brand-layer', 'docs/nuxt.config.ts')
+    expectTemplateFile('brand-layer', 'docs/app/app.config.ts')
+    expectTemplateFile('brand-layer', 'docs/content/index.md')
 
-    expect(readTemplateFile('brand-layer', 'app/app.vue')).toContain('<UApp>')
+    expect(existsSync(join(rootDir, 'templates/brand-layer/app/app.vue'))).toBe(false)
+    expect(existsSync(join(rootDir, 'templates/brand-layer/app/pages/index.vue'))).toBe(false)
     expect(readTemplateFile('brand-layer', 'app/app.config.ts')).toContain("from '../brand'")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("extends: ['@happydesigns/id/nuxt']")
+    expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).not.toContain('docus')
+    expect(readTemplateFile('brand-layer', 'docs/nuxt.config.ts')).toContain("extends: ['..', 'docus']")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("prefix: 'Brand'")
-    expect(readTemplateFile('brand-layer', 'app/pages/index.vue')).toContain('<BrandLogo')
-    expect(readTemplateFile('brand-layer', 'app/pages/index.vue')).toContain("rel: 'noopener noreferrer'")
+    expect(readTemplateFile('brand-layer', 'docs/content/index.md')).toContain('::brand-logo')
+    expect(readTemplateFile('brand-layer', 'docs/content/index.md')).toContain('rel: noopener noreferrer')
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain('defineBrand')
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain('nuxtUiAdapter.transform')
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain('assets: {')
@@ -77,6 +83,7 @@ describe('starter templates', () => {
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain("alt: 'Example Brand'")
     expect(readTemplateFile('brand-layer', 'app/app.config.ts')).toContain('assets: brandRuntimeAssets')
     expect(readTemplateFile('brand-layer', 'app/app.config.ts')).not.toContain('guide: brandGuide')
+    expect(readTemplateFile('brand-layer', 'docs/app/app.config.ts')).toContain('guide: brandGuide')
     expect(readTemplateFile('brand-layer', 'app/components/Logo.vue')).toContain('<IdLogo')
   })
 
@@ -105,7 +112,7 @@ describe('starter templates', () => {
       expect(templatePackage.devDependencies?.typescript).toBe(rootPackage.devDependencies?.typescript)
       expect(templatePackage.devDependencies?.['vue-tsc']).toBe(rootPackage.devDependencies?.['vue-tsc'])
       expect(templatePackage.scripts?.typecheck).toBe('nuxt typecheck')
-      expect(templatePackage.scripts?.verify).toBe('pnpm typecheck')
+      expect(templatePackage.scripts?.verify).toBe(template === 'brand-layer' ? 'pnpm typecheck && pnpm build' : 'pnpm typecheck')
     }
   })
 })

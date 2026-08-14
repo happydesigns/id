@@ -60,6 +60,7 @@
     "src",
     "themes",
     "templates/brand-layer/app",
+    "templates/brand-layer/docs",
     "templates/brand-layer/public",
     "templates/brand-layer/brand.ts",
     "templates/brand-layer/nuxt.config.ts",

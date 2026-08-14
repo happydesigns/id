@@ -11,6 +11,12 @@ pnpm install
 pnpm dev
 ```
 
+Nuxt's CLI accepts the same GitHub template source:
+
+```bash
+pnpm create nuxt@latest my-brand --template gh:happydesigns/id/templates/brand-layer
+```
+
 ## Apply in a Nuxt app
 
 ```ts [nuxt.config.ts]
@@ -23,4 +29,6 @@ This starter is for full build-time branding: assets, metadata, CSS variables, N
 
 Runtime app config receives only the theme and runtime assets. The exported `brandGuide` remains available for a dedicated guide application but is not shipped automatically to every consuming app.
 
-The starter includes `app/app.vue` with the standard Nuxt UI `UApp` root so toasts, tooltips, overlays, and runtime identity controls work from the first dev run. The homepage renders `BrandLogo`, which is auto-imported from `app/components/Logo.vue` through the brand component prefix and backed by `IdLogo`.
+The repository root is the public Nuxt layer. It contains only consumer-safe app config, CSS, assets, and reusable brand components. The separate Docus application in `docs/` extends that root, adds `id.guide`, and renders the reference pages. Consumers always extend the package or repository root, never `docs/`.
+
+`pnpm dev` and `pnpm build` target the reference app. `pnpm typecheck` checks the public layer in isolation, and `pnpm verify` checks both boundaries. The reference homepage renders `BrandLogo`, which is inherited from the root layer and backed by `IdLogo`.
