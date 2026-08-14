@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { adapterOmissionRows, adapterValidationRows, productSurfaceOutput } from '../utils/adapter-validation'
+
 defineOptions({
   name: 'IdPlaygroundPage'
 })
@@ -210,6 +212,87 @@ const rows = [
                 </div>
               </UPageCard>
             </UPageGrid>
+          </UPageSection>
+
+          <UPageSection
+            title="Adapter contract probes"
+            description="A deliberately incomplete brand proves that roles stay brand-owned, adapters stay explicit, and omitted capabilities remain omitted."
+          >
+            <div class="grid gap-6 lg:grid-cols-2">
+              <UCard>
+                <template #header>
+                  <div class="flex items-center justify-between gap-4">
+                    <h2 class="text-base font-semibold text-highlighted">
+                      Explicit mappings
+                    </h2>
+                    <UBadge color="secondary" variant="subtle">
+                      tertiary
+                    </UBadge>
+                  </div>
+                </template>
+
+                <dl class="divide-y divide-default">
+                  <div
+                    v-for="row in adapterValidationRows"
+                    :key="row.contract"
+                    class="grid gap-1 py-3 first:pt-0 last:pb-0 sm:grid-cols-[1fr_auto] sm:gap-4"
+                  >
+                    <div>
+                      <dt class="text-sm font-medium text-highlighted">
+                        {{ row.contract }}
+                      </dt>
+                      <dd class="font-mono text-xs text-muted">
+                        {{ row.input }}
+                      </dd>
+                    </div>
+                    <dd class="font-mono text-sm text-primary sm:text-right">
+                      {{ row.output }}
+                    </dd>
+                  </div>
+                </dl>
+              </UCard>
+
+              <UCard>
+                <template #header>
+                  <div class="flex items-center justify-between gap-4">
+                    <h2 class="text-base font-semibold text-highlighted">
+                      Optional capabilities
+                    </h2>
+                    <UBadge color="neutral" variant="outline">
+                      no fallback data
+                    </UBadge>
+                  </div>
+                </template>
+
+                <div class="space-y-4">
+                  <p class="text-sm text-muted">
+                    Select “Flexible light-only” above and switch color mode. ID supplies no invented dark values; Nuxt UI keeps its own target behavior.
+                  </p>
+
+                  <dl class="space-y-3">
+                    <div
+                      v-for="row in adapterOmissionRows"
+                      :key="row.contract"
+                      class="rounded-lg border border-default bg-muted p-3"
+                    >
+                      <dt class="text-sm font-medium text-highlighted">
+                        {{ row.contract }}
+                      </dt>
+                      <dd class="mt-1 text-sm text-muted">
+                        {{ row.behavior }}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <div class="rounded-lg border border-default bg-default p-4">
+                    <p class="text-xs font-medium uppercase tracking-wide text-muted">
+                      User-defined product adapter
+                    </p>
+                    <pre class="mt-3 overflow-x-auto text-xs text-highlighted">{{ JSON.stringify(productSurfaceOutput, null, 2) }}</pre>
+                  </div>
+                </div>
+              </UCard>
+            </div>
           </UPageSection>
 
           <UPageSection
