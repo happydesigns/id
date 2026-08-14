@@ -1,4 +1,4 @@
-import type { BrandAsset, BrandGuide, BrandGuideAssetEntry, BrandLogoSet } from './types'
+import type { BrandAsset, BrandAssets, BrandGuideAssetEntry, BrandLogoSet } from './types'
 
 export type BrandAssetEntry = {
   role: string
@@ -49,7 +49,7 @@ export function createBrandLogoSet(
 export function createBrandGuideAssets(
   entries: readonly BrandGuideAssetEntry[],
   options: BrandGuideAssetMappingOptions = {}
-): NonNullable<BrandGuide['assets']> {
+): BrandAssets {
   return {
     logos: createBrandLogoSet(entries, options),
     files: entries.map(entry => createBrandAsset(entry, options))
@@ -82,11 +82,14 @@ function selectFromEntries(entries: BrandAssetEntry[], selection: BrandAssetSele
   return entries[0]?.asset
 }
 
-export function collectBrandAssets(guide?: Pick<BrandGuide, 'assets'> | null): BrandAssetEntry[] {
-  const logos = Object.entries(guide?.assets?.logos ?? {})
+export function collectBrandAssets(source?: BrandAssets | { assets?: BrandAssets } | null): BrandAssetEntry[] {
+  const assets: BrandAssets | undefined = source
+    ? ('assets' in source ? source.assets : source as BrandAssets)
+    : undefined
+  const logos = Object.entries(assets?.logos ?? {})
     .map(([role, asset]) => asset ? { role, asset } : undefined)
     .filter((entry): entry is BrandAssetEntry => Boolean(entry))
-  const files = (guide?.assets?.files ?? []).map(asset => ({ role: asset.role, asset }))
+  const files = (assets?.files ?? []).map(asset => ({ role: asset.role, asset }))
 
   return [...logos, ...files]
 }

@@ -12,10 +12,15 @@ export type BrandColorShade =
   | 800
   | 900
   | 950
+  | (number & {})
 
 export type BrandColorScale = Partial<Record<BrandColorShade, string>>
 
 export type BrandPalette = Record<string, string | BrandColorScale>
+
+export type BrandColorName<TColors extends BrandPalette = BrandPalette> = Extract<keyof TColors, string>
+
+export type BrandColorRoles<TColors extends BrandPalette = BrandPalette> = Record<string, BrandColorName<TColors>>
 
 export type NuxtUiColorRole =
   | 'primary'
@@ -38,11 +43,13 @@ export type BrandCssVariables = {
   dark?: Record<string, string>
 }
 
-export type BrandTypography = {
-  sans?: string
-  mono?: string
-  display?: string
-}
+export type BrandTypographyRole =
+  | 'sans'
+  | 'mono'
+  | 'display'
+  | (string & {})
+
+export type BrandTypography = Partial<Record<BrandTypographyRole, string>>
 
 export type BrandAsset = {
   name: string
@@ -73,6 +80,11 @@ export type BrandLogoSet = {
   appIcon?: BrandAsset
 }
 
+export type BrandAssets = {
+  logos?: BrandLogoSet
+  files?: readonly BrandAsset[]
+}
+
 export type BrandVoice = {
   attributes?: string[]
   dos?: string[]
@@ -99,6 +111,20 @@ export type BrandIdentity<
   claim?: string
   logoAssetPaths?: TLogoAssetPaths
   colors?: TColors
+}
+
+export type BrandDefinition<
+  TColors extends BrandPalette = BrandPalette,
+  TRoles extends BrandColorRoles<TColors> = BrandColorRoles<TColors>,
+  TAssets extends BrandAssets = BrandAssets
+> = {
+  name: string
+  packageName?: string
+  claim?: string
+  colors: TColors
+  roles?: TRoles
+  typography?: BrandTypography
+  assets?: TAssets
 }
 
 export type BrandGuideSectionInput = {
@@ -181,10 +207,7 @@ export type BrandGuide = {
   description: string
   homepage?: string
   repository?: string
-  assets?: {
-    logos?: BrandLogoSet
-    files?: BrandAsset[]
-  }
+  assets?: BrandAssets
   palette?: BrandPalette
   semanticColors?: BrandSemanticColors
   cssVariables?: BrandCssVariables
@@ -236,14 +259,23 @@ export type NuxtUiAppConfig = {
   ui: NonNullable<AppConfigInput['ui']>
 }
 
-export type BrandRuntimeConfig = {
+export type BrandRuntimeOnlyConfig = {
   name?: string
   theme?: BrandTheme
   defaultTheme?: string
   themes?: BrandTheme[]
+  assets?: BrandAssets
+}
+
+export type BrandGuideConfig = {
   guide?: BrandGuide
 }
 
-export type BrandModuleOptions = BrandRuntimeConfig & {
+export type BrandGuideAppConfig = BrandRuntimeOnlyConfig & BrandGuideConfig
+
+/** Backward-compatible combined app-config name. */
+export type BrandRuntimeConfig = BrandGuideAppConfig
+
+export type BrandModuleOptions = BrandGuideAppConfig & {
   componentPrefix?: string
 }

@@ -1,12 +1,12 @@
-import type { BrandRuntimeConfig } from '../../src'
+import type { BrandGuideAppConfig } from '../../src'
 
 declare module 'nuxt/schema' {
   interface AppConfigInput {
-    id?: BrandRuntimeConfig
+    id?: BrandGuideAppConfig
   }
 
   interface AppConfig {
-    id?: BrandRuntimeConfig
+    id?: BrandGuideAppConfig
   }
 }
 

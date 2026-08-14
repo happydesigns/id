@@ -1,9 +1,9 @@
 import { useAppConfig } from '#imports'
 import { idBrandGuide } from '../../src/defaults'
-import type { BrandGuide, BrandRuntimeConfig } from '../../src'
+import type { BrandGuide, BrandGuideConfig } from '../../src'
 
 type IdentityAppConfig = {
-  id?: BrandRuntimeConfig
+  id?: BrandGuideConfig
 }
 
 export function useBrandGuide(): BrandGuide {

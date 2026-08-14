@@ -26,6 +26,11 @@ import {
   validateBrandIdentity,
   validateBrandTheme
 } from '../src'
+import type {
+  BrandGuideAppConfig,
+  BrandRuntimeConfig,
+  BrandRuntimeOnlyConfig
+} from '../src'
 import {
   editorialBrandTheme,
   studioBrandTheme,
@@ -272,6 +277,8 @@ describe('brand guide contract', () => {
     expect(assets.logos?.wordmark?.alt).toBe('Client wordmark asset')
     expect(assets.logos?.signature?.alt).toBe('Client signature for dark surfaces')
     expect(assets.files?.map(asset => asset.role)).toEqual(['wordmark', 'signature'])
+    expect(collectBrandAssets(assets).map(entry => entry.role)).toContain('signature')
+    expect(collectBrandAssets({ assets }).map(entry => entry.role)).toContain('signature')
   })
 
   it('ships an id brand guide for the default Nuxt UI baseline', () => {
@@ -525,5 +532,35 @@ describe('runtime theme application', () => {
     expect(style.get('--ui-bg')).toBe('white')
     expect(style.has('--ui-primary')).toBe(false)
     expect(style.has('--sample-surface-accent')).toBe(false)
+  })
+})
+
+describe('app config contracts', () => {
+  it('separates runtime-only config from optional guide app data and keeps the combined legacy name', () => {
+    const runtime = {
+      name: 'client',
+      assets: {
+        logos: {
+          logo: {
+            name: 'Client logo',
+            src: '/brand/logo.svg',
+            role: 'logo'
+          }
+        }
+      }
+    } satisfies BrandRuntimeOnlyConfig
+    const guideApp = {
+      ...runtime,
+      guide: {
+        name: 'client',
+        title: 'Client',
+        description: 'Client brand guide.'
+      }
+    } satisfies BrandGuideAppConfig
+    const legacyCombined = guideApp satisfies BrandRuntimeConfig
+
+    expect(runtime).not.toHaveProperty('guide')
+    expect(guideApp.guide.title).toBe('Client')
+    expect(legacyCombined.assets?.logos?.logo?.src).toBe('/brand/logo.svg')
   })
 })

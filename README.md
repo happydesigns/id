@@ -6,7 +6,9 @@ Reusable identity system for Nuxt UI brand guides, Nuxt UI defaults, and Nuxt br
 
 ## What it provides
 
-- Typed brand identity, brand-guide, and primary brand-theme contracts.
+- A neutral typed brand definition plus a small public adapter contract.
+- An official Nuxt UI adapter and a generic CSS-variable reference adapter.
+- Separate brand-guide and primary brand-theme contracts.
 - A neutral Nuxt UI baseline through `nuxtUiBrandTheme` and `idBrandGuide`.
 - Explicit theme exports for `@happydesigns/id/themes/nuxt-ui` and the neutral `@happydesigns/id/themes/sample-brand` reference theme.
 - Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
@@ -49,6 +51,8 @@ The layer export uses the standard `Id` component prefix. The module can registe
 
 `id` supports a brand-layer-first model:
 
+- A neutral brand definition stores named colors, optional free roles, freely named typography roles, and structured runtime assets once. `sans`, `mono`, and `display` are useful typography conventions, not a closed vocabulary.
+- Explicit adapters map those values to a target system. Nuxt UI is the maintained reference adapter; user adapters are ordinary TypeScript files or packages.
 - Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
 - A primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
 - A reusable brand source file such as `brand.ts` for package-owned identity data, with theme and guide exports wired into Nuxt through `app.config.ts`.
@@ -57,6 +61,10 @@ The layer export uses the standard `Id` component prefix. The module can registe
 The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes. The sample brand theme demonstrates the reusable contracts without carrying doctrine from a real brand; `@happydesigns/brand` owns the final public happydesigns guide, assets, logo doctrine, palette meaning, and voice.
 
 Runtime themes are intentionally lightweight. They do not load arbitrary remote Vue components, uncompiled Tailwind classes, domain behavior, credentials, APIs, or server runtime changes.
+
+Nuxt UI keeps its normal color-mode behavior. A brand may provide targeted dark CSS-variable overrides, but `id` does not require, generate, or force a separate dark theme.
+
+Normal apps use the runtime-only `BrandRuntimeOnlyConfig`. Guide applications add `BrandGuideConfig` through `BrandGuideAppConfig`; the existing `BrandRuntimeConfig` name remains a compatibility alias for that combined shape.
 
 ## Development
 

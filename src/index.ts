@@ -6,6 +6,12 @@ export {
   defaultBrandAssetRoles,
   selectBrandAsset
 } from './assets'
+export { defineBrandAdapter } from './adapter'
+export type { BrandAdapter } from './adapter'
+export { cssVariablesAdapter } from './adapters/css-variables'
+export type { CssVariablesAdapterOptions, CssVariablesAdapterOutput } from './adapters/css-variables'
+export { nuxtUiAdapter } from './adapters/nuxt-ui'
+export type { NuxtUiAdapterOptions } from './adapters/nuxt-ui'
 export type {
   BrandAssetEntry,
   BrandGuideAssetMappingOptions,
@@ -79,15 +85,21 @@ export {
   createBrandThemeCookieName,
   createBrandThemeStateKey
 } from './runtime'
-export { brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
+export { brandAssetsSchema, brandDefinitionSchema, brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
 export { normalizeBrandThemes, resolveBrandThemeName, resolveBrandThemes } from './themes'
 export type {
   ApplyBrandThemeOptions,
   BrandAsset,
+  BrandAssets,
+  BrandColorName,
+  BrandColorRoles,
   BrandColorScale,
   BrandColorShade,
   BrandComponentCoverage,
   BrandCssVariables,
+  BrandDefinition,
+  BrandGuideConfig,
+  BrandGuideAppConfig,
   BrandGuideAssetEntry,
   BrandGuideColorEntry,
   BrandGuideComponentEntry,
@@ -104,9 +116,11 @@ export type {
   BrandModuleOptions,
   BrandPalette,
   BrandRuntimeConfig,
+  BrandRuntimeOnlyConfig,
   BrandSemanticColors,
   BrandTheme,
   BrandTypography,
+  BrandTypographyRole,
   BrandVoice,
   NuxtUiAppConfig,
   NuxtUiColorRole,
@@ -115,10 +129,12 @@ export type {
 } from './types'
 export {
   BrandValidationError,
+  defineBrand,
   defineBrandIdentity,
   defineBrandGuide,
   defineBrandTheme,
   validateBrandIdentity,
+  validateBrandDefinition,
   validateBrandGuide,
   validateBrandTheme
 } from './validation'

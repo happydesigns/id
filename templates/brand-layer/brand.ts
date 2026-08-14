@@ -1,51 +1,58 @@
-import { createBrandGuideAssets, defineBrandGuide, defineBrandIdentity, defineBrandTheme } from '@happydesigns/id'
+import { defineBrand, defineBrandGuide } from '@happydesigns/id'
+import { nuxtUiAdapter } from '@happydesigns/id/adapters/nuxt-ui'
 
-export const brandIdentity = defineBrandIdentity({
+export const brandIdentity = defineBrand({
   name: 'example-brand',
   packageName: '@example/brand',
   claim: 'A reusable Nuxt UI brand layer.',
-  logoAssetPaths: {
-    logo: '/favicon.svg',
-    appIcon: '/favicon.svg'
+  colors: {
+    brand: {
+      50: '#eff6ff',
+      100: '#dbeafe',
+      200: '#bfdbfe',
+      300: '#93c5fd',
+      400: '#60a5fa',
+      500: '#3b82f6',
+      600: '#2563eb',
+      700: '#1d4ed8',
+      800: '#1e40af',
+      900: '#1e3a8a',
+      950: '#172554'
+    },
+    slate: '#64748B'
+  },
+  typography: {
+    sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
+    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+  },
+  assets: {
+    logos: {
+      logo: {
+        name: 'Example Brand logo',
+        src: '/favicon.svg',
+        role: 'logo',
+        media: 'any',
+        alt: 'Example Brand'
+      },
+      appIcon: {
+        name: 'Example Brand app icon',
+        src: '/favicon.svg',
+        role: 'appIcon',
+        media: 'any',
+        alt: 'Example Brand app icon'
+      }
+    }
   }
 })
 
 const brandColors = {
   primary: 'brand',
-  secondary: 'slate',
-  success: 'green',
-  info: 'sky',
-  warning: 'amber',
-  error: 'red',
   neutral: 'slate'
-}
+} as const
 
-const brandAssets = [
-  {
-    name: 'Example Brand logo',
-    role: 'logo',
-    path: brandIdentity.logoAssetPaths.logo,
-    usage: 'Primary logo for headers and brand-owned surfaces.',
-    media: 'any',
-    alt: 'Example Brand'
-  },
-  {
-    name: 'Example Brand app icon',
-    role: 'appIcon',
-    path: brandIdentity.logoAssetPaths.appIcon,
-    usage: 'Favicon, touch icon, and square app contexts.',
-    media: 'any',
-    alt: 'Example Brand app icon'
-  }
-] as const
-
-export const brandTheme = defineBrandTheme({
-  name: brandIdentity.name,
+export const brandTheme = nuxtUiAdapter.transform(brandIdentity, {
   label: 'Example Brand',
-  typography: {
-    sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
-    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-  },
+  colors: brandColors,
   cssVariables: {
     light: {
       '--ui-bg': 'white',
@@ -64,18 +71,18 @@ export const brandTheme = defineBrandTheme({
       '--ui-text-highlighted': 'white',
       '--ui-border': '#1E293B'
     }
-  },
-  ui: {
-    colors: brandColors
   }
 })
+
+export const brandRuntimeAssets = brandIdentity.assets
 
 export const brandGuide = defineBrandGuide({
   name: brandIdentity.name,
   packageName: brandIdentity.packageName,
   title: 'Example Brand',
   description: brandIdentity.claim,
-  assets: createBrandGuideAssets(brandAssets),
+  assets: brandRuntimeAssets,
+  palette: brandIdentity.colors,
   semanticColors: brandColors,
   cssVariables: brandTheme.cssVariables,
   typography: brandTheme.typography,
