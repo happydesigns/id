@@ -13,12 +13,12 @@
   },
   "dependencies": {
     "@happydesigns/id": "^0.1.0",
-    "@nuxt/ui": "^4.9.0",
+    "@nuxt/ui": "^4.10.0",
     "nuxt": "^4.5.2",
-    "tailwindcss": "^4.3.1"
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "typescript": "^6.0.3",
-    "vue-tsc": "^3.3.5"
+    "vue-tsc": "^3.3.10"
   }
 }

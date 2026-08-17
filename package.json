@@ -99,7 +99,7 @@
   "dependencies": {
     "@nuxt/kit": "^4.5.2",
     "@nuxt/schema": "^4.5.2",
-    "@nuxt/ui": "^4.9.0",
+    "@nuxt/ui": "^4.10.0",
     "nuxt": "^4.5.2",
     "zod": "^4.4.3"
   },
@@ -107,16 +107,16 @@
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.114",
-    "@iconify-json/simple-icons": "^1.2.87",
-    "@nuxt/eslint": "^1.16.0",
-    "@vue/compiler-sfc": "^3.5.39",
+    "@iconify-json/lucide": "^1.2.123",
+    "@iconify-json/simple-icons": "^1.2.93",
+    "@nuxt/eslint": "^1.17.0",
+    "@vue/compiler-sfc": "^3.5.41",
     "docus": "^5.12.3",
-    "eslint": "^10.6.0",
-    "tailwindcss": "^4.3.1",
+    "eslint": "^10.8.1",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9",
-    "vue-tsc": "^3.3.5",
+    "vitest": "^4.1.10",
+    "vue-tsc": "^3.3.10",
     "zod-to-json-schema": "^3.25.2"
   }
 }
