@@ -143,6 +143,7 @@ const treeItems = [
   <UCommandPalette
     v-else-if="props.name === 'command-palette'"
     :groups="commandGroups"
+    :autofocus="false"
     class="max-h-72"
   />
 
@@ -188,6 +189,7 @@ const treeItems = [
   <div v-else-if="props.name === 'navigation-fast-pattern'" class="space-y-4">
     <UCommandPalette
       :groups="commandGroups"
+      :autofocus="false"
       class="max-h-72"
     />
     <p class="text-sm text-muted">
