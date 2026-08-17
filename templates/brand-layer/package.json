@@ -4,24 +4,27 @@
   "type": "module",
   "version": "0.1.0",
   "description": "Nuxt UI brand layer generated from @happydesigns/id.",
+  "main": "./nuxt.config.ts",
   "exports": {
     ".": "./nuxt.config.ts"
   },
   "scripts": {
-    "dev": "nuxt dev",
-    "build": "nuxt build",
-    "preview": "nuxt preview",
-    "prepare": "nuxt prepare",
+    "dev": "nuxt dev docs",
+    "build": "nuxt build docs",
+    "build:layer": "nuxt build",
+    "preview": "nuxt preview docs",
+    "prepare": "nuxt prepare docs",
     "typecheck": "nuxt typecheck",
-    "verify": "pnpm typecheck"
+    "verify": "pnpm typecheck && pnpm build"
   },
   "dependencies": {
     "@happydesigns/id": "^0.1.0",
     "@nuxt/ui": "^4.9.0",
-    "nuxt": "^4.4.8",
+    "nuxt": "^4.5.2",
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
+    "docus": "^5.12.3",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.3.5"
   }

@@ -60,6 +60,7 @@
     "src",
     "themes",
     "templates/brand-layer/app",
+    "templates/brand-layer/docs",
     "templates/brand-layer/public",
     "templates/brand-layer/brand.ts",
     "templates/brand-layer/nuxt.config.ts",
@@ -96,9 +97,10 @@
     "verify": "pnpm lint && pnpm test && pnpm typecheck"
   },
   "dependencies": {
-    "@nuxt/kit": "^4.4.8",
+    "@nuxt/kit": "^4.5.2",
+    "@nuxt/schema": "^4.5.2",
     "@nuxt/ui": "^4.9.0",
-    "nuxt": "^4.4.8",
+    "nuxt": "^4.5.2",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
@@ -114,6 +116,7 @@
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9",
-    "vue-tsc": "^3.3.5"
+    "vue-tsc": "^3.3.5",
+    "zod-to-json-schema": "^3.25.2"
   }
 }
