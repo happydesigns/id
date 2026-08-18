@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from '#imports'
+import { ref } from 'vue'
 import { de, en } from '@nuxt/ui/locale'
 import type { ComponentExampleContext } from '../../../src/component-examples'
 
@@ -133,7 +133,7 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
 
   <div v-else-if="props.name === 'error'" class="overflow-hidden rounded-sm border border-default">
     <UError
-      :error="{ statusCode: 404, statusMessage: 'Pattern not found', message: 'The requested component pattern is not available yet.' }"
+      :error="{ statusCode: 404, message: 'This preview demonstrates a recoverable missing state.' }"
       :links="[{ label: 'Open components', to: props.context.paths.components, color: 'neutral', variant: 'outline' }]"
       :ui="{ root: 'min-h-0 px-4 py-8', statusMessage: 'text-2xl', message: 'text-sm' }"
     />
@@ -279,7 +279,7 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
       </UFormField>
       <div class="overflow-hidden rounded-sm border border-default">
         <UError
-          :error="{ statusCode: 404, statusMessage: 'Pattern not found', message: 'The requested component pattern is not available yet.' }"
+          :error="{ statusCode: 404, message: 'This preview demonstrates a recoverable missing state.' }"
           :links="[{ label: 'Open components', to: props.context.paths.components, color: 'neutral', variant: 'outline' }]"
           :ui="{ root: 'min-h-0 px-4 py-6', statusMessage: 'text-xl', message: 'text-sm' }"
         />

@@ -1,4 +1,5 @@
-import { computed, useAppConfig } from '#imports'
+import { useAppConfig } from '#imports'
+import { computed } from 'vue'
 import { collectBrandAssets, selectBrandAsset } from '../../src'
 import type { BrandAssetSelection, BrandGuideAppConfig } from '../../src'
 

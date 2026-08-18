@@ -71,26 +71,44 @@ const pageAnchors = [
 <template>
   <div v-if="props.name === 'page-hero'" class="overflow-hidden rounded-sm border border-default">
     <UPageHero
-      :title="props.context.copy.heroTitle"
-      :description="props.context.copy.heroDescription"
       :links="[
         { label: 'Open guide', to: props.context.paths.docs, icon: 'i-lucide-arrow-right', trailing: true },
         { label: 'View components', to: props.context.paths.components, color: 'neutral', variant: 'outline', icon: 'i-lucide-component' }
       ]"
       :ui="{ container: 'py-6 sm:py-8 lg:py-8 gap-4', title: 'text-2xl sm:text-3xl max-w-2xl', description: 'text-sm sm:text-base max-w-2xl', footer: 'mt-6' }"
-    />
+    >
+      <template #header>
+        <div class="space-y-3">
+          <h3 class="max-w-2xl text-2xl font-semibold text-highlighted sm:text-3xl">
+            {{ props.context.copy.heroTitle }}
+          </h3>
+          <p class="max-w-2xl text-sm text-muted sm:text-base">
+            {{ props.context.copy.heroDescription }}
+          </p>
+        </div>
+      </template>
+    </UPageHero>
   </div>
 
   <UPageSection
     v-else-if="props.name === 'page-section'"
-    title="Component families"
-    description="Use page structure to group related guidance without inventing one-off layouts."
     :features="[
       { title: 'Actions', description: 'Buttons and compact metadata.', icon: 'i-lucide-mouse-pointer-click' },
       { title: 'Forms', description: 'Labels, fields, and validation.', icon: 'i-lucide-text-cursor-input' }
     ]"
     :ui="{ container: 'py-0 sm:py-0 lg:py-0 gap-4', title: 'text-2xl sm:text-3xl', description: 'text-sm sm:text-base', features: 'mt-5' }"
-  />
+  >
+    <template #header>
+      <div class="space-y-3">
+        <h3 class="text-2xl font-semibold text-highlighted sm:text-3xl">
+          Component families
+        </h3>
+        <p class="text-sm text-muted sm:text-base">
+          Use page structure to group related guidance without inventing one-off layouts.
+        </p>
+      </div>
+    </template>
+  </UPageSection>
 
   <UPageCTA
     v-else-if="props.name === 'page-cta'"
@@ -126,11 +144,23 @@ const pageAnchors = [
   <UPageHeader
     v-else-if="props.name === 'page-header'"
     headline="Component docs"
-    :title="props.context.copy.pageTitle"
-    :description="props.context.copy.pageDescription"
-    :links="[{ label: 'Open docs', to: props.context.paths.components, color: 'neutral', variant: 'outline', trailingIcon: 'i-lucide-arrow-right' }]"
     :ui="{ root: '!mx-0 !px-0 py-0 sm:!px-0 lg:!mx-0 lg:!px-0', wrapper: '!flex-col !items-start gap-3', title: 'text-2xl sm:text-3xl', description: 'text-sm sm:text-base max-w-xl' }"
-  />
+  >
+    <h3 class="text-2xl font-semibold text-highlighted sm:text-3xl">
+      {{ props.context.copy.pageTitle }}
+    </h3>
+    <p class="mt-3 max-w-xl text-sm text-muted sm:text-base">
+      {{ props.context.copy.pageDescription }}
+    </p>
+    <UButton
+      class="mt-5"
+      label="Open docs"
+      :to="props.context.paths.components"
+      color="neutral"
+      variant="outline"
+      trailing-icon="i-lucide-arrow-right"
+    />
+  </UPageHeader>
 
   <UPageBody
     v-else-if="props.name === 'page-body'"
@@ -165,15 +195,18 @@ const pageAnchors = [
     <UPageCard title="Application" description="Components carry the system into interfaces." icon="i-lucide-component" variant="ghost" />
   </UPageList>
 
-  <UPageLogos
-    v-else-if="props.name === 'page-logos'"
-    title="Logo forms in one system"
-    :logos="[
-      { src: props.context.assets.wordmark || props.context.assets.symbol, alt: `${props.context.copy.brandLabel} wordmark` },
-      { src: props.context.assets.symbol || props.context.assets.wordmark, alt: props.context.logoAlt }
-    ].filter(logo => logo.src)"
-    :marquee="false"
-  />
+  <div v-else-if="props.name === 'page-logos'" class="space-y-4">
+    <h3 class="text-center text-lg font-semibold text-highlighted">
+      Logo forms in one system
+    </h3>
+    <UPageLogos
+      :logos="[
+        { src: props.context.assets.wordmark || props.context.assets.symbol, alt: `${props.context.copy.brandLabel} wordmark` },
+        { src: props.context.assets.symbol || props.context.assets.wordmark, alt: props.context.logoAlt }
+      ].filter(logo => logo.src)"
+      :marquee="false"
+    />
+  </div>
 
   <UPageAnchors
     v-else-if="props.name === 'page-anchors'"
@@ -276,34 +309,64 @@ const pageAnchors = [
 
   <div v-else-if="props.name === 'page-opening-pattern'" class="space-y-6">
     <UPageHero
-      :title="props.context.copy.heroTitle"
-      :description="props.context.copy.heroDescription"
       :links="[
         { label: 'Open guide', to: props.context.paths.docs, icon: 'i-lucide-arrow-right', trailing: true },
         { label: 'View components', to: props.context.paths.components, color: 'neutral', variant: 'outline', icon: 'i-lucide-component' }
       ]"
       :ui="{ container: 'py-0 sm:py-0 lg:py-0 gap-4', title: 'text-2xl sm:text-3xl max-w-2xl', description: 'text-sm sm:text-base max-w-2xl', footer: 'mt-6' }"
-    />
+    >
+      <template #header>
+        <div class="space-y-3">
+          <h3 class="max-w-2xl text-2xl font-semibold text-highlighted sm:text-3xl">
+            {{ props.context.copy.heroTitle }}
+          </h3>
+          <p class="max-w-2xl text-sm text-muted sm:text-base">
+            {{ props.context.copy.heroDescription }}
+          </p>
+        </div>
+      </template>
+    </UPageHero>
     <USeparator />
     <UPageHeader
       headline="Component docs"
-      :title="props.context.copy.pageTitle"
-      :description="props.context.copy.pageDescription"
-      :links="[{ label: 'Open docs', to: props.context.paths.components, color: 'neutral', variant: 'outline', trailingIcon: 'i-lucide-arrow-right' }]"
       :ui="{ root: '!mx-0 !px-0 pt-0 pb-6 sm:!px-0 lg:!mx-0 lg:!px-0', wrapper: '!flex-col !items-start gap-3', title: 'text-2xl sm:text-3xl', description: 'text-sm sm:text-base max-w-xl' }"
-    />
+    >
+      <h3 class="text-2xl font-semibold text-highlighted sm:text-3xl">
+        {{ props.context.copy.pageTitle }}
+      </h3>
+      <p class="mt-3 max-w-xl text-sm text-muted sm:text-base">
+        {{ props.context.copy.pageDescription }}
+      </p>
+      <UButton
+        class="mt-5"
+        label="Open docs"
+        :to="props.context.paths.components"
+        color="neutral"
+        variant="outline"
+        trailing-icon="i-lucide-arrow-right"
+      />
+    </UPageHeader>
   </div>
 
   <div v-else-if="props.name === 'section-system-pattern'" class="space-y-6">
     <UPageSection
-      title="Component families"
-      description="Use section primitives to group related guidance without inventing one-off layouts."
       :features="[
         { title: 'Actions', description: 'Buttons and compact metadata.', icon: 'i-lucide-mouse-pointer-click' },
         { title: 'Forms', description: 'Labels, fields, and validation.', icon: 'i-lucide-text-cursor-input' }
       ]"
       :ui="{ container: 'py-0 sm:py-0 lg:py-0 gap-4', title: 'text-2xl sm:text-3xl', description: 'text-sm sm:text-base', features: 'mt-5' }"
-    />
+    >
+      <template #header>
+        <div class="space-y-3">
+          <h3 class="text-2xl font-semibold text-highlighted sm:text-3xl">
+            Component families
+          </h3>
+          <p class="text-sm text-muted sm:text-base">
+            Use section primitives to group related guidance without inventing one-off layouts.
+          </p>
+        </div>
+      </template>
+    </UPageSection>
     <UPageGrid class="sm:grid-cols-2">
       <UPageCard title="Feedback" description="State messages stay close to the task." icon="i-lucide-circle-check" />
       <UPageCard title="Overlays" description="Contextual surfaces support the current flow." icon="i-lucide-panel-top-open" />
@@ -322,14 +385,18 @@ const pageAnchors = [
       <UPageCard title="Application" description="Components carry the system into interfaces." icon="i-lucide-component" variant="ghost" />
     </UPageList>
     <div class="grid gap-4 sm:grid-cols-2">
-      <UPageLogos
-        title="Logo forms"
-        :logos="[
-          { src: props.context.assets.wordmark || props.context.assets.symbol, alt: `${props.context.copy.brandLabel} wordmark` },
-          { src: props.context.assets.symbol || props.context.assets.wordmark, alt: props.context.logoAlt }
-        ].filter(logo => logo.src)"
-        :marquee="false"
-      />
+      <div class="space-y-4">
+        <h3 class="text-center text-lg font-semibold text-highlighted">
+          Logo forms
+        </h3>
+        <UPageLogos
+          :logos="[
+            { src: props.context.assets.wordmark || props.context.assets.symbol, alt: `${props.context.copy.brandLabel} wordmark` },
+            { src: props.context.assets.symbol || props.context.assets.wordmark, alt: props.context.logoAlt }
+          ].filter(logo => logo.src)"
+          :marquee="false"
+        />
+      </div>
       <UPageAnchors :links="pageAnchors" />
     </div>
   </div>

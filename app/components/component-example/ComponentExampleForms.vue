@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from '#imports'
+import { ref } from 'vue'
 import type { ComponentExampleContext } from '../../../src/component-examples'
 
 const props = defineProps<{

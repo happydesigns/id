@@ -1,4 +1,5 @@
-import { computed, updateAppConfig, useAppConfig, useCookie, useState } from '#imports'
+import { updateAppConfig, useAppConfig, useCookie, useState } from '#imports'
+import { computed } from 'vue'
 import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createBrandThemeStateKey, createNuxtUiAppConfig, resolveBrandThemeName, resolveBrandThemes } from '../../src'
 import type { BrandRuntimeOnlyConfig, BrandTheme, NuxtUiAppConfig } from '../../src'
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from '#imports'
+import { ref } from 'vue'
 import type { ComponentExampleContext } from '../../../src/component-examples'
 
 const props = defineProps<{
@@ -81,10 +81,13 @@ const navigationItems = [
 
     <UDashboardPanel :ui="{ root: 'min-h-full', body: 'p-4' }">
       <template #header>
-        <UDashboardNavbar title="Projects">
-          <template #leading>
+        <UDashboardNavbar>
+          <template #left>
             <UDashboardSidebarToggle class="lg:hidden" />
             <UDashboardSidebarCollapse class="hidden lg:inline-flex" />
+            <h3 class="text-base font-semibold text-highlighted">
+              Projects
+            </h3>
           </template>
 
           <template #right>

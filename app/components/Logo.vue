@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, useColorMode } from '#imports'
+import { useColorMode } from '#imports'
+import { computed } from 'vue'
 import { useBrandAssets } from '../composables/useBrandAssets'
 import type { BrandAsset } from '../../src'
 

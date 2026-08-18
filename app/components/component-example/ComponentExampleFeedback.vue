@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, useToast } from '#imports'
+import { useToast } from '#imports'
+import { ref } from 'vue'
 
 const props = defineProps<{
   name: string
@@ -81,10 +82,20 @@ function showToastPreview() {
   <UEmpty
     v-else-if="props.name === 'empty'"
     icon="i-lucide-folder-open"
-    title="No patterns yet"
-    description="Start with a project brief before adding variants."
     :actions="[{ label: 'Create pattern', icon: 'i-lucide-plus' }]"
-  />
+  >
+    <template #header>
+      <div class="flex flex-col items-center gap-2 text-center">
+        <UIcon name="i-lucide-folder-open" class="size-6 text-muted" />
+        <h3 class="font-semibold text-highlighted">
+          No patterns yet
+        </h3>
+        <p class="text-sm text-muted">
+          Start with a project brief before adding variants.
+        </p>
+      </div>
+    </template>
+  </UEmpty>
 
   <div v-else-if="props.name === 'icon'" class="flex flex-wrap items-center gap-4">
     <UIcon name="i-lucide-palette" class="size-5 text-primary" />
@@ -136,9 +147,18 @@ function showToastPreview() {
       </div>
       <UEmpty
         icon="i-lucide-folder-open"
-        title="No patterns yet"
-        description="Start with a project brief before adding variants."
       >
+        <template #header>
+          <div class="flex flex-col items-center gap-2 text-center">
+            <UIcon name="i-lucide-folder-open" class="size-6 text-muted" />
+            <h3 class="font-semibold text-highlighted">
+              No patterns yet
+            </h3>
+            <p class="text-sm text-muted">
+              Start with a project brief before adding variants.
+            </p>
+          </div>
+        </template>
         <template #actions>
           <UButton
             label="Show toast"

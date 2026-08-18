@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, useAppConfig } from '#imports'
+import { useAppConfig } from '#imports'
+import { computed } from 'vue'
 import {
   componentCoverageStatusMeta,
   normalizeComponentCoverage,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from '#imports'
+import { computed, ref } from 'vue'
 import { getTextFromMessage } from '@nuxt/ui/utils/ai'
 import type { ComponentExampleContext } from '../../../src/component-examples'
 import ComponentExampleEditorPreview from './ComponentExampleEditorPreview.vue'

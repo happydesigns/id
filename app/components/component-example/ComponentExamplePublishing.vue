@@ -82,14 +82,25 @@ const pricingTableSections = [{
           Editorial
         </UBadge>
       </div>
-      <UBlogPosts orientation="vertical">
-        <UBlogPost
+      <div class="grid gap-3">
+        <UCard
           v-for="post in blogPosts"
           :key="post.title"
-          v-bind="post"
           variant="outline"
-        />
-      </UBlogPosts>
+          :ui="{ body: 'p-4' }"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-mono text-xs text-label">{{ post.date }}</span>
+            <UBadge v-if="post.badge" v-bind="post.badge" />
+          </div>
+          <h3 class="mt-3 font-semibold text-highlighted">
+            {{ post.title }}
+          </h3>
+          <p class="mt-1 text-sm text-muted">
+            {{ post.description }}
+          </p>
+        </UCard>
+      </div>
     </div>
     <div class="space-y-3">
       <div class="flex items-start justify-between gap-3">
@@ -105,25 +116,25 @@ const pricingTableSections = [{
           Changelog
         </UBadge>
       </div>
-      <UChangelogVersions
-        :ui="{ container: 'gap-y-3 sm:gap-y-3 lg:gap-y-3', indicator: '!hidden' }"
-      >
-        <UChangelogVersion
+      <div class="grid gap-3">
+        <UCard
           v-for="version in changelogVersions"
           :key="version.title"
-          v-bind="version"
-          :ui="{
-            root: 'rounded-sm border border-default bg-default p-3',
-            container: 'mx-0 max-w-none',
-            meta: '!flex items-center gap-2 mb-2',
-            date: 'font-mono text-xs text-label',
-            badge: 'text-xs',
-            title: 'text-base leading-snug',
-            description: 'text-sm leading-relaxed',
-            indicator: '!hidden'
-          }"
-        />
-      </UChangelogVersions>
+          variant="outline"
+          :ui="{ body: 'p-4' }"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-mono text-xs text-label">{{ version.date }}</span>
+            <UBadge v-if="version.badge" v-bind="version.badge" />
+          </div>
+          <h3 class="mt-3 font-semibold text-highlighted">
+            {{ version.title }}
+          </h3>
+          <p class="mt-1 text-sm text-muted">
+            {{ version.description }}
+          </p>
+        </UCard>
+      </div>
     </div>
   </div>
 

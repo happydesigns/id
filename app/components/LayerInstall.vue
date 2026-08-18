@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from '#imports'
+import { computed } from 'vue'
 import {
   createLayerInstallSnippets,
   type LayerInstallPackageManager

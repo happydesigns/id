@@ -1,4 +1,5 @@
-import { defineNuxtPlugin, onNuxtReady, useHead, watch } from '#imports'
+import { defineNuxtPlugin, onNuxtReady, useHead } from '#imports'
+import { watch } from 'vue'
 import { brandThemeStyleElementId, createThemeCssVars } from '../../src'
 import { useBrandTheme } from '../composables/useBrandTheme'
 
