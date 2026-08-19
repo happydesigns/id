@@ -8,6 +8,7 @@ const props = defineProps<{
 }>()
 
 const status = ref('Ready for review')
+const sidebarCollapsed = ref(false)
 
 const statusItems = [
   { label: 'Draft', value: 'Draft' },
@@ -45,16 +46,21 @@ const navigationItems = [
     class="!relative !inset-auto h-[30rem] overflow-hidden rounded-sm border border-default bg-default"
   >
     <UDashboardSidebar
+      v-model:collapsed="sidebarCollapsed"
       collapsible
       resizable
       :default-size="34"
       :min-size="24"
       :max-size="42"
-      :collapsed-size="10"
+      :collapsed-size="8"
       class="!flex min-h-full transition-[width,min-width,max-width,flex-basis] duration-200 ease-out"
     >
       <template #header="{ collapsed }">
-        <UDashboardSearchButton :collapsed="collapsed" />
+        <UDashboardSearchButton
+          :collapsed="collapsed"
+          :variant="collapsed ? 'outline' : undefined"
+          :tooltip="collapsed"
+        />
       </template>
 
       <template #default="{ collapsed }">
@@ -71,8 +77,9 @@ const navigationItems = [
           :label="collapsed ? undefined : props.context.copy.brandLabel"
           :icon="collapsed ? 'i-lucide-component' : undefined"
           color="neutral"
-          variant="ghost"
-          block
+          :variant="collapsed ? 'outline' : 'ghost'"
+          :block="!collapsed"
+          :square="collapsed"
         />
       </template>
     </UDashboardSidebar>
@@ -84,7 +91,10 @@ const navigationItems = [
         <UDashboardNavbar>
           <template #left>
             <UDashboardSidebarToggle class="lg:hidden" />
-            <UDashboardSidebarCollapse class="hidden lg:inline-flex" />
+            <UDashboardSidebarCollapse
+              class="hidden lg:inline-flex"
+              :variant="sidebarCollapsed ? 'outline' : 'ghost'"
+            />
             <h3 class="text-base font-semibold text-highlighted">
               Projects
             </h3>
