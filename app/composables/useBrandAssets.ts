@@ -8,7 +8,9 @@ type IdentityAppConfig = {
 }
 
 export function useBrandAssets() {
-  const appConfig = useAppConfig() as IdentityAppConfig
+  // Host layers can narrow Nuxt's generated AppConfig with merge helpers that
+  // are not structurally identical to the portable contract at type-check time.
+  const appConfig = useAppConfig() as unknown as IdentityAppConfig
 
   const guide = computed(() => appConfig.id?.guide)
   const assets = computed(() => appConfig.id?.assets ?? guide.value?.assets)

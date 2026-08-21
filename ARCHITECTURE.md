@@ -18,9 +18,11 @@ This file defines the technical structure for `@happydesigns/id`: Nuxt UI brand-
 | Layer | Owns | Avoid putting here |
 | --- | --- | --- |
 | `src/` | Neutral brand definitions, adapter contracts, brand-guide types, validation, CSS generation, app-config helpers, brand-theme utilities. | Vue component state, routing, assets, app-specific copy. |
-| `app/` | Reusable Nuxt layer runtime, composables, plugin, neutral CSS defaults, identity UI helpers. | Concrete customer assets, domain behavior, server APIs. |
+| `app/` | Consumer-safe Nuxt layer runtime, composables, plugin, neutral CSS defaults, and runtime identity helpers. | Guide-only examples, concrete customer assets, domain behavior, server APIs. |
+| `guide/` | Optional brand-guide components such as example frames, coverage tables, install surfaces, and docs links. | Runtime requirements, brand doctrine, customer copy, or product behavior. |
 | `module.ts` | Optional Nuxt module integration, module options, runtime registration. | Brand-specific visual decisions. |
-| `nuxt.layer.config.ts` | Public Nuxt layer export for consumers extending `@happydesigns/id/nuxt`. | Repository-only tooling such as lint modules. |
+| `nuxt.layer.config.ts` | Public runtime layer export for consumers extending `@happydesigns/id/nuxt`. | Guide-only components and repository tooling such as lint modules. |
+| `guide/nuxt.config.ts` | Optional guide add-on for documentation applications extending `@happydesigns/id/guide`. | Theme selection, concrete guide content, or production app behavior. |
 | `nuxt.config.ts` | Development config for this repository, importing the public layer and adding local tooling. | Public layer behavior. |
 | `themes/` | Shipped reference themes such as the Nuxt UI baseline and a neutral sample brand demonstration theme. | Canonical brand doctrine, product-specific behavior, or private customer configuration. |
 | `templates/` | Starter projects for brand layers and themed apps. | Generated project state or private credentials. |
@@ -45,7 +47,7 @@ The existing `BrandTheme` contract is the output consumed by the Nuxt runtime. G
 
 `BrandRuntimeOnlyConfig` describes the normal app surface. `BrandGuideConfig` adds documentation data, and `BrandGuideAppConfig` combines them for an actual guide app. `BrandRuntimeConfig` remains a compatibility alias for the previously combined public shape.
 
-The layer export registers identity components with the `Id` prefix. The module accepts a build-time `componentPrefix` option when an app needs the same runtime helpers under another global prefix.
+The runtime layer exports `IdLogo`, `IdThemeSelect`, and `IdColorModeButton` with the `Id` prefix. The module accepts a build-time `componentPrefix` option when an app needs the same runtime helpers under another global prefix. Guide-only helpers are registered by the separate `@happydesigns/id/guide` add-on and are never included by the module or runtime layer.
 
 ## Runtime Limits
 
@@ -62,7 +64,7 @@ Runtime themes cannot guarantee:
 
 The npm package publishes built JavaScript and declarations from `dist/` for the TypeScript API, theme subpaths, and Nuxt module. The Nuxt layer export stays as `nuxt.layer.config.ts`, matching Docus-style layer packages where Nuxt loads the layer source directly. Runtime layer files are shipped both as source for the layer and copied into `dist/app` for the built module.
 
-`nuxt.config.ts` is intentionally a repository-development config. It imports the public layer config and can add `@nuxt/eslint` and other local tooling because it is not the `./nuxt` package export. Consumers extending `@happydesigns/id/nuxt` inherit the public layer only: Nuxt UI, `Id` components, identity CSS, and brand-guide runtime helpers. Docus-specific CSS generation and markdown highlighting remain owned by Docus.
+`nuxt.config.ts` is intentionally a repository-development config. It imports the public layer config and can add `@nuxt/eslint` and other local tooling because it is not the `./nuxt` package export. Consumers extending `@happydesigns/id/nuxt` inherit only Nuxt UI, runtime `Id` components, identity CSS, and theme behavior. Guide applications opt into `@happydesigns/id/guide`; Docus-specific CSS generation and markdown highlighting remain owned by Docus.
 
 Consuming apps should set their own `compatibilityDate` in their app config. Nuxt merges the app config on top of extended layers, so an explicit app-level date remains the controlling deployment contract. The layer keeps `compatibilityDate: 'latest'` for local development and starters that intentionally follow current Nuxt behavior.
 

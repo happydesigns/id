@@ -14,8 +14,8 @@ Reusable identity system for Nuxt UI brand guides, Nuxt UI defaults, and Nuxt br
 - Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
 - CSS variable generation for light and dark themes.
 - Nuxt UI app-config helpers for `ui.colors` and component defaults.
-- A Nuxt layer and module for applying identity runtime behavior.
-- Brand-guide helper components for docs links, example frames, reusable Nuxt UI component examples, install snippets, and component coverage.
+- A consumer-safe Nuxt layer and module for applying identity runtime behavior.
+- An optional guide layer for docs links, example frames, reusable Nuxt UI component examples, install snippets, swatches, and component coverage.
 - Starters for brand layers and themed apps.
 - Docus documentation for brand-guide authors and Nuxt developers.
 
@@ -46,6 +46,16 @@ export default defineNuxtConfig({
 ```
 
 The layer export uses the standard `Id` component prefix. The module can register the same runtime components under another global prefix when a host app needs to avoid naming collisions.
+
+Brand guides add the guide helpers separately so ordinary applications do not inherit documentation-only components:
+
+```ts [docs/nuxt.config.ts]
+export default defineNuxtConfig({
+  extends: ['@example/brand', '@happydesigns/id/guide', 'docus']
+})
+```
+
+`@happydesigns/id/guide` is an add-on to an existing identity runtime or brand layer. It does not select a brand or configure a theme by itself.
 
 ## Branding model
 

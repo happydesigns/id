@@ -7,7 +7,8 @@ type IdentityAppConfig = {
 }
 
 export function useBrandGuide(): BrandGuide {
-  const appConfig = useAppConfig() as IdentityAppConfig
+  // Guide layers may use Nuxt app-config merge functions for array replacement.
+  const appConfig = useAppConfig() as unknown as IdentityAppConfig
 
   return appConfig.id?.guide ?? idBrandGuide
 }

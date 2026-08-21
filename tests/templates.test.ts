@@ -31,6 +31,7 @@ describe('starter templates', () => {
     }
 
     expect(packageJson.exports['./nuxt']).toBe('./nuxt.layer.config.mjs')
+    expect(packageJson.exports['./guide']).toBe('./guide/nuxt.config.mjs')
     expect(packageJson.exports['./themes/sample-brand']).toBeTruthy()
     expect(packageJson.exports['./themes/sample-brand/tokens.css']).toBe('./dist/themes/sample-brand/tokens.css')
     expect(packageJson.exports['./adapters/nuxt-ui']).toBeTruthy()
@@ -38,6 +39,7 @@ describe('starter templates', () => {
     expect(packageJson.exports).not.toHaveProperty('./themes/happydesigns')
     expect(packageJson.files).toContain('nuxt.layer.config.ts')
     expect(packageJson.files).toContain('nuxt.layer.config.mjs')
+    expect(packageJson.files).toContain('guide')
     expect(packageJson.files).not.toContain('templates')
     expect(packageJson.files).toContain('templates/brand-layer/app')
     expect(packageJson.files).toContain('templates/brand-layer/docs')
@@ -69,7 +71,7 @@ describe('starter templates', () => {
     expect(readTemplateFile('brand-layer', 'app/app.config.ts')).toContain("from '../brand'")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("extends: ['@happydesigns/id/nuxt']")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).not.toContain('docus')
-    expect(readTemplateFile('brand-layer', 'docs/nuxt.config.ts')).toContain("extends: ['..', 'docus']")
+    expect(readTemplateFile('brand-layer', 'docs/nuxt.config.ts')).toContain("extends: ['..', '@happydesigns/id/guide', 'docus']")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("prefix: 'Brand'")
     expect(readTemplateFile('brand-layer', 'docs/content/index.md')).toContain('::brand-logo')
     expect(readTemplateFile('brand-layer', 'docs/content/index.md')).toContain('rel: noopener noreferrer')
@@ -85,6 +87,19 @@ describe('starter templates', () => {
     expect(readTemplateFile('brand-layer', 'app/app.config.ts')).not.toContain('guide: brandGuide')
     expect(readTemplateFile('brand-layer', 'docs/app/app.config.ts')).toContain('guide: brandGuide')
     expect(readTemplateFile('brand-layer', 'app/components/Logo.vue')).toContain('<IdLogo')
+  })
+
+  it('keeps guide-only components out of the runtime layer', () => {
+    expect(readFileSync(join(rootDir, 'app', 'app.config.ts'), 'utf8')).not.toContain('idBrandGuide')
+
+    for (const component of ['ColorModeButton.vue', 'Logo.vue', 'ThemeSelect.vue']) {
+      expect(statSync(join(rootDir, 'app', 'components', component)).isFile()).toBe(true)
+    }
+
+    for (const component of ['BrandSwatch.vue', 'ComponentCoverageTable.vue', 'ComponentExample.vue', 'ExampleFrame.vue', 'LayerInstall.vue', 'NuxtUiDocsLink.vue']) {
+      expect(statSync(join(rootDir, 'guide', 'components', component)).isFile()).toBe(true)
+      expect(existsSync(join(rootDir, 'app', 'components', component))).toBe(false)
+    }
   })
 
   it('keeps the themed-app template direct and Nuxt UI based', () => {

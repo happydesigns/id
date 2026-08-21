@@ -1,7 +1,7 @@
 import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
-  extends: ['..'],
+  extends: ['..', '../guide'],
   devtools: {
     enabled: false
   },

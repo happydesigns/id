@@ -1,12 +1,11 @@
-import { createNuxtUiAppConfig, idBrandGuide, nuxtUiBrandTheme } from '../src'
+import { createNuxtUiAppConfig, nuxtUiBrandTheme } from '../src'
 
 const nuxtUiConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
 
 export default defineAppConfig({
   id: {
     name: 'happydesigns-id',
-    theme: nuxtUiBrandTheme,
-    guide: idBrandGuide
+    theme: nuxtUiBrandTheme
   },
   ui: nuxtUiConfig.ui
 })

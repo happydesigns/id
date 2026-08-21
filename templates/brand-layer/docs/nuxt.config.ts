@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  extends: ['..', 'docus'],
+  extends: ['..', '@happydesigns/id/guide', 'docus'],
   $meta: { name: '@example/brand-docs' },
   compatibilityDate: 'latest',
   nitro: { output: { dir: '../.output' } }

@@ -5,7 +5,7 @@ import { defineNuxtConfig } from 'nuxt/config'
 const currentDir = dirname(fileURLToPath(import.meta.url))
 
 export default defineNuxtConfig({
-  extends: ['docus'],
+  extends: ['../guide', 'docus'],
   modules: [
     resolve(currentDir, '../module.ts')
   ],
