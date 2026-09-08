@@ -82,3 +82,11 @@ Docs and playground may import from the package to demonstrate real usage.
 - Root docs own durable architecture, contribution, security, design, and API rules.
 - Docus docs own product usage guidance.
 - Templates own recommended starting files, not every possible project shape.
+
+## Optional authoring surface
+
+`studio/` owns the optional Nuxt UI Brand Studio layer and the shared visual scenes. `src/studio.ts` owns its versioned JSON document, boundary validation, source-preserving diff, CSS and project exports. Studio is opt-in and is not imported by the normal runtime or module. The supported design system is Nuxt UI; the existing adapter exports remain compatible utilities.
+
+Original and draft render in separate same-origin frames. Messages require the parent origin and window identity. The editor never changes its own app config while editing. Local draft storage is scoped to the host brand. Replacing a dirty document requires a user choice; export requires no server storage or repository credentials.
+
+`brand.studio.json` is the editable source. Unknown JSON fields and custom component configuration survive a round trip. The importer accepts data only and rejects executable objects, prototype properties, remote assets and CSS injection. Exported projects regenerate CSS and scan their source for custom classes. Custom components, external fonts and app-specific utilities are not inferred from a token document.

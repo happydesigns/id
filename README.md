@@ -1,6 +1,6 @@
 # @happydesigns/id
 
-Reusable identity system for Nuxt UI brand guides, Nuxt UI defaults, and Nuxt brand layers.
+Brand authoring, previews and reusable brand layers for Nuxt UI. Nuxt UI is the supported design system.
 
 `@happydesigns/id` defines how a brand is described, validated, documented, and applied to Nuxt UI projects. It is the reusable identity mechanism between Nuxt UI apps and concrete brand layers such as `@happydesigns/brand`.
 
@@ -62,7 +62,7 @@ export default defineNuxtConfig({
 `id` supports a brand-layer-first model:
 
 - A neutral brand definition stores named colors, optional free roles, freely named typography roles, and structured runtime assets once. `sans`, `mono`, and `display` are useful typography conventions, not a closed vocabulary.
-- Explicit adapters map those values to a target system. Nuxt UI is the maintained reference adapter; user adapters are ordinary TypeScript files or packages.
+- Nuxt UI mappings turn those values into component defaults and theme variables. Existing adapter helpers remain compatible utilities; additional design-system runtimes and editors are outside the supported product.
 - Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
 - A primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
 - A reusable brand source file such as `brand.ts` for package-owned identity data, with theme and guide exports wired into Nuxt through `app.config.ts`.
@@ -77,6 +77,12 @@ Nuxt UI keeps its normal color-mode behavior. A brand may provide targeted dark 
 Normal apps use the runtime-only `BrandRuntimeOnlyConfig`. Guide applications add `BrandGuideConfig` through `BrandGuideAppConfig`; the existing `BrandRuntimeConfig` name remains a compatibility alias for that combined shape.
 
 ## Development
+
+## Brand Studio
+
+Extend `@happydesigns/id/studio` in a guide or playground to add `/studio`. Create a brand, open a versioned JSON source, compare original and draft on shared Components, Landing and Docs scenes, then export the source or a starter archive. The runtime layer never includes Studio. See `docs/content/3.guides/6.brand-studio.md` for source, asset and export contracts.
+
+## Development commands
 
 ```bash
 pnpm install

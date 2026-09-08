@@ -2,9 +2,9 @@
 
 `@happydesigns/id` is not one visual identity. It is the Nuxt UI foundation that makes brand-guide decisions durable, inspectable, documented, and usable as Nuxt layers.
 
-## Nuxt UI First
+## Nuxt UI Only
 
-Use Nuxt UI as the default component and theme system.
+Nuxt UI is the supported component and theme system. Neutral named data and the existing CSS adapter remain useful contracts; they do not imply another editor or renderer.
 
 - Map raw brand palettes to Nuxt UI semantic roles.
 - Keep palette names and optional brand-owned roles independent from Nuxt UI; map them explicitly through the Nuxt UI adapter.
@@ -59,3 +59,7 @@ Every theme should be checked across:
 - docs prose
 - light and dark color modes
 - mobile and desktop layouts
+
+## Brand Studio
+
+Studio is an optional authoring layer. Shared Components, Landing and Docs scenes provide the comparison surface for new and existing brands. Keep only useful brand controls, isolated original/draft frames, browser-local recovery, and reviewable source/project exports. The brand guide explains identity decisions; Nuxt UI owns component API documentation.

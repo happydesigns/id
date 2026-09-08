@@ -133,3 +133,9 @@ Use `BrandRuntimeOnlyConfig` for ordinary runtime configuration, `BrandGuideConf
 ## Stability
 
 The TypeScript API is intended to be stable within minor releases. Template file structures may evolve as recommended project structure improves.
+
+## Optional Studio API
+
+The @happydesigns/id/studio layer adds /studio and /studio/preview to an authoring application. appConfig.idStudio accepts document, sourcePath and home. It is separate from the consumer runtime.
+
+The @happydesigns/id/studio/core export provides StudioDocument, parseStudioDocument, createStudioDocument, createBlankStudioDocument, diffStudioDocuments, createStudioCss, createStudioProject and createStudioArchive. A version-1 document contains brand and theme plus preserved JSON metadata. Import validates JSON, CSS-value boundaries and local asset paths; it never evaluates source code. Projects export a runtime layer and an optional playground with tested framework versions.
