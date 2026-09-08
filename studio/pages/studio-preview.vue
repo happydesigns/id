@@ -48,7 +48,7 @@ function receive(event: MessageEvent) {
       previewDefaults,
       cssVariablesAdapter.transform(doc.brand, { prefix: '', includeRoles: false, selector: ':root:root' }).css,
       createThemeCssVars({ ...doc.theme, typography: { ...doc.brand.typography, ...doc.theme.typography } }, { lightSelector: ':root:root', darkSelector: ':root:root.dark' }),
-      'html, body { margin: 0; min-height: 100%; } body { background: var(--ui-bg); color: var(--ui-text); }'
+      'html, body { margin: 0; min-height: 100%; } html { color-scheme: light; overscroll-behavior: contain; } html.dark { color-scheme: dark; } body { background: var(--ui-bg); color: var(--ui-text); }'
     ].join('\n')
     document.value = doc
     error.value = ''

@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { createBlankStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioScenes, studioBuiltinPalettes } from '../../src/studio'
 import type { StudioDocument, StudioScene } from '../../src/studio'
 
+useHead({ bodyAttrs: { class: 'id-studio-page' } })
 const route = useRoute()
 const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, sourcePath?: string, home?: string } }
 const seed = config.idStudio?.document ? parseStudioDocument(config.idStudio.document) : createBlankStudioDocument()
@@ -188,13 +189,27 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
 <template>
   <main
     class="studio-shell"
+    :data-mode="mode"
     aria-label="Brand Studio"
   >
     <header class="studio-header">
       <a
         :href="config.idStudio?.home || '/'"
         class="studio-wordmark"
-      >id<span class="studio-dot">.</span><span class="studio-product">Brand Studio</span></a>
+      >id<span class="studio-dot">.</span><span class="studio-product">Brand Studio</span></a><h1 class="studio-brand-name">{{ draft.theme.label }}</h1>
+      <div
+        class="studio-segment"
+        aria-label="Preview scene"
+      >
+        <button
+          v-for="item in studioScenes"
+          :key="item"
+          :aria-pressed="scene === item"
+          @click="scene = item"
+        >
+          {{ item === 'components' ? 'Components' : item === 'landing' ? 'Landing' : 'Docs' }}
+        </button>
+      </div>
       <div class="studio-actions">
         <button
           class="studio-button"
@@ -272,61 +287,6 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       </button>
     </div>
 
-    <section class="studio-titlebar">
-      <div>
-        <p class="studio-eyebrow">
-          {{ editing ? 'Your identity, in context' : 'The brand in practice' }}
-        </p><h1>
-          {{ draft.theme.label }}
-        </h1><p class="studio-subtitle">
-          {{ editing ? 'Refine the details. See the whole picture.' : 'Explore the components and pages that bring this identity to life.' }}
-        </p>
-      </div>
-      <div class="studio-status">
-        <span class="studio-status-dot" />{{ dirty ? `${changes.length} changes in draft` : 'Original brand' }}<span class="studio-status-note">Nuxt UI</span>
-      </div>
-    </section>
-
-    <div class="studio-toolbar">
-      <div
-        class="studio-segment"
-        aria-label="Preview scene"
-      >
-        <button
-          v-for="item in studioScenes"
-          :key="item"
-          :aria-pressed="scene === item"
-          @click="scene = item"
-        >
-          {{ item === 'components' ? 'Components' : item === 'landing' ? 'Landing' : 'Docs' }}
-        </button>
-      </div>
-      <div class="studio-toolbar-end">
-        <label class="studio-check"><input
-          v-model="compare"
-          type="checkbox"
-        >Compare original</label><label class="studio-check"><input
-          v-model="mobile"
-          type="checkbox"
-        >Mobile</label><label class="studio-select-label">State<select
-          v-model="state"
-          aria-label="Preview state"
-        ><option value="default">Default</option><option value="error">Validation error</option></select></label><div class="studio-segment">
-          <button
-            :aria-pressed="mode === 'light'"
-            @click="mode = 'light'"
-          >
-            Light
-          </button><button
-            :aria-pressed="mode === 'dark'"
-            @click="mode = 'dark'"
-          >
-            Dark
-          </button>
-        </div>
-      </div>
-    </div>
-
     <div
       class="studio-workspace"
       :class="{ 'studio-browsing': !editing }"
@@ -368,7 +328,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         aria-label="Brand settings"
       >
         <div class="studio-inspector-header">
-          <span>Make it yours</span><div class="studio-actions">
+          <span>Make it yours</span><div class="studio-actions"><button class="studio-button small" aria-label="Close settings" @click="editing = false">Close</button>
             <button
               class="studio-icon-button"
               :disabled="!history.length"
@@ -563,6 +523,38 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       </aside>
     </div>
 
+    <div class="studio-toolbar">
+      <div class="studio-dock-settings">
+        <button v-for="item in ['identity', 'colors', 'type', 'details']" :key="item" class="studio-button" :aria-pressed="editing && panel === item" @click="panel = item; editing = true">
+          {{ item === 'identity' ? 'Brand' : item === 'type' ? 'Typography' : item === 'details' ? 'Appearance' : 'Palette' }}
+        </button>
+      </div>
+      <div class="studio-toolbar-end">
+        <label class="studio-check"><input
+          v-model="compare"
+          type="checkbox"
+        >Compare original</label><label class="studio-check"><input
+          v-model="mobile"
+          type="checkbox"
+        >Mobile</label><label class="studio-select-label">State<select
+          v-model="state"
+          aria-label="Preview state"
+        ><option value="default">Default</option><option value="error">Validation error</option></select></label><div class="studio-segment">
+          <button
+            :aria-pressed="mode === 'light'"
+            @click="mode = 'light'"
+          >
+            Light
+          </button><button
+            :aria-pressed="mode === 'dark'"
+            @click="mode = 'dark'"
+          >
+            Dark
+          </button>
+        </div>
+      </div>
+    </div>
+
     <UModal
       :open="!!pending"
       title="Replace this draft?"
@@ -631,16 +623,41 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
   </main>
 </template>
 
+<style>
+body.id-studio-page { margin: 0; overflow: hidden; }
+body.id-studio-page:has(.studio-shell[data-mode=dark]) { background: var(--ui-color-neutral-950); }
+</style>
 <style scoped>
-.studio-shell { min-height: 100dvh; background: var(--ui-bg); color: var(--ui-text); font-family: var(--font-sans); }
-.studio-header { min-height: 76px; border-bottom: 1px solid var(--ui-border); display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 28px; }
+.studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: var(--ui-bg); color: var(--ui-text); font-family: var(--font-sans); }
+.studio-shell[data-mode=dark] { --ui-bg: var(--ui-color-neutral-950); --ui-bg-muted: var(--ui-color-neutral-900); --ui-bg-elevated: var(--ui-color-neutral-800); --ui-bg-inverted: var(--ui-color-neutral-50); --ui-text: var(--ui-color-neutral-200); --ui-text-muted: var(--ui-color-neutral-400); --ui-text-highlighted: var(--ui-color-neutral-50); --ui-text-inverted: var(--ui-color-neutral-950); --ui-border: var(--ui-color-neutral-800); color-scheme: dark; }
+.studio-header { flex: none; min-height: 62px; display: flex; align-items: center; gap: 18px; }
 .studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
-.studio-dot { color: var(--ui-primary); }.studio-product { margin-left: 18px; font-size: 14px; font-weight: 500; letter-spacing: -.01em; }
-.studio-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }.studio-button { cursor: pointer; border: 1px solid var(--ui-border); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 550; background: var(--ui-bg); color: var(--ui-text-highlighted); }.studio-button:hover { background: var(--ui-bg-muted); }.studio-button.strong { background: var(--ui-bg-inverted); color: var(--ui-text-inverted); border-color: transparent; }.studio-button.small { padding: 5px 8px; font-size: 11px; }button:disabled { opacity: .4; cursor: not-allowed; }button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 3px; }
-.studio-titlebar { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 32px 28px 28px; }.studio-eyebrow { text-transform: uppercase; letter-spacing: .13em; font-size: 10px; font-weight: 600; color: var(--ui-text-muted); margin-bottom: 10px; }h1 { font-size: 30px; line-height: 1.15; font-weight: 600; letter-spacing: -.035em; color: var(--ui-text-highlighted); }.studio-subtitle { margin-top: 8px; font-size: 13px; color: var(--ui-text-muted); }.studio-status { display: flex; align-items: center; gap: 7px; font-size: 11px; white-space: nowrap; }.studio-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ui-primary); }.studio-status-note { margin-left: 8px; padding-left: 14px; border-left: 1px solid var(--ui-border); color: var(--ui-text-muted); }
-.studio-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 0 28px 18px; }.studio-toolbar-end { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }.studio-segment { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--ui-border); border-radius: 9px; background: var(--ui-bg-muted); }.studio-segment button { cursor: pointer; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: var(--ui-text-muted); text-transform: capitalize; }.studio-segment button[aria-pressed=true] { background: var(--ui-bg); color: var(--ui-text-highlighted); box-shadow: 0 1px 3px #0000000a; }.studio-check { display: flex; gap: 7px; align-items: center; font-size: 11px; }.studio-check input { accent-color: var(--ui-primary); }.studio-select-label { display: flex; align-items: center; gap: 6px; font-size: 11px; }.studio-select-label select { max-width: 140px; background: var(--ui-bg); }
-.studio-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 290px; border-top: 1px solid var(--ui-border); min-height: 650px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }.studio-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; padding: 24px; background: var(--ui-bg-muted); min-width: 0; }.studio-comparing { grid-template-columns: repeat(2, minmax(0, 1fr)); }.studio-frame-wrap { min-width: 0; display: flex; flex-direction: column; align-items: center; }.studio-frame-label { display: flex; justify-content: space-between; align-self: stretch; margin-bottom: 9px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }.studio-frame-label span { font-weight: 400; text-transform: capitalize; color: var(--ui-text-muted); letter-spacing: 0; }iframe { display: block; width: 100%; height: max(650px, calc(100dvh - 290px)); border: 1px solid var(--ui-border); border-radius: 12px; background: var(--ui-bg); box-shadow: 0 8px 30px #00000005; }iframe.studio-mobile { max-width: 390px; }
-.studio-inspector { border-left: 1px solid var(--ui-border); min-width: 0; }.studio-inspector-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 18px 16px; font-size: 12px; font-weight: 600; }.studio-icon-button { font-size: 20px; cursor: pointer; }.studio-panel-tabs { display: flex; border-top: 1px solid var(--ui-border); border-bottom: 1px solid var(--ui-border); padding: 0 12px; }.studio-panel-tabs button { padding: 12px 8px; font-size: 11px; text-transform: capitalize; cursor: pointer; border-bottom: 2px solid transparent; color: var(--ui-text-muted); }.studio-panel-tabs button[aria-pressed=true] { color: var(--ui-text-highlighted); border-bottom-color: var(--ui-primary); }.studio-fields { padding: 20px 18px; display: flex; flex-direction: column; gap: 18px; max-height: 650px; overflow-y: auto; }.studio-fields label { display: flex; flex-direction: column; gap: 7px; font-size: 11px; font-weight: 600; text-transform: capitalize; }.studio-fields input, .studio-fields select, .studio-fields textarea { width: 100%; min-width: 0; border: 1px solid var(--ui-border); padding: 8px 10px; border-radius: 6px; background: var(--ui-bg); color: var(--ui-text-highlighted); font-size: 12px; font-weight: 400; text-transform: none; }.studio-fields input:focus, .studio-fields select:focus, .studio-fields textarea:focus { outline: 2px solid var(--ui-primary); outline-offset: 1px; }.studio-fields small, .studio-help { font-size: 11px; line-height: 1.65; color: var(--ui-text-muted); font-weight: 400; text-transform: none; }.studio-fields h2 { font-size: 12px; font-weight: 600; margin-top: 8px; }.studio-inspector-footer { border-top: 1px solid var(--ui-border); padding: 15px 18px; font-size: 10px; color: var(--ui-text-muted); line-height: 1.6; }.studio-palette summary { cursor: pointer; font-size: 12px; padding: 8px 0; }.studio-swatches { display: flex; margin-top: 8px; border-radius: 5px; overflow: hidden; }.studio-swatches i { flex: 1; height: 18px; }.studio-palette label { margin: 10px 0; }.studio-assets { display: flex; flex-direction: column; gap: 8px; }.studio-assets div { display: flex; flex-direction: column; gap: 3px; font-size: 11px; }.studio-code { font-size: 10px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { padding: 12px 28px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12px; background: var(--ui-bg-elevated); border-bottom: 1px solid var(--ui-border); }.studio-notice.error { color: var(--ui-error); }.studio-export-code { max-height: 45vh; overflow: auto; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); border: 1px solid var(--ui-border); font-size: 11px; }
-@media (max-width: 1000px) { .studio-comparing { grid-template-columns: minmax(0, 1fr); }.studio-workspace { grid-template-columns: minmax(0, 1fr) 260px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }.studio-status { display: none; } }
-@media (max-width: 700px) { .studio-header { padding: 14px 16px; flex-wrap: wrap; }.studio-titlebar { padding: 24px 16px; }.studio-toolbar { padding: 0 16px 16px; }.studio-workspace { display: flex; flex-direction: column; }.studio-inspector { order: -1; border-left: 0; border-bottom: 1px solid var(--ui-border); }.studio-fields { max-height: 260px; }.studio-canvas { padding: 16px; }.studio-inspector-footer { display: none; }h1 { font-size: 26px; }.studio-toolbar-end { gap: 12px; }.studio-product { margin-left: 12px; } }
+.studio-dot { color: var(--ui-primary); }.studio-product { margin-left: 10px; font-size: 12px; font-weight: 500; letter-spacing: -.01em; }
+.studio-brand-name { font-size: 12px; font-weight: 550; max-width: 190px; overflow: hidden; white-space: nowrap; }
+.studio-header > .studio-segment { margin: auto; }
+.studio-actions { display: flex; align-items: center; gap: 6px; }
+.studio-button { cursor: pointer; border: 1px solid var(--ui-border); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 550; background: var(--ui-bg); color: var(--ui-text-highlighted); white-space: nowrap; }
+.studio-button:hover, .studio-button[aria-pressed=true] { background: var(--ui-bg-elevated); }.studio-button.strong { background: var(--ui-bg-inverted); color: var(--ui-text-inverted); border-color: transparent; }.studio-button.small { padding: 5px 8px; font-size: 11px; }
+button:disabled { opacity: .4; cursor: not-allowed; }button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 3px; }
+.studio-toolbar { order: 3; flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-muted); }
+.studio-toolbar-end, .studio-dock-settings { display: flex; gap: 10px; align-items: center; }
+.studio-segment { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--ui-border); border-radius: 9px; background: var(--ui-bg-muted); }.studio-segment button { cursor: pointer; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: var(--ui-text-muted); text-transform: capitalize; white-space: nowrap; }.studio-segment button[aria-pressed=true] { background: var(--ui-bg); color: var(--ui-text-highlighted); box-shadow: 0 1px 3px #0000000a; }
+.studio-check { display: flex; gap: 6px; align-items: center; font-size: 11px; white-space: nowrap; }.studio-check input { accent-color: var(--ui-primary); }.studio-select-label { display: flex; align-items: center; gap: 6px; font-size: 11px; }.studio-select-label select { max-width: 125px; background: var(--ui-bg); }
+.studio-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }
+.studio-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }.studio-comparing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.studio-frame-wrap { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; }.studio-frame-label { display: none; }.studio-comparing .studio-frame-label { display: flex; flex: none; justify-content: space-between; align-self: stretch; padding: 0 6px 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }.studio-frame-label span { font-weight: 400; text-transform: capitalize; color: var(--ui-text-muted); letter-spacing: 0; }
+iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-bg); }iframe.studio-mobile { max-width: 390px; }
+.studio-inspector { display: flex; flex-direction: column; border: 1px solid var(--ui-border); border-radius: 16px; min-width: 0; min-height: 0; overflow: hidden; background: var(--ui-bg); }
+.studio-inspector-header { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 12px; font-size: 12px; font-weight: 600; }.studio-icon-button { font-size: 20px; cursor: pointer; width: 24px; }
+.studio-panel-tabs { display: flex; flex: none; border-top: 1px solid var(--ui-border); border-bottom: 1px solid var(--ui-border); padding: 0 12px; }.studio-panel-tabs button { flex: 1; padding: 12px 6px; font-size: 11px; text-transform: capitalize; cursor: pointer; border-bottom: 2px solid transparent; color: var(--ui-text-muted); }.studio-panel-tabs button[aria-pressed=true] { color: var(--ui-text-highlighted); border-bottom-color: var(--ui-primary); }
+.studio-fields { flex: 1; min-height: 0; padding: 18px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; overscroll-behavior: contain; }.studio-fields label { display: flex; flex-direction: column; gap: 7px; font-size: 11px; font-weight: 600; text-transform: capitalize; }.studio-fields input, .studio-fields select, .studio-fields textarea { width: 100%; min-width: 0; border: 1px solid var(--ui-border); padding: 8px 10px; border-radius: 6px; background: var(--ui-bg); color: var(--ui-text-highlighted); font-size: 12px; font-weight: 400; text-transform: none; }.studio-fields input:focus, .studio-fields select:focus, .studio-fields textarea:focus { outline: 2px solid var(--ui-primary); outline-offset: 1px; }.studio-fields small, .studio-help { font-size: 11px; line-height: 1.65; color: var(--ui-text-muted); font-weight: 400; text-transform: none; }.studio-fields h2 { font-size: 12px; font-weight: 600; margin-top: 8px; }.studio-inspector-footer { border-top: 1px solid var(--ui-border); padding: 15px 18px; font-size: 10px; color: var(--ui-text-muted); line-height: 1.6; }.studio-palette summary { cursor: pointer; font-size: 12px; padding: 8px 0; }.studio-swatches { display: flex; margin-top: 8px; border-radius: 5px; overflow: hidden; }.studio-swatches i { flex: 1; height: 18px; }.studio-palette label { margin: 10px 0; }.studio-assets { display: flex; flex-direction: column; gap: 8px; }.studio-assets div { display: flex; flex-direction: column; gap: 3px; font-size: 11px; }.studio-code { font-size: 10px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { padding: 12px 28px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12px; background: var(--ui-bg-elevated); border-bottom: 1px solid var(--ui-border); }.studio-notice.error { color: var(--ui-error); }.studio-export-code { max-height: 45vh; overflow: auto; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); border: 1px solid var(--ui-border); font-size: 11px; }
+.studio-notice { flex: none; max-height: 100px; overflow: auto; border-radius: 10px; }
+.studio-inspector-footer { flex: none; }
+@media (max-width: 1100px) { .studio-product { display: none; }.studio-brand-name { max-width: 100px; font-size: 11px; }.studio-toolbar { flex-wrap: wrap; padding: 8px 12px; gap: 6px; }.studio-toolbar .studio-button { padding: 6px 10px; }.studio-workspace { grid-template-columns: minmax(0, 1fr) 280px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) {
+.studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 0; padding-top: 8px; gap: 8px; flex-wrap: wrap; }.studio-header > .studio-segment { order: 3; width: 100%; justify-content: center; }.studio-header > .studio-actions { margin-left: auto; }.studio-brand-name { display: none; }.studio-button { padding: 7px 9px; font-size: 11px; }
+.studio-workspace { position: relative; display: flex; }.studio-canvas { flex: 1; }.studio-inspector { position: absolute; z-index: 2; inset: 0 0 0 auto; width: min(320px, 100%); box-shadow: -12px 0 36px #0002; }
+.studio-toolbar { gap: 8px; padding: 8px; }.studio-dock-settings { width: 100%; gap: 6px; }.studio-dock-settings button { flex: 1; }.studio-toolbar-end { width: 100%; gap: 8px; flex-wrap: wrap; justify-content: space-between; }.studio-select-label { gap: 3px; }.studio-select-label select { max-width: 78px; }.studio-segment button { padding: 5px 8px; font-size: 11px; }
+.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+}
 </style>

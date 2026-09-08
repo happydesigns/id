@@ -3,24 +3,19 @@ import { computed, ref } from 'vue'
 import type { StudioDocument, StudioScene } from '../../src/studio'
 
 const props = defineProps<{ document: StudioDocument, scene: StudioScene, state: string, mode: 'light' | 'dark' }>()
-const email = ref('')
-const notification = ref(true)
+
+
 const open = ref(false)
 const saved = ref(false)
 const logo = computed(() => {
   const logos = props.document.brand.assets?.logos
   return (props.mode === 'dark' ? logos?.wordmarkInverse : undefined) ?? logos?.wordmark ?? logos?.logo
 })
-const rows = [
-  { project: 'Website refresh', owner: 'Alex Morgan', status: 'In review', progress: 72 },
-  { project: 'Product launch', owner: 'Sam Taylor', status: 'In progress', progress: 48 },
-  { project: 'Brand library', owner: 'Jamie Chen', status: 'Complete', progress: 100 }
-]
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl p-5 sm:p-8">
-    <header class="mb-8 flex items-center justify-between gap-4 border-b border-default pb-5">
+  <div :class="scene === 'components' ? '' : 'mx-auto max-w-6xl p-5 sm:p-8'">
+    <header v-if="scene !== 'components'" class="mb-8 flex items-center justify-between gap-4 border-b border-default pb-5">
       <div class="flex min-w-0 items-center gap-3">
         <img
           v-if="logo"
@@ -37,169 +32,11 @@ const rows = [
         color="neutral"
         variant="subtle"
       >
-        {{ scene === 'components' ? 'Components' : scene === 'landing' ? 'Landing page' : 'Documentation' }}
+        {{ scene === 'landing' ? 'Landing page' : 'Documentation' }}
       </UBadge>
     </header>
 
-    <template v-if="scene === 'components'">
-      <div class="mb-7">
-        <p class="text-xs font-medium uppercase tracking-widest text-muted">
-          The everyday essentials
-        </p>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight text-highlighted">
-          One brand. Every detail.
-        </h1>
-        <p class="mt-3 max-w-xl text-sm leading-6 text-muted">
-          Compare actions, forms and content in the same setting. Try the controls to inspect their real states.
-        </p>
-      </div>
-      <div class="grid items-start gap-5 sm:grid-cols-2">
-        <UCard>
-          <template #header>
-            <h2 class="font-semibold text-highlighted">
-              A clear next step
-            </h2>
-          </template>
-          <div class="flex flex-wrap items-center gap-3">
-            <UButton @click="saved = !saved">
-              {{ saved ? 'Changes saved' : 'Save changes' }}
-            </UButton>
-            <UButton
-              color="neutral"
-              variant="outline"
-              @click="open = true"
-            >
-              Preview dialog
-            </UButton>
-            <UButton variant="ghost">
-              View details
-            </UButton>
-            <UButton disabled>
-              Unavailable
-            </UButton>
-          </div>
-          <div class="mt-6 flex flex-wrap gap-2">
-            <UBadge>
-              New
-            </UBadge><UBadge
-              color="success"
-              variant="subtle"
-            >
-              Approved
-            </UBadge><UBadge
-              color="warning"
-              variant="subtle"
-            >
-              Needs review
-            </UBadge>
-          </div>
-          <UModal
-            v-model:open="open"
-            title="Review your changes"
-            description="This dialog uses the same brand as the page."
-          >
-            <template #body>
-              <p class="text-sm text-muted">
-                Check the action hierarchy, focus ring and overlay surface.
-              </p>
-            </template>
-            <template #footer>
-              <UButton @click="open = false">
-                Done
-              </UButton><UButton
-                color="neutral"
-                variant="outline"
-                @click="open = false"
-              >
-                Cancel
-              </UButton>
-            </template>
-          </UModal>
-        </UCard>
-        <UCard>
-          <template #header>
-            <h2 class="font-semibold text-highlighted">
-              Invite your team
-            </h2>
-          </template>
-          <div class="space-y-5">
-            <UFormField
-              label="Email address"
-              :error="state === 'error' ? 'Enter a valid email address.' : undefined"
-              help="Use your work email to join the workspace."
-            >
-              <UInput
-                v-model="email"
-                placeholder="alex@example.com"
-                class="w-full"
-              />
-            </UFormField>
-            <UFormField label="Role">
-              <USelect
-                :items="['Editor', 'Viewer', 'Admin']"
-                default-value="Editor"
-                class="w-full"
-              />
-            </UFormField>
-            <USwitch
-              v-model="notification"
-              label="Email notifications"
-            />
-          </div>
-        </UCard>
-        <UCard>
-          <template #header>
-            <h2 class="font-semibold text-highlighted">
-              Make progress visible
-            </h2>
-          </template>
-          <div class="space-y-5">
-            <UAlert
-              :color="state === 'error' ? 'error' : 'success'"
-              :title="state === 'error' ? 'Changes need attention' : 'Everything is up to date'"
-              description="Clear feedback keeps the next step obvious."
-            /><div class="flex justify-between text-sm">
-              <span>Monthly goal</span><span>72%</span>
-            </div><UProgress
-              aria-label="Monthly goal"
-              :model-value="72"
-            />
-          </div>
-        </UCard>
-        <UCard>
-          <template #header>
-            <h2 class="font-semibold text-highlighted">
-              Built for real work
-            </h2>
-          </template>
-          <p class="text-3xl font-semibold text-highlighted">
-            24,680
-          </p><p class="mt-2 text-sm text-muted">
-            Visitors this month
-          </p>
-          <div
-            class="mt-6 flex h-20 items-end gap-2"
-            role="img"
-            aria-label="Weekly activity: rising toward the end of the week"
-          >
-            <div
-              v-for="height in [35, 60, 42, 78, 58, 100, 86]"
-              :key="height"
-              class="flex-1 rounded-t bg-primary/70"
-              :style="{ height: `${height}%` }"
-            />
-          </div>
-        </UCard>
-      </div>
-      <UCard class="mt-5">
-        <template #header>
-          <h2 class="font-semibold text-highlighted">
-            Your projects
-          </h2>
-        </template><UTable :data="rows" />
-      </UCard>
-    </template>
-
+    <IdStudioComponents v-if="scene === 'components'" :state="state" />
     <template v-else-if="scene === 'landing'">
       <section class="py-10 sm:py-20">
         <UBadge variant="subtle">
@@ -323,7 +160,7 @@ const rows = [
         </article>
       </div>
     </template>
-    <footer class="mt-10 flex flex-wrap justify-between gap-3 border-t border-default pt-5 text-xs text-muted">
+    <footer v-if="scene !== 'components'" class="mt-10 flex flex-wrap justify-between gap-3 border-t border-default pt-5 text-xs text-muted">
       <span>{{ document.theme.label }} · Nuxt UI</span><span>Same content. Your identity.</span>
     </footer>
   </div>
