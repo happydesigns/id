@@ -23,6 +23,11 @@
     },
     "./nuxt": "./nuxt.layer.config.mjs",
     "./guide": "./guide/nuxt.config.mjs",
+    "./studio": "./studio/nuxt.config.mjs",
+    "./studio/core": {
+      "types": "./dist/src/studio.d.ts",
+      "import": "./dist/src/studio.js"
+    },
     "./defaults": {
       "types": "./dist/src/defaults.d.ts",
       "import": "./dist/src/defaults.js"
@@ -59,6 +64,7 @@
     "dist",
     "app",
     "guide",
+    "studio",
     "src",
     "themes",
     "templates/brand-layer/app",
