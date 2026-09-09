@@ -169,7 +169,7 @@ async function exportProject() {
       files[`public${asset.src}`] = bytes
     }
     download(`${draft.value.brand.name}.zip`, createStudioArchive(files), 'application/zip')
-    notice.value = 'Project exported. Your source remains unchanged until you apply the reviewed files.'
+    notice.value = 'Project downloaded.'
   } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Export failed.' }
   finally { busy.value = false }
 }
@@ -198,476 +198,143 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
 </script>
 
 <template>
-  <main
-    class="studio-shell"
-    :data-mode="mode"
-    aria-label="Brand Studio"
-  >
+  <main class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
-      <a
-        :href="config.idStudio?.home || '/'"
-        class="studio-wordmark"
-      >id<span class="studio-dot">.</span><span class="studio-product">Brand Studio</span></a><h1 class="studio-brand-name">{{ draft.theme.label }}</h1>
-      <div
-        class="studio-segment"
-        aria-label="Preview scene"
-      >
-        <button :aria-pressed="scene === 'components'" @click="scene = 'components'">Components</button>
-        <select aria-label="Template" :value="scene === 'components' ? '' : scene" @change="scene = value($event)">
-          <option value="" disabled>Templates</option>
-          <option v-for="item in templates" :key="item.id" :value="item.id">{{ item.label }}</option>
-        </select>
-        <select v-if="selectedTemplate && selectedTemplate.pages.length > 1" v-model="templatePage" aria-label="Template page">
-          <option v-for="page in selectedTemplate.pages" :key="page.id" :value="page.id">{{ page.label }}</option>
-        </select>      </div>
-      <div class="studio-actions">
-        <button
-          class="studio-button"
-          @click="guard(() => replace(createBlankStudioDocument()))"
-        >
-          New brand
-        </button><button
-          class="studio-button"
-          @click="input?.click()"
-        >
-          Open brand
-        </button><button
-          v-if="!editing"
-          class="studio-button strong"
-          @click="editing = true"
-        >
-          Customize brand
-        </button><button
-          v-else
-          class="studio-button strong"
-          @click="exportOpen = true"
-        >
-          Review & export <span aria-hidden="true">↗</span>
-        </button>
+      <a :href="config.idStudio?.home || '/'" class="studio-wordmark">id<span class="studio-dot">.</span><span class="studio-product">Brand Studio</span></a>
+      <h1 class="studio-brand-name">{{ draft.theme.label }}</h1>
+      <div class="studio-scenes" aria-label="Preview scene">
+        <UButton color="neutral" :variant="scene === 'components' ? 'soft' : 'ghost'" :aria-pressed="scene === 'components'" @click="scene = 'components'">Components</UButton>
+        <USelect aria-label="Template" placeholder="Templates" :ui="{ placeholder: 'text-muted' }" :model-value="scene === 'components' ? undefined : scene" :items="templates.map(item => ({ label: item.label, value: item.id }))" @update:model-value="scene = String($event)" />
+        <USelect v-if="selectedTemplate && selectedTemplate.pages.length > 1" v-model="templatePage" aria-label="Template page" :items="selectedTemplate.pages.map(item => ({ label: item.label, value: item.id }))" />
       </div>
-      <input
-        ref="input"
-        type="file"
-        accept=".json,application/json"
-        class="sr-only"
-        aria-label="Open brand document"
-        @change="openDocument"
-      >
+      <div class="studio-actions">
+        <UButton color="neutral" variant="outline" @click="guard(() => replace(createBlankStudioDocument()))">New brand</UButton>
+        <UButton color="neutral" variant="outline" @click="input?.click()">Open brand</UButton>
+        <UButton color="neutral" @click="exportOpen = true">Export</UButton>
+      </div>
+      <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
-
-    <div
-      v-if="recovery"
-      class="studio-notice"
-      role="status"
-    >
-      <span>A local draft is available. Restoring it also restores its original comparison source.</span><button
-        class="studio-button"
-        @click="baseline = recovery.baseline; draft = recovery.draft; recovery = undefined; editing = true"
-      >
-        Restore draft
-      </button><button
-        class="studio-button"
-        @click="recovery = undefined"
-      >
-        Dismiss
-      </button>
+    <div v-if="recovery" class="studio-notice" role="status">
+      <span>A saved draft is available.</span><UButton @click="baseline = recovery.baseline; draft = recovery.draft; recovery = undefined; editing = true">Restore draft</UButton><UButton variant="ghost" color="neutral" @click="recovery = undefined">Dismiss</UButton>
     </div>
-    <div
-      v-if="error"
-      class="studio-notice error"
-      role="alert"
-    >
-      {{ error }}<button
-        class="studio-button"
-        @click="error = ''"
-      >
-        Dismiss
-      </button>
-    </div>
-    <div
-      v-if="notice"
-      class="studio-notice"
-      role="status"
-    >
-      {{ notice }}<button
-        class="studio-button"
-        @click="notice = ''"
-      >
-        Dismiss
-      </button>
-    </div>
-
-    <div
-      class="studio-workspace"
-      :class="{ 'studio-browsing': !editing }"
-    >
-      <div
-        class="studio-canvas"
-        :class="{ 'studio-comparing': compare }"
-      >
-        <section
-          v-if="compare"
-          class="studio-frame-wrap"
-        >
-          <div class="studio-frame-label">
-            Original <span>{{ baseline.theme.label }}</span>
-          </div><iframe
-            ref="originalFrame"
-            src="/studio/preview?frame=original"
-            title="Original brand preview"
-            :class="{ 'studio-mobile': mobile }"
-            @load="send(originalFrame, baseline)"
-          />
+    <UAlert v-if="error" role="alert" color="error" :description="error" :close="{ onClick: () => error = '' }" />
+    <div v-if="notice" class="studio-notice" role="status">{{ notice }}<UButton variant="ghost" color="neutral" @click="notice = ''">Dismiss</UButton></div>
+    <div class="studio-workspace" :class="{ 'studio-browsing': !editing }">
+      <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
+        <section v-if="compare" class="studio-frame-wrap">
+          <div class="studio-frame-label">Original <span>{{ baseline.theme.label }}</span></div>
+          <iframe ref="originalFrame" src="/studio/preview?frame=original" title="Original brand preview" :class="{ 'studio-mobile': mobile }" @load="send(originalFrame, baseline)" />
         </section>
         <section class="studio-frame-wrap">
-          <div class="studio-frame-label">
-            {{ editing ? 'Draft' : 'Preview' }}<span>{{ scene }} · {{ mode }}</span>
-          </div><iframe
-            ref="draftFrame"
-            src="/studio/preview?frame=draft"
-            title="Draft brand preview"
-            :class="{ 'studio-mobile': mobile }"
-            @load="send(draftFrame, draft)"
-          />
+          <div class="studio-frame-label">Draft <span>{{ draft.theme.label }}</span></div>
+          <iframe ref="draftFrame" src="/studio/preview?frame=draft" title="Draft brand preview" :class="{ 'studio-mobile': mobile }" @load="send(draftFrame, draft)" />
         </section>
       </div>
-
-      <aside
-        v-if="editing"
-        class="studio-inspector"
-        aria-label="Brand settings"
-      >
+      <aside v-if="editing" class="studio-inspector" aria-label="Brand settings">
         <div class="studio-inspector-header">
-          <span>Make it yours</span><div class="studio-actions"><button class="studio-button small" aria-label="Close settings" @click="editing = false">Close</button>
-            <button
-              class="studio-icon-button"
-              :disabled="!history.length"
-              aria-label="Undo change"
-              @click="undo"
-            >
-              ↶
-            </button><button
-              class="studio-icon-button"
-              :disabled="!future.length"
-              aria-label="Redo change"
-              @click="redo"
-            >
-              ↷
-            </button><button
-              class="studio-button small"
-              :disabled="!dirty"
-              @click="reset"
-            >
-              Reset
-            </button>
+          <h2>{{ panel === 'identity' ? 'Brand' : panel === 'colors' ? 'Palette' : panel === 'type' ? 'Typography' : 'Appearance' }}</h2>
+          <div class="studio-actions">
+            <UButton icon="i-lucide-undo-2" aria-label="Undo change" color="neutral" variant="ghost" size="xs" :disabled="!history.length" @click="undo" />
+            <UButton icon="i-lucide-redo-2" aria-label="Redo change" color="neutral" variant="ghost" size="xs" :disabled="!future.length" @click="redo" />
+            <UButton color="neutral" variant="ghost" size="xs" :disabled="!dirty" @click="reset">Reset</UButton>
+            <UButton icon="i-lucide-x" aria-label="Close settings" color="neutral" variant="ghost" size="xs" @click="editing = false" />
           </div>
         </div>
-        <nav
-          class="studio-panel-tabs"
-          aria-label="Settings section"
-        >
-          <button
-            v-for="item in ['identity', 'colors', 'type', 'details']"
-            :key="item"
-            :aria-pressed="panel === item"
-            @click="panel = item"
-          >
-            {{ item }}
-          </button>
-        </nav>
         <div class="studio-fields">
           <template v-if="panel === 'identity'">
-            <p class="studio-help">
-              The name, words and assets that make this brand yours.
-            </p>
-            <label>Brand name<input
-              :value="draft.theme.label"
-              @change="edit(doc => { doc.theme.label = value($event) })"
-            ><small>{{ origin('theme.label') }}</small></label>
-            <label>Identifier<input
-              :value="draft.brand.name"
-              @change="edit(doc => { doc.brand.name = value($event); doc.theme.name = value($event) })"
-            ><small>Lowercase letters, numbers and hyphens</small></label>
-            <label>Package name<input
-              :value="draft.brand.packageName"
-              placeholder="@example/brand"
-              @change="edit(doc => { doc.brand.packageName = value($event) })"
-            ></label>
-            <label>Brand statement<textarea
-              :value="draft.brand.claim"
-              rows="3"
-              @change="edit(doc => { doc.brand.claim = value($event) })"
-            /></label>
-            <label class="studio-upload">Wordmark or logo<input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              @change="addLogo"
-            ><small>PNG, JPEG or WebP · up to 2 MB · stored in your document</small></label>
-            <div
-              v-if="draft.brand.assets?.logos"
-              class="studio-assets"
-            >
-              <div
-                v-for="(asset, role) in draft.brand.assets.logos"
-                :key="role"
-              >
-                <span>{{ role }}</span><small>{{ asset?.name }}</small>
-              </div>
-            </div>
-            <p class="studio-help">
-              Other existing asset roles are preserved. Fonts and custom Vue components remain part of their owning project.
-            </p>
+            <UFormField label="Brand name" :hint="dirty ? undefined : origin('theme.label')"><UInput :model-value="draft.theme.label" class="w-full" @change="edit(doc => { doc.theme.label = value($event) })" /></UFormField>
+            <UFormField label="Identifier" help="Lowercase letters, numbers and hyphens"><UInput :model-value="draft.brand.name" class="w-full" @change="edit(doc => { doc.brand.name = value($event); doc.theme.name = value($event) })" /></UFormField>
+            <UFormField label="Package name"><UInput :model-value="draft.brand.packageName" placeholder="@example/brand" class="w-full" @change="edit(doc => { doc.brand.packageName = value($event) })" /></UFormField>
+            <UFormField label="Brand statement"><UTextarea :model-value="draft.brand.claim" :rows="3" class="w-full" @change="edit(doc => { doc.brand.claim = value($event) })" /></UFormField>
+            <UFormField label="Wordmark or logo" help="PNG, JPEG or WebP · up to 2 MB"><UInput type="file" accept="image/png,image/jpeg,image/webp" class="w-full" @change="addLogo" /></UFormField>
           </template>
-
           <template v-if="panel === 'colors'">
-            <p class="studio-help">
-              Map your palettes to Nuxt UI roles. Named brand colors stay intact.
-            </p>
-            <label
-              v-for="role in studioRoles"
-              :key="role"
-            >{{ role }}<select
-              :value="draft.theme.ui?.colors?.[role] || ''"
-              @change="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if (value($event)) doc.theme.ui.colors[role] = value($event); else delete doc.theme.ui.colors[role] })"
-            ><option value="">Nuxt UI default</option><option
-              v-for="palette in paletteOptions"
-              :key="palette"
-            >{{ palette }}</option></select><small>{{ origin(`theme.ui.colors.${role}`) }}</small></label>
-            <h2>
-              Brand palettes
-            </h2>
-            <details
-              v-for="(palette, name) in draft.brand.colors"
-              :key="name"
-              class="studio-palette"
-            >
-              <summary>
-                {{ name }}<span class="studio-swatches"><i
-                  v-for="(color, shade) in typeof palette === 'string' ? { base: palette } : palette"
-                  :key="shade"
-                  :style="{ backgroundColor: color }"
-                /></span>
-              </summary><label
-                v-for="(color, shade) in typeof palette === 'string' ? { base: palette } : palette"
-                :key="shade"
-              >{{ shade }}<input
-                :value="color"
-                :aria-label="`${name} ${shade}`"
-                @change="edit(doc => { if (typeof doc.brand.colors[name] === 'string') doc.brand.colors[name] = value($event); else (doc.brand.colors[name] as Record<string, string>)[shade] = value($event) })"
-              ></label>
-            </details>
-            <label>New palette name<input v-model="newColorName"></label><button
-              class="studio-button"
-              @click="edit(doc => { if (!/^[a-z][a-z0-9-]*$/.test(newColorName) || doc.brand.colors[newColorName]) throw new Error('Choose a new lowercase palette name.'); doc.brand.colors[newColorName] = { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a', 950: '#172554' } })"
-            >
-              Add palette
-            </button>
-            <a
-              href="https://ui.nuxt.com/theme"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="studio-help"
-            >Explore advanced palette curves in Nuxt UI ↗</a>
+            <p class="studio-help">Map your palettes to Nuxt UI roles.</p>
+            <UFormField v-for="role in studioRoles" :key="role" :label="role">
+              <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
+            </UFormField>
+            <h3 class="text-sm font-semibold">Brand palettes</h3>
+            <UAccordion :items="Object.entries(draft.brand.colors).map(([name, palette]) => ({ label: name, value: name, palette }))">
+              <template #body="{ item }">
+                <div class="space-y-3">
+                  <UFormField v-for="(color, shade) in typeof item.palette === 'string' ? { base: item.palette } : item.palette" :key="shade" :label="String(shade)">
+                    <UInput :model-value="color" :aria-label="`${item.label} ${shade}`" class="w-full" @change="edit(doc => { if (typeof doc.brand.colors[item.label] === 'string') doc.brand.colors[item.label] = value($event); else (doc.brand.colors[item.label] as Record<string, string>)[shade] = value($event) })"><template #leading><span class="size-3 rounded-full border border-default" :style="{ backgroundColor: color }" /></template></UInput>
+                  </UFormField>
+                </div>
+              </template>
+            </UAccordion>
+            <UFormField label="New palette name"><UInput v-model="newColorName" class="w-full" /></UFormField>
+            <UButton color="neutral" variant="outline" @click="edit(doc => { if (!/^[a-z][a-z0-9-]*$/.test(newColorName) || doc.brand.colors[newColorName]) throw new Error('Choose a new lowercase palette name.'); doc.brand.colors[newColorName] = { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a', 950: '#172554' } })">Add palette</UButton>
           </template>
-
           <template v-if="panel === 'type'">
-            <p class="studio-help">
-              Use fonts available in your project, or a system stack. Selecting a name does not download a font.
-            </p>
-            <label
-              v-for="role in ['sans', 'mono', 'display']"
-              :key="role"
-            >{{ role }}<input
-              :value="draft.theme.typography?.[role] || draft.brand.typography?.[role] || ''"
-              placeholder="system-ui, sans-serif"
-              @change="font(role, value($event))"
-            ><small>{{ origin(`brand.typography.${role}`) }}</small></label>
-            <button
-              class="studio-button"
-              @click="font('sans', 'system-ui, sans-serif')"
-            >
-              Use system sans
-            </button><button
-              class="studio-button"
-              @click="font('sans', 'Georgia, serif')"
-            >
-              Use editorial serif
-            </button>
+            <p class="studio-help">Use installed fonts or a system stack. Entering a name does not download a font.</p>
+            <UFormField v-for="role in ['sans', 'mono', 'display']" :key="role" :label="role"><UInput :model-value="draft.theme.typography?.[role] || draft.brand.typography?.[role] || ''" placeholder="system-ui, sans-serif" class="w-full" @change="font(role, value($event))" /></UFormField>
+            <div class="flex flex-wrap gap-2"><UButton color="neutral" variant="outline" @click="font('sans', 'system-ui, sans-serif')">System sans</UButton><UButton color="neutral" variant="outline" @click="font('sans', 'Georgia, serif')">Georgia</UButton></div>
           </template>
-
           <template v-if="panel === 'details'">
-            <p class="studio-help">
-              Surface values apply to {{ mode }} mode. Empty fields inherit the framework. Other overrides are preserved.
-            </p>
-            <label
-              v-for="entry in [{ name: '--ui-radius', label: 'Corner radius', placeholder: '0.25rem' }, { name: '--ui-bg', label: 'Page background', placeholder: 'var(--ui-bg)' }, { name: '--ui-bg-elevated', label: 'Raised surface', placeholder: 'Framework default' }, { name: '--ui-text', label: 'Body text', placeholder: 'Framework default' }, { name: '--ui-border', label: 'Borders', placeholder: 'Framework default' }]"
-              :key="entry.name"
-            >{{ entry.label }}<input
-              :value="draft.theme.cssVariables?.[mode]?.[entry.name] || ''"
-              :placeholder="entry.placeholder"
-              @change="token(entry.name, value($event))"
-            ><small>{{ origin(`theme.cssVariables.${mode}.${entry.name}`) }}</small></label>
-            <label>Button style<select
-              :value="componentVariant('button')"
-              @change="defaultVariant('button', value($event))"
-            ><option value="">Nuxt UI default</option><option
-              v-for="variant in ['solid', 'outline', 'soft', 'subtle', 'ghost', 'link']"
-              :key="variant"
-            >{{ variant }}</option></select></label>
-            <p
-              v-if="customComponents.length"
-              class="studio-help"
-            >
-              {{ customComponents.length }} component configurations are preserved. Custom slot and compound-variant rules can override these controls. Review the result in the preview.
-            </p>
-            <details>
-              <summary>
-                Preserved component configuration
-              </summary><pre class="studio-code">{{ JSON.stringify(draft.theme.ui, null, 2) }}</pre>
-            </details>
+            <p class="studio-help">Editing {{ mode }} mode. Empty fields use defaults.</p>
+            <UFormField v-for="entry in [{ name: '--ui-radius', label: 'Corner radius', placeholder: '0.25rem' }, { name: '--ui-bg', label: 'Page background', placeholder: 'Default' }, { name: '--ui-bg-elevated', label: 'Raised surface', placeholder: 'Default' }, { name: '--ui-text', label: 'Body text', placeholder: 'Default' }, { name: '--ui-border', label: 'Borders', placeholder: 'Default' }]" :key="entry.name" :label="entry.label">
+              <UInput :model-value="draft.theme.cssVariables?.[mode]?.[entry.name] || ''" :placeholder="entry.placeholder" class="w-full" @change="token(entry.name, value($event))" />
+            </UFormField>
+            <UFormField label="Button style"><USelect :model-value="componentVariant('button') || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...['solid', 'outline', 'soft', 'subtle', 'ghost', 'link'].map(value => ({ label: value, value }))]" class="w-full" @update:model-value="defaultVariant('button', $event === '__default' ? '' : String($event))" /></UFormField>
+            <UAccordion v-if="customComponents.length" :items="[{ label: 'Component overrides', value: 'overrides' }]"><template #body><p class="studio-help">Existing overrides can affect these settings.</p><pre class="studio-code">{{ JSON.stringify(draft.theme.ui, null, 2) }}</pre></template></UAccordion>
           </template>
         </div>
-        <div class="studio-inspector-footer">
-          Drafts stay in this browser. Export to update your source.
-        </div>
+        <p class="studio-inspector-footer">Export to apply changes to your project.</p>
       </aside>
     </div>
-
     <div class="studio-toolbar">
       <div class="studio-dock-settings">
-        <button v-for="item in ['identity', 'colors', 'type', 'details']" :key="item" class="studio-button" :aria-pressed="editing && panel === item" @click="panel = item; editing = true">
-          {{ item === 'identity' ? 'Brand' : item === 'type' ? 'Typography' : item === 'details' ? 'Appearance' : 'Palette' }}
-        </button>
+        <UButton v-for="item in ['identity', 'colors', 'type', 'details']" :key="item" color="neutral" :variant="editing && panel === item ? 'soft' : 'ghost'" :aria-pressed="editing && panel === item" @click="panel = item; editing = true">{{ item === 'identity' ? 'Brand' : item === 'type' ? 'Typography' : item === 'details' ? 'Appearance' : 'Palette' }}</UButton>
       </div>
       <div class="studio-toolbar-end">
-        <label class="studio-check"><input
-          v-model="compare"
-          type="checkbox"
-        >Compare original</label><label class="studio-check"><input
-          v-model="mobile"
-          type="checkbox"
-        >Mobile</label><label class="studio-select-label">State<select
-          v-model="state"
-          aria-label="Preview state"
-        ><option value="default">Default</option><option value="error">Validation error</option></select></label><div class="studio-segment">
-          <button
-            :aria-pressed="mode === 'light'"
-            @click="mode = 'light'"
-          >
-            Light
-          </button><button
-            :aria-pressed="mode === 'dark'"
-            @click="mode = 'dark'"
-          >
-            Dark
-          </button>
-        </div>
+        <UCheckbox v-model="compare" label="Compare original" size="sm" />
+        <UCheckbox v-model="mobile" label="Mobile" size="sm" />
+        <USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" size="sm" />
+        <UFieldGroup><UButton color="neutral" :variant="mode === 'light' ? 'soft' : 'ghost'" :aria-pressed="mode === 'light'" size="sm" @click="mode = 'light'">Light</UButton><UButton color="neutral" :variant="mode === 'dark' ? 'soft' : 'ghost'" :aria-pressed="mode === 'dark'" size="sm" @click="mode = 'dark'">Dark</UButton></UFieldGroup>
       </div>
     </div>
-
-    <UModal
-      :open="!!pending"
-      title="Replace this draft?"
-      description="Export your changes first if you want to keep them."
-      @update:open="pending = null"
-    >
-      <template #footer>
-        <UButton
-          color="neutral"
-          variant="outline"
-          @click="pending = null"
-        >
-          Keep editing
-        </UButton><UButton @click="acceptReplacement">
-          Replace draft
-        </UButton>
-      </template>
-    </UModal>
-    <UModal
-      v-model:open="exportOpen"
-      title="Review & export"
-      description="Your original project is never overwritten by the browser."
-      :ui="{ content: 'max-w-4xl' }"
-    >
+    <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
+    <UModal v-model:open="exportOpen" title="Export brand" :ui="{ content: 'max-w-4xl' }">
       <template #body>
-        <p class="mb-4 text-sm text-muted">
-          {{ changes.length }} changes. For an existing project, replace <code>{{ sourcePath }}</code> with the reviewed source and run its normal generation checks. A new project archive includes the Nuxt layer and a Studio playground.
-        </p><div class="studio-segment mb-4">
-          <button
-            v-for="item in ['source', 'changes', 'css']"
-            :key="item"
-            :aria-pressed="exportTab === item"
-            @click="exportTab = item"
-          >
-            {{ item }}
-          </button>
-        </div><pre class="studio-export-code">{{ output }}</pre><p class="mt-4 text-sm text-muted">
-          The preview uses compiled Nuxt UI components. Existing custom classes, fonts and brand primitives must also be available in the consuming project.
-        </p><p
-          v-if="error"
-          role="alert"
-          class="mt-4 text-sm text-error"
-        >
-          {{ error }}
-        </p>
+        <p class="mb-4 text-sm text-muted">{{ changes.length }} changes. To update your project, replace <code>{{ sourcePath }}</code> and run its generation checks.</p>
+        <div class="mb-4 flex gap-2"><UButton v-for="item in ['source', 'changes', 'css']" :key="item" color="neutral" :variant="exportTab === item ? 'soft' : 'ghost'" :aria-pressed="exportTab === item" @click="exportTab = item">{{ item === 'css' ? 'CSS' : item === 'source' ? 'Source' : 'Changes' }}</UButton></div>
+        <pre class="studio-export-code">{{ output }}</pre>
+        <p class="mt-4 text-sm text-muted">A new project includes a Nuxt brand layer and Studio. Custom fonts, Vue components and capabilities must be added separately.</p>
+        <p v-if="error" role="alert" class="mt-4 text-sm text-error">{{ error }}</p>
       </template>
-      <template #footer>
-        <UButton @click="download('brand.studio.json', JSON.stringify(draft, null, 2) + '\n')">
-          Download source
-        </UButton><UButton
-          color="neutral"
-          variant="outline"
-          :loading="busy"
-          @click="exportProject"
-        >
-          Download new project
-        </UButton><UButton
-          color="neutral"
-          variant="ghost"
-          @click="exportOpen = false"
-        >
-          Keep editing
-        </UButton>
-      </template>
+      <template #footer><UButton @click="download('brand.studio.json', JSON.stringify(draft, null, 2) + '\n')">Download source</UButton><UButton color="neutral" variant="outline" :loading="busy" @click="exportProject">Download new project</UButton></template>
     </UModal>
   </main>
 </template>
 
 <style>
 body.id-studio-page { margin: 0; overflow: hidden; }
-body.id-studio-page:has(.studio-shell[data-mode=dark]) { background: var(--ui-color-neutral-950); }
 </style>
 <style scoped>
-.studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: var(--ui-bg); color: var(--ui-text); font-family: var(--font-sans); }
-.studio-shell[data-mode=dark] { --ui-bg: var(--ui-color-neutral-950); --ui-bg-muted: var(--ui-color-neutral-900); --ui-bg-elevated: var(--ui-color-neutral-800); --ui-bg-inverted: var(--ui-color-neutral-50); --ui-text: var(--ui-color-neutral-200); --ui-text-muted: var(--ui-color-neutral-400); --ui-text-highlighted: var(--ui-color-neutral-50); --ui-text-inverted: var(--ui-color-neutral-950); --ui-border: var(--ui-color-neutral-800); color-scheme: dark; }
-.studio-header { flex: none; min-height: 62px; display: flex; align-items: center; gap: 18px; }
+.studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: var(--ui-bg); color: var(--ui-text); }
+.studio-header { flex: none; min-height: 62px; display: flex; align-items: center; gap: 16px; }
 .studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
-.studio-dot { color: var(--ui-primary); }.studio-product { margin-left: 10px; font-size: 12px; font-weight: 500; letter-spacing: -.01em; }
-.studio-brand-name { font-size: 12px; font-weight: 550; max-width: 190px; overflow: hidden; white-space: nowrap; }
-.studio-header > .studio-segment { margin: auto; }
+.studio-dot { color: var(--ui-primary); }.studio-product { margin-left: 10px; font-size: 12px; font-weight: 500; letter-spacing: normal; }
+.studio-brand-name { font-size: 12px; max-width: 160px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.studio-scenes { display: flex; align-items: center; gap: 4px; margin: auto; min-width: 0; }.studio-scenes > * { max-width: 155px; }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
-.studio-button { cursor: pointer; border: 1px solid var(--ui-border); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 550; background: var(--ui-bg); color: var(--ui-text-highlighted); white-space: nowrap; }
-.studio-button:hover, .studio-button[aria-pressed=true] { background: var(--ui-bg-elevated); }.studio-button.strong { background: var(--ui-bg-inverted); color: var(--ui-text-inverted); border-color: transparent; }.studio-button.small { padding: 5px 8px; font-size: 11px; }
-button:disabled { opacity: .4; cursor: not-allowed; }button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 3px; }
-.studio-toolbar { order: 3; flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-muted); }
-.studio-toolbar-end, .studio-dock-settings { display: flex; gap: 10px; align-items: center; }
-.studio-segment select { min-width: 0; max-width: 150px; border-radius: 6px; padding: 6px 8px; font-size: 12px; color: var(--ui-text-highlighted); background: var(--ui-bg); cursor: pointer; } .studio-segment { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--ui-border); border-radius: 9px; background: var(--ui-bg-muted); }.studio-segment button { cursor: pointer; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: var(--ui-text-muted); text-transform: capitalize; white-space: nowrap; }.studio-segment button[aria-pressed=true] { background: var(--ui-bg); color: var(--ui-text-highlighted); box-shadow: 0 1px 3px #0000000a; }
-.studio-check { display: flex; gap: 6px; align-items: center; font-size: 11px; white-space: nowrap; }.studio-check input { accent-color: var(--ui-primary); }.studio-select-label { display: flex; align-items: center; gap: 6px; font-size: 11px; }.studio-select-label select { max-width: 125px; background: var(--ui-bg); }
+.studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 16px; }
+.studio-toolbar-end, .studio-dock-settings { display: flex; gap: 8px; align-items: center; }
 .studio-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }
 .studio-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }.studio-comparing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.studio-frame-wrap { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; }.studio-frame-label { display: none; }.studio-comparing .studio-frame-label { display: flex; flex: none; justify-content: space-between; align-self: stretch; padding: 0 6px 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }.studio-frame-label span { font-weight: 400; text-transform: capitalize; color: var(--ui-text-muted); letter-spacing: 0; }
+.studio-frame-wrap { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; }.studio-frame-label { display: none; }.studio-comparing .studio-frame-label { display: flex; justify-content: space-between; align-self: stretch; padding: 0 6px 6px; font-size: 11px; }.studio-frame-label span { color: var(--ui-text-muted); }
 iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-bg); }iframe.studio-mobile { max-width: 390px; }
 .studio-inspector { display: flex; flex-direction: column; border: 1px solid var(--ui-border); border-radius: 16px; min-width: 0; min-height: 0; overflow: hidden; background: var(--ui-bg); }
-.studio-inspector-header { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 12px; font-size: 12px; font-weight: 600; }.studio-icon-button { font-size: 20px; cursor: pointer; width: 24px; }
-.studio-panel-tabs { display: flex; flex: none; border-top: 1px solid var(--ui-border); border-bottom: 1px solid var(--ui-border); padding: 0 12px; }.studio-panel-tabs button { flex: 1; padding: 12px 6px; font-size: 11px; text-transform: capitalize; cursor: pointer; border-bottom: 2px solid transparent; color: var(--ui-text-muted); }.studio-panel-tabs button[aria-pressed=true] { color: var(--ui-text-highlighted); border-bottom-color: var(--ui-primary); }
-.studio-fields { flex: 1; min-height: 0; padding: 18px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; overscroll-behavior: contain; }.studio-fields label { display: flex; flex-direction: column; gap: 7px; font-size: 11px; font-weight: 600; text-transform: capitalize; }.studio-fields input, .studio-fields select, .studio-fields textarea { width: 100%; min-width: 0; border: 1px solid var(--ui-border); padding: 8px 10px; border-radius: 6px; background: var(--ui-bg); color: var(--ui-text-highlighted); font-size: 12px; font-weight: 400; text-transform: none; }.studio-fields input:focus, .studio-fields select:focus, .studio-fields textarea:focus { outline: 2px solid var(--ui-primary); outline-offset: 1px; }.studio-fields small, .studio-help { font-size: 11px; line-height: 1.65; color: var(--ui-text-muted); font-weight: 400; text-transform: none; }.studio-fields h2 { font-size: 12px; font-weight: 600; margin-top: 8px; }.studio-inspector-footer { border-top: 1px solid var(--ui-border); padding: 15px 18px; font-size: 10px; color: var(--ui-text-muted); line-height: 1.6; }.studio-palette summary { cursor: pointer; font-size: 12px; padding: 8px 0; }.studio-swatches { display: flex; margin-top: 8px; border-radius: 5px; overflow: hidden; }.studio-swatches i { flex: 1; height: 18px; }.studio-palette label { margin: 10px 0; }.studio-assets { display: flex; flex-direction: column; gap: 8px; }.studio-assets div { display: flex; flex-direction: column; gap: 3px; font-size: 11px; }.studio-code { font-size: 10px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { padding: 12px 28px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12px; background: var(--ui-bg-elevated); border-bottom: 1px solid var(--ui-border); }.studio-notice.error { color: var(--ui-error); }.studio-export-code { max-height: 45vh; overflow: auto; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); border: 1px solid var(--ui-border); font-size: 11px; }
-.studio-notice { flex: none; max-height: 100px; overflow: auto; border-radius: 10px; }
-.studio-inspector-footer { flex: none; }
-@media (max-width: 1100px) { .studio-product { display: none; }.studio-brand-name { max-width: 100px; font-size: 11px; }.studio-toolbar { flex-wrap: wrap; padding: 8px 12px; gap: 6px; }.studio-toolbar .studio-button { padding: 6px 10px; }.studio-workspace { grid-template-columns: minmax(0, 1fr) 280px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); } }
+.studio-inspector-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--ui-border); }
+.studio-fields { flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; overscroll-behavior: contain; }
+.studio-help { font-size: 12px; line-height: 1.6; color: var(--ui-text-muted); }.studio-inspector-footer { border-top: 1px solid var(--ui-border); padding: 12px 16px; font-size: 11px; color: var(--ui-text-muted); }
+.studio-code { font-size: 11px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { flex: none; max-height: 100px; overflow: auto; display: flex; gap: 12px; align-items: center; padding: 8px 12px; font-size: 13px; }
+.studio-export-code { max-height: 45vh; overflow: auto; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); font-size: 12px; }
+@media (max-width: 1100px) { .studio-product, .studio-brand-name { display: none; }.studio-toolbar { flex-wrap: wrap; }.studio-workspace { grid-template-columns: minmax(0, 1fr) 280px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) {
-.studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 0; padding-top: 8px; gap: 8px; flex-wrap: wrap; }.studio-header > .studio-segment { order: 3; width: 100%; justify-content: center; }.studio-header > .studio-actions { margin-left: auto; }.studio-brand-name { display: none; }.studio-button { padding: 7px 9px; font-size: 11px; }
-.studio-workspace { position: relative; display: flex; }.studio-canvas { flex: 1; }.studio-inspector { position: absolute; z-index: 2; inset: 0 0 0 auto; width: min(320px, 100%); box-shadow: -12px 0 36px #0002; }
-.studio-toolbar { gap: 8px; padding: 8px; }.studio-dock-settings { width: 100%; gap: 6px; }.studio-dock-settings button { flex: 1; }.studio-toolbar-end { width: 100%; gap: 8px; flex-wrap: wrap; justify-content: space-between; }.studio-select-label { gap: 3px; }.studio-select-label select { max-width: 78px; }.studio-segment button { padding: 5px 8px; font-size: 11px; }
-.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 0; padding-top: 8px; gap: 8px; flex-wrap: wrap; }.studio-scenes { order: 3; width: 100%; justify-content: center; }.studio-scenes > * { max-width: 135px; }.studio-header > .studio-actions { margin-left: auto; }
+  .studio-workspace { position: relative; display: flex; }.studio-canvas { flex: 1; }.studio-inspector { position: absolute; z-index: 2; inset: 0 0 0 auto; width: min(320px, 100%); box-shadow: -12px 0 36px #0002; }
+  .studio-dock-settings { width: 100%; }.studio-dock-settings > * { flex: 1; justify-content: center; }.studio-toolbar-end { width: 100%; flex-wrap: wrap; justify-content: space-between; }.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 defineProps<{ state: string }>()
 const email = ref('')
 const notifications = ref(true)
@@ -17,18 +17,22 @@ const selected = ref('Alex Morgan')
 const task = ref(false)
 const attached = ref(false)
 const submitted = ref(false)
-const message = ref('')
+const feedback = reactive({ title: '', category: 'Design', priority: 'Normal', message: '' })
+const validateFeedback = (state: typeof feedback) => [
+  ...(!state.title.trim() ? [{ name: 'title', message: 'Enter a title.' }] : []),
+  ...(state.message.trim().length < 10 ? [{ name: 'message', message: 'Describe the issue in at least 10 characters.' }] : [])
+]
 const pin = ref(['4', '3', '2', '', '', ''])
 const users = ['Alex Morgan', 'Sam Taylor', 'Jamie Chen']
 const card = { body: 'p-4 sm:p-5' }
 </script>
 
 <template>
-  <section class="component-gallery" aria-label="Interactive component examples">
-    <h1 class="sr-only">One brand. Every detail.</h1>
+  <UPageColumns as="section" class="component-gallery" aria-label="Interactive component examples">
+    <h1 class="sr-only">Component examples</h1>
     <div class="gallery-column">
       <UCard :ui="card" class="example-card">
-        <UFormField label="Email address" required :error="state === 'error' ? 'Enter a valid email address.' : undefined" help="We’ll only send you the essentials.">
+        <UFormField label="Email address" required :error="state === 'error' ? 'Enter a valid email address.' : undefined" help="Use your work email.">
           <UInput v-model="email" icon="i-lucide-mail" placeholder="you@example.com" class="w-full" />
         </UFormField>
         <UFormField label="Search" class="mt-5">
@@ -36,7 +40,7 @@ const card = { body: 'p-4 sm:p-5' }
         </UFormField>
       </UCard>
       <UCard :ui="card" class="example-card">
-        <h2>Recent activity</h2><p class="card-description">The little steps that move work forward.</p>
+        <h2>Recent activity</h2>
         <div class="mt-5 divide-y divide-default">
           <div v-for="(item, index) in [{ name: 'Brand library', detail: 'Published a new version', icon: 'i-lucide-library', time: '2m' }, { name: 'Website refresh', detail: 'Ready for your review', icon: 'i-lucide-panels-top-left', time: '18m' }, { name: 'Product launch', detail: 'Added three new assets', icon: 'i-lucide-sparkles', time: '1h' }, { name: 'Team workspace', detail: 'Jamie joined the team', icon: 'i-lucide-users', time: '2h' }]" :key="item.name" class="flex items-center gap-3 py-3" :class="{ 'pt-0': index === 0 }">
             <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-elevated"><UIcon :name="item.icon" class="size-4 text-muted" /></span>
@@ -46,12 +50,12 @@ const card = { body: 'p-4 sm:p-5' }
       </UCard>
       <UCard :ui="card" class="example-card text-center">
         <UIcon name="i-lucide-shield-check" class="mx-auto mb-3 size-7 text-highlighted" />
-        <h2>One more step</h2><p class="card-description">Enter the code sent to your email.</p>
+        <h2>Verify your email</h2><p class="card-description">Enter the code sent to your email.</p>
         <UPinInput v-model="pin" :length="6" aria-label="Verification code" class="mt-5 justify-center" :ui="{ base: 'w-8' }" />
-        <p class="mt-4 text-xs text-muted">Need a new code? <UButton size="xs" variant="link" @click="pin = ['', '', '', '', '', '']">Try again</UButton></p>
+        <p class="mt-4 text-xs text-muted">Need a new code? <UButton size="xs" variant="link" @click="pin = ['', '', '', '', '', '']">Resend code</UButton></p>
       </UCard>
       <UCard :ui="card" class="example-card">
-        <h2>Your milestones</h2><p class="card-description">Good things take shape, step by step.</p>
+        <h2>Your milestones</h2>
         <div v-for="goal in [{ name: 'Design system', value: 80, count: '24 / 30' }, { name: 'Website launch', value: 45, count: '9 / 20' }]" :key="goal.name" class="mt-5">
           <div class="mb-2 flex justify-between text-xs text-muted"><span>{{ goal.name }}</span><span>{{ goal.value }}%</span></div><p class="mb-3 text-2xl font-semibold text-highlighted">{{ goal.count }}<span class="ml-2 text-xs font-normal text-muted">tasks</span></p><UProgress :model-value="goal.value" :aria-label="goal.name" size="sm" />
         </div>
@@ -60,7 +64,7 @@ const card = { body: 'p-4 sm:p-5' }
 
     <div class="gallery-column">
       <UCard :ui="card" class="example-card">
-        <h2>Your workspace</h2><p class="card-description">People and actions, one search away.</p>
+        <h2>Your workspace</h2>
         <div class="mt-4 space-y-1">
           <button v-for="user in users.filter(user => user.toLowerCase().includes(search.toLowerCase()))" :key="user" class="flex w-full items-center gap-3 rounded-md p-2 text-left hover:bg-elevated" :class="{ 'bg-elevated': selected === user }" @click="selected = user">
             <UAvatar :alt="user" size="sm" /><span class="flex-1 text-sm text-highlighted">{{ user }}</span><UIcon v-if="selected === user" name="i-lucide-check" class="size-4 text-primary" />
@@ -72,7 +76,7 @@ const card = { body: 'p-4 sm:p-5' }
         <UButton color="neutral" variant="ghost" icon="i-lucide-user-plus" block class="justify-start" @click="invited = !invited">{{ invited ? 'Invite ready to share' : 'Invite someone' }}</UButton>
       </UCard>
       <UCard :ui="card" class="example-card">
-        <h2>Plan your next move</h2><p class="card-description">A little clarity goes a long way.</p>
+        <h2>Project budget</h2>
         <div class="mt-5 space-y-4">
           <UFormField label="Project budget"><UInputNumber v-model="amount" :min="0" :step="100" :format-options="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }" class="w-full" /></UFormField>
           <UFormField label="Workspace"><USelect :items="['Design team', 'Marketing', 'Product']" default-value="Design team" class="w-full" /></UFormField>
@@ -82,12 +86,12 @@ const card = { body: 'p-4 sm:p-5' }
         </div>
       </UCard>
       <UCard :ui="card" class="example-card">
-        <div class="flex items-start justify-between gap-3"><div><p class="text-sm text-muted">Team momentum</p><p class="mt-1 text-3xl font-semibold text-highlighted">92<span class="text-lg text-muted">%</span></p></div><UBadge color="success" variant="subtle" size="sm">+12%</UBadge></div>
-        <div class="my-4 flex justify-between text-xs text-muted"><span>This week’s goal</span><span>Almost there</span></div><UProgress :model-value="92" aria-label="Team momentum" />
-        <USeparator class="my-4" /><div class="flex items-center justify-between"><UAvatarGroup><UAvatar v-for="user in users" :key="user" :alt="user" size="sm" /></UAvatarGroup><span class="text-xs text-muted">Together, it adds up.</span></div>
+        <div class="flex items-start justify-between gap-3"><div><p class="text-sm text-muted">Tasks completed</p><p class="mt-1 text-3xl font-semibold text-highlighted">92<span class="text-lg text-muted">%</span></p></div><UBadge color="success" variant="subtle" size="sm">+12%</UBadge></div>
+        <div class="my-4 flex justify-between text-xs text-muted"><span>This week’s goal</span><span>Almost there</span></div><UProgress :model-value="92" aria-label="Tasks completed" />
+        <USeparator class="my-4" /><div class="flex items-center justify-between"><UAvatarGroup><UAvatar v-for="user in users" :key="user" :alt="user" size="sm" /></UAvatarGroup><span class="text-xs text-muted">3 contributors</span></div>
       </UCard>
       <UCard :ui="card" class="example-card">
-        <h2>A clear next step</h2><p class="card-description">Every action has its place.</p>
+        <h2>Actions</h2>
         <div class="mt-4 flex flex-wrap gap-2"><UButton @click="saved = !saved">{{ saved ? 'Changes saved' : 'Save changes' }}</UButton><UButton color="neutral" variant="outline" @click="open = true">Preview dialog</UButton><UButton disabled>Unavailable</UButton></div>
         <div class="mt-4 flex flex-wrap gap-2"><UBadge>New</UBadge><UBadge color="success" variant="subtle">Approved</UBadge><UBadge color="warning" variant="subtle">In review</UBadge></div>
       </UCard>
@@ -98,27 +102,27 @@ const card = { body: 'p-4 sm:p-5' }
         <h2 class="sr-only">Choose a date</h2><UCalendar aria-label="Choose a date" class="w-full" />
       </UCard>
       <UCard :ui="card" class="example-card">
-        <h2>Invite your team</h2><p class="card-description">Make room for another perspective.</p>
+        <h2>Invite your team</h2>
         <div class="mt-5 space-y-3">
           <div v-for="(user, index) in ['alex@example.com', 'sam@example.com']" :key="user" class="flex gap-2"><UInput :default-value="user" :aria-label="'Teammate ' + (index + 1)" class="min-w-0 flex-1" /><USelect :items="['Editor', 'Viewer']" :default-value="index ? 'Viewer' : 'Editor'" :aria-label="'Role for teammate ' + (index + 1)" class="w-24" /></div>
-        </div><USeparator label="Your shared workspace" class="my-5" /><div class="flex items-center gap-3"><UAvatar alt="Design team" icon="i-lucide-users" /><p class="flex-1 text-sm text-muted">Better work, together.</p><UButton @click="invited = !invited">{{ invited ? 'Invited' : 'Send invites' }}</UButton></div>
+        </div><USeparator label="Design team" class="my-5" /><div class="flex items-center gap-3"><UAvatar alt="Design team" icon="i-lucide-users" /><p class="flex-1 text-sm text-muted">2 pending invitations</p><UButton @click="invited = !invited">{{ invited ? 'Invited' : 'Send invites' }}</UButton></div>
       </UCard>
       <UCard :ui="card" class="example-card">
-        <h2>Share feedback</h2><p class="card-description">Help make the next version better.</p>
-        <form class="mt-5 space-y-4" @submit.prevent="submitted = true">
-          <UFormField label="Title"><UInput placeholder="What could be better?" class="w-full" required /></UFormField>
+        <h2>Share feedback</h2>
+        <UForm :state="feedback" :validate="validateFeedback" :validate-on="[]" class="mt-5 space-y-4" @submit="submitted = true">
+          <UFormField name="title" label="Title" required><UInput v-model="feedback.title" placeholder="Brief summary" class="w-full" /></UFormField>
           <div class="grid grid-cols-2 gap-3"><UFormField label="Category"><USelect :items="['Design', 'Content', 'Interaction']" default-value="Design" class="w-full" /></UFormField><UFormField label="Priority"><USelect :items="['Normal', 'High', 'Low']" default-value="Normal" class="w-full" /></UFormField></div>
-          <UFormField label="A little more detail"><UTextarea v-model="message" placeholder="Tell us what you have in mind…" :rows="3" class="w-full" /></UFormField>
+          <UFormField name="message" label="Description" required><UTextarea v-model="feedback.message" placeholder="What happened, and what did you expect?" :rows="3" class="w-full" /></UFormField>
           <div class="flex items-center justify-between gap-2"><UButton icon="i-lucide-paperclip" color="neutral" variant="ghost" size="sm" @click="attached = !attached">{{ attached ? 'Example attached' : 'Add example' }}</UButton><UButton type="submit">Send feedback</UButton></div>
-          <p v-if="submitted" role="status" class="text-sm text-success">Thanks. Your example feedback is ready.</p>
-        </form>
+          <p v-if="submitted" role="status" class="text-sm text-success">Feedback validated. Nothing was sent.</p>
+        </UForm>
       </UCard>
-      <UCard :ui="card" class="example-card"><h2>Today’s focus</h2><p class="card-description">Keep the next step small.</p><UCheckbox v-model="task" label="Review the new brand direction" class="mt-5" /><UCheckbox label="Share the first draft with the team" class="mt-4" /><UCheckbox label="Make time for a fresh perspective" class="mt-4" /></UCard>
+      <UCard :ui="card" class="example-card"><h2>Today’s focus</h2><UCheckbox v-model="task" label="Review the new brand direction" class="mt-5" /><UCheckbox label="Share the first draft with the team" class="mt-4" /><UCheckbox label="Check keyboard navigation" class="mt-4" /></UCard>
     </div>
 
     <div class="gallery-column">
       <UCard :ui="card" class="example-card">
-        <h2>Stay in the loop</h2><p class="card-description">A quieter inbox, on your terms.</p>
+        <h2>Notifications</h2>
         <div class="my-5 space-y-5"><USwitch v-model="notifications" label="Project updates" description="Reviews, milestones and next steps." /><USwitch v-model="security" label="Security alerts" description="Account activity worth knowing about." /><USwitch v-model="marketing" label="News and inspiration" description="Fresh ideas, every now and then." /></div>
         <UButton color="neutral" @click="preferencesSaved = !preferencesSaved">{{ preferencesSaved ? 'Preferences saved' : 'Save preferences' }}</UButton>
       </UCard>
@@ -129,15 +133,15 @@ const card = { body: 'p-4 sm:p-5' }
         </div>
       </UCard>
       <UCard :ui="card" class="example-card">
-        <h2>Room to grow</h2><p class="card-description">Your next milestone is getting closer.</p>
+        <h2>Quarterly goal</h2>
         <div class="goal-ring mx-auto my-6 flex size-32 items-center justify-center rounded-full" role="img" aria-label="80 percent of the quarterly goal achieved"><div class="flex size-26 flex-col items-center justify-center rounded-full bg-default"><span class="text-2xl font-semibold text-highlighted">80%</span><span class="text-xs text-muted">of the way there</span></div></div>
         <div class="flex justify-between text-xs"><span class="text-muted">Next milestone</span><span class="text-highlighted">End of quarter</span></div>
       </UCard>
-      <UCard :ui="card" class="example-card text-center"><UIcon name="i-lucide-sparkles" class="mx-auto mb-3 size-7 text-primary" /><h2>Something good is next.</h2><p class="card-description">A monthly note on design and better work.</p><UButton class="mt-5" color="neutral" @click="subscribed = !subscribed">{{ subscribed ? 'You’re on the list' : 'Count me in' }}</UButton></UCard>
+      <UCard :ui="card" class="example-card text-center"><UIcon name="i-lucide-sparkles" class="mx-auto mb-3 size-7 text-primary" /><h2>Design newsletter</h2><p class="card-description">One email per month.</p><UButton class="mt-5" color="neutral" @click="subscribed = !subscribed">{{ subscribed ? 'You’re on the list' : 'Subscribe' }}</UButton></UCard>
       <UAlert :color="state === 'error' ? 'error' : 'success'" variant="subtle" :title="state === 'error' ? 'Changes need attention' : 'Everything is up to date'" description="Your latest work is ready to share." />
     </div>
-    <UModal v-model:open="open" title="Review your changes" description="This dialog uses the same brand as the page."><template #body><p class="text-sm text-muted">Check the action hierarchy, focus ring and overlay surface.</p></template><template #footer><UButton @click="open = false">Done</UButton><UButton color="neutral" variant="outline" @click="open = false">Cancel</UButton></template></UModal>
-  </section>
+    <UModal v-model:open="open" title="Review your changes" description="Save the updated project settings?"><template #body><p class="text-sm text-muted">The new settings will apply to this project.</p></template><template #footer><UButton @click="open = false">Done</UButton><UButton color="neutral" variant="outline" @click="open = false">Cancel</UButton></template></UModal>
+  </UPageColumns>
 </template>
 
 <style scoped>

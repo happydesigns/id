@@ -7,6 +7,7 @@ const props = defineProps<{ document: StudioDocument, scene: StudioScene, state:
 
 const open = ref(false)
 const saved = ref(false)
+const projectName = ref('')
 const logo = computed(() => {
   const logos = props.document.brand.assets?.logos
   return (props.mode === 'dark' ? logos?.wordmarkInverse : undefined) ?? logos?.wordmark ?? logos?.logo
@@ -28,76 +29,26 @@ const logo = computed(() => {
           class="text-lg font-semibold text-highlighted"
         >{{ document.theme.label }}</span>
       </div>
-      <UBadge
-        color="neutral"
-        variant="subtle"
-      >
-        {{ scene === 'landing' ? 'Landing page' : 'Documentation' }}
-      </UBadge>
     </header>
 
     <IdStudioComponents v-if="scene === 'components'" :state="state" />
     <template v-else-if="scene === 'landing'">
-      <section class="py-10 sm:py-20">
-        <UBadge variant="subtle">
-          A fresh perspective
-        </UBadge>
-        <h1 class="mt-6 max-w-2xl text-4xl font-semibold leading-tight tracking-tight text-highlighted sm:text-6xl">
-          Good work starts<br>with a clear idea.
-        </h1>
-        <p class="mt-6 max-w-lg text-lg leading-8 text-muted">
-          {{ document.brand.claim || 'Bring your team, ideas and next steps together in one thoughtful workspace.' }}
-        </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <UButton
-            size="lg"
-            @click="saved = !saved"
-          >
-            {{ saved ? 'You’re on the list' : 'Get started' }}
-          </UButton><UButton
-            size="lg"
-            color="neutral"
-            variant="outline"
-            @click="open = !open"
-          >
-            Explore the details
-          </UButton>
-        </div>
-        <p
-          v-if="open"
-          class="mt-5 text-sm text-muted"
-        >
-          A considered experience, from your first idea to the finished result.
-        </p>
-      </section>
-      <div class="grid gap-5 sm:grid-cols-3">
-        <UCard
-          v-for="(title, index) in ['Find your focus', 'Make it yours', 'Move together']"
-          :key="title"
-        >
-          <p class="mb-8 font-mono text-sm text-primary">
-            0{{ index + 1 }}
-          </p><h2 class="text-lg font-semibold text-highlighted">
-            {{ title }}
-          </h2><p class="mt-3 text-sm leading-6 text-muted">
-            Simple tools and thoughtful details give your best work room to grow.
-          </p>
-        </UCard>
-      </div>
-      <section class="my-10 rounded-lg border border-default bg-muted px-6 py-10 sm:px-10">
-        <p class="text-xs uppercase tracking-widest text-muted">
-          Designed around you
-        </p><h2 class="mt-3 text-3xl font-semibold text-highlighted">
-          Less friction. More possibility.
-        </h2><p class="mt-4 max-w-lg leading-7 text-muted">
-          A consistent identity connects the big moments with the smallest interactions.
-        </p><UButton
-          class="mt-6"
-          @click="saved = !saved"
-        >
-          {{ saved ? 'Thank you' : 'Start a conversation' }}
-        </UButton>
-      </section>
+      <UPageHero title="Your projects, in one place" :description="document.brand.claim || 'Organize tasks, share files and track deadlines with your team.'" :ui="{ container: 'py-10 sm:py-16 lg:py-20' }">
+        <template #links>
+          <UButton size="lg" @click="open = true">Create a project</UButton>
+          <UButton size="lg" color="neutral" variant="outline" to="#features">View features</UButton>
+        </template>
+      </UPageHero>
+      <UPageSection id="features" title="Project tools" :ui="{ container: 'py-10 sm:py-12 lg:py-12', title: 'text-2xl sm:text-3xl lg:text-3xl' }">
+        <UPageGrid>
+          <UPageCard v-for="item in [{ title: 'Tasks', description: 'Assign owners and due dates. Filter by status to find unfinished work.', icon: 'i-lucide-list-checks' }, { title: 'Files', description: 'Keep briefs, designs and exports alongside the project.', icon: 'i-lucide-folder' }, { title: 'Activity', description: 'Review recent updates and decisions from your team.', icon: 'i-lucide-history' }]" :key="item.title" :title="item.title" :description="item.description" :icon="item.icon" />
+        </UPageGrid>
+      </UPageSection>
+      <UModal v-model:open="open" title="Create a project" description="Choose a name for your project.">
+        <template #body><UFormField label="Project name"><UInput v-model="projectName" placeholder="Website redesign" class="w-full" /></UFormField></template>
+        <template #footer><UButton :disabled="!projectName.trim()" @click="saved = true; open = false">Create project</UButton><UButton color="neutral" variant="outline" @click="open = false">Cancel</UButton></template>
+      </UModal>
+      <UAlert v-if="saved" color="success" title="Project created" :description="projectName" class="mb-8" />
     </template>
 
     <template v-else>
@@ -126,18 +77,18 @@ const logo = computed(() => {
             id="overview"
             class="mt-4 text-4xl font-semibold tracking-tight text-highlighted"
           >
-            A shared language
+            Use your brand
           </h1><p class="mt-5 text-lg leading-8 text-muted">
-            Make your identity easy to understand and consistent to use.
+            Install the brand layer and use its colors and typography in your application.
           </p>
           <USeparator class="my-8" />
           <h2
             id="principles"
             class="text-2xl font-semibold text-highlighted"
           >
-            Start with the essentials
+            Theme tokens
           </h2><p class="my-4 leading-7">
-            Colors, typography and a clear hierarchy create a familiar experience. Keep the meaning of your brand close to its source.
+            Use semantic tokens for text, backgrounds and borders. They follow the active brand and color mode.
           </p>
           <UAlert
             color="info"
@@ -161,7 +112,7 @@ const logo = computed(() => {
       </div>
     </template>
     <footer v-if="scene !== 'components'" class="mt-10 flex flex-wrap justify-between gap-3 border-t border-default pt-5 text-xs text-muted">
-      <span>{{ document.theme.label }} · Nuxt UI</span><span>Same content. Your identity.</span>
+      <span>{{ document.theme.label }}</span>
     </footer>
   </div>
 </template>

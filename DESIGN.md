@@ -68,3 +68,14 @@ The Studio is a viewport-sized workspace: its header and dock remain visible, an
 
 Visual acceptance includes desktop, short landscape windows and mobile, plus original/draft comparison. Verify actual scroll ownership, horizontal overflow, reachable controls and the proportion of space available to the preview. Functional tests alone do not establish visual quality. The integration checks in the brand repository exercise these constraints against a real consuming application.
 Reference: the Nuxt UI [Studio shell](https://github.com/nuxt/ui/blob/v4/docs/app/pages/theme.vue) and [component playground](https://github.com/nuxt/ui/blob/v4/docs/app/components/playground/Playground.vue) demonstrate the viewport and content-sized gallery patterns. Studio keeps its own brand-document editing and isolated comparison model.
+
+Preview copy should describe a concrete task, object or result. Avoid decorative
+slogans, repeated instructions and invented social proof. Keep field labels,
+validation messages and information needed to make a choice. Show controls only
+where the selected scene implements them.
+
+Use Nuxt UI controls and page components for their intended roles. Keep custom
+CSS focused on the Studio viewport and preview layout. The editor uses the host
+identity; draft changes apply inside the isolated preview, so editing the brand
+cannot make its own controls unusable. Example forms should exercise validation
+and local outcomes without implying that data was sent to a real service.
