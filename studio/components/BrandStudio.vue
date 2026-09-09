@@ -200,8 +200,8 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
 <template>
   <main class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
-      <a :href="config.idStudio?.home || '/'" class="studio-wordmark">id<span class="studio-dot">.</span><span class="studio-product">Brand Studio</span></a>
-      <h1 class="studio-brand-name">{{ draft.theme.label }}</h1>
+      <a :href="config.idStudio?.home || '/'" class="studio-wordmark" aria-label="id Studio home">id<span class="studio-dot">.</span></a>
+      <h1 class="sr-only">{{ draft.theme.label }}</h1>
       <div class="studio-scenes" aria-label="Preview scene">
         <UButton color="neutral" :variant="scene === 'components' ? 'soft' : 'ghost'" :aria-pressed="scene === 'components'" @click="scene = 'components'">Components</UButton>
         <USelect aria-label="Template" placeholder="Templates" :ui="{ placeholder: 'text-muted' }" :model-value="scene === 'components' ? undefined : scene" :items="templates.map(item => ({ label: item.label, value: item.id }))" @update:model-value="scene = String($event)" />
@@ -315,8 +315,8 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: var(--ui-bg); color: var(--ui-text); }
 .studio-header { flex: none; min-height: 62px; display: flex; align-items: center; gap: 16px; }
 .studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
-.studio-dot { color: var(--ui-primary); }.studio-product { margin-left: 10px; font-size: 12px; font-weight: 500; letter-spacing: normal; }
-.studio-brand-name { font-size: 12px; max-width: 160px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.studio-dot { color: var(--ui-primary); }
+
 .studio-scenes { display: flex; align-items: center; gap: 4px; margin: auto; min-width: 0; }.studio-scenes > * { max-width: 155px; }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
 .studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 16px; }
@@ -331,7 +331,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 1px solid 
 .studio-help { font-size: 12px; line-height: 1.6; color: var(--ui-text-muted); }.studio-inspector-footer { border-top: 1px solid var(--ui-border); padding: 12px 16px; font-size: 11px; color: var(--ui-text-muted); }
 .studio-code { font-size: 11px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { flex: none; max-height: 100px; overflow: auto; display: flex; gap: 12px; align-items: center; padding: 8px 12px; font-size: 13px; }
 .studio-export-code { max-height: 45vh; overflow: auto; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); font-size: 12px; }
-@media (max-width: 1100px) { .studio-product, .studio-brand-name { display: none; }.studio-toolbar { flex-wrap: wrap; }.studio-workspace { grid-template-columns: minmax(0, 1fr) 280px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1100px) { .studio-toolbar { flex-wrap: wrap; }.studio-workspace { grid-template-columns: minmax(0, 1fr) 280px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) {
   .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 0; padding-top: 8px; gap: 8px; flex-wrap: wrap; }.studio-scenes { order: 3; width: 100%; justify-content: center; }.studio-scenes > * { max-width: 135px; }.studio-header > .studio-actions { margin-left: auto; }
   .studio-workspace { position: relative; display: flex; }.studio-canvas { flex: 1; }.studio-inspector { position: absolute; z-index: 2; inset: 0 0 0 auto; width: min(320px, 100%); box-shadow: -12px 0 36px #0002; }
