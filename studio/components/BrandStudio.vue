@@ -203,15 +203,21 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <a :href="config.idStudio?.home || '/'" class="studio-wordmark" aria-label="id Studio home">id<span class="studio-dot">.</span></a>
       <h1 class="sr-only">{{ draft.theme.label }}</h1>
       <div class="studio-scenes" aria-label="Preview scene">
-        <UButton color="neutral" :variant="scene === 'components' ? 'soft' : 'ghost'" :aria-pressed="scene === 'components'" @click="scene = 'components'">Components</UButton>
-        <USelect aria-label="Template" placeholder="Templates" :ui="{ placeholder: 'text-muted' }" :model-value="scene === 'components' ? undefined : scene" :items="templates.map(item => ({ label: item.label, value: item.id }))" @update:model-value="scene = String($event)" />
+        <USelect v-model="scene" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
         <USelect v-if="selectedTemplate && selectedTemplate.pages.length > 1" v-model="templatePage" aria-label="Template page" :items="selectedTemplate.pages.map(item => ({ label: item.label, value: item.id }))" />
       </div>
-      <div class="studio-actions">
+      <div class="studio-actions studio-project-actions">
         <UButton color="neutral" variant="outline" @click="guard(() => replace(createBlankStudioDocument()))">New brand</UButton>
         <UButton color="neutral" variant="outline" @click="input?.click()">Open brand</UButton>
-        <UButton color="neutral" @click="exportOpen = true">Export</UButton>
+        <UButton color="neutral" variant="ghost" @click="exportOpen = true">Export</UButton>
       </div>
+      <UDropdownMenu
+class="studio-project-menu" :content="{ align: 'end' }" :items="[
+        [{ label: 'New brand', icon: 'i-lucide-plus', onSelect: () => guard(() => replace(createBlankStudioDocument())) }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input?.click() }],
+        [{ label: 'Export', icon: 'i-lucide-download', onSelect: () => { exportOpen = true } }]
+      ]">
+        <UButton icon="i-lucide-ellipsis" aria-label="Project actions" color="neutral" variant="ghost" class="size-10 justify-center" />
+      </UDropdownMenu>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
     <div v-if="recovery" class="studio-notice" role="status">
@@ -318,6 +324,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-dot { color: var(--ui-primary); }
 
 .studio-scenes { display: flex; align-items: center; gap: 4px; margin: auto; min-width: 0; }.studio-scenes > * { max-width: 155px; }
+.studio-project-menu { display: none; }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
 .studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 16px; }
 .studio-toolbar-end, .studio-dock-settings { display: flex; gap: 8px; align-items: center; }
@@ -333,7 +340,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 1px solid 
 .studio-export-code { max-height: 45vh; overflow: auto; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); font-size: 12px; }
 @media (max-width: 1100px) { .studio-toolbar { flex-wrap: wrap; }.studio-workspace { grid-template-columns: minmax(0, 1fr) 280px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) {
-  .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 0; padding-top: 8px; gap: 8px; flex-wrap: wrap; }.studio-scenes { order: 3; width: 100%; justify-content: center; }.studio-scenes > * { max-width: 135px; }.studio-header > .studio-actions { margin-left: auto; }
+  .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 48px; gap: 8px; }.studio-wordmark { font-size: 26px; }.studio-scenes { flex: 1; justify-content: center; gap: 4px; }.studio-scenes > * { min-width: 0; max-width: 130px; }.studio-project-actions { display: none; }.studio-project-menu { display: inline-flex; flex: none; }
   .studio-workspace { position: relative; display: flex; }.studio-canvas { flex: 1; }.studio-inspector { position: absolute; z-index: 2; inset: 0 0 0 auto; width: min(320px, 100%); box-shadow: -12px 0 36px #0002; }
   .studio-dock-settings { width: 100%; }.studio-dock-settings > * { flex: 1; justify-content: center; }.studio-toolbar-end { width: 100%; flex-wrap: wrap; justify-content: space-between; }.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 }
