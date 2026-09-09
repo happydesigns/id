@@ -108,3 +108,43 @@ pnpm docs:build
 ## Scope
 
 `id` owns reusable identity contracts and application mechanics. It does not own a specific brand expression, product domain behavior, authorization, storage, API contracts, runtime credentials, or customer-specific copy.
+
+### Capability-owned Studio templates
+
+The Studio supports an optional host catalog in `appConfig.idStudio.templates`.
+Capabilities keep their name and runtime ownership; **Templates** is the Studio's
+presentation of complete example applications. Landing and Docs work without any
+capability packages.
+
+A capability may publish an opt-in Nuxt layer that registers an async global
+component, its fixtures and this catalog entry:
+
+```ts
+export default defineAppConfig({
+  idStudio: {
+    templates: {
+      academy: {
+        label: 'Academy',
+        description: 'A complete learning scenario.',
+        owner: '@happydesigns/course-nuxt',
+        component: 'CourseAcademyPreview',
+        pages: [{ id: 'home', label: 'Home' }, { id: 'lesson', label: 'Lesson' }]
+      }
+    }
+  }
+})
+```
+
+The component receives `document` (the validated brand), `mode` and `page`, and
+emits `navigate(pageId)` for an internal page change. The host validates IDs against
+its catalog and synchronizes page selection between isolated original/draft frames.
+The component must use semantic theme tokens, keep demo data and progress local,
+and expose no real service mutations. Register it globally with Nuxt's async
+component registration so its implementation loads only when selected.
+
+Catalog configuration is trusted application code, never executable data from an
+imported brand document. Templates are previews: selecting one does not install a
+capability into the exported brand project. Add a capability explicitly when building
+that application. The Studio has no dependency on Course or another capability.
+The capability playground should consume the exact same component and fixtures;
+maintain one scenario, not separate Studio and playground implementations.

@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { createBlankStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioScenes, studioBuiltinPalettes } from '../../src/studio'
-import type { StudioDocument, StudioScene } from '../../src/studio'
+import { createBlankStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
+import { studioTemplates } from '../templates'
+import type { StudioDocument } from '../../src/studio'
 
 useHead({ bodyAttrs: { class: 'id-studio-page' } })
 const route = useRoute()
-const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, sourcePath?: string, home?: string } }
+const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, sourcePath?: string, home?: string, templates?: unknown } }
 const seed = config.idStudio?.document ? parseStudioDocument(config.idStudio.document) : createBlankStudioDocument()
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value))
 const baseline = ref(clone(seed))
 const draft = ref(clone(seed))
-const scene = ref<StudioScene>(studioScenes.includes(route.query.view as StudioScene) ? route.query.view as StudioScene : 'components')
+const templates = studioTemplates(config.idStudio?.templates)
+const scene = ref(typeof route.query.view === 'string' && templates.some(item => item.id === route.query.view) ? route.query.view : 'components')
+const selectedTemplate = computed(() => templates.find(item => item.id === scene.value))
+const templatePage = ref(selectedTemplate.value?.pages[0]?.id || 'home')
+watch(scene, () => { templatePage.value = selectedTemplate.value?.pages[0]?.id || 'home' }, { flush: 'sync' })
 const mode = ref<'light' | 'dark'>('light')
 const state = ref('default')
 const compare = ref(false)
@@ -128,11 +133,17 @@ async function addLogo(event: Event) {
   reader.readAsDataURL(file)
 }
 function send(frame: HTMLIFrameElement | undefined, doc: StudioDocument) {
-  frame?.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, mode: mode.value, state: state.value }, window.location.origin)
+  frame?.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, page: templatePage.value, mode: mode.value, state: state.value }, window.location.origin)
 }
 function refresh() { send(originalFrame.value, baseline.value); send(draftFrame.value, draft.value) }
 function ready(event: MessageEvent) {
-  if (event.origin !== window.location.origin || event.data?.type !== 'id-studio-ready') return
+  if (event.origin !== window.location.origin) return
+  if (event.source !== originalFrame.value?.contentWindow && event.source !== draftFrame.value?.contentWindow) return
+  if (event.data?.type === 'id-studio-navigate') {
+    if (event.data.scene === scene.value && selectedTemplate.value?.pages.some(page => page.id === event.data.page)) templatePage.value = event.data.page
+    return
+  }
+  if (event.data?.type !== 'id-studio-ready') return
   if (event.source === originalFrame.value?.contentWindow) send(originalFrame.value, baseline.value)
   if (event.source === draftFrame.value?.contentWindow) send(draftFrame.value, draft.value)
 }
@@ -182,7 +193,7 @@ watch([draft, baseline], () => {
     catch { notice.value = 'Local draft storage is unavailable. Export your source before leaving.' }
   }
 }, { deep: true })
-watch([draft, baseline, scene, mode, state, compare], () => nextTick(refresh), { deep: true })
+watch([draft, baseline, scene, templatePage, mode, state, compare], () => nextTick(refresh), { deep: true })
 onBeforeUnmount(() => { window.removeEventListener('message', ready); window.removeEventListener('beforeunload', beforeUnload) })
 </script>
 
@@ -201,15 +212,14 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         class="studio-segment"
         aria-label="Preview scene"
       >
-        <button
-          v-for="item in studioScenes"
-          :key="item"
-          :aria-pressed="scene === item"
-          @click="scene = item"
-        >
-          {{ item === 'components' ? 'Components' : item === 'landing' ? 'Landing' : 'Docs' }}
-        </button>
-      </div>
+        <button :aria-pressed="scene === 'components'" @click="scene = 'components'">Components</button>
+        <select aria-label="Template" :value="scene === 'components' ? '' : scene" @change="scene = value($event)">
+          <option value="" disabled>Templates</option>
+          <option v-for="item in templates" :key="item.id" :value="item.id">{{ item.label }}</option>
+        </select>
+        <select v-if="selectedTemplate && selectedTemplate.pages.length > 1" v-model="templatePage" aria-label="Template page">
+          <option v-for="page in selectedTemplate.pages" :key="page.id" :value="page.id">{{ page.label }}</option>
+        </select>      </div>
       <div class="studio-actions">
         <button
           class="studio-button"
@@ -641,7 +651,7 @@ body.id-studio-page:has(.studio-shell[data-mode=dark]) { background: var(--ui-co
 button:disabled { opacity: .4; cursor: not-allowed; }button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 3px; }
 .studio-toolbar { order: 3; flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-muted); }
 .studio-toolbar-end, .studio-dock-settings { display: flex; gap: 10px; align-items: center; }
-.studio-segment { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--ui-border); border-radius: 9px; background: var(--ui-bg-muted); }.studio-segment button { cursor: pointer; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: var(--ui-text-muted); text-transform: capitalize; white-space: nowrap; }.studio-segment button[aria-pressed=true] { background: var(--ui-bg); color: var(--ui-text-highlighted); box-shadow: 0 1px 3px #0000000a; }
+.studio-segment select { min-width: 0; max-width: 150px; border-radius: 6px; padding: 6px 8px; font-size: 12px; color: var(--ui-text-highlighted); background: var(--ui-bg); cursor: pointer; } .studio-segment { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--ui-border); border-radius: 9px; background: var(--ui-bg-muted); }.studio-segment button { cursor: pointer; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: var(--ui-text-muted); text-transform: capitalize; white-space: nowrap; }.studio-segment button[aria-pressed=true] { background: var(--ui-bg); color: var(--ui-text-highlighted); box-shadow: 0 1px 3px #0000000a; }
 .studio-check { display: flex; gap: 6px; align-items: center; font-size: 11px; white-space: nowrap; }.studio-check input { accent-color: var(--ui-primary); }.studio-select-label { display: flex; align-items: center; gap: 6px; font-size: 11px; }.studio-select-label select { max-width: 125px; background: var(--ui-bg); }
 .studio-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }
 .studio-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }.studio-comparing { grid-template-columns: repeat(2, minmax(0, 1fr)); }

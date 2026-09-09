@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from 'vue'
-import { parseStudioDocument, studioScenes } from '../../src/studio'
+import { onMounted, onBeforeUnmount, computed, ref } from 'vue'
+import { parseStudioDocument } from '../../src/studio'
 import type { StudioDocument, StudioScene } from '../../src/studio'
 import { cssVariablesAdapter } from '../../src/adapters/css-variables'
 import { createThemeCssVars } from '../../src/css'
+import { studioTemplates } from '../templates'
 import { previewDefaults } from '../preview-defaults'
 
 definePageMeta({ layout: false, header: false, footer: false })
@@ -11,7 +12,14 @@ useSeoMeta({ robots: 'noindex, nofollow' })
 const route = useRoute()
 const appConfig = useAppConfig()
 const document = ref<StudioDocument>()
-const scene = ref<StudioScene>('components')
+const templates = studioTemplates((appConfig as unknown as { idStudio?: { templates?: unknown } }).idStudio?.templates)
+const scene = ref('components')
+const page = ref('home')
+const builtinScene = computed(() => scene.value as StudioScene)
+const selectedTemplate = computed(() => templates.find(item => item.id === scene.value))
+function navigate(next: string) {
+  if (selectedTemplate.value?.pages.some(item => item.id === next)) window.parent.postMessage({ type: 'id-studio-navigate', scene: scene.value, page: next }, window.location.origin)
+}
 const state = ref('default')
 const mode = ref<'light' | 'dark'>('light')
 const error = ref('')
@@ -23,8 +31,9 @@ function receive(event: MessageEvent) {
   if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'id-studio-preview') return
   try {
     const doc = parseStudioDocument(event.data.document)
-    if (!studioScenes.includes(event.data.scene)) return
+    if (event.data.scene !== 'components' && !templates.some(item => item.id === event.data.scene)) return
     scene.value = event.data.scene
+    page.value = selectedTemplate.value?.pages.find(item => item.id === event.data.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home'
     state.value = event.data.state === 'error' ? 'error' : 'default'
     const ui = appConfig.ui as Record<string, unknown>
     for (const key of Object.keys(ui)) {
@@ -69,10 +78,19 @@ onBeforeUnmount(() => window.removeEventListener('message', receive))
       :description="error"
       title="Preview unavailable"
     />
+    <component
+      :is="selectedTemplate.component"
+      v-else-if="document && selectedTemplate?.component"
+      :key="scene"
+      :document="document"
+      :mode="mode"
+      :page="page"
+      @navigate="navigate"
+    />
     <IdStudioScenes
       v-else-if="document"
       :document="document"
-      :scene="scene"
+      :scene="builtinScene"
       :state="state"
       :mode="mode"
     />
