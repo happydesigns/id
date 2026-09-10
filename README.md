@@ -93,7 +93,7 @@ pnpm docs
 pnpm verify
 ```
 
-`pnpm dev` starts the playground app. `pnpm docs` starts the Docus documentation.
+`pnpm dev` opens the shared Studio through the playground root. `/runtime` contains compact developer checks for runtime theme switching and adapter fixtures; the Studio wordmark links there. `pnpm docs` starts the Docus documentation.
 
 `pnpm build:package` creates the publishable `dist/` package output and copies the Nuxt layer runtime files used by the package exports.
 
