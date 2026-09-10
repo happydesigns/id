@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, computed, ref } from 'vue'
+import { onMounted, onBeforeUnmount, computed, ref, nextTick } from 'vue'
 import { parseStudioDocument } from '../../src/studio'
 import type { StudioDocument, StudioScene } from '../../src/studio'
 import { cssVariablesAdapter } from '../../src/adapters/css-variables'
@@ -61,6 +61,18 @@ function receive(event: MessageEvent) {
     ].join('\n')
     document.value = doc
     error.value = ''
+    nextTick(() => {
+      const styles = getComputedStyle(window.document.body)
+      function srgb(value: string) {
+        const canvas = window.document.createElement('canvas')
+        canvas.width = canvas.height = 1
+        const context = canvas.getContext('2d')!
+        context.fillStyle = value; context.fillRect(0, 0, 1, 1)
+        const [r, g, b, alpha] = context.getImageData(0, 0, 1, 1).data
+        return alpha === 255 ? `rgb(${r}, ${g}, ${b})` : ''
+      }
+      window.parent.postMessage({ type: 'id-studio-colors', foreground: srgb(styles.color), background: srgb(styles.backgroundColor) }, window.location.origin)
+    })
   } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Preview unavailable.' }
 }
 onMounted(() => {

@@ -68,7 +68,11 @@
     "src",
     "themes",
     "templates/brand-layer/app",
-    "templates/brand-layer/docs",
+    "templates/brand-layer/docs/app",
+    "templates/brand-layer/docs/content",
+    "templates/brand-layer/docs/nuxt.config.ts",
+    "templates/brand-layer/docs/package.json",
+    "templates/brand-layer/docs/tsconfig.json",
     "templates/brand-layer/public",
     "templates/brand-layer/brand.ts",
     "templates/brand-layer/nuxt.config.ts",
@@ -102,7 +106,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
-    "verify": "pnpm lint && pnpm test && pnpm typecheck"
+    "verify": "pnpm lint && pnpm test && pnpm typecheck",
+    "pack:studio": "pnpm build:package && pnpm --config.ignore-scripts=true pack --out .output/studio-package/id.tgz"
   },
   "dependencies": {
     "@nuxt/kit": "^4.5.2",

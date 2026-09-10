@@ -79,3 +79,5 @@ CSS focused on the Studio viewport and preview layout. The editor uses the host
 identity; draft changes apply inside the isolated preview, so editing the brand
 cannot make its own controls unusable. Example forms should exercise validation
 and local outcomes without implying that data was sent to a real service.
+
+On narrow screens, keep the Studio dock to Customize and Preview. Project actions live in the header menu. Distinguish the comparison baseline from local persistence and the exported snapshot; exporting does not mean repository changes were applied. Per-project IDs survive renames, while shared URLs contain only preview navigation settings.
