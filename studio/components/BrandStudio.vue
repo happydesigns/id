@@ -20,6 +20,7 @@ const selectedTemplate = computed(() => templates.find(item => item.id === scene
 const templatePage = ref(selectedTemplate.value?.pages.find(page => page.id === route.query.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home')
 watch(scene, () => { templatePage.value = selectedTemplate.value?.pages[0]?.id || 'home' }, { flush: 'sync' })
 const mode = ref<'light' | 'dark'>(route.query.mode === 'dark' ? 'dark' : 'light')
+const colorMode = useColorMode()
 const state = ref(route.query.state === 'error' ? 'error' : 'default')
 const compare = ref(route.query.compare === 'true')
 const mobile = ref(route.query.mobile === 'true')
@@ -287,6 +288,11 @@ watch([scene, templatePage, mode, state, compare, mobile], () => {
   router.replace({ query: { ...route.query, view: scene.value, page: selectedTemplate.value ? templatePage.value : undefined, mode: mode.value, state: scene.value === 'components' ? state.value : undefined, compare: compare.value ? 'true' : undefined, mobile: mobile.value ? 'true' : undefined } })
 })
 onMounted(() => {
+  // The shell and its teleported controls must follow the same mode as the frames,
+  // including when a shared URL overrides a saved or system preference.
+  watch([mode, () => colorMode.unknown], ([value, unknown]) => {
+    if (!unknown) colorMode.preference = value
+  }, { immediate: true })
   window.addEventListener('message', ready); window.addEventListener('beforeunload', beforeUnload)
   nextTick(refresh)
   try {
