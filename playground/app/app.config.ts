@@ -14,6 +14,7 @@ export default defineAppConfig({
   },
   idStudio: {
     home: '/runtime',
+    templates: { docs: { label: 'Docs', owner: 'docus', route: '/docs/introduction', routePrefix: '/docs' } },
     document: createStudioDocument({ name: 'nuxt-ui', colors: {} }, nuxtUiBrandTheme)
   },
   header: {

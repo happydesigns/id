@@ -4,6 +4,8 @@ import { brandThemeStyleElementId, createThemeCssVars } from '../../src'
 import { useBrandTheme } from '../composables/useBrandTheme'
 
 export default defineNuxtPlugin(() => {
+  // The opt-in Studio bridge owns the theme in its isolated documents.
+  if (import.meta.client && window.parent !== window && (window.location.pathname === '/studio/preview' || new URLSearchParams(window.location.search).has('idPreview'))) return
   const brandTheme = useBrandTheme()
 
   function suppressTransitionsDuringThemeSync() {

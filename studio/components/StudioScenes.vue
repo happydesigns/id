@@ -51,66 +51,6 @@ const logo = computed(() => {
       <UAlert v-if="saved" color="success" title="Project created" :description="projectName" class="mb-8" />
     </template>
 
-    <template v-else>
-      <div class="grid gap-8 sm:grid-cols-[150px_1fr]">
-        <nav
-          aria-label="Example documentation"
-          class="space-y-2 text-sm"
-        >
-          <p class="mb-4 font-semibold text-highlighted">
-            Getting started
-          </p><a
-            href="#overview"
-            class="block rounded-md bg-primary/10 px-3 py-2 text-primary"
-          >Overview</a><a
-            href="#principles"
-            class="block px-3 py-2 text-muted"
-          >Principles</a><a
-            href="#installation"
-            class="block px-3 py-2 text-muted"
-          >Installation</a>
-        </nav>
-        <article class="min-w-0 max-w-2xl">
-          <p class="text-xs uppercase tracking-widest text-muted">
-            Guide / Getting started
-          </p><h1
-            id="overview"
-            class="mt-4 text-4xl font-semibold tracking-tight text-highlighted"
-          >
-            Use your brand
-          </h1><p class="mt-5 text-lg leading-8 text-muted">
-            Install the brand layer and use its colors and typography in your application.
-          </p>
-          <USeparator class="my-8" />
-          <h2
-            id="principles"
-            class="text-2xl font-semibold text-highlighted"
-          >
-            Theme tokens
-          </h2><p class="my-4 leading-7">
-            Use semantic tokens for text, backgrounds and borders. They follow the active brand and color mode.
-          </p>
-          <UAlert
-            color="info"
-            variant="subtle"
-            title="One source of truth"
-            description="Change the brand document once, then use the same values in every application."
-            class="my-6"
-          />
-          <h2
-            id="installation"
-            class="mt-9 text-2xl font-semibold text-highlighted"
-          >
-            Use the brand layer
-          </h2><pre class="my-5 overflow-x-auto rounded-lg border border-default bg-elevated p-5 text-sm"><code>export default defineNuxtConfig({
-  extends: ['{{ document.brand.packageName || '@example/brand' }}']
-})</code></pre>
-          <UCard>
-            <UTable :data="[{ token: 'Primary', purpose: 'Actions and focus' }, { token: 'Neutral', purpose: 'Text, surfaces and borders' }]" />
-          </UCard>
-        </article>
-      </div>
-    </template>
     <footer v-if="scene !== 'components'" class="mt-10 flex flex-wrap justify-between gap-3 border-t border-default pt-5 text-xs text-muted">
       <span>{{ document.theme.label }}</span>
     </footer>

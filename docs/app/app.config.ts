@@ -7,6 +7,9 @@ import { idBrandGuide, nuxtUiBrandTheme } from '../../themes/nuxt-ui'
 const nuxtUiAppConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
 
 export default defineAppConfig({
+  idStudio: {
+    templates: { docs: { label: 'Docs', owner: 'docus', route: '/getting-started/introduction', routePrefix: '/getting-started' } }
+  },
   seo: {
     title: 'happydesigns id',
     description: 'Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for Nuxt projects.'

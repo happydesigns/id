@@ -59,7 +59,7 @@ describe('editable Nuxt UI brand documents', () => {
 
   it('exports a source-first runtime layer and an optional Studio playground', () => {
     const doc = createBlankStudioDocument()
-    const files = createStudioProject(doc)
+    const files = createStudioProject(doc, { legacyRuntime: true })
     expect(parseStudioDocument(files['brand.studio.json'])).toEqual(doc)
     expect(files['nuxt.config.ts']).toContain('@happydesigns/id/nuxt')
     expect(files['nuxt.config.ts']).not.toContain("extends: ['@happydesigns/id/studio']")

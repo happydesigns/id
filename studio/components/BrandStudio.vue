@@ -3,7 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { createBlankStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
 import { createStudioPalette, parseStudioSession, contrastRatio } from '../editor'
 import type { StudioSession } from '../editor'
-import { studioTemplates } from '../templates'
+import { studioTemplates, withinStudioRoute } from '../templates'
 import type { StudioDocument } from '../../src/studio'
 
 useHead({ bodyAttrs: { class: 'id-studio-page' } })
@@ -17,19 +17,25 @@ const draft = ref(clone(seed))
 const templates = studioTemplates(config.idStudio?.templates)
 const scene = ref(typeof route.query.view === 'string' && templates.some(item => item.id === route.query.view) ? route.query.view : 'components')
 const selectedTemplate = computed(() => templates.find(item => item.id === scene.value))
+const paths = ref<Record<string, string>>({})
+const previewPath = computed(() => selectedTemplate.value?.routePrefix && withinStudioRoute(paths.value[scene.value], selectedTemplate.value.routePrefix) ? paths.value[scene.value] : selectedTemplate.value?.route)
+function frameSrc(frame: string) {
+  return selectedTemplate.value?.route ? `${selectedTemplate.value.route}?idPreview=${scene.value}&frame=${frame}` : `/studio/preview?frame=${frame}`
+}
 const templatePage = ref(selectedTemplate.value?.pages.find(page => page.id === route.query.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home')
 watch(scene, () => { templatePage.value = selectedTemplate.value?.pages[0]?.id || 'home' }, { flush: 'sync' })
-const mode = ref<'light' | 'dark'>(route.query.mode === 'dark' ? 'dark' : 'light')
 const colorMode = useColorMode()
+const preference = ref<'light' | 'dark' | 'system'>(route.query.mode === 'dark' ? 'dark' : route.query.mode === 'light' ? 'light' : 'system')
+const mode = computed<'light' | 'dark'>(() => preference.value === 'system' ? colorMode.value === 'dark' ? 'dark' : 'light' : preference.value)
 const state = ref(route.query.state === 'error' ? 'error' : 'default')
 const compare = ref(route.query.compare === 'true')
 const mobile = ref(route.query.mobile === 'true')
 const editing = ref(route.query.browse !== 'true')
-const panel = ref('identity')
+const panel = ref('colors')
 const error = ref('')
 const notice = ref('')
 const exportOpen = ref(false)
-const exportTab = ref('source')
+const exportTab = ref('changes')
 const busy = ref(false)
 const pending = ref<(() => void) | null>(null)
 const input = ref<HTMLInputElement>()
@@ -49,6 +55,21 @@ const previewOptionsOpen = ref(false)
 const newColor = ref('#2563eb')
 const scale = computed(() => { try { return createStudioPalette(newColor.value) } catch { return {} } })
 const bodyContrast = ref<number>()
+const writerToken = useRuntimeConfig().public.idStudioWriterToken as string | undefined
+const sourceRevision = ref('')
+const connected = ref(false)
+const sourceConflict = ref(false)
+const busySource = ref(false)
+const customizeButton = ref<{ $el?: HTMLElement }>()
+const logoRole = ref('wordmark')
+const currentLogo = computed(() => draft.value.brand.assets?.logos?.[logoRole.value])
+function removeLogo() { edit(doc => { if (doc.brand.assets?.logos) Reflect.deleteProperty(doc.brand.assets.logos, logoRole.value) }) }
+const logoRoles = [{ label: 'Wordmark · light', value: 'wordmark' }, { label: 'Wordmark · dark', value: 'wordmarkInverse' }, { label: 'Symbol · light', value: 'logo' }, { label: 'Symbol · dark', value: 'logoInverse' }]
+const projectItems = computed(() => [
+  [{ label: 'New brand', icon: 'i-lucide-plus', onSelect: () => guard(() => replace(createBlankStudioDocument())) }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }, { label: 'Recent projects', icon: 'i-lucide-history', onSelect: () => { projectsOpen.value = true } }],
+  [{ label: 'Duplicate brand', icon: 'i-lucide-copy', onSelect: () => { const doc = clone(draft.value); doc.theme.label += ' copy'; replace(doc) } }, { label: 'Review changes', icon: 'i-lucide-git-compare-arrows', onSelect: () => { exportOpen.value = true } }, { label: 'Download', icon: 'i-lucide-download', onSelect: () => { exportOpen.value = true; exportTab.value = 'source' } }],
+  [{ label: 'Reset draft', icon: 'i-lucide-rotate-ccw', disabled: !dirty.value, onSelect: reset }, { label: 'Open connected project', icon: 'i-lucide-folder-sync', disabled: !writerToken, onSelect: () => guard(() => loadSource(true)) }, { label: 'Documentation', icon: 'i-lucide-book-open', to: config.idStudio?.home || '/' }]
+])
 const panels = [{ label: 'Brand', value: 'identity' }, { label: 'Palette', value: 'colors' }, { label: 'Typography', value: 'type' }, { label: 'Appearance', value: 'details' }]
 const fontPresets = [{ label: 'System sans', value: 'system-ui, sans-serif' }, { label: 'System serif', value: 'Georgia, serif' }, { label: 'System mono', value: 'ui-monospace, monospace' }]
 const newColorName = ref('accent')
@@ -101,6 +122,7 @@ function reset() {
   error.value = ''
 }
 function replace(doc: StudioDocument) {
+  connected.value = false
   baseline.value = clone(doc)
   draft.value = clone(doc)
   history.value = []
@@ -113,6 +135,36 @@ function replace(doc: StudioDocument) {
   recovery.value = undefined
   persist()
 }
+async function loadSource(replaceDraft = false) {
+  if (!writerToken) return
+  busySource.value = true
+  try {
+    const result = await $fetch<{ document: StudioDocument, revision: string }>('/api/id-studio/source', { headers: { 'x-id-studio-token': writerToken } })
+    const doc = parseStudioDocument(result.document)
+    sourceRevision.value = result.revision
+    sourceConflict.value = false
+    if (replaceDraft) replace(doc)
+    if (replaceDraft || !dirty.value) { baseline.value = clone(doc); draft.value = clone(doc); connected.value = true }
+  } catch { notice.value = 'The local project is unavailable. Your draft can still be downloaded.' }
+  finally { busySource.value = false }
+}
+async function applySource() {
+  if (!connected.value || !writerToken || !sourceRevision.value) return
+  busySource.value = true
+  try {
+    const result = await $fetch<{ document: StudioDocument, revision: string }>('/api/id-studio/source', { method: 'POST', headers: { 'x-id-studio-token': writerToken }, body: { revision: sourceRevision.value, document: clone(draft.value) } })
+    baseline.value = parseStudioDocument(result.document)
+    sourceRevision.value = result.revision
+    sourceConflict.value = false
+    exportOpen.value = false
+    notice.value = 'Changes applied to the project source.'
+    persist()
+  } catch (cause) {
+    sourceConflict.value = (cause as { status?: number }).status === 409 || (cause as { statusCode?: number }).statusCode === 409
+    error.value = sourceConflict.value ? 'The project changed outside Studio. Download your draft or reopen the connected project before applying changes.' : 'The source could not be saved. Your draft is still available.'
+  } finally { busySource.value = false }
+}
+function closeSettings() { editing.value = false; nextTick(() => customizeButton.value?.$el?.focus()) }
 function guard(action: () => void) { if (needsExport.value && !storedLocally.value) pending.value = action; else action() }
 function acceptReplacement() { const action = pending.value; pending.value = null; action?.() }
 function value(event: Event) { return (event.target as HTMLInputElement).value }
@@ -142,10 +194,6 @@ function defaultVariant(component: string, next: string) {
 function componentVariant(component: string) {
   return ((draft.value.theme.ui?.[component] as Record<string, unknown> | undefined)?.defaultVariants as Record<string, string> | undefined)?.variant || ''
 }
-function origin(path: string) {
-  if (changes.value.some(change => change.path === path || change.path.startsWith(`${path}.`))) return 'Changed in draft'
-  return path.split('.').reduce<unknown>((item, key) => item && typeof item === 'object' ? (item as Record<string, unknown>)[key] : undefined, baseline.value) === undefined ? 'Nuxt UI default' : 'Brand value'
-}
 async function openDocument(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
@@ -156,20 +204,20 @@ async function openDocument(event: Event) {
   } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Could not open this document.' }
   finally { if (input.value) input.value.value = '' }
 }
-async function addLogo(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
+async function addLogo(file: File | null | undefined) {
   if (!file) return
   if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2_000_000) { error.value = 'Choose a PNG, JPEG or WebP smaller than 2 MB.'; return }
+  const role = logoRole.value
   const reader = new FileReader()
   reader.onerror = () => { error.value = 'The image could not be read.' }
   reader.onload = () => edit((doc) => {
     doc.brand.assets ??= {}; doc.brand.assets.logos ??= {}
-    doc.brand.assets.logos.wordmark = { name: file.name, role: 'wordmark', media: 'any', alt: doc.theme.label, src: String(reader.result) }
+    doc.brand.assets.logos[role] = { name: file.name, role, media: role.endsWith('Inverse') ? 'dark' : 'light', alt: doc.theme.label, src: String(reader.result) }
   })
   reader.readAsDataURL(file)
 }
 function send(frame: HTMLIFrameElement | undefined, doc: StudioDocument) {
-  frame?.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, page: templatePage.value, mode: mode.value, state: state.value }, window.location.origin)
+  frame?.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, page: templatePage.value, path: previewPath.value, mode: mode.value, state: state.value }, window.location.origin)
 }
 function refresh() { send(originalFrame.value, baseline.value); send(draftFrame.value, draft.value) }
 function ready(event: MessageEvent) {
@@ -178,8 +226,11 @@ function ready(event: MessageEvent) {
   if (event.data?.type === 'id-studio-colors' && event.source === draftFrame.value?.contentWindow) { bodyContrast.value = contrastRatio(String(event.data.foreground), String(event.data.background)); return }
   if (event.data?.type === 'id-studio-navigate') {
     if (event.data.scene === scene.value && selectedTemplate.value?.pages.some(page => page.id === event.data.page)) templatePage.value = event.data.page
+    if (event.data.scene === scene.value && selectedTemplate.value?.routePrefix && withinStudioRoute(event.data.path, selectedTemplate.value.routePrefix)) paths.value[scene.value] = event.data.path
     return
   }
+  if (event.data?.type === 'id-studio-mode' && ['light', 'dark'].includes(event.data.mode)) { preference.value = event.data.mode; return }
+  if (event.data?.type === 'id-studio-preview-error') { error.value = 'This preview could not apply the brand. Try reloading it.'; return }
   if (event.data?.type !== 'id-studio-ready') return
   if (event.source === originalFrame.value?.contentWindow) send(originalFrame.value, baseline.value)
   if (event.source === draftFrame.value?.contentWindow) send(draftFrame.value, draft.value)
@@ -244,6 +295,7 @@ function persist() {
   } catch { notice.value = 'Local draft storage is unavailable. Export your source before leaving.' }
 }
 function restore(session: StudioSession) {
+  connected.value = false
   baseline.value = clone(session.baseline); draft.value = clone(session.draft)
   exported.value = session.exported ? clone(session.exported) : undefined
   projectId.value = session.id; history.value = []; future.value = []; fieldErrors.value = {}
@@ -278,23 +330,26 @@ watch(() => route.query, query => {
   applyingQuery = true
   scene.value = templates.some(item => item.id === query.view) ? String(query.view) : 'components'
   templatePage.value = selectedTemplate.value?.pages.find(page => page.id === query.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home'
-  mode.value = query.mode === 'dark' ? 'dark' : 'light'
+  preference.value = query.mode === 'dark' ? 'dark' : query.mode === 'light' ? 'light' : 'system'
+  if (selectedTemplate.value?.routePrefix && withinStudioRoute(query.path, selectedTemplate.value.routePrefix)) paths.value[scene.value] = query.path
   state.value = query.state === 'error' ? 'error' : 'default'
   compare.value = query.compare === 'true'; mobile.value = query.mobile === 'true'
   nextTick(() => { applyingQuery = false })
 })
-watch([scene, templatePage, mode, state, compare, mobile], () => {
+watch([scene, templatePage, preference, previewPath, state, compare, mobile], () => {
   if (applyingQuery) return
-  router.replace({ query: { ...route.query, view: scene.value, page: selectedTemplate.value ? templatePage.value : undefined, mode: mode.value, state: scene.value === 'components' ? state.value : undefined, compare: compare.value ? 'true' : undefined, mobile: mobile.value ? 'true' : undefined } })
+  router.replace({ query: { ...route.query, view: scene.value, page: selectedTemplate.value?.component ? templatePage.value : undefined, path: previewPath.value, mode: preference.value, state: scene.value === 'components' ? state.value : undefined, compare: compare.value ? 'true' : undefined, mobile: mobile.value ? 'true' : undefined } })
 })
 onMounted(() => {
   // The shell and its teleported controls must follow the same mode as the frames,
   // including when a shared URL overrides a saved or system preference.
-  watch([mode, () => colorMode.unknown], ([value, unknown]) => {
+  watch([preference, () => colorMode.unknown], ([value, unknown]) => {
     if (!unknown) colorMode.preference = value
   }, { immediate: true })
   window.addEventListener('message', ready); window.addEventListener('beforeunload', beforeUnload)
   nextTick(refresh)
+  if (selectedTemplate.value?.routePrefix && withinStudioRoute(route.query.path, selectedTemplate.value.routePrefix)) paths.value[scene.value] = route.query.path
+  loadSource()
   try {
     listProjects()
     const last = localStorage.getItem(lastProjectKey)
@@ -312,32 +367,21 @@ onMounted(() => {
   } catch { storageReady.value = true; projectId.value = crypto.randomUUID(); notice.value = 'The previous local draft could not be restored. Your source has not changed.' }
 })
 watch([draft, baseline, exported], persist, { deep: true, flush: 'post' })
-watch([draft, baseline, scene, templatePage, mode, state, compare], () => nextTick(refresh), { deep: true })
+watch([draft, baseline, scene, templatePage, previewPath, mode, state, compare], () => nextTick(refresh), { deep: true })
 onBeforeUnmount(() => { window.removeEventListener('message', ready); window.removeEventListener('beforeunload', beforeUnload) })
 </script>
 
 <template>
   <main class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
-      <a :href="config.idStudio?.home || '/'" class="studio-wordmark" aria-label="id Studio home">id<span class="studio-dot">.</span></a>
-      <h1 class="sr-only">{{ draft.theme.label }}</h1>
+      <UDropdownMenu :items="projectItems" :content="{ align: 'start' }">
+        <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Project menu" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
+      </UDropdownMenu>
+      <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
         <USelect v-model="scene" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
-        <USelect v-if="selectedTemplate && selectedTemplate.pages.length > 1" v-model="templatePage" aria-label="Template page" :items="selectedTemplate.pages.map(item => ({ label: item.label, value: item.id }))" />
       </div>
-      <div class="studio-actions studio-project-actions">
-        <UButton color="neutral" variant="outline" @click="guard(() => replace(createBlankStudioDocument()))">New brand</UButton>
-        <UButton color="neutral" variant="outline" @click="input?.click()">Open brand</UButton>
-        <UButton color="neutral" variant="ghost" @click="projectsOpen = true">Recent</UButton>
-        <UButton color="neutral" variant="ghost" @click="exportOpen = true">Export</UButton>
-      </div>
-      <UDropdownMenu
-class="studio-project-menu" :content="{ align: 'end' }" :items="[
-        [{ label: 'New brand', icon: 'i-lucide-plus', onSelect: () => guard(() => replace(createBlankStudioDocument())) }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input?.click() }],
-        [{ label: 'Recent projects', icon: 'i-lucide-history', onSelect: () => { projectsOpen = true } }, { label: 'Export', icon: 'i-lucide-download', onSelect: () => { exportOpen = true } }]
-      ]">
-        <UButton icon="i-lucide-ellipsis" aria-label="Project actions" color="neutral" variant="ghost" class="size-10 justify-center" />
-      </UDropdownMenu>
+      <UButton class="studio-review studio-desktop" color="neutral" variant="outline" @click="exportTab = connected ? 'changes' : 'source'; exportOpen = true">{{ connected ? 'Changes' : 'Download' }}<span v-if="dirty" class="text-muted">{{ changes.length }}</span></UButton>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
     <div v-if="recovery" class="studio-notice" role="status">
@@ -345,41 +389,45 @@ class="studio-project-menu" :content="{ align: 'end' }" :items="[
     </div>
     <UAlert v-if="error" role="alert" color="error" :description="error" :close="{ onClick: () => error = '' }" />
     <div v-if="notice" class="studio-notice" role="status">{{ notice }}<UButton variant="ghost" color="neutral" @click="notice = ''">Dismiss</UButton></div>
-    <div class="studio-workspace" :class="{ 'studio-browsing': !editing }">
+    <div class="studio-workspace" :class="{ 'studio-browsing': !editing, 'studio-editing': editing }">
       <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
         <section v-if="compare" class="studio-frame-wrap">
-          <div class="studio-frame-label">Original <span>{{ baseline.theme.label }}</span></div>
-          <iframe ref="originalFrame" src="/studio/preview?frame=original" title="Original brand preview" :class="{ 'studio-mobile': mobile }" @load="send(originalFrame, baseline)" />
+          <div class="studio-frame-label">Applied <span>{{ baseline.theme.label }}</span></div>
+          <iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :class="{ 'studio-mobile': mobile }" @load="send(originalFrame, baseline)" />
         </section>
         <section class="studio-frame-wrap">
           <div class="studio-frame-label">Draft <span>{{ draft.theme.label }}</span></div>
-          <iframe ref="draftFrame" src="/studio/preview?frame=draft" title="Draft brand preview" :class="{ 'studio-mobile': mobile }" @load="send(draftFrame, draft)" />
+          <iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :class="{ 'studio-mobile': mobile }" @load="send(draftFrame, draft)" />
         </section>
       </div>
       <aside v-if="editing" class="studio-inspector" aria-label="Brand settings">
         <div class="studio-inspector-header">
-          <h2 class="studio-desktop">{{ panel === 'identity' ? 'Brand' : panel === 'colors' ? 'Palette' : panel === 'type' ? 'Typography' : 'Appearance' }}</h2>
-          <div class="studio-mobile-control min-w-0 max-w-32"><USelect v-model="panel" :items="panels" aria-label="Settings section" class="w-full" /></div>
-          <div class="studio-actions">
-            <UButton icon="i-lucide-undo-2" aria-label="Undo change" color="neutral" variant="ghost" size="xs" :disabled="!history.length" @click="undo" />
-            <UButton icon="i-lucide-redo-2" aria-label="Redo change" color="neutral" variant="ghost" size="xs" :disabled="!future.length" @click="redo" />
-            <UButton color="neutral" variant="ghost" size="xs" :disabled="!dirty" @click="reset">Reset</UButton>
-            <UButton icon="i-lucide-x" aria-label="Close settings" color="neutral" variant="ghost" size="xs" @click="editing = false" />
-          </div>
+          <h2>Customize</h2>
+          <UButton icon="i-lucide-x" aria-label="Close settings" color="neutral" variant="ghost" @click="closeSettings" />
         </div>
-        <div class="studio-fields">
-          <template v-if="panel === 'identity'">
-            <UFormField :error="fieldErrors['label']" label="Brand name" :hint="dirty ? undefined : origin('theme.label')"><UInput :model-value="draft.theme.label" class="w-full" @change="edit(doc => { doc.theme.label = value($event) }, 'label')" /></UFormField>
+        <UAccordion v-model="panel" :items="panels" class="studio-fields">
+          <template #body="{ item: section }"><div class="studio-form-section">
+          <template v-if="section.value === 'identity'">
+            <UFormField :error="fieldErrors['label']" label="Brand name" ><UInput :model-value="draft.theme.label" class="w-full" @change="edit(doc => { doc.theme.label = value($event) }, 'label')" /></UFormField>
             <UFormField :error="fieldErrors['identifier']" label="Identifier" help="Lowercase letters, numbers and hyphens"><UInput :model-value="draft.brand.name" class="w-full" @change="edit(doc => { doc.brand.name = value($event); doc.theme.name = value($event) }, 'identifier')" /></UFormField>
             <UFormField :error="fieldErrors['package']" label="Package name"><UInput :model-value="draft.brand.packageName" placeholder="@example/brand" class="w-full" @change="edit(doc => { doc.brand.packageName = value($event) }, 'package')" /></UFormField>
             <UFormField :error="fieldErrors['claim']" label="Brand statement"><UTextarea :model-value="draft.brand.claim" :rows="3" class="w-full" @change="edit(doc => { doc.brand.claim = value($event) }, 'claim')" /></UFormField>
-            <UFormField label="Wordmark or logo" help="PNG, JPEG or WebP · up to 2 MB"><UInput type="file" accept="image/png,image/jpeg,image/webp" class="w-full" @change="addLogo" /></UFormField>
+            <UFormField label="Logo"><USelect v-model="logoRole" :items="logoRoles" class="w-full" /></UFormField>
+            <div v-if="currentLogo" class="rounded border border-default p-4" :class="logoRole.endsWith('Inverse') ? 'bg-gray-900' : 'bg-white'"><img :src="currentLogo.src" :alt="currentLogo.alt || 'Brand logo'" class="mx-auto max-h-16 max-w-full" ></div>
+            <UFileUpload :key="logoRole" accept="image/png,image/jpeg,image/webp" label="Upload image" description="PNG, JPEG or WebP · up to 2 MB" :preview="false" @update:model-value="addLogo" />
+            <UButton v-if="currentLogo" color="neutral" variant="link" @click="removeLogo">Remove image</UButton>
           </template>
-          <template v-if="panel === 'colors'">
-            <p class="studio-help">Map your palettes to Nuxt UI roles.</p>
-            <UFormField v-for="role in studioRoles" :key="role" :label="role">
+          <template v-if="section.value === 'colors'">
+            <UFormField v-for="role in ['primary', 'neutral']" :key="role" :label="role">
               <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
             </UFormField>
+            <UAccordion :items="[{ label: 'More color roles', value: 'roles' }]">
+              <template #body><div class="studio-form-section">
+                <UFormField v-for="role in studioRoles.filter(role => !['primary', 'neutral'].includes(role))" :key="role" :label="role">
+                  <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
+                </UFormField>
+              </div></template>
+            </UAccordion>
             <h3 class="text-sm font-semibold">Brand palettes</h3>
             <UAccordion :items="Object.entries(draft.brand.colors).map(([name, palette]) => ({ label: name, value: name, palette }))">
               <template #body="{ item }">
@@ -393,7 +441,7 @@ class="studio-project-menu" :content="{ align: 'end' }" :items="[
             <div class="flex overflow-hidden rounded" aria-label="New palette preview"><span v-for="(color, shade) in scale" :key="shade" class="h-7 flex-1" :style="{ background: color }" :title="`${shade}: ${color}`" /></div>
             <UButton color="neutral" variant="outline" @click="addPalette">Add palette</UButton>
           </template>
-          <template v-if="panel === 'type'">
+          <template v-if="section.value === 'type'">
             <p class="studio-help">Use installed fonts or a system stack. Entering a name does not download a font.</p>
             <div v-for="role in ['sans', 'mono', 'display']" :key="role" class="space-y-2">
               <UFormField :label="role" :error="fieldErrors[`font:${role}`]"><UInput :model-value="draft.theme.typography?.[role] || draft.brand.typography?.[role] || ''" placeholder="system-ui, sans-serif" class="w-full" @change="font(role, value($event))" /></UFormField>
@@ -401,7 +449,7 @@ class="studio-project-menu" :content="{ align: 'end' }" :items="[
               <p class="rounded border border-default p-3 text-xl" :style="{ fontFamily: draft.theme.typography?.[role] || draft.brand.typography?.[role] || 'inherit' }">The quick brown fox. 0123456789</p>
             </div>
           </template>
-          <template v-if="panel === 'details'">
+          <template v-if="section.value === 'details'">
             <p class="studio-help">Editing {{ mode }} mode. Empty fields use defaults.</p>
             <UFormField label="Corner radius" :error="fieldErrors['token:--ui-radius']">
               <UInput :model-value="draft.theme.cssVariables?.[mode]?.['--ui-radius'] || ''" placeholder="0.25rem" class="w-full" @change="token('--ui-radius', value($event))" />
@@ -415,33 +463,33 @@ class="studio-project-menu" :content="{ align: 'end' }" :items="[
             <UAccordion v-if="customComponents.length" :items="[{ label: 'Component overrides', value: 'overrides' }]"><template #body><p class="studio-help">Existing overrides can affect these settings.</p><pre class="studio-code">{{ JSON.stringify(draft.theme.ui, null, 2) }}</pre></template></UAccordion>
           </template>
         </div>
+      </template></UAccordion>
         <p class="studio-inspector-footer" role="status">{{ saveStatus }}<span v-if="needsExport"> · Not exported</span></p>
       </aside>
     </div>
-    <div class="studio-toolbar">
-      <div class="studio-dock-settings studio-desktop">
-        <UButton v-for="item in ['identity', 'colors', 'type', 'details']" :key="item" color="neutral" :variant="editing && panel === item ? 'soft' : 'ghost'" :aria-pressed="editing && panel === item" @click="panel = item; editing = true">{{ item === 'identity' ? 'Brand' : item === 'type' ? 'Typography' : item === 'details' ? 'Appearance' : 'Palette' }}</UButton>
+    <div class="studio-toolbar" role="toolbar" aria-label="Brand tools">
+      <div class="studio-dock-settings">
+        <UTooltip text="Undo"><UButton class="studio-desktop" icon="i-lucide-undo-2" aria-label="Undo change" color="neutral" variant="ghost" :disabled="!history.length" @click="undo" /></UTooltip>
+        <UTooltip text="Redo"><UButton class="studio-desktop" icon="i-lucide-redo-2" aria-label="Redo change" color="neutral" variant="ghost" :disabled="!future.length" @click="redo" /></UTooltip>
+        <UButton ref="customizeButton" color="neutral" :variant="editing ? 'soft' : 'ghost'" icon="i-lucide-sliders-horizontal" :aria-pressed="editing" @click="editing = !editing">{{ editing ? 'Preview' : 'Customize' }}</UButton>
       </div>
       <div class="studio-toolbar-end studio-desktop">
-        <UCheckbox v-model="compare" label="Compare original" size="sm" />
-        <UCheckbox v-model="mobile" label="Mobile" size="sm" />
-        <USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" size="sm" />
-        <UFieldGroup><UButton color="neutral" :variant="mode === 'light' ? 'soft' : 'ghost'" :aria-pressed="mode === 'light'" size="sm" @click="mode = 'light'">Light</UButton><UButton color="neutral" :variant="mode === 'dark' ? 'soft' : 'ghost'" :aria-pressed="mode === 'dark'" size="sm" @click="mode = 'dark'">Dark</UButton></UFieldGroup>
+        <UTooltip text="Compare applied and draft"><UButton icon="i-lucide-columns-2" aria-label="Compare applied brand" :aria-pressed="compare" color="neutral" :variant="compare ? 'soft' : 'ghost'" @click="compare = !compare" /></UTooltip>
+        <USelect :model-value="mobile ? '390' : 'auto'" aria-label="Preview width" :items="[{ label: 'Auto', value: 'auto' }, { label: '390 px', value: '390' }]" @update:model-value="mobile = $event === '390'" />
+        <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
       </div>
-      <UButton class="studio-mobile-control" color="neutral" :variant="editing ? 'soft' : 'ghost'" icon="i-lucide-sliders-horizontal" @click="editing = !editing">Customize</UButton>
-      <UPopover v-model:open="previewOptionsOpen" class="studio-mobile-control">
-        <UButton color="neutral" variant="ghost" icon="i-lucide-monitor" label="Preview" />
+      <UPopover v-model:open="previewOptionsOpen">
+        <UButton color="neutral" variant="ghost" icon="i-lucide-settings-2" label="View" />
         <template #content>
           <div class="flex w-64 flex-col gap-4 p-4">
-            <UCheckbox v-model="compare" label="Compare original" />
-            <UCheckbox v-model="mobile" label="Mobile" />
+            <UCheckbox v-model="compare" label="Compare applied brand" />
+            <USelect :model-value="mobile ? '390' : 'auto'" aria-label="Preview width" :items="[{ label: 'Auto width', value: 'auto' }, { label: '390 px', value: '390' }]" @update:model-value="mobile = $event === '390'" />
+            <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
             <USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" />
-            <UFieldGroup><UButton color="neutral" :variant="mode === 'light' ? 'soft' : 'ghost'" @click="mode = 'light'">Light</UButton><UButton color="neutral" :variant="mode === 'dark' ? 'soft' : 'ghost'" @click="mode = 'dark'">Dark</UButton></UFieldGroup>
             <UButton color="neutral" variant="outline" icon="i-lucide-link" @click="shareView">Copy view link</UButton>
           </div>
         </template>
       </UPopover>
-      <UButton class="studio-desktop" color="neutral" variant="ghost" icon="i-lucide-link" aria-label="Copy view link" @click="shareView" />
     </div>
     <UModal v-model:open="projectsOpen" title="Recent projects" description="Drafts stored in this browser.">
       <template #body>
@@ -450,15 +498,20 @@ class="studio-project-menu" :content="{ align: 'end' }" :items="[
       </template>
     </UModal>
     <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
-    <UModal v-model:open="exportOpen" title="Export brand" :ui="{ content: 'max-w-4xl' }">
+    <UModal v-model:open="exportOpen" :title="connected ? 'Review changes' : 'Download brand'" :ui="{ content: 'max-w-4xl' }">
       <template #body>
-        <p class="mb-4 text-sm text-muted" role="status">{{ exported && !needsExport ? 'This version was downloaded. ' : '' }}{{ changes.length }} changes. To update your project, replace <code>{{ sourcePath }}</code> and run its generation checks.</p>
+        <p class="mb-4 text-sm text-muted">{{ connected ? 'Apply to the connected project source.' : 'Download a source document or a new Nuxt brand layer.' }} <code v-if="connected">{{ sourcePath }}</code></p>
+        <UAlert v-if="sourceConflict" color="warning" title="Source changed" description="Your draft is preserved. Download it before reopening the project to resolve the conflict." class="mb-4" />
+        <div v-if="exportTab === 'changes'" class="mb-4 divide-y divide-default">
+          <p v-if="!changes.length" class="text-sm text-muted">No changes to apply.</p>
+          <div v-for="change in changes" :key="change.path" class="py-2 text-sm"><code>{{ change.path }}</code><div class="mt-1 break-all text-muted">{{ change.before ?? 'Inherited' }} → {{ change.after ?? 'Inherited' }}</div></div>
+        </div>
         <div class="mb-4 flex gap-2"><UButton v-for="item in ['source', 'changes', 'css']" :key="item" color="neutral" :variant="exportTab === item ? 'soft' : 'ghost'" :aria-pressed="exportTab === item" @click="exportTab = item">{{ item === 'css' ? 'CSS' : item === 'source' ? 'Source' : 'Changes' }}</UButton></div>
-        <pre class="studio-export-code">{{ output }}</pre>
+        <pre v-if="exportTab !== 'changes'" class="studio-export-code">{{ output }}</pre>
         <p class="mt-4 text-sm text-muted">A new project includes a Nuxt brand layer and Studio. Custom fonts, Vue components and capabilities must be added separately.</p>
         <p v-if="error" role="alert" class="mt-4 text-sm text-error">{{ error }}</p>
       </template>
-      <template #footer><UButton @click="exportSource">Download source</UButton><UButton color="neutral" variant="outline" :loading="busy" @click="exportProject">Download new project</UButton></template>
+      <template #footer><UButton v-if="connected" :loading="busySource" :disabled="!dirty || sourceConflict || Object.keys(fieldErrors).length > 0" @click="applySource">Apply changes</UButton><UButton color="neutral" variant="outline" @click="exportSource">Download source</UButton><UButton color="neutral" variant="outline" :loading="busy" @click="exportProject">Download new project</UButton></template>
     </UModal>
   </main>
 </template>
@@ -468,7 +521,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 </style>
 <style scoped>
 .studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: var(--ui-bg); color: var(--ui-text); }
-.studio-header { flex: none; min-height: 62px; display: flex; align-items: center; gap: 16px; }
+.studio-header { flex: none; min-height: 56px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }.studio-project-name { min-width: 0; max-width: 100%; justify-self: start; }.studio-review { justify-self: end; }
 .studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
 .studio-dot { color: var(--ui-primary); }
 
@@ -477,13 +530,13 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
 .studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 16px; }
 .studio-toolbar-end, .studio-dock-settings { display: flex; gap: 8px; align-items: center; }
-.studio-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }
+.studio-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }
 .studio-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }.studio-comparing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .studio-frame-wrap { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; }.studio-frame-label { display: none; }.studio-comparing .studio-frame-label { display: flex; justify-content: space-between; align-self: stretch; padding: 0 6px 6px; font-size: 11px; }.studio-frame-label span { color: var(--ui-text-muted); }
 iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-bg); }iframe.studio-mobile { max-width: 390px; }
 .studio-inspector { display: flex; flex-direction: column; border: 1px solid var(--ui-border); border-radius: 16px; min-width: 0; min-height: 0; overflow: hidden; background: var(--ui-bg); }
 .studio-inspector-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--ui-border); }
-.studio-fields { flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; overscroll-behavior: contain; }
+.studio-fields { flex: 1; min-height: 0; padding: 0 16px; overflow-y: auto; overscroll-behavior: contain; }.studio-form-section { display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; }
 .studio-help { font-size: 12px; line-height: 1.6; color: var(--ui-text-muted); }.studio-inspector-footer { border-top: 1px solid var(--ui-border); padding: 12px 16px; font-size: 11px; color: var(--ui-text-muted); }
 .studio-code { font-size: 11px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { flex: none; max-height: 100px; overflow: auto; display: flex; gap: 12px; align-items: center; padding: 8px 12px; font-size: 13px; }
 .studio-export-code { max-height: 45vh; overflow: auto; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); font-size: 12px; }
@@ -492,5 +545,19 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 1px solid 
   .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 48px; gap: 8px; }.studio-wordmark { font-size: 26px; }.studio-scenes { flex: 1; justify-content: center; gap: 4px; }.studio-scenes > * { min-width: 0; max-width: 130px; }.studio-project-actions { display: none; }.studio-project-menu { display: inline-flex; flex: none; }
   .studio-workspace { position: relative; display: flex; }.studio-canvas { flex: 1; }.studio-inspector { position: absolute; z-index: 2; inset: 0 0 0 auto; width: min(320px, 100%); box-shadow: -12px 0 36px #0002; }
   .studio-mobile-control { display: inline-flex; }.studio-desktop { display: none; }.studio-toolbar { flex-wrap: nowrap; justify-content: space-between; }.studio-dock-settings { width: 100%; }.studio-dock-settings > * { flex: 1; justify-content: center; }.studio-toolbar-end { width: 100%; flex-wrap: wrap; justify-content: space-between; }.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+}
+</style>
+
+<style scoped>
+@media (max-width: 900px) {
+  .studio-workspace.studio-editing { display: flex; }
+  .studio-editing .studio-canvas { display: none; }
+  .studio-inspector { position: static; width: 100%; flex: 1; box-shadow: none; }
+}
+@media (max-width: 700px) {
+  .studio-header { grid-template-columns: minmax(0, 1fr) auto; }
+  .studio-scenes { margin: 0; }
+  .studio-scenes > * { max-width: 155px; }
+  .studio-dock-settings { width: auto; }
 }
 </style>

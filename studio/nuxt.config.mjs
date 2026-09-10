@@ -3,6 +3,8 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   $meta: { name: '@happydesigns/id-studio' },
+  modules: [fileURLToPath(new URL('./module.ts', import.meta.url))],
+  plugins: [fileURLToPath(new URL('./plugins/preview.client.ts', import.meta.url))],
   components: [{ path: fileURLToPath(new URL('./components', import.meta.url)), pathPrefix: false, prefix: 'Id' }],
   hooks: {
     'pages:extend'(pages) {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { adapterOmissionRows, adapterValidationRows, productSurfaceOutput } from '../utils/adapter-validation'
 defineOptions({ name: 'RuntimeChecks' })
+definePageMeta({ layout: false, header: false, footer: false })
 const brandTheme = useBrandTheme()
 const exampleName = ref('Example project')
 const count = ref(0)
