@@ -54,6 +54,53 @@ const createName = ref('')
 const createError = ref('')
 const createBase = ref<StudioDocument>()
 const persistPristine = ref(false)
+const manageOpen = ref(false)
+const manageSearch = ref('')
+const manageError = ref('')
+const manageTarget = ref<StudioSession>()
+const manageAction = ref<'rename' | 'delete'>('rename')
+const manageName = ref('')
+const managedProjects = computed(() => projects.value.filter(project => `${project.draft.theme.label} ${project.draft.brand.packageName || project.draft.brand.name}`.toLocaleLowerCase().includes(manageSearch.value.trim().toLocaleLowerCase())))
+function openManager() {
+  persist()
+  manageTarget.value = undefined
+  manageError.value = ''
+  manageSearch.value = ''
+  manageOpen.value = true
+}
+function manageProject(project: StudioSession, action: 'rename' | 'delete') {
+  manageTarget.value = project
+  manageAction.value = action
+  manageName.value = project.draft.theme.label
+  manageError.value = ''
+}
+function saveManagedProject() {
+  const project = manageTarget.value
+  if (!project) return
+  try {
+    if (manageAction.value === 'delete') {
+      localStorage.removeItem(projectPrefix + project.id)
+      if (localStorage.getItem(lastProjectKey) === project.id) localStorage.removeItem(lastProjectKey)
+      if (recovery.value?.id === project.id) recovery.value = undefined
+      if (projectId.value === project.id) {
+        storedLocally.value = false
+        replace(catalog.find(item => item.key === 'nuxt-ui')!.document, 'nuxt-ui')
+      }
+    } else {
+      const name = manageName.value.trim()
+      if (!name || name.length > 80) { manageError.value = 'Enter a name of 1–80 characters.'; return }
+      if ([...catalog.map(item => item.document.theme.label), ...projects.value.filter(item => item.id !== project.id).map(item => item.draft.theme.label)].some(label => label.trim().toLocaleLowerCase() === name.toLocaleLowerCase())) { manageError.value = 'A brand with this name already exists.'; return }
+      const renamed = clone(project)
+      renamed.draft.theme.label = name
+      renamed.updatedAt = Date.now()
+      localStorage.setItem(projectPrefix + project.id, JSON.stringify(renamed))
+      if (recovery.value?.id === project.id) recovery.value = renamed
+      if (projectId.value === project.id) edit(doc => { doc.theme.label = name })
+    }
+    listProjects()
+    manageTarget.value = undefined
+  } catch { manageError.value = 'Browser storage is unavailable. Please try again.' }
+}
 const exported = ref<StudioDocument>()
 const projectId = ref('')
 const storageReady = ref(false)
@@ -83,7 +130,7 @@ const currentLogo = computed(() => draft.value.brand.assets?.logos?.[logoRole.va
 function removeLogo() { edit(doc => { if (doc.brand.assets?.logos) Reflect.deleteProperty(doc.brand.assets.logos, logoRole.value) }) }
 const logoRoles = [{ label: 'Wordmark · light', value: 'wordmark' }, { label: 'Wordmark · dark', value: 'wordmarkInverse' }, { label: 'Symbol · light', value: 'logo' }, { label: 'Symbol · dark', value: 'logoInverse' }]
 const projectItems = computed(() => [
-  [{ label: 'Create new brand', icon: 'i-lucide-plus', onSelect: () => beginCreate() }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }],
+  [{ label: 'Create new brand', icon: 'i-lucide-plus', onSelect: () => beginCreate() }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }, { label: 'Manage brands', icon: 'i-lucide-library', onSelect: openManager }],
   [{ label: 'Duplicate brand', icon: 'i-lucide-copy', onSelect: () => beginCreate(draft.value) }, { label: 'Review changes', icon: 'i-lucide-git-compare-arrows', onSelect: () => { exportOpen.value = true } }, { label: 'Download', icon: 'i-lucide-download', onSelect: () => { exportOpen.value = true; exportTab.value = 'source' } }],
   [{ label: 'Reset draft', icon: 'i-lucide-rotate-ccw', disabled: !dirty.value, onSelect: reset }, { label: 'Open connected project', icon: 'i-lucide-folder-sync', disabled: !writerToken, onSelect: () => guard(() => loadSource(true)) }, { label: 'Documentation', icon: 'i-lucide-book-open', to: config.idStudio?.home || '/' }]
 ])
@@ -469,6 +516,34 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <UButton class="studio-review studio-desktop" color="neutral" variant="outline" @click="exportTab = connected ? 'changes' : 'source'; exportOpen = true">{{ connected ? 'Changes' : 'Download' }}<span v-if="dirty" class="text-muted">{{ changes.length }}</span></UButton>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
+    <UModal v-model:open="manageOpen" title="Manage brands" description="Saved in this browser. Repository files are unchanged." :ui="{ content: 'max-w-2xl' }">
+      <template #body>
+        <form v-if="manageTarget" class="space-y-4" @submit.prevent="saveManagedProject">
+          <template v-if="manageAction === 'delete'">
+            <p>Delete the local copy of <strong>{{ manageTarget.draft.theme.label }}</strong>? Its saved draft will be permanently removed.</p>
+            <p class="text-sm text-muted break-words">{{ manageTarget.draft.brand.packageName || manageTarget.draft.brand.name }} · {{ new Date(manageTarget.updatedAt).toLocaleString() }}</p>
+          </template>
+          <UFormField v-else label="Brand name" required><UInput v-model="manageName" aria-label="Rename brand" maxlength="80" autofocus class="w-full" /></UFormField>
+          <UAlert v-if="manageError" color="error" :description="manageError" />
+          <div class="flex flex-wrap gap-2"><UButton color="neutral" variant="ghost" @click="manageTarget = undefined; manageError = ''">Cancel</UButton><UButton type="submit" :color="manageAction === 'delete' ? 'error' : 'primary'">{{ manageAction === 'delete' ? 'Delete local copy' : 'Save name' }}</UButton></div>
+        </form>
+        <div v-else class="space-y-4">
+          <UInput v-model="manageSearch" icon="i-lucide-search" placeholder="Search saved brands…" aria-label="Search saved brands" class="w-full" />
+          <ul class="divide-y divide-default">
+            <li v-for="project in managedProjects" :key="project.id" class="py-4 space-y-3">
+              <div><p class="font-medium break-words">{{ project.draft.theme.label }}<span v-if="project.id === projectId" class="text-xs text-muted ml-2">Current</span></p><p class="text-sm text-muted break-words">{{ project.draft.brand.packageName || project.draft.brand.name }} · {{ new Date(project.updatedAt).toLocaleString() }}</p></div>
+              <div class="flex flex-wrap gap-2">
+                <UButton color="neutral" variant="outline" @click="manageOpen = false; pickBrand(() => restore(project))">Open</UButton>
+                <UButton color="neutral" variant="ghost" @click="manageProject(project, 'rename')">Rename</UButton>
+                <UButton color="neutral" variant="ghost" @click="manageOpen = false; beginCreate(project.draft)">Duplicate</UButton>
+                <UButton color="error" variant="ghost" @click="manageProject(project, 'delete')">Delete local copy</UButton>
+              </div>
+            </li>
+          </ul>
+          <p v-if="!managedProjects.length" class="text-sm text-muted">{{ manageSearch ? 'No matching brands.' : 'No saved brands yet.' }}</p>
+        </div>
+      </template>
+    </UModal>
     <UModal v-model:open="createOpen" :title="createBase ? 'Duplicate brand' : 'Create brand'" description="Choose a name for your brand.">
       <template #body><form id="studio-create-brand" @submit.prevent="createBrand"><UFormField label="Name" :error="createError" required><UInput v-model="createName" aria-label="New brand name" autofocus maxlength="80" class="w-full" @update:model-value="createError = ''" /></UFormField></form></template>
       <template #footer><UButton color="neutral" variant="ghost" @click="createOpen = false">Cancel</UButton><UButton type="submit" form="studio-create-brand" :disabled="!createName.trim()">Create brand</UButton></template>
