@@ -45,6 +45,10 @@ export default defineNuxtPlugin({
       if (!applying && active && ['light', 'dark'].includes(value)) post({ type: 'id-studio-mode', mode: value })
     })
     async function receive(event: MessageEvent) {
+      if (event.source === window.parent && event.origin === window.location.origin && event.data?.type === 'id-studio-color-mode') {
+        colorMode.preference = event.data.mode === 'dark' ? 'dark' : 'light'
+        return
+      }
       if (event.source !== window.parent || event.origin !== window.location.origin || event.data?.type !== 'id-studio-preview' || event.data.scene !== template!.id) return
       if (nuxtApp.isHydrating) { pendingMessage = event; return }
       try {

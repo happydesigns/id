@@ -28,6 +28,11 @@ const style = ref('')
 useHead({ style: [{ key: 'id-studio-preview', textContent: style }] })
 
 function receive(event: MessageEvent) {
+  if (event.origin === window.location.origin && event.source === window.parent && event.data?.type === 'id-studio-color-mode') {
+    mode.value = event.data.mode === 'dark' ? 'dark' : 'light'
+    colorMode.preference = mode.value
+    return
+  }
   if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'id-studio-preview') return
   try {
     const doc = parseStudioDocument(event.data.document)

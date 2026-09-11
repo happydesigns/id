@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import StudioPaletteSelect from './StudioPaletteSelect.vue'
 import { paletteRamp } from '../palette'
+import { copyConfig, previewUi, studioPreviewCss } from '../preview'
 import StudioViewport from './StudioViewport.vue'
 import StudioViewportControls from './StudioViewportControls.vue'
 import { createBlankStudioDocument, createStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
@@ -19,6 +20,10 @@ const seed = config.idStudio?.document ? parseStudioDocument(config.idStudio.doc
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value))
 const baseline = ref(clone(seed))
 const draft = ref(clone(seed))
+const shellConfig = useAppConfig()
+const hostUi = copyConfig(shellConfig.ui)
+const shellTheme = ref('')
+useHead({ style: [{ key: 'id-studio-shell-theme', textContent: shellTheme }] })
 const templates = studioTemplates(config.idStudio?.templates)
 const scene = ref(typeof route.query.view === 'string' && templates.some(item => item.id === route.query.view) ? route.query.view : 'components')
 const selectedTemplate = computed(() => templates.find(item => item.id === scene.value))
@@ -587,6 +592,22 @@ watch([scene, templatePage, preference, previewPath, state, compare, viewportWid
   router.replace({ query: { ...route.query, view: scene.value, page: selectedTemplate.value?.component ? templatePage.value : undefined, path: previewPath.value, mode: preference.value, state: scene.value === 'components' ? state.value : undefined, compare: compare.value ? 'true' : undefined, mobile: undefined, width: viewportWidth.value || undefined, height: viewportWidth.value ? viewportHeight.value : undefined } })
 })
 onMounted(() => {
+  const root = window.document.documentElement
+  const hostStyle = root.getAttribute('style')
+  root.dataset.idStudioTheme = ''
+  root.removeAttribute('style')
+  watch(draft, doc => {
+    shellConfig.ui = previewUi(hostUi, seed.theme.ui ?? {}, doc.theme.ui ?? {}) as typeof shellConfig.ui
+    shellTheme.value = studioPreviewCss(doc)
+  }, { immediate: true, deep: true })
+  onBeforeUnmount(() => {
+    shellConfig.ui = hostUi
+    delete root.dataset.idStudioTheme
+    if (hostStyle === null) root.removeAttribute('style')
+    else root.setAttribute('style', hostStyle)
+    // Let the host runtime reapply its theme for the current color mode.
+    root.setAttribute('class', root.className)
+  })
   // The shell and its teleported controls must follow the same mode as the frames,
   // including when a shared URL overrides a saved or system preference.
   watch([preference, () => colorMode.unknown], ([value, unknown]) => {
@@ -622,7 +643,18 @@ onMounted(() => {
   loadSource()
 })
 watch([draft, baseline, exported], persist, { deep: true, flush: 'post' })
-watch([draft, baseline, scene, templatePage, previewPath, mode, state, compare], () => nextTick(refresh), { deep: true })
+watch([draft, baseline, scene, templatePage, previewPath, state, compare], () => nextTick(refresh), { deep: true })
+watch(mode, value => {
+  if (!import.meta.client) return
+  // Same-origin documents change CSS mode in one task, before the next paint.
+  for (const frame of [originalFrame.value, draftFrame.value]) {
+    const root = frame?.contentDocument?.documentElement
+    if (!root) continue
+    root.classList.toggle('dark', value === 'dark')
+    root.classList.toggle('light', value === 'light')
+    frame?.contentWindow?.postMessage({ type: 'id-studio-color-mode', mode: value }, window.location.origin)
+  }
+}, { flush: 'sync' })
 onBeforeUnmount(() => { window.removeEventListener('message', ready); window.removeEventListener('beforeunload', beforeUnload) })
 </script>
 

@@ -31,6 +31,7 @@ export default defineNuxtPlugin(() => {
   }
 
   function syncClientTheme() {
+    if (document.documentElement.hasAttribute('data-id-studio-theme')) return
     const theme = brandTheme.currentTheme.value
 
     if (!theme) {
@@ -58,6 +59,7 @@ export default defineNuxtPlugin(() => {
       watch(() => brandTheme.currentTheme.value, syncClientTheme, { immediate: true })
 
       onNuxtReady(() => {
+        if (document.documentElement.hasAttribute('data-id-studio-theme')) return
         brandTheme.restorePersistedTheme()
       })
 
