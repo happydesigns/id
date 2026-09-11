@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 const width = defineModel<number>('width', { required: true })
 const height = defineModel<number>('height', { required: true })
+const zoom = defineModel<number>('zoom', { default: 1 })
 const dragging = ref(false)
 let origin = { x: 0, y: 0, width: 0, height: 0, scale: 1 }
 const clamp = (value: number) => Math.min(3840, Math.max(240, Math.round(value)))
@@ -11,15 +12,19 @@ function start(event: PointerEvent) {
   if (!width.value) { width.value = clamp(available.value.width); height.value = clamp(available.value.height) }
   origin = { x: event.clientX, y: event.clientY, width: width.value, height: height.value, scale: currentScale || 1 }
   dragging.value = true
+  zoom.value = currentScale
+  ;(event.currentTarget as HTMLElement).focus()
   ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
   event.preventDefault()
 }
 function move(event: PointerEvent, axis: string) {
   if (!dragging.value) return
-  if (axis !== 'height') width.value = clamp(origin.width + 2 * (event.clientX - origin.x) / origin.scale)
-  if (axis !== 'width') height.value = clamp(origin.height + (event.clientY - origin.y) / origin.scale)
+  if (axis !== 'height') width.value = clamp(Math.min(available.value.width / origin.scale, origin.width + 2 * (event.clientX - origin.x) / origin.scale))
+  if (axis !== 'width') height.value = clamp(Math.min(available.value.height / origin.scale, origin.height + (event.clientY - origin.y) / origin.scale))
 }
+function cancel() { if (dragging.value) { width.value = origin.width; height.value = origin.height; dragging.value = false } }
 function keyboard(event: KeyboardEvent, axis: string) {
+  if (event.key === 'Escape') { event.preventDefault(); cancel(); return }
   if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return
   event.preventDefault()
   if (!width.value) { width.value = clamp(available.value.width); height.value = clamp(available.value.height) }
@@ -37,7 +42,7 @@ onMounted(() => {
   if (surface.value) observer.observe(surface.value)
 })
 onBeforeUnmount(() => observer?.disconnect())
-const scale = computed(() => dragging.value ? origin.scale : width.value ? Math.min(1, available.value.width / width.value, available.value.height / height.value) : 1)
+const scale = computed(() => dragging.value ? origin.scale : width.value ? Math.min(zoom.value, available.value.width / width.value, available.value.height / height.value) : 1)
 const frameStyle = computed(() => width.value ? { width: `${width.value}px`, height: `${height.value}px`, flex: 'none', transform: `scale(${scale.value})`, transformOrigin: 'top left' } : { width: '100%', height: '100%' })
 </script>
 
@@ -45,7 +50,7 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
   <div ref="surface" class="viewport-surface" :class="{ 'viewport-responsive': width }">
     <div class="viewport-frame" :style="width ? { width: `${width * scale}px`, height: `${height * scale}px` } : { width: '100%', height: '100%' }">
       <slot :frame-style="frameStyle" />
-      <button v-for="axis in width ? ['width', 'height', 'both'] : []" :key="axis" type="button" :class="['viewport-handle', `handle-${axis}`]" :aria-label="`Resize viewport ${axis}`" :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`" @pointerdown="start" @pointermove="move($event, axis)" @pointerup="dragging = false" @pointercancel="dragging = false" @lostpointercapture="dragging = false" @keydown="keyboard($event, axis)"><span aria-hidden="true" /></button>
+      <button v-for="axis in width ? ['width', 'height', 'both'] : []" :key="axis" type="button" :class="['viewport-handle', `handle-${axis}`]" :aria-label="`Resize viewport ${axis}`" :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`" @pointerdown="start" @pointermove="move($event, axis)" @pointerup="dragging = false" @pointercancel="cancel" @lostpointercapture="dragging = false" @keydown="keyboard($event, axis)"><span aria-hidden="true" /></button>
     </div>
     <span v-if="width && scale < 0.99" class="viewport-scale">{{ Math.round(scale * 100) }}%</span>
   </div>
@@ -65,4 +70,10 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
 .handle-both { bottom: -20px; right: -20px; width: 20px; height: 20px; cursor: nwse-resize; }
 .handle-both span { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; border-bottom-right-radius: 3px; }
 .viewport-scale { position: absolute; bottom: 2px; right: 26px; font-size: 11px; color: var(--ui-text-muted); background: var(--ui-bg); border-radius: 4px; padding: 2px 4px; pointer-events: none; }
+@media (pointer: coarse) {
+  .viewport-responsive { padding: 28px; }
+  .handle-width { width: 28px; right: -28px; }
+  .handle-height { height: 28px; bottom: -28px; }
+  .handle-both { width: 28px; height: 28px; right: -28px; bottom: -28px; }
+}
 </style>

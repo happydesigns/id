@@ -30,6 +30,7 @@ watch(scene, () => { templatePage.value = selectedTemplate.value?.pages[0]?.id |
 const colorMode = useColorMode()
 const preference = ref<'light' | 'dark' | 'system'>(route.query.mode === 'dark' ? 'dark' : route.query.mode === 'light' ? 'light' : 'system')
 const mode = computed<'light' | 'dark'>(() => preference.value === 'system' ? colorMode.value === 'dark' ? 'dark' : 'light' : preference.value)
+const previewZoom = ref(1)
 const state = ref(route.query.state === 'error' ? 'error' : 'default')
 const compare = ref(route.query.compare === 'true')
 function viewportDimension(value: unknown, fallback: number) { const number = Number(value); return Number.isInteger(number) && number >= 240 && number <= 3840 ? number : fallback }
@@ -39,6 +40,16 @@ const editing = ref(route.query.browse !== 'true')
 const panel = ref('colors')
 const error = ref('')
 const notice = ref('')
+const toast = useToast()
+watch(notice, message => {
+  if (!message) return
+  toast.add({ id: 'studio-status', description: message, color: 'neutral' })
+  notice.value = ''
+})
+watch(error, message => {
+  if (message) toast.add({ id: 'studio-error', description: message, color: 'error' })
+  else toast.remove('studio-error')
+})
 const exportOpen = ref(false)
 const exportTab = ref('changes')
 const busy = ref(false)
@@ -49,6 +60,10 @@ const draftFrame = ref<HTMLIFrameElement>()
 const history = ref<StudioDocument[]>([])
 const future = ref<StudioDocument[]>([])
 const recovery = ref<StudioSession>()
+watch(recovery, session => {
+  if (!session) { toast.remove('studio-recovery'); return }
+  toast.add({ id: 'studio-recovery', title: 'An older draft is available', description: session.draft.theme.label, duration: 0, actions: [{ label: 'Open draft', onClick: () => restore(session) }] })
+})
 const projects = ref<StudioSession[]>([])
 const brandPickerOpen = ref(false)
 const brandSearch = ref('')
@@ -250,6 +265,10 @@ function replace(doc: StudioDocument, key?: string) {
   projectId.value = crypto.randomUUID()
   recovery.value = undefined
   persist()
+  if (key && storageReady.value) {
+    try { localStorage.setItem(lastProjectKey, `catalog:${key}`) }
+    catch { notice.value = 'The selected brand could not be remembered in this browser.' }
+  }
 }
 async function loadSource(replaceDraft = false) {
   if (!writerToken) return
@@ -324,7 +343,7 @@ async function openDocument(event: Event) {
     if (file.size > 8_000_000) throw new Error('Choose a brand document smaller than 8 MB.')
     const doc = parseStudioDocument(await file.text())
     guard(() => replace(doc))
-  } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Could not open this document.' }
+  } catch { error.value = file.size > 8_000_000 ? 'Choose a brand document smaller than 8 MB.' : 'This file is not a valid brand document. Choose a Studio source JSON file.' }
   finally { if (input.value) input.value.value = '' }
 }
 async function addLogo(file: File | null | undefined) {
@@ -482,6 +501,13 @@ onMounted(() => {
   try {
     listProjects()
     const last = localStorage.getItem(lastProjectKey)
+    storageReady.value = true
+    const active = projects.value.find(item => item.id === last)
+    if (active) { restore(active); return }
+    if (last?.startsWith('catalog:')) {
+      const selected = catalog.find(item => item.key === last.slice(8))
+      if (selected) { replace(selected.document, selected.key); if (selected.key === 'host') loadSource(); return }
+    }
     recovery.value = projects.value.find(item => item.id === last)
     if (!recovery.value) {
       const stored = localStorage.getItem(storageKey)
@@ -552,20 +578,15 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <template #body><form id="studio-create-brand" @submit.prevent="createBrand"><UFormField label="Name" :error="createError" required><UInput v-model="createName" aria-label="New brand name" autofocus maxlength="80" class="w-full" @update:model-value="createError = ''" /></UFormField></form></template>
       <template #footer><UButton color="neutral" variant="ghost" @click="createOpen = false">Cancel</UButton><UButton type="submit" form="studio-create-brand" :disabled="!createName.trim()">Create brand</UButton></template>
     </UModal>
-    <div v-if="recovery" class="studio-notice" role="status">
-      <span>A saved draft is available.</span><UButton @click="restore(recovery)">Restore draft</UButton><UButton variant="ghost" color="neutral" @click="recovery = undefined">Dismiss</UButton>
-    </div>
-    <UAlert v-if="error" role="alert" color="error" :description="error" :close="{ onClick: () => error = '' }" />
-    <div v-if="notice" class="studio-notice" role="status">{{ notice }}<UButton variant="ghost" color="neutral" @click="notice = ''">Dismiss</UButton></div>
     <div class="studio-workspace" :class="{ 'studio-browsing': !editing, 'studio-editing': editing }">
       <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
         <section v-if="compare" class="studio-frame-wrap">
           <div class="studio-frame-label">Applied <span>{{ baseline.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" v-model:width="viewportWidth" v-model:height="viewportHeight"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
         </section>
         <section class="studio-frame-wrap">
           <div class="studio-frame-label">Draft <span>{{ draft.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" v-model:width="viewportWidth" v-model:height="viewportHeight"><iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="send(draftFrame, draft)" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight"><iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="send(draftFrame, draft)" /></StudioViewport>
         </section>
       </div>
       <aside v-if="editing && !readOnly" class="studio-inspector" aria-label="Brand settings">
@@ -643,7 +664,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       </div>
       <div class="studio-toolbar-end studio-desktop">
         <UTooltip text="Compare applied and draft"><UButton icon="i-lucide-columns-2" aria-label="Compare applied brand" :aria-pressed="compare" color="neutral" :variant="compare ? 'soft' : 'ghost'" @click="compare = !compare" /></UTooltip>
-        <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" />
+        <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" @update:width="previewZoom = 1" @update:height="previewZoom = 1" />
         <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
       </div>
       <UPopover v-model:open="previewOptionsOpen">
@@ -651,7 +672,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         <template #content>
           <div class="flex w-64 flex-col gap-4 p-4">
             <div class="studio-view-mobile flex flex-col gap-4"><UCheckbox v-model="compare" label="Compare applied brand" />
-            <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" />
+            <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" @update:width="previewZoom = 1" @update:height="previewZoom = 1" />
             <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
             </div><USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" />
             <UButton color="neutral" variant="outline" icon="i-lucide-link" @click="shareView">Copy view link</UButton>
