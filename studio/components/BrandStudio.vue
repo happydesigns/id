@@ -429,17 +429,15 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
 <template>
   <main class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
-      <div class="studio-brand-controls">
-      <UPopover v-model:open="brandPickerOpen" :content="{ align: 'start' }">
-        <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
-        <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="{ 'aria-label': 'Search brands' }" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]' }" /></template>
-      </UPopover>
       <UDropdownMenu :items="projectItems" :content="{ align: 'start' }">
-        <UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" aria-label="Brand actions" class="shrink-0" />
+        <UButton color="neutral" variant="ghost" icon="i-lucide-menu" aria-label="Brand actions" class="studio-main-menu"><span class="studio-menu-label">Menu</span></UButton>
       </UDropdownMenu>
-      </div>
       <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
+        <UPopover v-model:open="brandPickerOpen" :content="{ align: 'start' }">
+          <UButton color="neutral" variant="outline" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
+          <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="{ 'aria-label': 'Search brands' }" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]' }" /></template>
+        </UPopover>
         <USelect v-model="scene" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
       </div>
       <UButton class="studio-review studio-desktop" color="neutral" variant="outline" @click="exportTab = connected ? 'changes' : 'source'; exportOpen = true">{{ connected ? 'Changes' : 'Download' }}<span v-if="dirty" class="text-muted">{{ changes.length }}</span></UButton>
@@ -577,11 +575,11 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 <style scoped>
 .studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: var(--ui-bg); color: var(--ui-text); }
 .studio-header { flex: none; min-height: 56px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }.studio-project-name { min-width: 0; max-width: 100%; justify-self: start; }.studio-review { justify-self: end; }
-.studio-brand-controls { display: flex; align-items: center; min-width: 0; justify-self: start; max-width: 100%; }
+.studio-main-menu { justify-self: start; }
 .studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
 .studio-dot { color: var(--ui-primary); }
 
-.studio-scenes { display: flex; align-items: center; gap: 4px; margin: auto; min-width: 0; }.studio-scenes > * { max-width: 155px; }
+.studio-scenes { display: flex; align-items: center; gap: 8px; margin: auto; min-width: 0; max-width: 60vw; }.studio-scenes > * { max-width: 240px; min-width: 0; }
 .studio-project-menu, .studio-mobile-control { display: none; }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
 .studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 16px; }
@@ -611,9 +609,10 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 1px solid 
   .studio-inspector { position: static; width: 100%; flex: 1; box-shadow: none; }
 }
 @media (max-width: 700px) {
-  .studio-header { grid-template-columns: minmax(0, 1fr) auto; }
-  .studio-scenes { margin: 0; }
-  .studio-scenes > * { max-width: 155px; }
+  .studio-header { grid-template-columns: auto minmax(0, 1fr); }
+  .studio-scenes { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: none; }
+  .studio-scenes > * { width: 100%; max-width: none; }
   .studio-dock-settings { width: auto; }
 }
+@media (max-width: 480px) { .studio-menu-label { display: none; } }
 </style>
