@@ -60,7 +60,15 @@ const input = ref<HTMLInputElement>()
 const originalFrame = ref<HTMLIFrameElement>()
 const draftFrame = ref<HTMLIFrameElement>()
 const loadedFrames = ref({ original: false, draft: false })
-watch(scene, () => { loadedFrames.value = { original: false, draft: false } }, { flush: 'sync' })
+const failedFrames = ref({ original: false, draft: false })
+const previewAttempt = ref(0)
+function retryPreview() { failedFrames.value = { original: false, draft: false }; loadedFrames.value = { original: false, draft: false }; previewAttempt.value++ }
+function frameLoaded(frame: HTMLIFrameElement | undefined, doc: StudioDocument, key: 'original' | 'draft') {
+  if (!frame?.contentDocument) { failedFrames.value[key] = true; return }
+  send(frame, doc)
+}
+
+watch(scene, () => { failedFrames.value = { original: false, draft: false }; loadedFrames.value = { original: false, draft: false } }, { flush: 'sync' })
 watch(compare, () => { loadedFrames.value.original = false })
 const history = ref<StudioDocument[]>([])
 const future = ref<StudioDocument[]>([])
@@ -128,6 +136,15 @@ function saveManagedProject() {
 const exported = ref<StudioDocument>()
 const projectId = ref('')
 const storageReady = ref(false)
+watch([loadedFrames, storageReady, compare, previewAttempt], (_value, _previous, cleanup) => {
+  if (!storageReady.value || (loadedFrames.value.draft && (!compare.value || loadedFrames.value.original))) return
+  const timer = setTimeout(() => {
+    if (!loadedFrames.value.draft) failedFrames.value.draft = true
+    if (compare.value && !loadedFrames.value.original) failedFrames.value.original = true
+  }, 30000)
+  cleanup(() => clearTimeout(timer))
+}, { deep: true })
+
 const storedLocally = ref(false)
 const fieldErrors = ref<Record<string, string>>({})
 const previewOptionsOpen = ref(false)
@@ -407,13 +424,15 @@ async function addLogo(file: File | null | undefined) {
   reader.readAsDataURL(file)
 }
 function send(frame: HTMLIFrameElement | undefined, doc: StudioDocument) {
-  frame?.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, page: templatePage.value, path: previewPath.value, mode: mode.value, state: state.value }, window.location.origin)
+  if (!frame?.contentDocument) return
+  frame.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, page: templatePage.value, path: previewPath.value, mode: mode.value, state: state.value }, window.location.origin)
 }
 function refresh() { send(originalFrame.value, baseline.value); send(draftFrame.value, draft.value) }
 function ready(event: MessageEvent) {
   if (event.origin !== window.location.origin) return
   if (event.source !== originalFrame.value?.contentWindow && event.source !== draftFrame.value?.contentWindow) return
   if (event.data?.type === 'id-studio-rendered') {
+    failedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = false
     loadedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true
     return
   }
@@ -424,7 +443,7 @@ function ready(event: MessageEvent) {
     return
   }
   if (event.data?.type === 'id-studio-mode' && ['light', 'dark'].includes(event.data.mode)) { preference.value = event.data.mode; return }
-  if (event.data?.type === 'id-studio-preview-error') { loadedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true; error.value = 'This preview could not apply the brand. Try reloading it.'; return }
+  if (event.data?.type === 'id-studio-preview-error') { failedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true; loadedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true; error.value = 'This preview could not apply the brand. Try reloading it.'; return }
   if (event.data?.type !== 'id-studio-ready') return
   if (event.source === originalFrame.value?.contentWindow) send(originalFrame.value, baseline.value)
   if (event.source === draftFrame.value?.contentWindow) send(draftFrame.value, draft.value)
@@ -658,11 +677,11 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
         <section v-if="compare" class="studio-frame-wrap">
           <div class="studio-frame-label">Original <span>{{ baseline.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.original"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.original" :failed="failedFrames.original" @retry="retryPreview"><iframe ref="originalFrame" :key="`${scene}:${previewAttempt}`" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="frameLoaded(originalFrame, baseline, 'original')" /></StudioViewport>
         </section>
         <section class="studio-frame-wrap">
           <div class="studio-frame-label">Draft <span>{{ draft.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.draft"><iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="send(draftFrame, draft)" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.draft" :failed="failedFrames.draft" @retry="retryPreview"><iframe ref="draftFrame" :key="`${scene}:${previewAttempt}`" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="frameLoaded(draftFrame, draft, 'draft')" /></StudioViewport>
         </section>
       </div>
       <aside v-if="editing && !readOnly" class="studio-inspector" aria-label="Brand settings">

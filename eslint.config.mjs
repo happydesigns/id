@@ -6,6 +6,8 @@ export default withNuxt({
     '.tmp/**',
     'node_modules/**',
     'docs/.nuxt/**',
+    'docs/.nuxt-dev/**',
+    'playground/.nuxt-dev/**',
     'playground/.nuxt/**'
   ]
 })

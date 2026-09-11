@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-defineProps<{ loading?: boolean }>()
+defineProps<{ loading?: boolean, failed?: boolean }>()
+defineEmits<{ retry: [] }>()
 const width = defineModel<number>('width', { required: true })
 const height = defineModel<number>('height', { required: true })
 const zoom = defineModel<number>('zoom', { default: 1 })
@@ -52,7 +53,13 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
     <div class="viewport-frame" :style="width ? { width: `${width * scale}px`, height: `${height * scale}px` } : { width: '100%', height: '100%' }">
       <div class="viewport-clip">
       <slot :frame-style="frameStyle" />
-      <div v-if="loading" class="viewport-loading" role="status"><UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" /><span class="sr-only">Loading preview</span></div>
+      <div v-if="failed" class="viewport-loading">
+        <div class="space-y-3 p-6 text-center">
+          <p role="alert" class="text-sm">Preview could not load.</p>
+          <UButton color="neutral" variant="outline" icon="i-lucide-refresh-cw" @click="$emit('retry')">Retry preview</UButton>
+        </div>
+      </div>
+      <div v-else-if="loading" class="viewport-loading" role="status"><UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" /><span class="sr-only">Loading preview</span></div>
       </div>
       <button v-for="axis in width ? ['width', 'height', 'both'] : []" :key="axis" type="button" :class="['viewport-handle', `handle-${axis}`]" :aria-label="`Resize viewport ${axis}`" :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`" @pointerdown="start" @pointermove="move($event, axis)" @pointerup="dragging = false" @pointercancel="cancel" @lostpointercapture="dragging = false" @keydown="keyboard($event, axis)"><span aria-hidden="true" /></button>
     </div>
