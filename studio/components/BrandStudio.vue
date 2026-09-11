@@ -48,6 +48,12 @@ const recovery = ref<StudioSession>()
 const projects = ref<StudioSession[]>([])
 const brandPickerOpen = ref(false)
 const brandSearch = ref('')
+const brandSearchInput = { placeholder: 'Search brands…', 'aria-label': 'Search brands' }
+const createOpen = ref(false)
+const createName = ref('')
+const createError = ref('')
+const createBase = ref<StudioDocument>()
+const persistPristine = ref(false)
 const exported = ref<StudioDocument>()
 const projectId = ref('')
 const storageReady = ref(false)
@@ -77,8 +83,8 @@ const currentLogo = computed(() => draft.value.brand.assets?.logos?.[logoRole.va
 function removeLogo() { edit(doc => { if (doc.brand.assets?.logos) Reflect.deleteProperty(doc.brand.assets.logos, logoRole.value) }) }
 const logoRoles = [{ label: 'Wordmark · light', value: 'wordmark' }, { label: 'Wordmark · dark', value: 'wordmarkInverse' }, { label: 'Symbol · light', value: 'logo' }, { label: 'Symbol · dark', value: 'logoInverse' }]
 const projectItems = computed(() => [
-  [{ label: 'Create new brand', icon: 'i-lucide-plus', onSelect: () => guard(() => replace(createBlankStudioDocument())) }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }],
-  [{ label: 'Duplicate brand', icon: 'i-lucide-copy', onSelect: () => { const doc = clone(draft.value); doc.theme.label += ' copy'; replace(doc) } }, { label: 'Review changes', icon: 'i-lucide-git-compare-arrows', onSelect: () => { exportOpen.value = true } }, { label: 'Download', icon: 'i-lucide-download', onSelect: () => { exportOpen.value = true; exportTab.value = 'source' } }],
+  [{ label: 'Create new brand', icon: 'i-lucide-plus', onSelect: () => beginCreate() }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }],
+  [{ label: 'Duplicate brand', icon: 'i-lucide-copy', onSelect: () => beginCreate(draft.value) }, { label: 'Review changes', icon: 'i-lucide-git-compare-arrows', onSelect: () => { exportOpen.value = true } }, { label: 'Download', icon: 'i-lucide-download', onSelect: () => { exportOpen.value = true; exportTab.value = 'source' } }],
   [{ label: 'Reset draft', icon: 'i-lucide-rotate-ccw', disabled: !dirty.value, onSelect: reset }, { label: 'Open connected project', icon: 'i-lucide-folder-sync', disabled: !writerToken, onSelect: () => guard(() => loadSource(true)) }, { label: 'Documentation', icon: 'i-lucide-book-open', to: config.idStudio?.home || '/' }]
 ])
 const brandGroups = computed(() => [
@@ -87,8 +93,25 @@ const brandGroups = computed(() => [
     const saved = projects.value.find(project => project.catalogKey === key)
     return { label: key === catalogKey.value ? draft.value.theme.label : saved?.draft.theme.label || item.document.theme.label, icon: key === catalogKey.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: item.document.brand.packageName, onSelect: () => pickBrand(() => selectCatalog(item.key)) }
   }) },
-  { id: 'local', label: 'Saved in this browser', items: projects.value.filter(project => !catalog.some(item => project.catalogKey === catalogPrefix + item.key)).map(project => ({ label: project.draft.theme.label, icon: project.id === projectId.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: project.draft.brand.packageName, onSelect: () => pickBrand(() => restore(project)) })) }
+  { id: 'local', label: 'Saved in this browser', items: projects.value.filter(project => !catalog.some(item => project.catalogKey === catalogPrefix + item.key)).map(project => ({ label: project.draft.theme.label, description: projects.value.filter(other => other.draft.theme.label === project.draft.theme.label).length > 1 ? `${project.draft.brand.packageName || project.draft.brand.name} · ${new Date(project.updatedAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'medium' })}` : undefined, icon: project.id === projectId.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: project.draft.brand.packageName, onSelect: () => pickBrand(() => restore(project)) })) }
 ])
+function beginCreate(base?: StudioDocument) {
+  createBase.value = base ? clone(base) : undefined
+  createName.value = base ? `${base.theme.label} copy` : ''
+  createError.value = ''
+  createOpen.value = true
+}
+function createBrand() {
+  const name = createName.value.trim()
+  if (!name) { createError.value = 'Give your brand a name.'; return }
+  if (name.length > 80) { createError.value = 'Use 80 characters or fewer.'; return }
+  const existing = [...catalog.map(item => item.document.theme.label), ...projects.value.map(project => project.draft.theme.label)]
+  if (existing.some(label => label.trim().toLocaleLowerCase() === name.toLocaleLowerCase())) { createError.value = 'A brand with this name already exists. Choose a different name.'; return }
+  const doc = clone(createBase.value || createBlankStudioDocument())
+  doc.theme.label = name
+  createOpen.value = false
+  guard(() => { persist(); replace(doc) })
+}
 function pickBrand(action: () => void) {
   brandPickerOpen.value = false
   brandSearch.value = ''
@@ -105,7 +128,7 @@ function selectCatalog(key: string) {
   }
 }
 function customize() {
-  if (readOnly.value) guard(() => replace(createBlankStudioDocument()))
+  if (readOnly.value) beginCreate()
   else editing.value = !editing.value
 }
 const panels = [{ label: 'Brand', value: 'identity' }, { label: 'Palette', value: 'colors' }, { label: 'Typography', value: 'type' }, { label: 'Appearance', value: 'details' }]
@@ -161,6 +184,7 @@ function reset() {
   error.value = ''
 }
 function replace(doc: StudioDocument, key?: string) {
+  persistPristine.value = !key
   connected.value = false
   catalogKey.value = key ? catalogPrefix + key : undefined
   sourceConflict.value = false
@@ -333,6 +357,7 @@ function listProjects() {
 }
 function persist() {
   if (!storageReady.value || !projectId.value || readOnly.value) return
+  if (!persistPristine.value && !dirty.value && !exported.value && !projects.value.some(project => project.id === projectId.value)) return
   storedLocally.value = false
   try {
     const session: StudioSession = { id: projectId.value, baseline: clone(baseline.value), draft: clone(draft.value), exported: exported.value ? clone(exported.value) : undefined, updatedAt: Date.now(), catalogKey: catalogKey.value }
@@ -343,6 +368,7 @@ function persist() {
   } catch { notice.value = 'Local draft storage is unavailable. Export your source before leaving.' }
 }
 function restore(session: StudioSession) {
+  persistPristine.value = true
   connected.value = false
   error.value = ''
   notice.value = ''
@@ -430,19 +456,23 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
   <main class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
       <UDropdownMenu :items="projectItems" :content="{ align: 'start' }">
-        <UButton color="neutral" variant="ghost" icon="i-lucide-menu" aria-label="Brand actions" class="studio-main-menu"><span class="studio-menu-label">Menu</span></UButton>
+        <UButton color="neutral" variant="ghost" icon="i-lucide-menu" aria-label="Brand actions" class="studio-main-menu"><span class="studio-menu-label">Studio</span></UButton>
       </UDropdownMenu>
       <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
         <UPopover v-model:open="brandPickerOpen" :content="{ align: 'start' }">
-          <UButton color="neutral" variant="outline" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
-          <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="{ 'aria-label': 'Search brands' }" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]' }" /></template>
+          <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
+          <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="brandSearchInput" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]', itemDescription: 'whitespace-normal break-words text-clip overflow-visible' }" /></template>
         </UPopover>
-        <USelect v-model="scene" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
+        <USelect v-model="scene" variant="ghost" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
       </div>
       <UButton class="studio-review studio-desktop" color="neutral" variant="outline" @click="exportTab = connected ? 'changes' : 'source'; exportOpen = true">{{ connected ? 'Changes' : 'Download' }}<span v-if="dirty" class="text-muted">{{ changes.length }}</span></UButton>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
+    <UModal v-model:open="createOpen" :title="createBase ? 'Duplicate brand' : 'Create brand'" description="Choose a name for your brand.">
+      <template #body><form id="studio-create-brand" @submit.prevent="createBrand"><UFormField label="Name" :error="createError" required><UInput v-model="createName" aria-label="New brand name" autofocus maxlength="80" class="w-full" @update:model-value="createError = ''" /></UFormField></form></template>
+      <template #footer><UButton color="neutral" variant="ghost" @click="createOpen = false">Cancel</UButton><UButton type="submit" form="studio-create-brand" :disabled="!createName.trim()">Create brand</UButton></template>
+    </UModal>
     <div v-if="recovery" class="studio-notice" role="status">
       <span>A saved draft is available.</span><UButton @click="restore(recovery)">Restore draft</UButton><UButton variant="ghost" color="neutral" @click="recovery = undefined">Dismiss</UButton>
     </div>
