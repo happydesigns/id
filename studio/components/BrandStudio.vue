@@ -561,11 +561,11 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
         <section v-if="compare" class="studio-frame-wrap">
           <div class="studio-frame-label">Applied <span>{{ baseline.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" :width="viewportWidth" :height="viewportHeight"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:width="viewportWidth" v-model:height="viewportHeight"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
         </section>
         <section class="studio-frame-wrap">
           <div class="studio-frame-label">Draft <span>{{ draft.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" :width="viewportWidth" :height="viewportHeight"><iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="send(draftFrame, draft)" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:width="viewportWidth" v-model:height="viewportHeight"><iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="send(draftFrame, draft)" /></StudioViewport>
         </section>
       </div>
       <aside v-if="editing && !readOnly" class="studio-inspector" aria-label="Brand settings">
@@ -650,10 +650,10 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         <UButton color="neutral" variant="ghost" icon="i-lucide-settings-2" label="View" />
         <template #content>
           <div class="flex w-64 flex-col gap-4 p-4">
-            <UCheckbox v-model="compare" label="Compare applied brand" />
+            <div class="studio-view-mobile flex flex-col gap-4"><UCheckbox v-model="compare" label="Compare applied brand" />
             <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" />
             <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
-            <USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" />
+            </div><USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" />
             <UButton color="neutral" variant="outline" icon="i-lucide-link" @click="shareView">Copy view link</UButton>
           </div>
         </template>
@@ -689,7 +689,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-dot { color: var(--ui-primary); }
 
 .studio-scenes { display: flex; align-items: center; gap: 8px; margin: auto; min-width: 0; max-width: 60vw; }.studio-scenes > * { max-width: 240px; min-width: 0; }
-.studio-project-menu, .studio-mobile-control { display: none; }
+.studio-project-menu, .studio-mobile-control, .studio-view-mobile { display: none; }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
 .studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 16px; }
 .studio-toolbar-end, .studio-dock-settings { display: flex; gap: 8px; align-items: center; }
@@ -707,7 +707,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; border-
 @media (max-width: 700px) {
   .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 48px; gap: 8px; }.studio-wordmark { font-size: 26px; }.studio-scenes { flex: 1; justify-content: center; gap: 4px; }.studio-scenes > * { min-width: 0; max-width: 130px; }.studio-project-actions { display: none; }.studio-project-menu { display: inline-flex; flex: none; }
   .studio-workspace { position: relative; display: flex; }.studio-canvas { flex: 1; }.studio-inspector { position: absolute; z-index: 2; inset: 0 0 0 auto; width: min(320px, 100%); box-shadow: -12px 0 36px #0002; }
-  .studio-mobile-control { display: inline-flex; }.studio-desktop { display: none; }.studio-toolbar { flex-wrap: nowrap; justify-content: space-between; }.studio-dock-settings { width: 100%; }.studio-dock-settings > * { flex: 1; justify-content: center; }.studio-toolbar-end { width: 100%; flex-wrap: wrap; justify-content: space-between; }.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .studio-view-mobile { display: flex; }.studio-mobile-control { display: inline-flex; }.studio-desktop { display: none; }.studio-toolbar { flex-wrap: nowrap; justify-content: space-between; }.studio-dock-settings { width: 100%; }.studio-dock-settings > * { flex: 1; justify-content: center; }.studio-toolbar-end { width: 100%; flex-wrap: wrap; justify-content: space-between; }.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 }
 </style>
 
