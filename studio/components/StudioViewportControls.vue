@@ -28,7 +28,7 @@ function rotate() { const previous = width.value; width.value = height.value; he
 
 <template>
   <div class="viewport-controls">
-    <USelect :model-value="selected" :items="presets" aria-label="Preview width" class="max-w-48" @update:model-value="select(String($event))" />
+    <USelect :model-value="selected" :items="presets" aria-label="Preview width" class="max-w-48" :ui="{ content: 'min-w-64 max-w-[calc(100vw-2rem)]', itemLabel: 'whitespace-normal' }" @update:model-value="select(String($event))" />
     <div v-if="width" class="flex items-center gap-1">
       <UInput :model-value="width" type="number" :min="240" :max="3840" aria-label="Viewport width" class="w-20" @change="dimension('width', $event)" />
       <span class="text-muted" aria-hidden="true">×</span>
