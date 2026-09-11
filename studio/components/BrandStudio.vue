@@ -568,7 +568,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
         <UPopover v-model:open="brandPickerOpen" :content="{ align: 'start' }">
-          <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
+          <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name" :ui="{ trailingIcon: 'ms-auto shrink-0' }"><span class="truncate">{{ draft.theme.label }}</span></UButton>
           <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="brandSearchInput" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]', itemDescription: 'whitespace-normal break-words text-clip overflow-visible' }" /></template>
         </UPopover>
         <USelect v-model="scene" variant="ghost" aria-label="Template" :ui="{ content: 'min-w-48 max-w-[calc(100vw-2rem)]', itemLabel: 'whitespace-normal' }" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
@@ -752,7 +752,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
 .studio-dot { color: var(--ui-primary); }
 
-.studio-scenes { display: flex; align-items: center; gap: 8px; margin: auto; min-width: 0; max-width: 60vw; }.studio-scenes > * { max-width: 240px; min-width: 0; }
+.studio-scenes { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 9rem); align-items: center; gap: 8px; margin: auto; width: 21.5rem; min-width: 0; max-width: 60vw; }.studio-scenes > * { width: 100%; min-width: 0; }
 .studio-project-menu, .studio-mobile-control, .studio-view-mobile { display: none; }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
 .studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 16px; }
@@ -784,7 +784,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; border-
 }
 @media (max-width: 700px) {
   .studio-header { grid-template-columns: auto minmax(0, 1fr); }
-  .studio-scenes { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: none; }
+  .studio-scenes { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); width: 100%; max-width: none; }
   .studio-scenes > * { width: 100%; max-width: none; }
   .studio-dock-settings { width: auto; }
 }
