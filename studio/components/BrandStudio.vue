@@ -638,12 +638,12 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
           </template>
           <template v-if="section.value === 'colors'">
             <UFormField v-for="role in ['primary', 'neutral']" :key="role" :label="title(role)">
-              <StudioPaletteSelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :label="title(role)" :options="paletteOptions" :colors="draft.brand.colors" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
+              <StudioPaletteSelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :label="title(role)" :role="role" :options="paletteOptions" :colors="draft.brand.colors" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
             </UFormField>
             <UAccordion :items="[{ label: 'More color roles', value: 'roles' }]">
               <template #body><div class="studio-form-section">
                 <UFormField v-for="role in studioRoles.filter(role => !['primary', 'neutral'].includes(role))" :key="role" :label="title(role)">
-                  <StudioPaletteSelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :label="title(role)" :options="paletteOptions" :colors="draft.brand.colors" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
+                  <StudioPaletteSelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :label="title(role)" :role="role" :options="paletteOptions" :colors="draft.brand.colors" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
                 </UFormField>
               </div></template>
             </UAccordion>
@@ -760,7 +760,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }
 .studio-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }.studio-comparing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .studio-frame-wrap { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; }.studio-frame-label { display: none; }.studio-comparing .studio-frame-label { display: flex; justify-content: space-between; align-self: stretch; padding: 0 6px 6px; font-size: 11px; }.studio-frame-label span { color: var(--ui-text-muted); }
-iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; border-radius: 18px; background: var(--ui-bg); box-shadow: inset 0 0 0 1px var(--ui-border); }
+iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; background: var(--ui-bg); }
 .studio-inspector { display: flex; flex-direction: column; border: 1px solid var(--ui-border); border-radius: 16px; min-width: 0; min-height: 0; overflow: hidden; background: var(--ui-bg); }
 .studio-inspector-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--ui-border); }
 .studio-fields { flex: 1; min-height: 0; padding: 0 16px; overflow-y: auto; overscroll-behavior: contain; }.studio-form-section { display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; }

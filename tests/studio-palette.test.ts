@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { studioBuiltinPalettes } from '../src/studio'
-import { paletteRamp, paletteSwatch } from '../studio/palette'
+import { paletteRamp, paletteSwatch, rolePalettes } from '../studio/palette'
 
 describe('Studio palette swatches', () => {
+  it('suggests role-appropriate palettes without hiding custom or existing choices', () => {
+    const options = ['slate', 'green', 'sand']
+    const custom = { sand: { 500: '#aaaa88' } }
+    expect(rolePalettes(options, 'neutral', '__default', custom)).toEqual(['slate', 'sand'])
+    expect(rolePalettes(options, 'primary', '__default', custom)).toEqual(['green', 'sand'])
+    expect(rolePalettes(options, 'neutral', 'green', custom)).toEqual(options)
+    expect(rolePalettes(options, 'neutral', '__default', custom, true)).toEqual(options)
+  })
   it('resolves every built-in palette without host CSS variables', () => {
     for (const name of studioBuiltinPalettes) {
       expect(paletteSwatch(name, {})).toBeTruthy()
