@@ -572,7 +572,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
           <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
           <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="brandSearchInput" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]', itemDescription: 'whitespace-normal break-words text-clip overflow-visible' }" /></template>
         </UPopover>
-        <USelect v-model="scene" variant="ghost" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
+        <USelect v-model="scene" variant="ghost" aria-label="Template" :ui="{ content: 'min-w-48 max-w-[calc(100vw-2rem)]', itemLabel: 'whitespace-normal' }" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
       </div>
       <UButton class="studio-review studio-desktop" color="neutral" variant="ghost" :icon="connected ? 'i-lucide-git-compare-arrows' : 'i-lucide-download'" @click="exportTab = connected ? 'changes' : 'download'; exportOpen = true">{{ connected ? 'Review changes' : 'Download' }}</UButton>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
