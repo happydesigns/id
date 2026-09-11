@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import StudioPaletteSelect from './StudioPaletteSelect.vue'
+import StudioTemplatePicker from './StudioTemplatePicker.vue'
 import { paletteRamp } from '../palette'
 import { copyConfig, previewUi, studioPreviewCss } from '../preview'
 import StudioViewport from './StudioViewport.vue'
@@ -689,7 +690,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
           <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name" :ui="{ trailingIcon: 'ms-auto shrink-0' }"><span class="truncate">{{ draft.theme.label }}</span></UButton>
           <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="brandSearchInput" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]', itemDescription: 'whitespace-normal break-words text-clip overflow-visible' }" /></template>
         </UPopover>
-        <USelect v-model="scene" variant="ghost" aria-label="Template" :ui="{ content: 'min-w-48 max-w-[calc(100vw-2rem)]', itemLabel: 'whitespace-normal' }" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
+        <StudioTemplatePicker v-model="scene" :templates="templates" />
       </div>
       <UButton class="studio-review studio-desktop" color="neutral" variant="ghost" :icon="connected ? 'i-lucide-git-compare-arrows' : 'i-lucide-download'" @click="exportTab = connected ? 'changes' : 'download'; exportOpen = true">{{ connected ? 'Review changes' : 'Download' }}</UButton>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
@@ -881,7 +882,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
 .studio-dot { color: var(--ui-primary); }
 
-.studio-scenes { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 9rem); align-items: center; gap: 8px; margin: auto; width: 21.5rem; min-width: 0; max-width: 60vw; padding: 4px; border-radius: 14px; background: var(--ui-bg-elevated); }.studio-scenes > * { width: 100%; min-width: 0; }
+.studio-scenes { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 18rem); align-items: center; gap: 8px; margin: auto; width: 29.5rem; min-width: 0; max-width: 60vw; padding: 4px; border-radius: 14px; background: var(--ui-bg-elevated); }.studio-scenes > * { width: 100%; min-width: 0; }
 .studio-project-menu, .studio-mobile-control, .studio-view-mobile { display: none; }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
 .studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-bg); }
@@ -914,7 +915,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; backgro
 }
 @media (max-width: 700px) {
   .studio-header { grid-template-columns: auto minmax(0, 1fr); }
-  .studio-scenes { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); width: 100%; max-width: none; }
+  .studio-scenes { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 11rem); width: 100%; max-width: none; }
   .studio-scenes > * { width: 100%; max-width: none; }
   .studio-dock-settings { width: auto; }
 }

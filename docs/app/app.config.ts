@@ -3,12 +3,13 @@ import {
   sampleBrandTheme
 } from '../../themes/sample-brand'
 import { idBrandGuide, nuxtUiBrandTheme } from '../../themes/nuxt-ui'
+const docsThumbnail = '/id-studio/templates/docs.png'
 
 const nuxtUiAppConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
 
 export default defineAppConfig({
   idStudio: {
-    templates: { docs: { label: 'Docs', owner: 'docus', route: '/getting-started/introduction', routePrefix: '/getting-started' } }
+    templates: { docs: { label: 'Docs', description: 'Docus navigation, search, prose and code examples.', thumbnail: docsThumbnail, owner: 'docus', route: '/getting-started/introduction', routePrefix: '/getting-started' } }
   },
   seo: {
     title: 'happydesigns id',

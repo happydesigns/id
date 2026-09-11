@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { studioTemplates } from '../studio/templates'
 
 describe('optional studio templates', () => {
+  it('preserves local thumbnail assets for capability-owned previews', () => {
+    const entry = { label: 'Academy', component: 'CourseAcademyPreview', description: 'Lessons and course navigation.', thumbnail: '/previews/academy.webp', pages: [{ id: 'home', label: 'Home' }] }
+    expect(studioTemplates({ academy: entry }).at(-1)?.thumbnail).toBe('/previews/academy.webp')
+    expect(studioTemplates({ academy: { ...entry, thumbnail: '//example.com/preview.png' } }).at(-1)?.thumbnail).toBeUndefined()
+  })
   it('keeps the base studio usable without capability packages', () => {
     expect(studioTemplates().map(item => item.id)).toEqual(['landing'])
   })
