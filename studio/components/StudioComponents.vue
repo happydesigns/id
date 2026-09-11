@@ -24,7 +24,7 @@ const validateFeedback = (state: typeof feedback) => [
 ]
 const pin = ref(['4', '3', '2', '', '', ''])
 const users = ['Alex Morgan', 'Sam Taylor', 'Jamie Chen']
-const card = { body: 'p-4 sm:p-5' }
+const card = { header: 'px-4 py-4', body: 'p-4', footer: 'px-4 py-3' }
 </script>
 
 <template>
@@ -40,8 +40,8 @@ const card = { body: 'p-4 sm:p-5' }
         </UFormField>
       </UCard>
       <UCard :ui="card" class="example-card">
-        <h2>Recent activity</h2>
-        <div class="mt-5 divide-y divide-default">
+        <template #header><h2>Recent activity</h2></template>
+        <div class="divide-y divide-default">
           <div v-for="(item, index) in [{ name: 'Brand library', detail: 'Published a new version', icon: 'i-lucide-library', time: '2m' }, { name: 'Website refresh', detail: 'Ready for your review', icon: 'i-lucide-panels-top-left', time: '18m' }, { name: 'Product launch', detail: 'Added three new assets', icon: 'i-lucide-sparkles', time: '1h' }, { name: 'Team workspace', detail: 'Jamie joined the team', icon: 'i-lucide-users', time: '2h' }]" :key="item.name" class="flex items-center gap-3 py-3" :class="{ 'pt-0': index === 0 }">
             <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-elevated"><UIcon :name="item.icon" class="size-4 text-muted" /></span>
             <div class="min-w-0 flex-1"><p class="text-sm font-medium text-highlighted">{{ item.name }}</p><p class="text-xs text-muted">{{ item.detail }}</p></div><span class="text-xs text-muted">{{ item.time }}</span>
@@ -78,12 +78,12 @@ const card = { body: 'p-4 sm:p-5' }
       <UCard :ui="card" class="example-card">
         <h2>Project budget</h2>
         <div class="mt-5 space-y-4">
-          <UFormField label="Project budget"><UInputNumber v-model="amount" :min="0" :step="100" :format-options="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }" class="w-full" /></UFormField>
+          <UFormField label="Amount"><UInputNumber v-model="amount" :min="0" :step="100" :format-options="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }" class="w-full" /></UFormField>
           <UFormField label="Workspace"><USelect :items="['Design team', 'Marketing', 'Product']" default-value="Design team" class="w-full" /></UFormField>
           <UFormField label="Priority"><USelect :items="['Normal', 'High', 'Low']" default-value="Normal" class="w-full" /></UFormField>
           <div class="flex justify-between text-sm"><span class="text-muted">Next check-in</span><span class="text-highlighted">Tomorrow</span></div>
-          <UButton block @click="planSaved = !planSaved">{{ planSaved ? 'Plan saved' : 'Save plan' }}</UButton>
         </div>
+        <template #footer><div class="flex justify-end"><UButton @click="planSaved = !planSaved">{{ planSaved ? 'Plan saved' : 'Save plan' }}</UButton></div></template>
       </UCard>
       <UCard :ui="card" class="example-card">
         <div class="flex items-start justify-between gap-3"><div><p class="text-sm text-muted">Tasks completed</p><p class="mt-1 text-3xl font-semibold text-highlighted">92<span class="text-lg text-muted">%</span></p></div><UBadge color="success" variant="subtle" size="sm">+12%</UBadge></div>
@@ -92,8 +92,8 @@ const card = { body: 'p-4 sm:p-5' }
       </UCard>
       <UCard :ui="card" class="example-card">
         <h2>Actions</h2>
-        <div class="mt-4 flex flex-wrap gap-2"><UButton @click="saved = !saved">{{ saved ? 'Changes saved' : 'Save changes' }}</UButton><UButton color="neutral" variant="outline" @click="open = true">Preview dialog</UButton><UButton disabled>Unavailable</UButton></div>
-        <div class="mt-4 flex flex-wrap gap-2"><UBadge>New</UBadge><UBadge color="success" variant="subtle">Approved</UBadge><UBadge color="warning" variant="subtle">In review</UBadge></div>
+        <div class="mt-4 flex flex-wrap gap-2"><UButton @click="saved = !saved">{{ saved ? 'Changes saved' : 'Save changes' }}</UButton><UButton color="neutral" variant="outline" @click="open = true">Preview dialog</UButton><UButton color="neutral" variant="soft" disabled>Unavailable</UButton></div>
+        <div class="mt-4 flex flex-wrap gap-2"><UBadge variant="subtle">New</UBadge><UBadge color="success" variant="subtle">Approved</UBadge><UBadge color="warning" variant="subtle">In review</UBadge></div>
       </UCard>
     </div>
 
@@ -123,8 +123,8 @@ const card = { body: 'p-4 sm:p-5' }
     <div class="gallery-column">
       <UCard :ui="card" class="example-card">
         <h2>Notifications</h2>
-        <div class="my-5 space-y-5"><USwitch v-model="notifications" label="Project updates" description="Reviews, milestones and next steps." /><USwitch v-model="security" label="Security alerts" description="Account activity worth knowing about." /><USwitch v-model="marketing" label="News and inspiration" description="Fresh ideas, every now and then." /></div>
-        <UButton color="neutral" @click="preferencesSaved = !preferencesSaved">{{ preferencesSaved ? 'Preferences saved' : 'Save preferences' }}</UButton>
+        <div class="mt-4 space-y-4"><USwitch v-model="notifications" label="Project updates" description="Reviews, milestones and next steps." /><USwitch v-model="security" label="Security alerts" description="Account activity worth knowing about." /><USwitch v-model="marketing" label="News and inspiration" description="Fresh ideas, every now and then." /></div>
+        <template #footer><div class="flex justify-end"><UButton color="neutral" @click="preferencesSaved = !preferencesSaved">{{ preferencesSaved ? 'Preferences saved' : 'Save preferences' }}</UButton></div></template>
       </UCard>
       <UCard :ui="card" class="example-card">
         <div class="flex items-start justify-between"><div><p class="text-sm text-muted">Visitors</p><p class="mt-1 text-3xl font-semibold text-highlighted">24,680</p></div><UBadge color="success" variant="subtle" size="sm">+18%</UBadge></div>
@@ -150,7 +150,9 @@ const card = { body: 'p-4 sm:p-5' }
 .gallery-column { display: contents; }
 .gallery-column > * { break-inside: avoid; margin-bottom: 16px; }
 .example-card { min-width: 0; }
-h2 { font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--ui-text-highlighted); }
+.example-card :deep(label) { font-weight: 500; }
+.example-card :deep([data-slot="label"]) { font-weight: 500; }
+h2 { font-size: 15px; line-height: 1.5; font-weight: 600; color: var(--ui-text-highlighted); }
 .card-description { margin-top: 2px; font-size: 13px; line-height: 1.55; color: var(--ui-text-muted); }
 .goal-ring { background: conic-gradient(var(--ui-primary) 0 80%, var(--ui-bg-accented) 80% 100%); }
 @media (max-width: 1199px) { .component-gallery { columns: 3; } }
