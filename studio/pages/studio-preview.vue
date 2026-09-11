@@ -65,8 +65,9 @@ function receive(event: MessageEvent) {
         return alpha === 255 ? `rgb(${r}, ${g}, ${b})` : ''
       }
       window.parent.postMessage({ type: 'id-studio-colors', foreground: srgb(styles.color), background: srgb(styles.backgroundColor) }, window.location.origin)
+      window.parent.postMessage({ type: 'id-studio-rendered' }, window.location.origin)
     })))
-  } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Preview unavailable.' }
+  } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Preview unavailable.'; window.parent.postMessage({ type: 'id-studio-preview-error' }, window.location.origin) }
 }
 onMounted(() => {
   window.addEventListener('message', receive)

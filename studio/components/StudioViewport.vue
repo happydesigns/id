@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+defineProps<{ loading?: boolean }>()
 const width = defineModel<number>('width', { required: true })
 const height = defineModel<number>('height', { required: true })
 const zoom = defineModel<number>('zoom', { default: 1 })
@@ -50,6 +51,7 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
   <div ref="surface" class="viewport-surface" :class="{ 'viewport-responsive': width }">
     <div class="viewport-frame" :style="width ? { width: `${width * scale}px`, height: `${height * scale}px` } : { width: '100%', height: '100%' }">
       <slot :frame-style="frameStyle" />
+      <div v-if="loading" class="viewport-loading" role="status"><UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" /><span class="sr-only">Loading preview</span></div>
       <button v-for="axis in width ? ['width', 'height', 'both'] : []" :key="axis" type="button" :class="['viewport-handle', `handle-${axis}`]" :aria-label="`Resize viewport ${axis}`" :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`" @pointerdown="start" @pointermove="move($event, axis)" @pointerup="dragging = false" @pointercancel="cancel" @lostpointercapture="dragging = false" @keydown="keyboard($event, axis)"><span aria-hidden="true" /></button>
     </div>
     <span v-if="width && scale < 0.99" class="viewport-scale">{{ Math.round(scale * 100) }}%</span>
@@ -60,6 +62,7 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
 .viewport-surface { position: relative; flex: 1; width: 100%; min-height: 0; display: flex; justify-content: center; overflow: hidden; }
 .viewport-responsive { box-sizing: border-box; padding: 20px; background: var(--ui-bg-muted); border-radius: 18px; }
 .viewport-frame { position: relative; flex: none; }
+.viewport-loading { position: absolute; inset: 0; display: grid; place-items: center; background: var(--ui-bg-muted); color: var(--ui-text-muted); border-radius: 18px; z-index: 2; }
 .viewport-handle { position: absolute; display: flex; align-items: center; justify-content: center; color: var(--ui-text-dimmed); border: 0; background: transparent; touch-action: none; z-index: 1; }
 .viewport-handle:hover, .viewport-handle:focus-visible { color: var(--ui-primary); background: var(--ui-bg-accented); border-radius: 6px; outline: none; }
 .viewport-handle:focus-visible { box-shadow: inset 0 0 0 2px var(--ui-primary); }

@@ -60,6 +60,7 @@ export default defineNuxtPlugin({
         if (withinStudioRoute(event.data.path, template!.routePrefix!) && router.currentRoute.value.path !== event.data.path) await router.replace({ path: event.data.path, query: initial.query })
         await nextTick()
         status.value = 'ready'
+        requestAnimationFrame(() => requestAnimationFrame(() => post({ type: 'id-studio-rendered' })))
       } catch { post({ type: 'id-studio-preview-error', message: 'The documentation preview could not apply this brand.' }) }
       finally { applying = false }
     }

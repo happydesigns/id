@@ -57,6 +57,9 @@ const pending = ref<(() => void) | null>(null)
 const input = ref<HTMLInputElement>()
 const originalFrame = ref<HTMLIFrameElement>()
 const draftFrame = ref<HTMLIFrameElement>()
+const loadedFrames = ref({ original: false, draft: false })
+watch(scene, () => { loadedFrames.value = { original: false, draft: false } }, { flush: 'sync' })
+watch(compare, () => { loadedFrames.value.original = false })
 const history = ref<StudioDocument[]>([])
 const future = ref<StudioDocument[]>([])
 const recovery = ref<StudioSession>()
@@ -365,6 +368,10 @@ function refresh() { send(originalFrame.value, baseline.value); send(draftFrame.
 function ready(event: MessageEvent) {
   if (event.origin !== window.location.origin) return
   if (event.source !== originalFrame.value?.contentWindow && event.source !== draftFrame.value?.contentWindow) return
+  if (event.data?.type === 'id-studio-rendered') {
+    loadedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true
+    return
+  }
   if (event.data?.type === 'id-studio-colors' && event.source === draftFrame.value?.contentWindow) { bodyContrast.value = contrastRatio(String(event.data.foreground), String(event.data.background)); return }
   if (event.data?.type === 'id-studio-navigate') {
     if (event.data.scene === scene.value && selectedTemplate.value?.pages.some(page => page.id === event.data.page)) templatePage.value = event.data.page
@@ -372,7 +379,7 @@ function ready(event: MessageEvent) {
     return
   }
   if (event.data?.type === 'id-studio-mode' && ['light', 'dark'].includes(event.data.mode)) { preference.value = event.data.mode; return }
-  if (event.data?.type === 'id-studio-preview-error') { error.value = 'This preview could not apply the brand. Try reloading it.'; return }
+  if (event.data?.type === 'id-studio-preview-error') { loadedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true; error.value = 'This preview could not apply the brand. Try reloading it.'; return }
   if (event.data?.type !== 'id-studio-ready') return
   if (event.source === originalFrame.value?.contentWindow) send(originalFrame.value, baseline.value)
   if (event.source === draftFrame.value?.contentWindow) send(draftFrame.value, draft.value)
@@ -530,7 +537,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
 </script>
 
 <template>
-  <main class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
+  <main v-if="storageReady" class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
       <UDropdownMenu :items="projectItems" :content="{ align: 'start' }">
         <UButton color="neutral" variant="ghost" icon="i-lucide-menu" aria-label="Brand actions" class="studio-main-menu"><span class="studio-menu-label">Studio</span></UButton>
@@ -543,7 +550,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         </UPopover>
         <USelect v-model="scene" variant="ghost" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
       </div>
-      <UButton class="studio-review studio-desktop" color="neutral" variant="outline" @click="exportTab = connected ? 'changes' : 'source'; exportOpen = true">{{ connected ? 'Changes' : 'Download' }}<span v-if="dirty" class="text-muted">{{ changes.length }}</span></UButton>
+      <UButton class="studio-review studio-desktop" color="neutral" variant="ghost" :icon="connected ? 'i-lucide-git-compare-arrows' : 'i-lucide-download'" @click="exportTab = connected ? 'changes' : 'source'; exportOpen = true">{{ connected ? 'Review changes' : 'Download' }}</UButton>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
     <UModal v-model:open="manageOpen" title="Manage brands" description="Saved in this browser. Repository files are unchanged." :ui="{ content: 'max-w-2xl' }">
@@ -582,11 +589,11 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
         <section v-if="compare" class="studio-frame-wrap">
           <div class="studio-frame-label">Applied <span>{{ baseline.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.original"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
         </section>
         <section class="studio-frame-wrap">
           <div class="studio-frame-label">Draft <span>{{ draft.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight"><iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="send(draftFrame, draft)" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.draft"><iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="send(draftFrame, draft)" /></StudioViewport>
         </section>
       </div>
       <aside v-if="editing && !readOnly" class="studio-inspector" aria-label="Brand settings">
@@ -681,22 +688,24 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       </UPopover>
     </div>
     <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
-    <UModal v-model:open="exportOpen" :title="connected ? 'Review changes' : 'Download brand'" :ui="{ content: 'max-w-4xl' }">
+    <UModal v-model:open="exportOpen" :title="connected ? 'Review changes' : 'Download brand'" :ui="{ content: 'max-w-4xl h-[min(720px,calc(100dvh-2rem))]', body: 'flex min-h-0 flex-1 flex-col overflow-hidden', header: 'shrink-0', footer: 'shrink-0 flex-wrap' }">
       <template #body>
         <p class="mb-4 text-sm text-muted">{{ connected ? 'Apply to the connected project source.' : 'Download a source document or a new Nuxt brand layer.' }} <code v-if="connected">{{ sourcePath }}</code></p>
         <UAlert v-if="sourceConflict" color="warning" title="Source changed" description="Your draft is preserved. Download it before reopening the project to resolve the conflict." class="mb-4" />
-        <div v-if="exportTab === 'changes'" class="mb-4 divide-y divide-default">
+        <UTabs v-model="exportTab" :items="[{ label: 'Source', value: 'source' }, { label: 'Changes', value: 'changes' }, { label: 'CSS', value: 'css' }]" variant="link" :ui="{ root: 'flex min-h-0 flex-1 flex-col', list: 'shrink-0 justify-start', trigger: 'flex-none', content: 'min-h-0 flex-1 overflow-auto' }">
+        <template #content="{ item }">
+        <div v-if="item.value === 'changes'" class="mb-4 divide-y divide-default">
           <p v-if="!changes.length" class="text-sm text-muted">No changes to apply.</p>
           <div v-for="change in changes" :key="change.path" class="py-2 text-sm"><code>{{ change.path }}</code><div class="mt-1 break-all text-muted">{{ change.before ?? 'Inherited' }} → {{ change.after ?? 'Inherited' }}</div></div>
         </div>
-        <div class="mb-4 flex gap-2"><UButton v-for="item in ['source', 'changes', 'css']" :key="item" color="neutral" :variant="exportTab === item ? 'soft' : 'ghost'" :aria-pressed="exportTab === item" @click="exportTab = item">{{ item === 'css' ? 'CSS' : item === 'source' ? 'Source' : 'Changes' }}</UButton></div>
-        <pre v-if="exportTab !== 'changes'" class="studio-export-code">{{ output }}</pre>
+        <pre v-else class="studio-export-code">{{ output }}</pre>
+        </template></UTabs>
         <p class="mt-4 text-sm text-muted">A new project includes a Nuxt brand layer and Studio. Custom fonts, Vue components and capabilities must be added separately.</p>
-        <p v-if="error" role="alert" class="mt-4 text-sm text-error">{{ error }}</p>
       </template>
       <template #footer><UButton v-if="connected" :loading="busySource" :disabled="!dirty || sourceConflict || Object.keys(fieldErrors).length > 0" @click="applySource">Apply changes</UButton><UButton color="neutral" variant="outline" @click="exportSource">Download source</UButton><UButton color="neutral" variant="outline" :loading="busy" @click="exportProject">Download new project</UButton></template>
     </UModal>
   </main>
+  <div v-else class="studio-loading" role="status"><UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" /><span class="sr-only">Loading Studio</span></div>
 </template>
 
 <style>
@@ -723,7 +732,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; border-
 .studio-fields { flex: 1; min-height: 0; padding: 0 16px; overflow-y: auto; overscroll-behavior: contain; }.studio-form-section { display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; }
 .studio-help { font-size: 12px; line-height: 1.6; color: var(--ui-text-muted); }.studio-inspector-footer { border-top: 1px solid var(--ui-border); padding: 12px 16px; font-size: 11px; color: var(--ui-text-muted); }
 .studio-code { font-size: 11px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { flex: none; max-height: 100px; overflow: auto; display: flex; gap: 12px; align-items: center; padding: 8px 12px; font-size: 13px; }
-.studio-export-code { max-height: 45vh; overflow: auto; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); font-size: 12px; }
+.studio-export-code { min-height: 100%; width: max-content; min-width: 100%; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); font-size: 12px; }
 @media (max-width: 1100px) { .studio-toolbar { flex-wrap: wrap; }.studio-workspace { grid-template-columns: minmax(0, 1fr) 280px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) {
   .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 48px; gap: 8px; }.studio-wordmark { font-size: 26px; }.studio-scenes { flex: 1; justify-content: center; gap: 4px; }.studio-scenes > * { min-width: 0; max-width: 130px; }.studio-project-actions { display: none; }.studio-project-menu { display: inline-flex; flex: none; }
@@ -733,6 +742,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; border-
 </style>
 
 <style scoped>
+.studio-loading { height: 100dvh; display: grid; place-items: center; color: var(--ui-text-muted); background: var(--ui-bg); }
 @media (max-width: 900px) {
   .studio-workspace.studio-editing { display: flex; }
   .studio-editing .studio-canvas { display: none; }
