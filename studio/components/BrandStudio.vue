@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import StudioPaletteSelect from './StudioPaletteSelect.vue'
+import { paletteSwatch } from '../palette'
 import StudioViewport from './StudioViewport.vue'
 import StudioViewportControls from './StudioViewportControls.vue'
 import { createBlankStudioDocument, createStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
@@ -208,10 +210,7 @@ function fontOptions(role: string) {
   const stacks = [...new Set([draft.value.theme.typography?.[role], draft.value.brand.typography?.[role], baseline.value.theme.typography?.[role], baseline.value.brand.typography?.[role]])]
   return [...stacks.filter((stack): stack is string => !!stack && !fontPresets.some(item => item.value === stack)).map(stack => ({ label: stack.split(',')[0]!.replace(/["']/g, ''), value: stack })), ...fontPresets]
 }
-function swatch(name: string) {
-  const palette = draft.value.brand.colors[name]
-  return typeof palette === 'string' ? palette : palette?.['500'] || Object.values(palette || {})[0] || `var(--color-${name}-500)`
-}
+function swatch(name: string) { return paletteSwatch(name, draft.value.brand.colors) }
 function title(value: string) { return value.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[-_]/g, ' ').replace(/^./, letter => letter.toUpperCase()) }
 function changeLabel(path: string) {
   if (path.startsWith('theme.ui.colors.')) return `${title(path.slice('theme.ui.colors.'.length))} color`
@@ -639,18 +638,12 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
           </template>
           <template v-if="section.value === 'colors'">
             <UFormField v-for="role in ['primary', 'neutral']" :key="role" :label="title(role)">
-              <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })">
-                <template #leading><span class="size-3 rounded-full ring ring-default" :style="{ background: swatch(draft.theme.ui?.colors?.[role] || '') }" /></template>
-                <template #item-leading="{ item }"><span class="size-3 rounded-full ring ring-default" :style="{ background: swatch(item.value) }" /></template>
-              </USelect>
+              <StudioPaletteSelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :label="title(role)" :options="paletteOptions" :colors="draft.brand.colors" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
             </UFormField>
             <UAccordion :items="[{ label: 'More color roles', value: 'roles' }]">
               <template #body><div class="studio-form-section">
                 <UFormField v-for="role in studioRoles.filter(role => !['primary', 'neutral'].includes(role))" :key="role" :label="title(role)">
-                  <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })">
-                <template #leading><span class="size-3 rounded-full ring ring-default" :style="{ background: swatch(draft.theme.ui?.colors?.[role] || '') }" /></template>
-                <template #item-leading="{ item }"><span class="size-3 rounded-full ring ring-default" :style="{ background: swatch(item.value) }" /></template>
-              </USelect>
+                  <StudioPaletteSelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :label="title(role)" :options="paletteOptions" :colors="draft.brand.colors" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
                 </UFormField>
               </div></template>
             </UAccordion>
