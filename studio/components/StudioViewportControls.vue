@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 const width = defineModel<number>('width', { required: true })
 const height = defineModel<number>('height', { required: true })
+let lastSize = { width: 390, height: 844 }
+watch([width, height], ([w, h]) => { if (w) lastSize = { width: w, height: h } }, { immediate: true, flush: 'sync' })
+function toggle() {
+  if (width.value) width.value = 0
+  else { height.value = lastSize.height; width.value = lastSize.width }
+}
 const presets = [
-  { label: 'Auto', value: 'auto', width: 0, height: 844 },
   { label: 'Mobile S · 320 × 568', value: 'small', width: 320, height: 568 },
   { label: 'Mobile · 390 × 844', value: 'mobile', width: 390, height: 844 },
   { label: 'Tablet · 768 × 1024', value: 'tablet', width: 768, height: 1024 },
@@ -28,7 +33,8 @@ function rotate() { const previous = width.value; width.value = height.value; he
 
 <template>
   <div class="viewport-controls">
-    <USelect :model-value="selected" :items="presets" aria-label="Preview width" class="max-w-48" :ui="{ content: 'min-w-64 max-w-[calc(100vw-2rem)]', itemLabel: 'whitespace-normal' }" @update:model-value="select(String($event))" />
+    <UTooltip :text="width ? 'Return to standard preview' : 'Responsive preview'"><UButton icon="i-lucide-tablet-smartphone" aria-label="Responsive preview" :aria-pressed="!!width" color="neutral" :variant="width ? 'soft' : 'ghost'" @click="toggle" /></UTooltip>
+    <USelect v-if="width" :model-value="selected" :items="presets" aria-label="Preview width" class="max-w-48" :ui="{ content: 'min-w-64 max-w-[calc(100vw-2rem)]', itemLabel: 'whitespace-normal' }" @update:model-value="select(String($event))" />
     <div v-if="width" class="flex items-center gap-1">
       <UInput :model-value="width" type="number" :min="240" :max="3840" aria-label="Viewport width" class="w-20" @change="dimension('width', $event)" />
       <span class="text-muted" aria-hidden="true">×</span>

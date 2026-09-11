@@ -42,10 +42,10 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
 </script>
 
 <template>
-  <div ref="surface" class="viewport-surface">
+  <div ref="surface" class="viewport-surface" :class="{ 'viewport-responsive': width }">
     <div class="viewport-frame" :style="width ? { width: `${width * scale}px`, height: `${height * scale}px` } : { width: '100%', height: '100%' }">
       <slot :frame-style="frameStyle" />
-      <button v-for="axis in ['width', 'height', 'both']" :key="axis" type="button" :class="['viewport-handle', `handle-${axis}`]" :aria-label="`Resize viewport ${axis}`" :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`" @pointerdown="start" @pointermove="move($event, axis)" @pointerup="dragging = false" @pointercancel="dragging = false" @lostpointercapture="dragging = false" @keydown="keyboard($event, axis)"><UIcon :name="axis === 'both' ? 'i-lucide-move-diagonal-2' : axis === 'width' ? 'i-lucide-grip-vertical' : 'i-lucide-grip-horizontal'" /></button>
+      <button v-for="axis in width ? ['width', 'height', 'both'] : []" :key="axis" type="button" :class="['viewport-handle', `handle-${axis}`]" :aria-label="`Resize viewport ${axis}`" :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`" @pointerdown="start" @pointermove="move($event, axis)" @pointerup="dragging = false" @pointercancel="dragging = false" @lostpointercapture="dragging = false" @keydown="keyboard($event, axis)"><span aria-hidden="true" /></button>
     </div>
     <span v-if="width && scale < 0.99" class="viewport-scale">{{ Math.round(scale * 100) }}%</span>
   </div>
@@ -53,11 +53,16 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
 
 <style scoped>
 .viewport-surface { position: relative; flex: 1; width: 100%; min-height: 0; display: flex; justify-content: center; overflow: hidden; }
+.viewport-responsive { box-sizing: border-box; padding: 20px; background: var(--ui-bg-muted); border-radius: 18px; }
 .viewport-frame { position: relative; flex: none; }
-.viewport-handle { position: absolute; display: flex; align-items: center; justify-content: center; background: var(--ui-bg-elevated); color: var(--ui-text-muted); border: 1px solid var(--ui-border); border-radius: 6px; touch-action: none; z-index: 1; }
-.viewport-handle:hover, .viewport-handle:focus-visible { color: var(--ui-primary); outline: 2px solid var(--ui-primary); }
-.handle-width { right: 0; top: calc(50% - 18px); width: 16px; height: 36px; cursor: ew-resize; }
-.handle-height { bottom: 0; left: calc(50% - 18px); width: 36px; height: 16px; cursor: ns-resize; }
-.handle-both { bottom: 0; right: 0; width: 22px; height: 22px; cursor: nwse-resize; }
-.viewport-scale { position: absolute; bottom: 4px; right: 8px; font-size: 11px; color: var(--ui-text-muted); background: var(--ui-bg); border-radius: 4px; padding: 2px 4px; pointer-events: none; }
+.viewport-handle { position: absolute; display: flex; align-items: center; justify-content: center; color: var(--ui-text-dimmed); border: 0; background: transparent; touch-action: none; z-index: 1; }
+.viewport-handle:hover, .viewport-handle:focus-visible { color: var(--ui-primary); background: var(--ui-bg-accented); border-radius: 6px; outline: none; }
+.viewport-handle:focus-visible { box-shadow: inset 0 0 0 2px var(--ui-primary); }
+.handle-width { right: -20px; top: 0; width: 20px; height: 100%; cursor: ew-resize; }
+.handle-height { bottom: -20px; left: 0; width: 100%; height: 20px; cursor: ns-resize; }
+.handle-width span { width: 4px; height: 36px; border-radius: 4px; background: currentColor; }
+.handle-height span { height: 4px; width: 36px; border-radius: 4px; background: currentColor; }
+.handle-both { bottom: -20px; right: -20px; width: 20px; height: 20px; cursor: nwse-resize; }
+.handle-both span { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; border-bottom-right-radius: 3px; }
+.viewport-scale { position: absolute; bottom: 2px; right: 26px; font-size: 11px; color: var(--ui-text-muted); background: var(--ui-bg); border-radius: 4px; padding: 2px 4px; pointer-events: none; }
 </style>
