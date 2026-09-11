@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import StudioPaletteSelect from './StudioPaletteSelect.vue'
-import { paletteSwatch } from '../palette'
+import { paletteRamp } from '../palette'
 import StudioViewport from './StudioViewport.vue'
 import StudioViewportControls from './StudioViewportControls.vue'
 import { createBlankStudioDocument, createStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
@@ -210,7 +210,6 @@ function fontOptions(role: string) {
   const stacks = [...new Set([draft.value.theme.typography?.[role], draft.value.brand.typography?.[role], baseline.value.theme.typography?.[role], baseline.value.brand.typography?.[role]])]
   return [...stacks.filter((stack): stack is string => !!stack && !fontPresets.some(item => item.value === stack)).map(stack => ({ label: stack.split(',')[0]!.replace(/["']/g, ''), value: stack })), ...fontPresets]
 }
-function swatch(name: string) { return paletteSwatch(name, draft.value.brand.colors) }
 function title(value: string) { return value.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[-_]/g, ' ').replace(/^./, letter => letter.toUpperCase()) }
 function changeLabel(path: string) {
   if (path.startsWith('theme.ui.colors.')) return `${title(path.slice('theme.ui.colors.'.length))} color`
@@ -218,7 +217,30 @@ function changeLabel(path: string) {
 }
 function changeValue(value: unknown) { return value == null ? 'Inherited' : typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value) }
 const fontPresets = [{ label: 'System sans', value: 'system-ui, sans-serif' }, { label: 'System serif', value: 'Georgia, serif' }, { label: 'System mono', value: 'ui-monospace, monospace' }]
-const newColorName = ref('accent')
+const newColorName = ref('')
+const paletteOpen = ref(false)
+const paletteTarget = ref('')
+const paletteAction = ref<'create' | 'rename' | 'delete'>('create')
+const paletteExpanded = ref<string>()
+const replacementPalette = ref('')
+const paletteNameError = computed(() => {
+  const name = newColorName.value.trim()
+  if (!name) return 'Enter a palette name.'
+  if (!/^[a-z][a-z0-9-]*$/.test(name)) return 'Use lowercase letters, numbers and hyphens.'
+  if (studioBuiltinPalettes.includes(name) || Object.keys(draft.value.brand.colors).some(key => key !== paletteTarget.value && key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase() === name)) return 'This palette name is already in use.'
+  return ''
+})
+function paletteUses(name: string) {
+  const tokenName = name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+  const cssUse = Object.values(draft.value.theme.cssVariables || {}).some(variables => Object.values(variables || {}).some(value => value.includes(`--color-${tokenName}-`)))
+  return [...Object.entries(draft.value.theme.ui?.colors || {}).filter(([, palette]) => palette === name).map(([role]) => title(role)), ...Object.entries(draft.value.brand.roles || {}).filter(([, palette]) => palette === name).map(([role]) => title(role)), ...(cssUse ? ['CSS variables'] : [])]
+}
+function openPalette(action: 'create' | 'rename' | 'delete', name = '') {
+  paletteAction.value = action; paletteTarget.value = name; newColorName.value = action === 'rename' ? name : ''
+  newColor.value = '#2563eb'; replacementPalette.value = ''; delete fieldErrors.value['new-palette']; paletteOpen.value = true
+}
+const replacementOptions = computed(() => paletteOptions.value.filter(name => name !== paletteTarget.value && (!Object.values(draft.value.brand.roles || {}).includes(paletteTarget.value) || typeof draft.value.brand.colors[name] === 'object')))
+
 const changes = computed(() => diffStudioDocuments(baseline.value, draft.value))
 const dirty = computed(() => changes.value.length > 0)
 const colors = computed(() => Object.keys(draft.value.brand.colors))
@@ -487,11 +509,37 @@ function exportSource() {
   persist()
 }
 function addPalette() {
+  const name = newColorName.value.trim()
+  if (paletteAction.value !== 'delete' && paletteNameError.value) return
+  if (paletteAction.value === 'delete' && paletteUses(paletteTarget.value).length && !replacementPalette.value) return
   edit(doc => {
-    if (!/^[a-z][a-z0-9-]*$/.test(newColorName.value) || doc.brand.colors[newColorName.value]) throw new Error('Choose a new lowercase palette name.')
-    doc.brand.colors[newColorName.value] = createStudioPalette(newColor.value)
+    if (paletteAction.value === 'create') doc.brand.colors[name] = createStudioPalette(newColor.value)
+    else {
+      const previous = paletteTarget.value
+      const next = paletteAction.value === 'rename' ? name : replacementPalette.value
+      if (paletteAction.value === 'rename') doc.brand.colors[next] = doc.brand.colors[previous]!
+      for (const roles of [doc.theme.ui?.colors, doc.brand.roles]) {
+        for (const [role, value] of Object.entries(roles || {})) if (value === previous) roles![role] = next
+      }
+      const tokenName = previous.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+      const tokenPattern = new RegExp(`--color-${tokenName}-(?:50|100|200|300|400|500|600|700|800|900|950)(?![\\w-])`, 'g')
+      for (const variables of Object.values(doc.theme.cssVariables || {})) {
+        for (const [key, value] of Object.entries(variables || {})) {
+          if (value.match(tokenPattern)) {
+            if (!next) throw new Error('This palette is referenced by CSS variables. Choose a replacement.')
+            variables![key] = value.replace(tokenPattern, token => token.replace(`--color-${tokenName}-`, `--color-${next}-`))
+          }
+        }
+      }
+      if (previous !== next) Reflect.deleteProperty(doc.brand.colors, previous)
+    }
   }, 'new-palette')
+  if (fieldErrors.value['new-palette']) return
+  paletteOpen.value = false
+  paletteExpanded.value = paletteAction.value === 'delete' ? undefined : name
+  toast.add({ id: 'studio-palette', title: paletteAction.value === 'create' ? 'Palette created' : paletteAction.value === 'rename' ? 'Palette renamed' : 'Palette deleted', description: paletteAction.value === 'create' ? 'Select it under Primary or Neutral to use it.' : undefined, color: 'neutral' })
 }
+
 function paletteColor(name: string, shade: string, color: string) {
   const field = `palette:${name}:${shade}`
   if (!CSS.supports('color', color)) { fieldErrors.value[field] = 'Enter a valid CSS color.'; return }
@@ -647,21 +695,17 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
                 </UFormField>
               </div></template>
             </UAccordion>
-            <h3 class="text-sm font-semibold">Brand palettes</h3>
-            <UAccordion :items="Object.entries(draft.brand.colors).map(([name, palette]) => ({ label: name, value: name, palette }))">
-              <template #leading="{ item }"><span class="size-4 rounded ring ring-default" :style="{ background: swatch(item.value) }" /></template>
+            <div class="flex items-center justify-between gap-2"><h3 class="text-sm font-semibold">Brand palettes</h3><UButton color="neutral" variant="soft" size="xs" icon="i-lucide-plus" @click="openPalette('create')">New palette</UButton></div>
+            <UAccordion v-model="paletteExpanded" :items="Object.entries(draft.brand.colors).map(([name, palette]) => ({ label: name, value: name, palette }))">
+              <template #leading="{ item }"><span class="h-3 w-8 shrink-0 rounded ring ring-default" :style="{ background: paletteRamp(item.value, draft.brand.colors) }" /></template>
+              <template #trailing="{ item, open }"><span v-if="paletteUses(item.value).length" class="ml-auto max-w-24 truncate text-xs text-muted" :title="[...new Set(paletteUses(item.value))].join(', ')">{{ paletteUses(item.value)[0] }}<span v-if="paletteUses(item.value).length > 1"> +{{ paletteUses(item.value).length - 1 }}</span></span><UIcon name="i-lucide-chevron-down" class="size-4 shrink-0" :class="{ 'rotate-180': open }" /></template>
               <template #body="{ item }">
                 <div class="space-y-3">
+                  <div class="flex justify-end"><UDropdownMenu :items="[{ label: 'Rename', icon: 'i-lucide-pencil', onSelect: () => openPalette('rename', item.value) }, { label: 'Delete palette', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => openPalette('delete', item.value) }]"><UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" :aria-label="`Actions for palette ${item.value}`" /></UDropdownMenu></div>
                   <IdStudioColorField v-for="(color, shade) in typeof item.palette === 'string' ? { base: item.palette } : item.palette" :key="shade" :label="`${item.label} ${shade}`" :model-value="color || ''" :error="fieldErrors[`palette:${item.label}:${shade}`]" @change="paletteColor(item.label, String(shade), $event)" />
                 </div>
               </template>
             </UAccordion>
-            <UAccordion :items="[{ label: 'Add palette', icon: 'i-lucide-plus', value: 'add' }]"><template #body><div class="studio-form-section">
-            <UFormField label="New palette name" :error="fieldErrors['new-palette']"><UInput v-model="newColorName" class="w-full" /></UFormField>
-            <IdStudioColorField label="Base color" :model-value="newColor" @change="newColor = $event" />
-            <div class="flex overflow-hidden rounded" aria-label="New palette preview"><span v-for="(color, shade) in scale" :key="shade" class="h-7 flex-1" :style="{ background: color }" :title="`${shade}: ${color}`" /></div>
-            <UButton color="neutral" variant="outline" @click="addPalette">Create palette</UButton>
-            </div></template></UAccordion>
           </template>
           <template v-if="section.value === 'type'">
             <div v-for="role in ['sans', 'mono', 'display']" :key="role" class="space-y-2">
@@ -717,6 +761,21 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         </template>
       </UPopover>
     </div>
+    <UModal v-model:open="paletteOpen" :title="paletteAction === 'create' ? 'New palette' : paletteAction === 'rename' ? 'Rename palette' : 'Delete palette'">
+      <template #body><form id="studio-palette-form" class="space-y-4" @submit.prevent="addPalette">
+        <UFormField v-if="paletteAction !== 'delete'" label="Palette name" required :error="newColorName ? paletteNameError || fieldErrors['new-palette'] : fieldErrors['new-palette']"><UInput v-model="newColorName" placeholder="e.g. accent" autofocus class="w-full" /></UFormField>
+        <template v-if="paletteAction === 'create'">
+          <IdStudioColorField label="Base color" :model-value="newColor" @change="newColor = $event" />
+          <UFormField label="Generated shades"><div class="flex overflow-hidden rounded"><span v-for="(color, shade) in scale" :key="shade" class="h-8 flex-1" :style="{ background: color }" :title="`${shade}: ${color}`" /></div></UFormField>
+        </template>
+        <template v-if="paletteAction === 'delete'">
+          <p class="text-sm">Delete <strong>{{ paletteTarget }}</strong>?</p>
+          <p v-if="paletteUses(paletteTarget).length" class="text-sm text-muted">Used by {{ [...new Set(paletteUses(paletteTarget))].join(', ') }}. Choose a replacement.</p>
+          <UFormField v-if="paletteUses(paletteTarget).length" label="Replacement palette" :required="!!paletteUses(paletteTarget).length" :error="fieldErrors['new-palette']"><USelect v-model="replacementPalette" placeholder="Select a replacement" :items="replacementOptions" class="w-full" /></UFormField>
+        </template>
+      </form></template>
+      <template #footer><UButton color="neutral" variant="ghost" @click="paletteOpen = false">Cancel</UButton><UButton type="submit" form="studio-palette-form" :color="paletteAction === 'delete' ? 'error' : 'primary'" :disabled="paletteAction === 'delete' ? !!paletteUses(paletteTarget).length && !replacementPalette : !!paletteNameError || (paletteAction === 'create' && !Object.keys(scale).length)">{{ paletteAction === 'create' ? 'Create palette' : paletteAction === 'rename' ? 'Save name' : 'Delete palette' }}</UButton></template>
+    </UModal>
     <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
     <UModal v-model:open="exportOpen" :title="connected ? 'Review changes' : 'Download brand'" :ui="{ content: 'max-w-4xl h-[min(720px,calc(100dvh-2rem))]', body: 'flex min-h-0 flex-1 flex-col overflow-hidden', header: 'shrink-0', footer: 'shrink-0 flex-wrap' }">
       <template #body>
