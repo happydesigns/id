@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import StudioViewport from './StudioViewport.vue'
+import StudioViewportControls from './StudioViewportControls.vue'
 import { createBlankStudioDocument, createStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
 import { nuxtUiBrandTheme } from '../../themes/nuxt-ui'
 import { createStudioPalette, parseStudioSession, contrastRatio } from '../editor'
@@ -30,7 +32,9 @@ const preference = ref<'light' | 'dark' | 'system'>(route.query.mode === 'dark' 
 const mode = computed<'light' | 'dark'>(() => preference.value === 'system' ? colorMode.value === 'dark' ? 'dark' : 'light' : preference.value)
 const state = ref(route.query.state === 'error' ? 'error' : 'default')
 const compare = ref(route.query.compare === 'true')
-const mobile = ref(route.query.mobile === 'true')
+function viewportDimension(value: unknown, fallback: number) { const number = Number(value); return Number.isInteger(number) && number >= 240 && number <= 3840 ? number : fallback }
+const viewportWidth = ref(viewportDimension(route.query.width, route.query.mobile === 'true' ? 390 : 0))
+const viewportHeight = ref(viewportDimension(route.query.height, 844))
 const editing = ref(route.query.browse !== 'true')
 const panel = ref('colors')
 const error = ref('')
@@ -459,12 +463,12 @@ watch(() => route.query, query => {
   preference.value = query.mode === 'dark' ? 'dark' : query.mode === 'light' ? 'light' : 'system'
   if (selectedTemplate.value?.routePrefix && withinStudioRoute(query.path, selectedTemplate.value.routePrefix)) paths.value[scene.value] = query.path
   state.value = query.state === 'error' ? 'error' : 'default'
-  compare.value = query.compare === 'true'; mobile.value = query.mobile === 'true'
+  compare.value = query.compare === 'true'; viewportWidth.value = viewportDimension(query.width, query.mobile === 'true' ? 390 : 0); viewportHeight.value = viewportDimension(query.height, 844)
   nextTick(() => { applyingQuery = false })
 })
-watch([scene, templatePage, preference, previewPath, state, compare, mobile], () => {
+watch([scene, templatePage, preference, previewPath, state, compare, viewportWidth, viewportHeight], () => {
   if (applyingQuery) return
-  router.replace({ query: { ...route.query, view: scene.value, page: selectedTemplate.value?.component ? templatePage.value : undefined, path: previewPath.value, mode: preference.value, state: scene.value === 'components' ? state.value : undefined, compare: compare.value ? 'true' : undefined, mobile: mobile.value ? 'true' : undefined } })
+  router.replace({ query: { ...route.query, view: scene.value, page: selectedTemplate.value?.component ? templatePage.value : undefined, path: previewPath.value, mode: preference.value, state: scene.value === 'components' ? state.value : undefined, compare: compare.value ? 'true' : undefined, mobile: undefined, width: viewportWidth.value || undefined, height: viewportWidth.value ? viewportHeight.value : undefined } })
 })
 onMounted(() => {
   // The shell and its teleported controls must follow the same mode as the frames,
@@ -557,11 +561,11 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
         <section v-if="compare" class="studio-frame-wrap">
           <div class="studio-frame-label">Applied <span>{{ baseline.theme.label }}</span></div>
-          <iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :class="{ 'studio-mobile': mobile }" @load="send(originalFrame, baseline)" />
+          <StudioViewport v-slot="{ frameStyle }" :width="viewportWidth" :height="viewportHeight"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
         </section>
         <section class="studio-frame-wrap">
           <div class="studio-frame-label">Draft <span>{{ draft.theme.label }}</span></div>
-          <iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :class="{ 'studio-mobile': mobile }" @load="send(draftFrame, draft)" />
+          <StudioViewport v-slot="{ frameStyle }" :width="viewportWidth" :height="viewportHeight"><iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="send(draftFrame, draft)" /></StudioViewport>
         </section>
       </div>
       <aside v-if="editing && !readOnly" class="studio-inspector" aria-label="Brand settings">
@@ -639,7 +643,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       </div>
       <div class="studio-toolbar-end studio-desktop">
         <UTooltip text="Compare applied and draft"><UButton icon="i-lucide-columns-2" aria-label="Compare applied brand" :aria-pressed="compare" color="neutral" :variant="compare ? 'soft' : 'ghost'" @click="compare = !compare" /></UTooltip>
-        <USelect :model-value="mobile ? '390' : 'auto'" aria-label="Preview width" :items="[{ label: 'Auto', value: 'auto' }, { label: '390 px', value: '390' }]" @update:model-value="mobile = $event === '390'" />
+        <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" />
         <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
       </div>
       <UPopover v-model:open="previewOptionsOpen">
@@ -647,7 +651,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         <template #content>
           <div class="flex w-64 flex-col gap-4 p-4">
             <UCheckbox v-model="compare" label="Compare applied brand" />
-            <USelect :model-value="mobile ? '390' : 'auto'" aria-label="Preview width" :items="[{ label: 'Auto width', value: 'auto' }, { label: '390 px', value: '390' }]" @update:model-value="mobile = $event === '390'" />
+            <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" />
             <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
             <USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" />
             <UButton color="neutral" variant="outline" icon="i-lucide-link" @click="shareView">Copy view link</UButton>
@@ -692,7 +696,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }
 .studio-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }.studio-comparing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .studio-frame-wrap { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; }.studio-frame-label { display: none; }.studio-comparing .studio-frame-label { display: flex; justify-content: space-between; align-self: stretch; padding: 0 6px 6px; font-size: 11px; }.studio-frame-label span { color: var(--ui-text-muted); }
-iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-bg); }iframe.studio-mobile { max-width: 390px; }
+iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; border-radius: 18px; background: var(--ui-bg); box-shadow: inset 0 0 0 1px var(--ui-border); }
 .studio-inspector { display: flex; flex-direction: column; border: 1px solid var(--ui-border); border-radius: 16px; min-width: 0; min-height: 0; overflow: hidden; background: var(--ui-bg); }
 .studio-inspector-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--ui-border); }
 .studio-fields { flex: 1; min-height: 0; padding: 0 16px; overflow-y: auto; overscroll-behavior: contain; }.studio-form-section { display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; }

@@ -146,7 +146,7 @@ const card = { body: 'p-4 sm:p-5' }
 
 <style scoped>
 /* CSS columns keep short cards packed at every frame width without a second scroll container. */
-.component-gallery { columns: 4; column-gap: 16px; padding: 20px 20px 4px; }
+.component-gallery { columns: 4; column-gap: 16px; padding: 20px; }
 .gallery-column { display: contents; }
 .gallery-column > * { break-inside: avoid; margin-bottom: 16px; }
 .example-card { min-width: 0; }
@@ -154,6 +154,6 @@ h2 { font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--ui-text-h
 .card-description { margin-top: 2px; font-size: 13px; line-height: 1.55; color: var(--ui-text-muted); }
 .goal-ring { background: conic-gradient(var(--ui-primary) 0 80%, var(--ui-bg-accented) 80% 100%); }
 @media (max-width: 1199px) { .component-gallery { columns: 3; } }
-@media (max-width: 899px) { .component-gallery { columns: 2; column-gap: 12px; padding: 14px 14px 2px; }.gallery-column > * { margin-bottom: 12px; } }
-@media (max-width: 579px) { .component-gallery { columns: 1; padding: 12px 12px 0; } }
+@media (max-width: 899px) { .component-gallery { columns: 2; column-gap: 12px; padding: 14px; }.gallery-column > * { margin-bottom: 12px; } }
+@media (max-width: 579px) { .component-gallery { columns: 1; padding: 12px; } }
 </style>
