@@ -74,6 +74,13 @@ slogans, repeated instructions and invented social proof. Keep field labels,
 validation messages and information needed to make a choice. Show controls only
 where the selected scene implements them.
 
+The component gallery composes independent examples from `studio/components/gallery`.
+Each example owns its local interaction state; shared card spacing lives in
+`studio/gallery.ts`. Use native Nuxt UI components for command search, navigation,
+tabs, authentication, empty states and chat input. All examples remain available
+at every preview width. Demo authentication and chat submissions stay local and
+explicitly disclose that no request is sent.
+
 Use Nuxt UI controls and page components for their intended roles. Keep custom
 CSS focused on the Studio viewport and preview layout. The editor uses the host
 identity while outside Studio. Within Studio, the shell and its teleported controls
