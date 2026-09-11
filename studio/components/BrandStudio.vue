@@ -592,6 +592,25 @@ watch([scene, templatePage, preference, previewPath, state, compare, viewportWid
   router.replace({ query: { ...route.query, view: scene.value, page: selectedTemplate.value?.component ? templatePage.value : undefined, path: previewPath.value, mode: preference.value, state: scene.value === 'components' ? state.value : undefined, compare: compare.value ? 'true' : undefined, mobile: undefined, width: viewportWidth.value || undefined, height: viewportWidth.value ? viewportHeight.value : undefined } })
 })
 onMounted(() => {
+  // A failed iframe has no live Vite client. Recover it when the host receives
+  // a successful update or reconnects after a dev-server restart.
+  if (import.meta.hot) {
+    const hot = import.meta.hot
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const recover = () => {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        if (failedFrames.value.draft || (compare.value && failedFrames.value.original)) retryPreview()
+      }, 250)
+    }
+    hot.on('vite:afterUpdate', recover)
+    hot.on('vite:ws:connect', recover)
+    onBeforeUnmount(() => {
+      clearTimeout(timer)
+      hot.off('vite:afterUpdate', recover)
+      hot.off('vite:ws:connect', recover)
+    })
+  }
   const root = window.document.documentElement
   const hostStyle = root.getAttribute('style')
   root.dataset.idStudioTheme = ''
