@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { createBlankStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
+import { createBlankStudioDocument, createStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
+import { nuxtUiBrandTheme } from '../../themes/nuxt-ui'
 import { createStudioPalette, parseStudioSession, contrastRatio } from '../editor'
 import type { StudioSession } from '../editor'
 import { studioTemplates, withinStudioRoute } from '../templates'
@@ -9,7 +10,7 @@ import type { StudioDocument } from '../../src/studio'
 useHead({ bodyAttrs: { class: 'id-studio-page' } })
 const route = useRoute()
 const router = useRouter()
-const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, sourcePath?: string, home?: string, templates?: unknown, packageAsset?: string } }
+const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, brands?: Record<string, StudioDocument>, sourcePath?: string, home?: string, templates?: unknown, packageAsset?: string } }
 const seed = config.idStudio?.document ? parseStudioDocument(config.idStudio.document) : createBlankStudioDocument()
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value))
 const baseline = ref(clone(seed))
@@ -45,7 +46,8 @@ const history = ref<StudioDocument[]>([])
 const future = ref<StudioDocument[]>([])
 const recovery = ref<StudioSession>()
 const projects = ref<StudioSession[]>([])
-const projectsOpen = ref(false)
+const brandPickerOpen = ref(false)
+const brandSearch = ref('')
 const exported = ref<StudioDocument>()
 const projectId = ref('')
 const storageReady = ref(false)
@@ -56,6 +58,15 @@ const newColor = ref('#2563eb')
 const scale = computed(() => { try { return createStudioPalette(newColor.value) } catch { return {} } })
 const bodyContrast = ref<number>()
 const writerToken = useRuntimeConfig().public.idStudioWriterToken as string | undefined
+const catalogPrefix = `${seed.brand.packageName || seed.brand.name}::`
+const isBaselineHost = !writerToken && seed.brand.name === 'nuxt-ui'
+const catalog = [
+  { key: 'nuxt-ui', document: createStudioDocument({ name: 'nuxt-ui', colors: {} }, nuxtUiBrandTheme) },
+  ...isBaselineHost ? [] : [{ key: 'host', document: seed }],
+  ...Object.entries(config.idStudio?.brands ?? {}).map(([key, document]) => ({ key: `brand:${key}`, document: parseStudioDocument(document) }))
+]
+const catalogKey = ref<string | undefined>(catalogPrefix + (isBaselineHost ? 'nuxt-ui' : 'host'))
+const readOnly = computed(() => catalogKey.value === catalogPrefix + 'nuxt-ui')
 const sourceRevision = ref('')
 const connected = ref(false)
 const sourceConflict = ref(false)
@@ -66,10 +77,37 @@ const currentLogo = computed(() => draft.value.brand.assets?.logos?.[logoRole.va
 function removeLogo() { edit(doc => { if (doc.brand.assets?.logos) Reflect.deleteProperty(doc.brand.assets.logos, logoRole.value) }) }
 const logoRoles = [{ label: 'Wordmark · light', value: 'wordmark' }, { label: 'Wordmark · dark', value: 'wordmarkInverse' }, { label: 'Symbol · light', value: 'logo' }, { label: 'Symbol · dark', value: 'logoInverse' }]
 const projectItems = computed(() => [
-  [{ label: 'New brand', icon: 'i-lucide-plus', onSelect: () => guard(() => replace(createBlankStudioDocument())) }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }, { label: 'Recent projects', icon: 'i-lucide-history', onSelect: () => { projectsOpen.value = true } }],
+  [{ label: 'Create new brand', icon: 'i-lucide-plus', onSelect: () => guard(() => replace(createBlankStudioDocument())) }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }],
   [{ label: 'Duplicate brand', icon: 'i-lucide-copy', onSelect: () => { const doc = clone(draft.value); doc.theme.label += ' copy'; replace(doc) } }, { label: 'Review changes', icon: 'i-lucide-git-compare-arrows', onSelect: () => { exportOpen.value = true } }, { label: 'Download', icon: 'i-lucide-download', onSelect: () => { exportOpen.value = true; exportTab.value = 'source' } }],
   [{ label: 'Reset draft', icon: 'i-lucide-rotate-ccw', disabled: !dirty.value, onSelect: reset }, { label: 'Open connected project', icon: 'i-lucide-folder-sync', disabled: !writerToken, onSelect: () => guard(() => loadSource(true)) }, { label: 'Documentation', icon: 'i-lucide-book-open', to: config.idStudio?.home || '/' }]
 ])
+const brandGroups = computed(() => [
+  { id: 'brands', label: 'Brands', items: catalog.map(item => {
+    const key = catalogPrefix + item.key
+    const saved = projects.value.find(project => project.catalogKey === key)
+    return { label: key === catalogKey.value ? draft.value.theme.label : saved?.draft.theme.label || item.document.theme.label, icon: key === catalogKey.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: item.document.brand.packageName, onSelect: () => pickBrand(() => selectCatalog(item.key)) }
+  }) },
+  { id: 'local', label: 'Saved in this browser', items: projects.value.filter(project => !catalog.some(item => project.catalogKey === catalogPrefix + item.key)).map(project => ({ label: project.draft.theme.label, icon: project.id === projectId.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: project.draft.brand.packageName, onSelect: () => pickBrand(() => restore(project)) })) }
+])
+function pickBrand(action: () => void) {
+  brandPickerOpen.value = false
+  brandSearch.value = ''
+  guard(() => { persist(); action() })
+}
+function selectCatalog(key: string) {
+  const item = catalog.find(item => item.key === key)
+  if (!item || catalogKey.value === catalogPrefix + key) return
+  const saved = projects.value.find(project => project.catalogKey === catalogPrefix + key)
+  if (saved) restore(saved)
+  else {
+    replace(item.document, key)
+    if (key === 'host') loadSource()
+  }
+}
+function customize() {
+  if (readOnly.value) guard(() => replace(createBlankStudioDocument()))
+  else editing.value = !editing.value
+}
 const panels = [{ label: 'Brand', value: 'identity' }, { label: 'Palette', value: 'colors' }, { label: 'Typography', value: 'type' }, { label: 'Appearance', value: 'details' }]
 const fontPresets = [{ label: 'System sans', value: 'system-ui, sans-serif' }, { label: 'System serif', value: 'Georgia, serif' }, { label: 'System mono', value: 'ui-monospace, monospace' }]
 const newColorName = ref('accent')
@@ -87,6 +125,7 @@ const output = computed(() => exportTab.value === 'changes' ? JSON.stringify(cha
 const customComponents = computed(() => Object.keys(draft.value.theme.ui ?? {}).filter(key => !['colors', 'icons'].includes(key)))
 
 function edit(change: (doc: StudioDocument) => void, field?: string) {
+  if (readOnly.value) return
   if (field) Reflect.deleteProperty(fieldErrors.value, field)
   try {
     const next = clone(draft.value)
@@ -121,14 +160,16 @@ function reset() {
   draft.value = clone(baseline.value)
   error.value = ''
 }
-function replace(doc: StudioDocument) {
+function replace(doc: StudioDocument, key?: string) {
   connected.value = false
+  catalogKey.value = key ? catalogPrefix + key : undefined
+  sourceConflict.value = false
   baseline.value = clone(doc)
   draft.value = clone(doc)
   history.value = []
   future.value = []
   error.value = ''
-  editing.value = true
+  editing.value = !readOnly.value
   exported.value = undefined
   fieldErrors.value = {}
   projectId.value = crypto.randomUUID()
@@ -137,22 +178,29 @@ function replace(doc: StudioDocument) {
 }
 async function loadSource(replaceDraft = false) {
   if (!writerToken) return
+  const requestedProject = projectId.value
   busySource.value = true
   try {
     const result = await $fetch<{ document: StudioDocument, revision: string }>('/api/id-studio/source', { headers: { 'x-id-studio-token': writerToken } })
+    if (projectId.value !== requestedProject) return
     const doc = parseStudioDocument(result.document)
     sourceRevision.value = result.revision
     sourceConflict.value = false
-    if (replaceDraft) replace(doc)
-    if (replaceDraft || !dirty.value) { baseline.value = clone(doc); draft.value = clone(doc); connected.value = true }
+    if (replaceDraft) replace(doc, 'host')
+    if (catalogKey.value !== catalogPrefix + 'host') return
+    connected.value = true
+    if (dirty.value) sourceConflict.value = diffStudioDocuments(baseline.value, doc).length > 0
+    else { baseline.value = clone(doc); draft.value = clone(doc) }
   } catch { notice.value = 'The local project is unavailable. Your draft can still be downloaded.' }
   finally { busySource.value = false }
 }
 async function applySource() {
   if (!connected.value || !writerToken || !sourceRevision.value) return
+  const requestedProject = projectId.value
   busySource.value = true
   try {
     const result = await $fetch<{ document: StudioDocument, revision: string }>('/api/id-studio/source', { method: 'POST', headers: { 'x-id-studio-token': writerToken }, body: { revision: sourceRevision.value, document: clone(draft.value) } })
+    if (projectId.value !== requestedProject) return
     baseline.value = parseStudioDocument(result.document)
     sourceRevision.value = result.revision
     sourceConflict.value = false
@@ -284,10 +332,10 @@ function listProjects() {
   projects.value = saved.sort((a, b) => b.updatedAt - a.updatedAt)
 }
 function persist() {
-  if (!storageReady.value || !projectId.value) return
+  if (!storageReady.value || !projectId.value || readOnly.value) return
   storedLocally.value = false
   try {
-    const session: StudioSession = { id: projectId.value, baseline: clone(baseline.value), draft: clone(draft.value), exported: exported.value ? clone(exported.value) : undefined, updatedAt: Date.now() }
+    const session: StudioSession = { id: projectId.value, baseline: clone(baseline.value), draft: clone(draft.value), exported: exported.value ? clone(exported.value) : undefined, updatedAt: Date.now(), catalogKey: catalogKey.value }
     localStorage.setItem(projectPrefix + projectId.value, JSON.stringify(session))
     localStorage.setItem(lastProjectKey, projectId.value)
     storedLocally.value = true
@@ -296,11 +344,16 @@ function persist() {
 }
 function restore(session: StudioSession) {
   connected.value = false
+  error.value = ''
+  notice.value = ''
+  catalogKey.value = session.catalogKey
+  sourceConflict.value = false
   baseline.value = clone(session.baseline); draft.value = clone(session.draft)
   exported.value = session.exported ? clone(session.exported) : undefined
   projectId.value = session.id; history.value = []; future.value = []; fieldErrors.value = {}
-  recovery.value = undefined; projectsOpen.value = false; editing.value = true
+  recovery.value = undefined; brandPickerOpen.value = false; editing.value = !readOnly.value
   persist()
+  if (catalogKey.value === catalogPrefix + 'host') loadSource()
 }
 function exportSource() {
   download('brand.studio.json', JSON.stringify(draft.value, null, 2) + '\n')
@@ -349,7 +402,6 @@ onMounted(() => {
   window.addEventListener('message', ready); window.addEventListener('beforeunload', beforeUnload)
   nextTick(refresh)
   if (selectedTemplate.value?.routePrefix && withinStudioRoute(route.query.path, selectedTemplate.value.routePrefix)) paths.value[scene.value] = route.query.path
-  loadSource()
   try {
     listProjects()
     const last = localStorage.getItem(lastProjectKey)
@@ -362,9 +414,12 @@ onMounted(() => {
       }
     }
     projectId.value = crypto.randomUUID()
+    if (recovery.value?.catalogKey === catalogKey.value) catalogKey.value = undefined
     storageReady.value = true
     // Do not overwrite the last project before the author chooses whether to restore it.
   } catch { storageReady.value = true; projectId.value = crypto.randomUUID(); notice.value = 'The previous local draft could not be restored. Your source has not changed.' }
+  if (readOnly.value) editing.value = false
+  loadSource()
 })
 watch([draft, baseline, exported], persist, { deep: true, flush: 'post' })
 watch([draft, baseline, scene, templatePage, previewPath, mode, state, compare], () => nextTick(refresh), { deep: true })
@@ -374,9 +429,15 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
 <template>
   <main class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
+      <div class="studio-brand-controls">
+      <UPopover v-model:open="brandPickerOpen" :content="{ align: 'start' }">
+        <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
+        <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="{ 'aria-label': 'Search brands' }" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]' }" /></template>
+      </UPopover>
       <UDropdownMenu :items="projectItems" :content="{ align: 'start' }">
-        <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Project menu" class="studio-project-name"><span class="truncate">{{ draft.theme.label }}</span></UButton>
+        <UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" aria-label="Brand actions" class="shrink-0" />
       </UDropdownMenu>
+      </div>
       <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
         <USelect v-model="scene" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
@@ -400,7 +461,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
           <iframe ref="draftFrame" :key="scene" :src="frameSrc('draft')" title="Draft brand preview" :class="{ 'studio-mobile': mobile }" @load="send(draftFrame, draft)" />
         </section>
       </div>
-      <aside v-if="editing" class="studio-inspector" aria-label="Brand settings">
+      <aside v-if="editing && !readOnly" class="studio-inspector" aria-label="Brand settings">
         <div class="studio-inspector-header">
           <h2>Customize</h2>
           <UButton icon="i-lucide-x" aria-label="Close settings" color="neutral" variant="ghost" @click="closeSettings" />
@@ -471,7 +532,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <div class="studio-dock-settings">
         <UTooltip text="Undo"><UButton class="studio-desktop" icon="i-lucide-undo-2" aria-label="Undo change" color="neutral" variant="ghost" :disabled="!history.length" @click="undo" /></UTooltip>
         <UTooltip text="Redo"><UButton class="studio-desktop" icon="i-lucide-redo-2" aria-label="Redo change" color="neutral" variant="ghost" :disabled="!future.length" @click="redo" /></UTooltip>
-        <UButton ref="customizeButton" color="neutral" :variant="editing ? 'soft' : 'ghost'" icon="i-lucide-sliders-horizontal" :aria-pressed="editing" @click="editing = !editing">{{ editing ? 'Preview' : 'Customize' }}</UButton>
+        <UButton ref="customizeButton" color="neutral" :variant="editing ? 'soft' : 'ghost'" icon="i-lucide-sliders-horizontal" :aria-pressed="editing" @click="customize">{{ readOnly ? 'Create brand' : editing ? 'Preview' : 'Customize' }}</UButton>
       </div>
       <div class="studio-toolbar-end studio-desktop">
         <UTooltip text="Compare applied and draft"><UButton icon="i-lucide-columns-2" aria-label="Compare applied brand" :aria-pressed="compare" color="neutral" :variant="compare ? 'soft' : 'ghost'" @click="compare = !compare" /></UTooltip>
@@ -491,12 +552,6 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         </template>
       </UPopover>
     </div>
-    <UModal v-model:open="projectsOpen" title="Recent projects" description="Drafts stored in this browser.">
-      <template #body>
-        <p v-if="!projects.length" class="text-sm text-muted">No saved projects yet.</p>
-        <div v-else class="space-y-2"><UButton v-for="project in projects" :key="project.id" color="neutral" variant="outline" block class="justify-between" @click="guard(() => restore(project))"><span>{{ project.draft.theme.label }}</span><span class="text-xs text-muted">{{ project.id === projectId ? 'Current' : project.draft.brand.packageName }}</span></UButton></div>
-      </template>
-    </UModal>
     <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
     <UModal v-model:open="exportOpen" :title="connected ? 'Review changes' : 'Download brand'" :ui="{ content: 'max-w-4xl' }">
       <template #body>
@@ -522,6 +577,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 <style scoped>
 .studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: var(--ui-bg); color: var(--ui-text); }
 .studio-header { flex: none; min-height: 56px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }.studio-project-name { min-width: 0; max-width: 100%; justify-self: start; }.studio-review { justify-self: end; }
+.studio-brand-controls { display: flex; align-items: center; min-width: 0; justify-self: start; max-width: 100%; }
 .studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
 .studio-dot { color: var(--ui-primary); }
 

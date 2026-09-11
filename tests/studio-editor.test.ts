@@ -24,6 +24,9 @@ describe('Studio authoring tools', () => {
     expect(doc.theme.label).toBe('New brand')
     expect(() => parseStudioSession({ ...session, id: '../a' })).toThrow()
     expect(() => parseStudioSession({ ...session, draft: {} })).toThrow()
+    expect(parseStudioSession({ ...session, catalogKey: '@example/brand::host' }).catalogKey).toBe('@example/brand::host')
+    expect(parseStudioSession(session).catalogKey).toBeUndefined()
+    expect(parseStudioSession({ ...session, catalogKey: {} }).catalogKey).toBeUndefined()
   })
   it('exports a portable dependency and instructions when the host supplies a package', () => {
     const files = createStudioProject(createBlankStudioDocument(), { bundledPackage: true })

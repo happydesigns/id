@@ -1,11 +1,11 @@
 import { parseStudioDocument } from '../src/studio'
 import type { StudioDocument } from '../src/studio'
 
-export type StudioSession = { id: string, baseline: StudioDocument, draft: StudioDocument, exported?: StudioDocument, updatedAt: number }
+export type StudioSession = { id: string, baseline: StudioDocument, draft: StudioDocument, exported?: StudioDocument, updatedAt: number, catalogKey?: string }
 export function parseStudioSession(value: unknown): StudioSession {
   const item = value as StudioSession
   if (!item || typeof item.id !== 'string' || !/^[a-zA-Z0-9:_-]{1,200}$/.test(item.id) || !Number.isFinite(item.updatedAt)) throw new Error('Invalid saved project.')
-  return { id: item.id, baseline: parseStudioDocument(item.baseline), draft: parseStudioDocument(item.draft), exported: item.exported ? parseStudioDocument(item.exported) : undefined, updatedAt: item.updatedAt }
+  return { id: item.id, baseline: parseStudioDocument(item.baseline), draft: parseStudioDocument(item.draft), exported: item.exported ? parseStudioDocument(item.exported) : undefined, updatedAt: item.updatedAt, catalogKey: typeof item.catalogKey === 'string' && item.catalogKey.length <= 500 ? item.catalogKey : undefined }
 }
 
 /** A predictable tint/shade starting scale; the chosen color remains exactly 500. */
