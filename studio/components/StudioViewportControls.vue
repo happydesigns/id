@@ -9,11 +9,11 @@ function toggle() {
   else { height.value = lastSize.height; width.value = lastSize.width }
 }
 const presets = [
-  { label: 'Mobile S · 320 × 568', value: 'small', width: 320, height: 568 },
-  { label: 'Mobile · 390 × 844', value: 'mobile', width: 390, height: 844 },
-  { label: 'Tablet · 768 × 1024', value: 'tablet', width: 768, height: 1024 },
-  { label: 'Laptop · 1280 × 800', value: 'laptop', width: 1280, height: 800 },
-  { label: 'Desktop · 1440 × 900', value: 'desktop', width: 1440, height: 900 },
+  { label: 'Mobile S', value: 'small', width: 320, height: 568 },
+  { label: 'Mobile', value: 'mobile', width: 390, height: 844 },
+  { label: 'Tablet', value: 'tablet', width: 768, height: 1024 },
+  { label: 'Laptop', value: 'laptop', width: 1280, height: 800 },
+  { label: 'Desktop', value: 'desktop', width: 1440, height: 900 },
   { label: 'Custom', value: 'custom', width: 1024, height: 768 }
 ]
 const selected = computed(() => !width.value ? 'auto' : presets.find(item => item.value !== 'custom' && item.width === width.value && item.height === height.value)?.value || 'custom')

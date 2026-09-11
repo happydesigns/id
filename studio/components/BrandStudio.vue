@@ -153,16 +153,16 @@ function removeLogo() { edit(doc => { if (doc.brand.assets?.logos) Reflect.delet
 const logoRoles = [{ label: 'Wordmark · light', value: 'wordmark' }, { label: 'Wordmark · dark', value: 'wordmarkInverse' }, { label: 'Symbol · light', value: 'logo' }, { label: 'Symbol · dark', value: 'logoInverse' }]
 const projectItems = computed(() => [
   [{ label: 'Create new brand', icon: 'i-lucide-plus', onSelect: () => beginCreate() }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }, { label: 'Manage brands', icon: 'i-lucide-library', onSelect: openManager }],
-  [{ label: 'Duplicate brand', icon: 'i-lucide-copy', onSelect: () => beginCreate(draft.value) }, { label: 'Review changes', icon: 'i-lucide-git-compare-arrows', onSelect: () => { exportOpen.value = true } }, { label: 'Download', icon: 'i-lucide-download', onSelect: () => { exportOpen.value = true; exportTab.value = 'source' } }],
+  [{ label: 'Duplicate brand', icon: 'i-lucide-copy', onSelect: () => beginCreate(draft.value) }, { label: 'Review changes', icon: 'i-lucide-git-compare-arrows', onSelect: () => { exportTab.value = 'changes'; exportOpen.value = true } }, { label: 'Download', icon: 'i-lucide-download', onSelect: () => { exportOpen.value = true; exportTab.value = 'download' } }],
   [{ label: 'Reset draft', icon: 'i-lucide-rotate-ccw', disabled: !dirty.value, onSelect: reset }, { label: 'Open connected project', icon: 'i-lucide-folder-sync', disabled: !writerToken, onSelect: () => guard(() => loadSource(true)) }, { label: 'Documentation', icon: 'i-lucide-book-open', to: config.idStudio?.home || '/' }]
 ])
 const brandGroups = computed(() => [
   { id: 'brands', label: 'Brands', items: catalog.map(item => {
     const key = catalogPrefix + item.key
     const saved = projects.value.find(project => project.catalogKey === key)
-    return { label: key === catalogKey.value ? draft.value.theme.label : saved?.draft.theme.label || item.document.theme.label, icon: key === catalogKey.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: item.document.brand.packageName, onSelect: () => pickBrand(() => selectCatalog(item.key)) }
+    return { label: key === catalogKey.value ? draft.value.theme.label : saved?.draft.theme.label || item.document.theme.label, icon: key === catalogKey.value ? 'i-lucide-check' : 'i-lucide-palette', description: item.key === 'nuxt-ui' ? 'Starting point' : key === catalogKey.value && connected.value ? 'Connected project' : saved ? 'Browser draft · ' + (item.document.brand.packageName || item.document.brand.name) : 'Configured brand · ' + (item.document.brand.packageName || item.document.brand.name), keywords: item.document.brand.packageName, onSelect: () => pickBrand(() => selectCatalog(item.key)) }
   }) },
-  { id: 'local', label: 'Saved in this browser', items: projects.value.filter(project => !catalog.some(item => project.catalogKey === catalogPrefix + item.key)).map(project => ({ label: project.draft.theme.label, description: projects.value.filter(other => other.draft.theme.label === project.draft.theme.label).length > 1 ? `${project.draft.brand.packageName || project.draft.brand.name} · ${new Date(project.updatedAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'medium' })}` : undefined, icon: project.id === projectId.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: project.draft.brand.packageName, onSelect: () => pickBrand(() => restore(project)) })) }
+  { id: 'local', label: 'Saved in this browser', items: projects.value.filter(project => !catalog.some(item => project.catalogKey === catalogPrefix + item.key)).map(project => ({ label: project.draft.theme.label, description: `${project.draft.brand.packageName || project.draft.brand.name} · ${new Date(project.updatedAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'medium' })}`, icon: project.id === projectId.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: project.draft.brand.packageName, onSelect: () => pickBrand(() => restore(project)) })) }
 ])
 function beginCreate(base?: StudioDocument) {
   createBase.value = base ? clone(base) : undefined
@@ -179,7 +179,7 @@ function createBrand() {
   const doc = clone(createBase.value || createBlankStudioDocument())
   doc.theme.label = name
   createOpen.value = false
-  guard(() => { persist(); replace(doc) })
+  guard(() => { persist(); replace(doc); editing.value = true })
 }
 function pickBrand(action: () => void) {
   brandPickerOpen.value = false
@@ -196,11 +196,28 @@ function selectCatalog(key: string) {
     if (key === 'host') loadSource()
   }
 }
+watch(editing, value => {
+  if (storageReady.value) router.replace({ query: { ...route.query, browse: value ? undefined : 'true' } })
+})
 function customize() {
   if (readOnly.value) beginCreate()
   else editing.value = !editing.value
 }
 const panels = [{ label: 'Brand', value: 'identity' }, { label: 'Palette', value: 'colors' }, { label: 'Typography', value: 'type' }, { label: 'Appearance', value: 'details' }]
+function fontOptions(role: string) {
+  const stacks = [...new Set([draft.value.theme.typography?.[role], draft.value.brand.typography?.[role], baseline.value.theme.typography?.[role], baseline.value.brand.typography?.[role]])]
+  return [...stacks.filter((stack): stack is string => !!stack && !fontPresets.some(item => item.value === stack)).map(stack => ({ label: stack.split(',')[0]!.replace(/["']/g, ''), value: stack })), ...fontPresets]
+}
+function swatch(name: string) {
+  const palette = draft.value.brand.colors[name]
+  return typeof palette === 'string' ? palette : palette?.['500'] || Object.values(palette || {})[0] || `var(--color-${name}-500)`
+}
+function title(value: string) { return value.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[-_]/g, ' ').replace(/^./, letter => letter.toUpperCase()) }
+function changeLabel(path: string) {
+  if (path.startsWith('theme.ui.colors.')) return `${title(path.slice('theme.ui.colors.'.length))} color`
+  return ({ 'theme.label': 'Brand name', 'brand.name': 'Identifier', 'brand.packageName': 'Package name', 'brand.claim': 'Brand statement' } as Record<string, string>)[path] || title(path.split('.').slice(-2).join(' · '))
+}
+function changeValue(value: unknown) { return value == null ? 'Inherited' : typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value) }
 const fontPresets = [{ label: 'System sans', value: 'system-ui, sans-serif' }, { label: 'System serif', value: 'Georgia, serif' }, { label: 'System mono', value: 'ui-monospace, monospace' }]
 const newColorName = ref('accent')
 const changes = computed(() => diffStudioDocuments(baseline.value, draft.value))
@@ -222,6 +239,13 @@ function edit(change: (doc: StudioDocument) => void, field?: string) {
   try {
     const next = clone(draft.value)
     change(next)
+    if (next.theme.label !== draft.value.theme.label) {
+      const name = next.theme.label.trim()
+      if (!name || name.length > 80) throw new Error('Enter a name of 1–80 characters.')
+      const labels = [...catalog.filter(item => catalogPrefix + item.key !== catalogKey.value).map(item => item.document.theme.label), ...projects.value.filter(item => item.id !== projectId.value).map(item => item.draft.theme.label)]
+      if (labels.some(label => label.trim().toLocaleLowerCase() === name.toLocaleLowerCase())) throw new Error('A brand with this name already exists.')
+      next.theme.label = name
+    }
     const valid = parseStudioDocument(next)
     if (!diffStudioDocuments(draft.value, valid).length) return
     history.value.push(clone(draft.value))
@@ -262,7 +286,7 @@ function replace(doc: StudioDocument, key?: string) {
   history.value = []
   future.value = []
   error.value = ''
-  editing.value = !readOnly.value
+  editing.value = !readOnly.value && route.query.browse !== 'true'
   exported.value = undefined
   fieldErrors.value = {}
   projectId.value = crypto.randomUUID()
@@ -454,7 +478,7 @@ function restore(session: StudioSession) {
   baseline.value = clone(session.baseline); draft.value = clone(session.draft)
   exported.value = session.exported ? clone(session.exported) : undefined
   projectId.value = session.id; history.value = []; future.value = []; fieldErrors.value = {}
-  recovery.value = undefined; brandPickerOpen.value = false; editing.value = !readOnly.value
+  recovery.value = undefined; brandPickerOpen.value = false; editing.value = !readOnly.value && route.query.browse !== 'true'
   persist()
   if (catalogKey.value === catalogPrefix + 'host') loadSource()
 }
@@ -550,10 +574,10 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         </UPopover>
         <USelect v-model="scene" variant="ghost" aria-label="Template" :items="[{ label: 'Components', value: 'components' }, ...templates.map(item => ({ label: item.label, value: item.id }))]" />
       </div>
-      <UButton class="studio-review studio-desktop" color="neutral" variant="ghost" :icon="connected ? 'i-lucide-git-compare-arrows' : 'i-lucide-download'" @click="exportTab = connected ? 'changes' : 'source'; exportOpen = true">{{ connected ? 'Review changes' : 'Download' }}</UButton>
+      <UButton class="studio-review studio-desktop" color="neutral" variant="ghost" :icon="connected ? 'i-lucide-git-compare-arrows' : 'i-lucide-download'" @click="exportTab = connected ? 'changes' : 'download'; exportOpen = true">{{ connected ? 'Review changes' : 'Download' }}</UButton>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
-    <UModal v-model:open="manageOpen" title="Manage brands" description="Saved in this browser. Repository files are unchanged." :ui="{ content: 'max-w-2xl' }">
+    <UModal v-model:open="manageOpen" title="Manage brands" description="Saved in this browser. Repository files are unchanged." :ui="{ content: 'max-w-2xl h-[min(640px,calc(100dvh-2rem))]', body: 'min-h-0 flex-1 overflow-auto' }">
       <template #body>
         <form v-if="manageTarget" class="space-y-4" @submit.prevent="saveManagedProject">
           <template v-if="manageAction === 'delete'">
@@ -571,9 +595,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
               <div><p class="font-medium break-words">{{ project.draft.theme.label }}<span v-if="project.id === projectId" class="text-xs text-muted ml-2">Current</span></p><p class="text-sm text-muted break-words">{{ project.draft.brand.packageName || project.draft.brand.name }} · {{ new Date(project.updatedAt).toLocaleString() }}</p></div>
               <div class="flex flex-wrap gap-2">
                 <UButton color="neutral" variant="outline" @click="manageOpen = false; pickBrand(() => restore(project))">Open</UButton>
-                <UButton color="neutral" variant="ghost" @click="manageProject(project, 'rename')">Rename</UButton>
-                <UButton color="neutral" variant="ghost" @click="manageOpen = false; beginCreate(project.draft)">Duplicate</UButton>
-                <UButton color="error" variant="ghost" @click="manageProject(project, 'delete')">Delete local copy</UButton>
+                <UDropdownMenu :items="[{ label: 'Rename', icon: 'i-lucide-pencil', onSelect: () => manageProject(project, 'rename') }, { label: 'Duplicate', icon: 'i-lucide-copy', onSelect: () => { manageOpen = false; beginCreate(project.draft) } }, { label: 'Delete local copy', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => manageProject(project, 'delete') }]"><UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" :aria-label="`Actions for ${project.draft.theme.label}`" /></UDropdownMenu>
               </div>
             </li>
           </ul>
@@ -588,7 +610,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
     <div class="studio-workspace" :class="{ 'studio-browsing': !editing, 'studio-editing': editing }">
       <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
         <section v-if="compare" class="studio-frame-wrap">
-          <div class="studio-frame-label">Applied <span>{{ baseline.theme.label }}</span></div>
+          <div class="studio-frame-label">Original <span>{{ baseline.theme.label }}</span></div>
           <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.original"><iframe ref="originalFrame" :key="scene" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="send(originalFrame, baseline)" /></StudioViewport>
         </section>
         <section class="studio-frame-wrap">
@@ -605,45 +627,60 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
           <template #body="{ item: section }"><div class="studio-form-section">
           <template v-if="section.value === 'identity'">
             <UFormField :error="fieldErrors['label']" label="Brand name" ><UInput :model-value="draft.theme.label" class="w-full" @change="edit(doc => { doc.theme.label = value($event) }, 'label')" /></UFormField>
-            <UFormField :error="fieldErrors['identifier']" label="Identifier" help="Lowercase letters, numbers and hyphens"><UInput :model-value="draft.brand.name" class="w-full" @change="edit(doc => { doc.brand.name = value($event); doc.theme.name = value($event) }, 'identifier')" /></UFormField>
-            <UFormField :error="fieldErrors['package']" label="Package name"><UInput :model-value="draft.brand.packageName" placeholder="@example/brand" class="w-full" @change="edit(doc => { doc.brand.packageName = value($event) }, 'package')" /></UFormField>
             <UFormField :error="fieldErrors['claim']" label="Brand statement"><UTextarea :model-value="draft.brand.claim" :rows="3" class="w-full" @change="edit(doc => { doc.brand.claim = value($event) }, 'claim')" /></UFormField>
             <UFormField label="Logo"><USelect v-model="logoRole" :items="logoRoles" class="w-full" /></UFormField>
             <div v-if="currentLogo" class="rounded border border-default p-4" :class="logoRole.endsWith('Inverse') ? 'bg-gray-900' : 'bg-white'"><img :src="currentLogo.src" :alt="currentLogo.alt || 'Brand logo'" class="mx-auto max-h-16 max-w-full" ></div>
             <UFileUpload :key="logoRole" accept="image/png,image/jpeg,image/webp" label="Upload image" description="PNG, JPEG or WebP · up to 2 MB" :preview="false" @update:model-value="addLogo" />
             <UButton v-if="currentLogo" color="neutral" variant="link" @click="removeLogo">Remove image</UButton>
+            <UAccordion :items="[{ label: 'Advanced', value: 'metadata' }]"><template #body><div class="studio-form-section">
+            <UFormField :error="fieldErrors['identifier']" label="Identifier" help="Lowercase letters, numbers and hyphens"><UInput :model-value="draft.brand.name" class="w-full" @change="edit(doc => { doc.brand.name = value($event); doc.theme.name = value($event) }, 'identifier')" /></UFormField>
+            <UFormField :error="fieldErrors['package']" label="Package name"><UInput :model-value="draft.brand.packageName" placeholder="@example/brand" class="w-full" @change="edit(doc => { doc.brand.packageName = value($event) }, 'package')" /></UFormField>
+            </div></template></UAccordion>
           </template>
           <template v-if="section.value === 'colors'">
-            <UFormField v-for="role in ['primary', 'neutral']" :key="role" :label="role">
-              <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
+            <UFormField v-for="role in ['primary', 'neutral']" :key="role" :label="title(role)">
+              <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })">
+                <template #leading><span class="size-3 rounded-full ring ring-default" :style="{ background: swatch(draft.theme.ui?.colors?.[role] || '') }" /></template>
+                <template #item-leading="{ item }"><span class="size-3 rounded-full ring ring-default" :style="{ background: swatch(item.value) }" /></template>
+              </USelect>
             </UFormField>
             <UAccordion :items="[{ label: 'More color roles', value: 'roles' }]">
               <template #body><div class="studio-form-section">
-                <UFormField v-for="role in studioRoles.filter(role => !['primary', 'neutral'].includes(role))" :key="role" :label="role">
-                  <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
+                <UFormField v-for="role in studioRoles.filter(role => !['primary', 'neutral'].includes(role))" :key="role" :label="title(role)">
+                  <USelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...paletteOptions.map(value => ({ label: value, value }))]" class="w-full" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })">
+                <template #leading><span class="size-3 rounded-full ring ring-default" :style="{ background: swatch(draft.theme.ui?.colors?.[role] || '') }" /></template>
+                <template #item-leading="{ item }"><span class="size-3 rounded-full ring ring-default" :style="{ background: swatch(item.value) }" /></template>
+              </USelect>
                 </UFormField>
               </div></template>
             </UAccordion>
             <h3 class="text-sm font-semibold">Brand palettes</h3>
             <UAccordion :items="Object.entries(draft.brand.colors).map(([name, palette]) => ({ label: name, value: name, palette }))">
+              <template #leading="{ item }"><span class="size-4 rounded ring ring-default" :style="{ background: swatch(item.value) }" /></template>
               <template #body="{ item }">
                 <div class="space-y-3">
                   <IdStudioColorField v-for="(color, shade) in typeof item.palette === 'string' ? { base: item.palette } : item.palette" :key="shade" :label="`${item.label} ${shade}`" :model-value="color || ''" :error="fieldErrors[`palette:${item.label}:${shade}`]" @change="paletteColor(item.label, String(shade), $event)" />
                 </div>
               </template>
             </UAccordion>
+            <UAccordion :items="[{ label: 'Add palette', icon: 'i-lucide-plus', value: 'add' }]"><template #body><div class="studio-form-section">
             <UFormField label="New palette name" :error="fieldErrors['new-palette']"><UInput v-model="newColorName" class="w-full" /></UFormField>
             <IdStudioColorField label="Base color" :model-value="newColor" @change="newColor = $event" />
             <div class="flex overflow-hidden rounded" aria-label="New palette preview"><span v-for="(color, shade) in scale" :key="shade" class="h-7 flex-1" :style="{ background: color }" :title="`${shade}: ${color}`" /></div>
-            <UButton color="neutral" variant="outline" @click="addPalette">Add palette</UButton>
+            <UButton color="neutral" variant="outline" @click="addPalette">Create palette</UButton>
+            </div></template></UAccordion>
           </template>
           <template v-if="section.value === 'type'">
-            <p class="studio-help">Use installed fonts or a system stack. Entering a name does not download a font.</p>
             <div v-for="role in ['sans', 'mono', 'display']" :key="role" class="space-y-2">
-              <UFormField :label="role" :error="fieldErrors[`font:${role}`]"><UInput :model-value="draft.theme.typography?.[role] || draft.brand.typography?.[role] || ''" placeholder="system-ui, sans-serif" class="w-full" @change="font(role, value($event))" /></UFormField>
-              <USelect :aria-label="`${role} preset`" placeholder="Choose a font preset" :items="fontPresets" class="w-full" @update:model-value="font(role, String($event))" />
+              <UFormField :label="{ sans: 'Body', mono: 'Code', display: 'Headings' }[role]" :error="fieldErrors[`font:${role}`]">
+                <USelect :model-value="draft.theme.typography?.[role] || draft.brand.typography?.[role]" placeholder="Inherited" :items="fontOptions(role)" class="w-full" @update:model-value="font(role, String($event))" />
+              </UFormField>
               <p class="rounded border border-default p-3 text-xl" :style="{ fontFamily: draft.theme.typography?.[role] || draft.brand.typography?.[role] || 'inherit' }">The quick brown fox. 0123456789</p>
             </div>
+            <UAccordion :items="[{ label: 'Advanced', value: 'fonts' }]"><template #body><div class="studio-form-section">
+              <p class="studio-help">Custom fonts must be installed in your project. These fields set CSS font stacks.</p>
+              <UFormField v-for="role in ['sans', 'mono', 'display']" :key="role" :label="`${title(role)} font stack`" :error="fieldErrors[`font:${role}`]"><UInput :model-value="draft.theme.typography?.[role] || draft.brand.typography?.[role] || ''" class="w-full" @change="font(role, value($event))" /></UFormField>
+            </div></template></UAccordion>
           </template>
           <template v-if="section.value === 'details'">
             <p class="studio-help">Editing {{ mode }} mode. Empty fields use defaults.</p>
@@ -667,10 +704,10 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <div class="studio-dock-settings">
         <UTooltip text="Undo"><UButton class="studio-desktop" icon="i-lucide-undo-2" aria-label="Undo change" color="neutral" variant="ghost" :disabled="!history.length" @click="undo" /></UTooltip>
         <UTooltip text="Redo"><UButton class="studio-desktop" icon="i-lucide-redo-2" aria-label="Redo change" color="neutral" variant="ghost" :disabled="!future.length" @click="redo" /></UTooltip>
-        <UButton ref="customizeButton" color="neutral" :variant="editing ? 'soft' : 'ghost'" icon="i-lucide-sliders-horizontal" :aria-pressed="editing" @click="customize">{{ readOnly ? 'Create brand' : editing ? 'Preview' : 'Customize' }}</UButton>
+        <UButton ref="customizeButton" color="neutral" :variant="editing ? 'soft' : 'ghost'" icon="i-lucide-sliders-horizontal" :aria-pressed="editing" @click="customize">{{ readOnly ? 'Create brand' : 'Customize' }}</UButton>
       </div>
       <div class="studio-toolbar-end studio-desktop">
-        <UTooltip text="Compare applied and draft"><UButton icon="i-lucide-columns-2" aria-label="Compare applied brand" :aria-pressed="compare" color="neutral" :variant="compare ? 'soft' : 'ghost'" @click="compare = !compare" /></UTooltip>
+        <UTooltip text="Compare original and draft"><UButton icon="i-lucide-columns-2" aria-label="Compare original brand" :aria-pressed="compare" color="neutral" :variant="compare ? 'soft' : 'ghost'" @click="compare = !compare" /></UTooltip>
         <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" @update:width="previewZoom = 1" @update:height="previewZoom = 1" />
         <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
       </div>
@@ -678,7 +715,7 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
         <UButton color="neutral" variant="ghost" icon="i-lucide-settings-2" label="View" />
         <template #content>
           <div class="flex w-64 flex-col gap-4 p-4">
-            <div class="studio-view-mobile flex flex-col gap-4"><UCheckbox v-model="compare" label="Compare applied brand" />
+            <div class="studio-view-mobile flex flex-col gap-4"><UCheckbox v-model="compare" label="Compare original brand" />
             <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" @update:width="previewZoom = 1" @update:height="previewZoom = 1" />
             <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
             </div><USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" />
@@ -690,19 +727,23 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
     <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
     <UModal v-model:open="exportOpen" :title="connected ? 'Review changes' : 'Download brand'" :ui="{ content: 'max-w-4xl h-[min(720px,calc(100dvh-2rem))]', body: 'flex min-h-0 flex-1 flex-col overflow-hidden', header: 'shrink-0', footer: 'shrink-0 flex-wrap' }">
       <template #body>
-        <p class="mb-4 text-sm text-muted">{{ connected ? 'Apply to the connected project source.' : 'Download a source document or a new Nuxt brand layer.' }} <code v-if="connected">{{ sourcePath }}</code></p>
+        <p class="mb-4 text-sm text-muted">{{ connected ? 'Apply to the connected project source.' : 'Choose how to use your brand.' }} <code v-if="connected">{{ sourcePath }}</code></p>
         <UAlert v-if="sourceConflict" color="warning" title="Source changed" description="Your draft is preserved. Download it before reopening the project to resolve the conflict." class="mb-4" />
-        <UTabs v-model="exportTab" :items="[{ label: 'Source', value: 'source' }, { label: 'Changes', value: 'changes' }, { label: 'CSS', value: 'css' }]" variant="link" :ui="{ root: 'flex min-h-0 flex-1 flex-col', list: 'shrink-0 justify-start', trigger: 'flex-none', content: 'min-h-0 flex-1 overflow-auto' }">
+        <UTabs v-model="exportTab" :items="[{ label: 'Download', value: 'download' }, { label: 'Changes', value: 'changes' }, { label: 'Source', value: 'source' }, { label: 'CSS', value: 'css' }]" variant="link" :ui="{ root: 'flex min-h-0 flex-1 flex-col', list: 'shrink-0 justify-start', trigger: 'flex-none', content: 'min-h-0 flex-1 overflow-auto' }">
         <template #content="{ item }">
-        <div v-if="item.value === 'changes'" class="mb-4 divide-y divide-default">
+        <div v-if="item.value === 'download'" class="grid gap-4 py-4 sm:grid-cols-2">
+          <UCard><h3 class="font-semibold">Brand file</h3><p class="mt-2 mb-4 text-sm text-muted">Reopen and continue editing in Studio, or share your brand with another author.</p><UButton color="neutral" variant="outline" icon="i-lucide-download" @click="exportSource">Download JSON</UButton></UCard>
+          <UCard><h3 class="font-semibold">Nuxt project</h3><p class="mt-2 mb-4 text-sm text-muted">A reusable Nuxt UI brand layer with a Studio playground.</p><UButton color="neutral" variant="outline" icon="i-lucide-download" :loading="busy" @click="exportProject">Download ZIP</UButton><p class="mt-4 text-xs text-muted">Add custom fonts and capabilities in the generated project. Custom Vue components are not included.</p></UCard>
+        </div>
+        <div v-else-if="item.value === 'changes'" class="mb-4 divide-y divide-default">
           <p v-if="!changes.length" class="text-sm text-muted">No changes to apply.</p>
-          <div v-for="change in changes" :key="change.path" class="py-2 text-sm"><code>{{ change.path }}</code><div class="mt-1 break-all text-muted">{{ change.before ?? 'Inherited' }} → {{ change.after ?? 'Inherited' }}</div></div>
+          <div v-for="change in changes" :key="change.path" class="py-2 text-sm"><p class="font-medium">{{ changeLabel(change.path) }}</p><div class="mt-1 whitespace-pre-wrap break-words text-muted">{{ changeValue(change.before) }} → {{ changeValue(change.after) }}</div><code class="mt-1 block break-all text-xs text-dimmed">{{ change.path }}</code></div>
         </div>
         <pre v-else class="studio-export-code">{{ output }}</pre>
         </template></UTabs>
-        <p class="mt-4 text-sm text-muted">A new project includes a Nuxt brand layer and Studio. Custom fonts, Vue components and capabilities must be added separately.</p>
+
       </template>
-      <template #footer><UButton v-if="connected" :loading="busySource" :disabled="!dirty || sourceConflict || Object.keys(fieldErrors).length > 0" @click="applySource">Apply changes</UButton><UButton color="neutral" variant="outline" @click="exportSource">Download source</UButton><UButton color="neutral" variant="outline" :loading="busy" @click="exportProject">Download new project</UButton></template>
+      <template #footer><UButton v-if="connected" :loading="busySource" :disabled="!dirty || sourceConflict || Object.keys(fieldErrors).length > 0" @click="applySource">Apply changes</UButton><UButton v-if="exportTab !== 'download'" color="neutral" variant="outline" @click="exportTab = 'download'">Download options</UButton><UButton color="neutral" variant="ghost" @click="exportOpen = false">Close</UButton></template>
     </UModal>
   </main>
   <div v-else class="studio-loading" role="status"><UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" /><span class="sr-only">Loading Studio</span></div>

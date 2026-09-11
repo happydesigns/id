@@ -99,7 +99,7 @@ const card = { body: 'p-4 sm:p-5' }
 
     <div class="gallery-column">
       <UCard :ui="{ body: 'p-3 sm:p-4' }" class="example-card">
-        <h2 class="sr-only">Choose a date</h2><UCalendar aria-label="Choose a date" class="w-full" />
+        <h2 class="sr-only">Choose a date</h2><UCalendar aria-label="Choose a date" :year-controls="false" class="w-full" />
       </UCard>
       <UCard :ui="card" class="example-card">
         <h2>Invite your team</h2>
