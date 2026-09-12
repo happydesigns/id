@@ -138,3 +138,4 @@ export {
   validateBrandGuide,
   validateBrandTheme
 } from './validation'
+export { createBrandReference } from './guide-reference'

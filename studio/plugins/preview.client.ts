@@ -65,6 +65,8 @@ export default defineNuxtPlugin({
         config.ui = previewUi(hostUi, seedUi, doc.theme.ui ?? {})
         config.header = docusBrandHeader(doc, header)
         config.brand = { name: doc.theme.label ?? doc.brand.name, assets: doc.brand.assets }
+        // Guide components must describe the same source as the rendered draft.
+        if (config.idStudio) config.idStudio.document = doc
         if (config.id) { config.id.theme = doc.theme; config.id.themes = []; config.id.assets = doc.brand.assets }
         style.value = studioPreviewCss(doc)
         applyMode(event.data)
