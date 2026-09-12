@@ -1,9 +1,19 @@
 <script setup lang="ts">
+import { useStudioIcon } from "../playground-icons"
+
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import StudioPaletteSelect from './StudioPaletteSelect.vue'
 import StudioTemplatePicker from './StudioTemplatePicker.vue'
+import StudioColorMode from './StudioColorMode.vue'
+import StudioAskAi from './StudioAskAi.vue'
+import StudioIconPicker from './StudioIconPicker.vue'
+import StudioEditorPanel from './StudioEditorPanel.vue'
+import StudioControlGroup from './StudioControlGroup.vue'
+import { editorCategories } from '../editor-categories'
+import { themeIcons, type ThemeIcons } from '../icon-sets'
+import StudioBrandThumbnail from './StudioBrandThumbnail.vue'
 import { paletteRamp } from '../palette'
-import { copyConfig, previewUi, studioPreviewCss } from '../preview'
+import { copyConfig, previewUi, studioShellCss } from '../preview'
 import StudioViewport from './StudioViewport.vue'
 import StudioViewportControls from './StudioViewportControls.vue'
 import { createBlankStudioDocument, createStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
@@ -30,8 +40,15 @@ const scene = ref(typeof route.query.view === 'string' && templates.some(item =>
 const selectedTemplate = computed(() => templates.find(item => item.id === scene.value))
 const paths = ref<Record<string, string>>({})
 const previewPath = computed(() => selectedTemplate.value?.routePrefix && withinStudioRoute(paths.value[scene.value], selectedTemplate.value.routePrefix) ? paths.value[scene.value] : selectedTemplate.value?.route)
-function frameSrc(frame: string) {
-  return selectedTemplate.value?.route ? `${selectedTemplate.value.route}?idPreview=${scene.value}&frame=${frame}` : `/studio/preview?frame=${frame}`
+const previewRuntime = computed(() => selectedTemplate.value?.route ? scene.value : '__builtin')
+const cachedRuntimes = ref([previewRuntime.value])
+watch(previewRuntime, runtime => {
+  // Reordering live iframe elements reloads their documents in browsers.
+  if (!cachedRuntimes.value.includes(runtime)) cachedRuntimes.value = [...cachedRuntimes.value, runtime].slice(-3)
+}, { flush: 'sync' })
+function frameSrc(frame: string, runtime: string) {
+  const template = templates.find(item => item.id === runtime)
+  return template?.route ? `${template.route}?idPreview=${runtime}&frame=${frame}` : `/studio/preview?frame=${frame}`
 }
 const templatePage = ref(selectedTemplate.value?.pages.find(page => page.id === route.query.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home')
 watch(scene, () => { templatePage.value = selectedTemplate.value?.pages[0]?.id || 'home' }, { flush: 'sync' })
@@ -44,8 +61,12 @@ const compare = ref(route.query.compare === 'true')
 function viewportDimension(value: unknown, fallback: number) { const number = Number(value); return Number.isInteger(number) && number >= 240 && number <= 3840 ? number : fallback }
 const viewportWidth = ref(viewportDimension(route.query.width, route.query.mobile === 'true' ? 390 : 0))
 const viewportHeight = ref(viewportDimension(route.query.height, 844))
-const editing = ref(route.query.browse !== 'true')
-const panel = ref('colors')
+const editing = ref(typeof route.query.editor === 'string' || route.query.browse === 'false')
+const editorPinned = ref(route.query.docked === 'true')
+function editorCategory(value: unknown) { return ['details', 'components'].includes(String(value)) ? 'styles' : ['identity', 'colors', 'type', 'icons', 'styles'].includes(String(value)) ? String(value) : 'colors' }
+const panel = ref(editorCategory(route.query.editor))
+const editorHeading = ref<HTMLElement>()
+let editorTrigger: HTMLElement | undefined
 const error = ref('')
 const notice = ref('')
 const toast = useToast()
@@ -59,12 +80,15 @@ watch(error, message => {
   else toast.remove('studio-error')
 })
 const exportOpen = ref(false)
+const askAiOpen = ref(false)
 const exportTab = ref('changes')
 const busy = ref(false)
 const pending = ref<(() => void) | null>(null)
 const input = ref<HTMLInputElement>()
-const originalFrame = ref<HTMLIFrameElement>()
-const draftFrame = ref<HTMLIFrameElement>()
+const frameCache = ref<Record<string, HTMLIFrameElement | undefined>>({})
+const originalFrame = computed(() => frameCache.value[`original:${previewRuntime.value}`])
+const draftFrame = computed(() => frameCache.value[`draft:${previewRuntime.value}`])
+function cacheFrame(frame: unknown, key: string) { frameCache.value[key] = frame instanceof HTMLIFrameElement ? frame : undefined }
 const loadedFrames = ref({ original: false, draft: false })
 const failedFrames = ref({ original: false, draft: false })
 const previewAttempt = ref(0)
@@ -85,6 +109,7 @@ watch(recovery, session => {
 })
 const projects = ref<StudioSession[]>([])
 const brandPickerOpen = ref(false)
+const templatePickerOpen = ref(false)
 const brandSearch = ref('')
 const brandSearchInput = { placeholder: 'Search brands…', 'aria-label': 'Search brands' }
 const createOpen = ref(false)
@@ -176,19 +201,33 @@ const logoRole = ref('wordmark')
 const currentLogo = computed(() => draft.value.brand.assets?.logos?.[logoRole.value])
 function removeLogo() { edit(doc => { if (doc.brand.assets?.logos) Reflect.deleteProperty(doc.brand.assets.logos, logoRole.value) }) }
 const logoRoles = [{ label: 'Wordmark · light', value: 'wordmark' }, { label: 'Wordmark · dark', value: 'wordmarkInverse' }, { label: 'Symbol · light', value: 'logo' }, { label: 'Symbol · dark', value: 'logoInverse' }]
-const projectItems = computed(() => [
-  [{ label: 'Create new brand', icon: 'i-lucide-plus', onSelect: () => beginCreate() }, { label: 'Open brand', icon: 'i-lucide-folder-open', onSelect: () => input.value?.click() }, { label: 'Manage brands', icon: 'i-lucide-library', onSelect: openManager }],
-  [{ label: 'Duplicate brand', icon: 'i-lucide-copy', onSelect: () => beginCreate(draft.value) }, { label: 'Review changes', icon: 'i-lucide-git-compare-arrows', onSelect: () => { exportTab.value = 'changes'; exportOpen.value = true } }, { label: 'Download', icon: 'i-lucide-download', onSelect: () => { exportOpen.value = true; exportTab.value = 'download' } }],
-  [{ label: 'Reset draft', icon: 'i-lucide-rotate-ccw', disabled: !dirty.value, onSelect: reset }, { label: 'Open connected project', icon: 'i-lucide-folder-sync', disabled: !writerToken, onSelect: () => guard(() => loadSource(true)) }, { label: 'Documentation', icon: 'i-lucide-book-open', to: config.idStudio?.home || '/' }]
+function brandAction(action: () => void) { brandPickerOpen.value = false; action() }
+const brandActions = computed(() => [
+  [{ label: 'Create new brand', icon: resolveIcon('i-lucide-plus'), onSelect: () => brandAction(() => beginCreate()) }, { label: 'Import brand', icon: resolveIcon('i-lucide-folder-open'), onSelect: () => brandAction(() => input.value?.click()) }, { label: 'Duplicate brand', icon: resolveIcon('i-lucide-copy'), onSelect: () => brandAction(() => beginCreate(draft.value)) }, { label: 'Manage brands', icon: resolveIcon('i-lucide-library'), onSelect: () => brandAction(openManager) }],
+  [{ label: 'Reset appearance…', icon: resolveIcon('i-lucide-rotate-ccw'), disabled: readOnly.value || !dirty.value, onSelect: () => brandAction(() => { resetOpen.value = true }) }, { label: 'Open connected project', icon: resolveIcon('i-lucide-folder-sync'), disabled: !writerToken, onSelect: () => brandAction(() => guard(() => loadSource(true))) }]
 ])
+function brandDescription(doc: StudioDocument) {
+  return doc.brand.packageName && doc.brand.packageName !== '@example/brand' ? doc.brand.packageName : 'Local brand'
+}
 const brandGroups = computed(() => [
   { id: 'brands', label: 'Brands', items: catalog.map(item => {
     const key = catalogPrefix + item.key
     const saved = projects.value.find(project => project.catalogKey === key)
-    return { label: key === catalogKey.value ? draft.value.theme.label : saved?.draft.theme.label || item.document.theme.label, icon: key === catalogKey.value ? 'i-lucide-check' : 'i-lucide-palette', description: item.key === 'nuxt-ui' ? 'Starting point' : key === catalogKey.value && connected.value ? 'Connected project' : saved ? 'Browser draft · ' + (item.document.brand.packageName || item.document.brand.name) : 'Configured brand · ' + (item.document.brand.packageName || item.document.brand.name), keywords: item.document.brand.packageName, onSelect: () => pickBrand(() => selectCatalog(item.key)) }
+    return { document: key === catalogKey.value ? draft.value : saved?.draft || item.document, label: key === catalogKey.value ? draft.value.theme.label : saved?.draft.theme.label || item.document.theme.label, icon: key === catalogKey.value ? 'i-lucide-check' : 'i-lucide-palette', description: item.key === 'nuxt-ui' ? 'Starting point' : key === catalogKey.value && connected.value ? 'Connected project' : saved ? 'Browser draft · ' + (item.document.brand.packageName || item.document.brand.name) : 'Configured brand · ' + (item.document.brand.packageName || item.document.brand.name), keywords: item.document.brand.packageName, onSelect: () => pickBrand(() => selectCatalog(item.key)) }
   }) },
-  { id: 'local', label: 'Saved in this browser', items: projects.value.filter(project => !catalog.some(item => project.catalogKey === catalogPrefix + item.key)).map(project => ({ label: project.draft.theme.label, description: `${project.draft.brand.packageName || project.draft.brand.name} · ${new Date(project.updatedAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'medium' })}`, icon: project.id === projectId.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: project.draft.brand.packageName, onSelect: () => pickBrand(() => restore(project)) })) }
+  { id: 'local', label: 'Saved in this browser', items: projects.value.filter(project => !catalog.some(item => project.catalogKey === catalogPrefix + item.key)).map(project => ({ document: project.id === projectId.value ? draft.value : project.draft, label: project.draft.theme.label, description: brandDescription(project.id === projectId.value ? draft.value : project.draft), icon: project.id === projectId.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: project.draft.brand.packageName, onSelect: () => pickBrand(() => restore(project)) })) }
 ])
+const brandMenuItems = computed(() => {
+  const search = brandSearch.value.trim().toLocaleLowerCase()
+  const groups = brandGroups.value.map(group => {
+    const items = group.items.filter(item => [item.label, item.description, item.keywords].some(value => value?.toLocaleLowerCase().includes(search)))
+    return items.length ? [{ type: 'label' as const, label: group.label }, ...items.map(item => ({ ...item, icon: undefined, slot: 'brand' as const, checked: item.icon === 'i-lucide-check' }))] : []
+  }).filter(group => group.length)
+  return [...groups, [
+    ...(!readOnly.value ? [{ label: 'Brand settings', icon: resolveIcon('i-lucide-fingerprint'), onSelect: () => { brandPickerOpen.value = false; openEditor('identity') } }] : []),
+    { label: 'Manage brand', icon: resolveIcon('i-lucide-ellipsis'), children: brandActions.value }
+  ]]
+})
 function beginCreate(base?: StudioDocument) {
   createBase.value = base ? clone(base) : undefined
   createName.value = base ? `${base.theme.label} copy` : ''
@@ -203,6 +242,11 @@ function createBrand() {
   if (existing.some(label => label.trim().toLocaleLowerCase() === name.toLocaleLowerCase())) { createError.value = 'A brand with this name already exists. Choose a different name.'; return }
   const doc = clone(createBase.value || createBlankStudioDocument())
   doc.theme.label = name
+  if (!createBase.value) {
+    const identifier = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'brand'
+    doc.brand.name = identifier
+    doc.brand.packageName = `@${identifier}/brand`
+  }
   createOpen.value = false
   guard(() => { persist(); replace(doc); editing.value = true })
 }
@@ -221,14 +265,23 @@ function selectCatalog(key: string) {
     if (key === 'host') loadSource()
   }
 }
-watch(editing, value => {
-  if (storageReady.value) router.replace({ query: { ...route.query, browse: value ? undefined : 'true' } })
+watch([editing, panel, editorPinned], () => {
+  if (applyingQuery) return
+  if (storageReady.value) router.replace({ query: { ...route.query, browse: editing.value ? undefined : 'true', editor: editing.value ? panel.value : undefined, docked: editorPinned.value ? 'true' : undefined } })
 })
+function openEditor(category: string, event?: Event) {
+  editorTrigger = event?.currentTarget as HTMLElement | undefined
+  panel.value = category
+  if (readOnly.value) { beginCreate(); return }
+  editing.value = true
+  nextTick(() => editorHeading.value?.focus())
+}
 function customize() {
   if (readOnly.value) beginCreate()
-  else editing.value = !editing.value
+  else if (editing.value) closeSettings()
+  else openEditor(panel.value)
 }
-const panels = [{ label: 'Brand', value: 'identity' }, { label: 'Palette', value: 'colors' }, { label: 'Typography', value: 'type' }, { label: 'Appearance', value: 'details' }]
+const panels = computed(() => editorCategories.map(item => ({ ...item, icon: resolveIcon(item.icon) })))
 function fontOptions(role: string) {
   const stacks = [...new Set([draft.value.theme.typography?.[role], draft.value.brand.typography?.[role], baseline.value.theme.typography?.[role], baseline.value.brand.typography?.[role]])]
   return [...stacks.filter((stack): stack is string => !!stack && !fontPresets.some(item => item.value === stack)).map(stack => ({ label: stack.split(',')[0]!.replace(/["']/g, ''), value: stack })), ...fontPresets]
@@ -272,7 +325,6 @@ const storageKey = `id-studio:1:${seed.brand.packageName || seed.brand.name}`
 const projectPrefix = 'id-studio:project:2:'
 const lastProjectKey = `${storageKey}:active`
 const needsExport = computed(() => diffStudioDocuments(exported.value || baseline.value, draft.value).length > 0)
-const saveStatus = computed(() => !storedLocally.value ? 'Not saved in this browser' : exported.value && !needsExport.value ? 'Saved locally · Export downloaded' : 'Saved in this browser')
 const sourcePath = computed(() => draft.value.brand.name === seed.brand.name ? config.idStudio?.sourcePath || 'brand.studio.json' : 'brand.studio.json')
 const output = computed(() => exportTab.value === 'changes' ? JSON.stringify(changes.value, null, 2) : exportTab.value === 'css' ? createStudioProject(draft.value)['app/assets/css/brand.css'] : JSON.stringify(draft.value, null, 2))
 const customComponents = computed(() => Object.keys(draft.value.theme.ui ?? {}).filter(key => !['colors', 'icons'].includes(key)))
@@ -313,12 +365,67 @@ function redo() {
   const next = future.value.pop()
   if (next) { history.value.push(clone(draft.value)); draft.value = next }
 }
+const resetOpen = ref(false)
+const randomScope = ref('all')
+const randomScopeKey = 'id-studio:randomizer-scope'
+function selectRandomScope(value: string) {
+  randomScope.value = value
+  try { localStorage.setItem(randomScopeKey, value) } catch { /* Optional UI preference; brand saving is independent. */ }
+}
+const randomScopes = computed(() => [{ label: 'Entire look', value: 'all', icon: resolveIcon('i-lucide-sparkles') }, ...panels.value.filter(item => item.randomScope).map(item => ({ label: item.label, value: item.randomScope!, icon: item.icon }))])
+function pick(values: string[], current?: string) {
+  const alternatives = values.filter(value => value !== current)
+  return alternatives[Math.floor(Math.random() * alternatives.length)] || current || values[0]!
+}
+function randomize() {
+  edit(doc => {
+    if (['colors', 'all'].includes(randomScope.value)) {
+      doc.theme.ui ??= {}
+      doc.theme.ui.colors ??= {}
+      for (const [role, options] of Object.entries({ primary: ['blue', 'violet', 'rose', 'teal', 'orange', 'emerald', 'indigo'], neutral: ['slate', 'gray', 'zinc', 'neutral', 'stone'] })) {
+        doc.theme.ui.colors[role] = pick(options, doc.theme.ui.colors[role])
+      }
+    }
+    if (['typography', 'all'].includes(randomScope.value)) {
+      doc.theme.typography ??= {}
+      doc.brand.typography ??= {}
+      const sans = pick(['system-ui, sans-serif', 'Arial, sans-serif', 'Verdana, sans-serif'], doc.theme.typography.sans || doc.brand.typography.sans)
+      const display = pick(['system-ui, sans-serif', 'Georgia, serif', 'Arial, sans-serif'], doc.theme.typography.display || doc.brand.typography.display)
+      Object.assign(doc.theme.typography, { sans, display, mono: 'ui-monospace, monospace' })
+      Object.assign(doc.brand.typography, doc.theme.typography)
+    }
+    if (['icons', 'all'].includes(randomScope.value)) {
+      doc.theme.ui ??= {}
+      const current = Object.keys(themeIcons).find(key => themeIcons[key as ThemeIcons].search === doc.theme.ui?.icons?.search) || 'lucide'
+      doc.theme.ui.icons = { ...themeIcons[pick(Object.keys(themeIcons), current) as ThemeIcons] }
+    }
+    if (['styles', 'all'].includes(randomScope.value)) {
+      doc.theme.ui ??= {}
+      const button = (doc.theme.ui.button ?? {}) as Record<string, unknown>
+      const defaults = (button.defaultVariants ?? {}) as Record<string, unknown>
+      doc.theme.ui.button = {
+        ...button,
+        defaultVariants: { ...defaults, variant: pick(['solid', 'outline', 'soft', 'subtle'], String(defaults.variant || 'solid')) }
+      }
+      doc.theme.cssVariables ??= {}
+      for (const appearanceMode of ['light', 'dark'] as const) {
+        doc.theme.cssVariables[appearanceMode] ??= {}
+        doc.theme.cssVariables[appearanceMode]['--ui-radius'] = pick(['0rem', '0.25rem', '0.375rem', '0.5rem'], doc.theme.cssVariables[appearanceMode]['--ui-radius'])
+      }
+    }
+  })
+}
 function reset() {
+  edit(doc => {
+    for (const key of ['ui', 'typography', 'cssVariables'] as const) {
+      Reflect.deleteProperty(doc.theme, key)
+      if (baseline.value.theme[key]) Object.assign(doc.theme, { [key]: clone(baseline.value.theme[key]) })
+    }
+    delete doc.brand.typography
+    if (baseline.value.brand.typography) doc.brand.typography = clone(baseline.value.brand.typography)
+  })
   fieldErrors.value = {}
-  history.value.push(clone(draft.value))
-  future.value = []
-  draft.value = clone(baseline.value)
-  error.value = ''
+  resetOpen.value = false
 }
 function replace(doc: StudioDocument, key?: string) {
   persistPristine.value = !key
@@ -330,7 +437,7 @@ function replace(doc: StudioDocument, key?: string) {
   history.value = []
   future.value = []
   error.value = ''
-  editing.value = !readOnly.value && route.query.browse !== 'true'
+  editing.value = !readOnly.value && (typeof route.query.editor === 'string' || route.query.browse === 'false')
   exported.value = undefined
   fieldErrors.value = {}
   projectId.value = crypto.randomUUID()
@@ -377,7 +484,18 @@ async function applySource() {
     error.value = sourceConflict.value ? 'The project changed outside Studio. Download your draft or reopen the connected project before applying changes.' : 'The source could not be saved. Your draft is still available.'
   } finally { busySource.value = false }
 }
-function closeSettings() { editing.value = false; nextTick(() => customizeButton.value?.$el?.focus()) }
+function dismissEditor() {
+  if (editing.value && !editorPinned.value && !paletteOpen.value) editing.value = false
+}
+
+function closeSettings() { editing.value = false; restoreEditorFocus() }
+function restoreEditorFocus() {
+  nextTick(() => {
+    const trigger = editorTrigger?.isConnected && editorTrigger.offsetParent ? editorTrigger : customizeButton.value?.$el
+    if (trigger?.offsetParent) trigger.focus()
+    else (window.document.querySelector<HTMLButtonElement>(`.studio-categories button[data-editor-category="${panel.value}"]`) || window.document.querySelector<HTMLButtonElement>('[aria-label="Brand picker"]'))?.focus()
+  })
+}
 function guard(action: () => void) { if (needsExport.value && !storedLocally.value) pending.value = action; else action() }
 function acceptReplacement() { const action = pending.value; pending.value = null; action?.() }
 function value(event: Event) { return (event.target as HTMLInputElement).value }
@@ -431,12 +549,19 @@ async function addLogo(file: File | null | undefined) {
 }
 function send(frame: HTMLIFrameElement | undefined, doc: StudioDocument) {
   if (!frame?.contentDocument) return
-  frame.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, page: templatePage.value, path: previewPath.value, mode: mode.value, state: state.value }, window.location.origin)
+  frame.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, page: templatePage.value, path: previewPath.value, mode: mode.value, preference: preference.value, state: state.value }, window.location.origin)
 }
 function refresh() { send(originalFrame.value, baseline.value); send(draftFrame.value, draft.value) }
 function ready(event: MessageEvent) {
   if (event.origin !== window.location.origin) return
   if (event.source !== originalFrame.value?.contentWindow && event.source !== draftFrame.value?.contentWindow) return
+  if (event.data?.type === 'id-studio-pointer') {
+    brandPickerOpen.value = false
+    templatePickerOpen.value = false
+    previewOptionsOpen.value = false
+    dismissEditor()
+    return
+  }
   if (event.data?.type === 'id-studio-rendered') {
     failedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = false
     loadedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true
@@ -448,7 +573,7 @@ function ready(event: MessageEvent) {
     if (event.data.scene === scene.value && selectedTemplate.value?.routePrefix && withinStudioRoute(event.data.path, selectedTemplate.value.routePrefix)) paths.value[scene.value] = event.data.path
     return
   }
-  if (event.data?.type === 'id-studio-mode' && ['light', 'dark'].includes(event.data.mode)) { preference.value = event.data.mode; return }
+  if (event.data?.type === 'id-studio-mode' && ['light', 'dark', 'system'].includes(event.data.mode)) { preference.value = event.data.mode; return }
   if (event.data?.type === 'id-studio-preview-error') { failedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true; loadedFrames.value[event.source === originalFrame.value?.contentWindow ? 'original' : 'draft'] = true; error.value = 'This preview could not apply the brand. Try reloading it.'; return }
   if (event.data?.type !== 'id-studio-ready') return
   if (event.source === originalFrame.value?.contentWindow) send(originalFrame.value, baseline.value)
@@ -524,7 +649,7 @@ function restore(session: StudioSession) {
   baseline.value = clone(session.baseline); draft.value = clone(session.draft)
   exported.value = session.exported ? clone(session.exported) : undefined
   projectId.value = session.id; history.value = []; future.value = []; fieldErrors.value = {}
-  recovery.value = undefined; brandPickerOpen.value = false; editing.value = !readOnly.value && route.query.browse !== 'true'
+  recovery.value = undefined; brandPickerOpen.value = false; editing.value = !readOnly.value && (typeof route.query.editor === 'string' || route.query.browse === 'false')
   persist()
   if (catalogKey.value === catalogPrefix + 'host') loadSource()
 }
@@ -580,6 +705,9 @@ async function shareView() {
 let applyingQuery = false
 watch(() => route.query, query => {
   applyingQuery = true
+  editing.value = !readOnly.value && (typeof query.editor === 'string' || query.browse === 'false')
+  if (typeof query.editor === 'string') panel.value = editorCategory(query.editor)
+  editorPinned.value = query.docked === 'true'
   scene.value = templates.some(item => item.id === query.view) ? String(query.view) : 'components'
   templatePage.value = selectedTemplate.value?.pages.find(page => page.id === query.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home'
   preference.value = query.mode === 'dark' ? 'dark' : query.mode === 'light' ? 'light' : 'system'
@@ -593,6 +721,10 @@ watch([scene, templatePage, preference, previewPath, state, compare, viewportWid
   router.replace({ query: { ...route.query, view: scene.value, page: selectedTemplate.value?.component ? templatePage.value : undefined, path: previewPath.value, mode: preference.value, state: scene.value === 'components' ? state.value : undefined, compare: compare.value ? 'true' : undefined, mobile: undefined, width: viewportWidth.value || undefined, height: viewportWidth.value ? viewportHeight.value : undefined } })
 })
 onMounted(() => {
+  try {
+    const savedScope = localStorage.getItem(randomScopeKey)
+    if (randomScopes.value.some(item => item.value === savedScope)) randomScope.value = savedScope!
+  } catch { /* Keep the default when browser storage is unavailable. */ }
   // A failed iframe has no live Vite client. Recover it when the host receives
   // a successful update or reconnects after a dev-server restart.
   if (import.meta.hot) {
@@ -618,7 +750,7 @@ onMounted(() => {
   root.removeAttribute('style')
   watch(draft, doc => {
     shellConfig.ui = previewUi(hostUi, seed.theme.ui ?? {}, doc.theme.ui ?? {}) as typeof shellConfig.ui
-    shellTheme.value = studioPreviewCss(doc)
+    shellTheme.value = studioShellCss(doc)
   }, { immediate: true, deep: true })
   onBeforeUnmount(() => {
     shellConfig.ui = hostUi
@@ -664,7 +796,7 @@ onMounted(() => {
 })
 watch([draft, baseline, exported], persist, { deep: true, flush: 'post' })
 watch([draft, baseline, scene, templatePage, previewPath, state, compare], () => nextTick(refresh), { deep: true })
-watch(mode, value => {
+watch([mode, preference], ([value, selected]) => {
   if (!import.meta.client) return
   // Same-origin documents change CSS mode in one task, before the next paint.
   for (const frame of [originalFrame.value, draftFrame.value]) {
@@ -672,27 +804,38 @@ watch(mode, value => {
     if (!root) continue
     root.classList.toggle('dark', value === 'dark')
     root.classList.toggle('light', value === 'light')
-    frame?.contentWindow?.postMessage({ type: 'id-studio-color-mode', mode: value }, window.location.origin)
+    frame?.contentWindow?.postMessage({ type: 'id-studio-color-mode', mode: value, preference: selected }, window.location.origin)
   }
 }, { flush: 'sync' })
 onBeforeUnmount(() => { window.removeEventListener('message', ready); window.removeEventListener('beforeunload', beforeUnload) })
+
+const resolveIcon = useStudioIcon()
 </script>
 
 <template>
   <main v-if="storageReady" class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
-      <UDropdownMenu :items="projectItems" :content="{ align: 'start' }">
-        <UButton color="neutral" variant="ghost" icon="i-lucide-menu" aria-label="Brand actions" class="studio-main-menu"><span class="studio-menu-label">Studio</span></UButton>
-      </UDropdownMenu>
+      <div class="studio-product inline-flex items-center gap-2.5 font-semibold tracking-tight text-highlighted" aria-label="happydesigns/id" title="happydesigns/id">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-inverted"><UIcon name="i-lucide-fingerprint" class="size-5" /></span>
+        <span><span class="studio-product-prefix">happydesigns</span><span class="text-primary">/id</span></span>
+      </div>
       <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
-        <UPopover v-model:open="brandPickerOpen" :content="{ align: 'start' }">
-          <UButton color="neutral" variant="ghost" trailing-icon="i-lucide-chevron-down" aria-label="Brand picker" class="studio-project-name" :ui="{ trailingIcon: 'ms-auto shrink-0' }"><span class="truncate">{{ draft.theme.label }}</span></UButton>
-          <template #content><UCommandPalette v-model:search-term="brandSearch" :groups="brandGroups" :fuse="{ fuseOptions: { keys: ['label', 'keywords'] } }" placeholder="Search brands…" :input="brandSearchInput" class="w-80 max-w-[calc(100vw-2rem)]" :ui="{ viewport: 'max-h-[min(65dvh,28rem)]', itemDescription: 'whitespace-normal break-words text-clip overflow-visible' }" /></template>
-        </UPopover>
-        <StudioTemplatePicker v-model="scene" :templates="templates" />
+        <div class="studio-scene-pill" role="group" aria-label="Brand selection">
+        <UDropdownMenu v-model:open="brandPickerOpen" v-model:search-term="brandSearch" :items="brandMenuItems" :filter="brandSearchInput" ignore-filter :modal="false" :content="{ align: 'start' }" :ui="{ content: 'w-80 max-w-[calc(100vw-2rem)]', viewport: 'max-h-[min(65dvh,28rem)]', item: 'gap-3 px-3 py-2.5', itemDescription: 'truncate' }">
+          <UButton color="neutral" variant="ghost" :trailing-icon="resolveIcon('i-lucide-chevron-down')" aria-label="Brand picker" class="studio-project-name studio-scene-trigger" :ui="{ trailingIcon: 'ms-auto shrink-0' }"><span class="truncate">{{ draft.theme.label }}</span></UButton>
+          <template #brand-leading="{ item }"><StudioBrandThumbnail :document="item.document" /></template>
+          <template #brand-trailing="{ item }"><UIcon v-if="item.checked" :name="resolveIcon('i-lucide-check')" class="size-4 shrink-0" /></template>
+          <template #content-bottom="{ sub }"><p v-if="!sub && !readOnly && !storedLocally" class="border-t border-default px-4 py-3 text-xs text-warning" role="status">Changes could not be saved in this browser.</p></template>
+        </UDropdownMenu>
+        </div>
+        <StudioTemplatePicker v-model="scene" v-model:open="templatePickerOpen" :templates="templates" />
       </div>
-      <UButton class="studio-review studio-desktop" color="neutral" variant="ghost" :icon="connected ? 'i-lucide-git-compare-arrows' : 'i-lucide-download'" @click="exportTab = connected ? 'changes' : 'download'; exportOpen = true">{{ connected ? 'Review changes' : 'Download' }}</UButton>
+      <div class="studio-review flex items-center gap-2">
+        <UTooltip text="Documentation"><UButton :to="config.idStudio?.home || '/'" target="_blank" color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-book-open')" aria-label="Documentation (opens in a new tab)"><span class="studio-docs-label">Docs</span></UButton></UTooltip>
+        <UButton color="neutral" variant="outline" @click="askAiOpen = true">Ask AI</UButton>
+        <UButton color="neutral" variant="solid" @click="exportTab = 'download'; exportOpen = true">Export</UButton>
+      </div>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
     <UModal v-model:open="manageOpen" title="Manage brands" description="Saved in this browser. Repository files are unchanged." :ui="{ content: 'max-w-2xl h-[min(640px,calc(100dvh-2rem))]', body: 'min-h-0 flex-1 overflow-auto' }">
@@ -725,24 +868,26 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <template #body><form id="studio-create-brand" @submit.prevent="createBrand"><UFormField label="Name" :error="createError" required><UInput v-model="createName" aria-label="New brand name" autofocus maxlength="80" class="w-full" @update:model-value="createError = ''" /></UFormField></form></template>
       <template #footer><UButton color="neutral" variant="ghost" @click="createOpen = false">Cancel</UButton><UButton type="submit" form="studio-create-brand" :disabled="!createName.trim()">Create brand</UButton></template>
     </UModal>
-    <div class="studio-workspace" :class="{ 'studio-browsing': !editing, 'studio-editing': editing }">
+    <div class="studio-workspace" :class="{ 'studio-editing': editing && !readOnly, 'studio-pinned': editing && !readOnly && editorPinned }">
       <div class="studio-canvas" :class="{ 'studio-comparing': compare }">
         <section v-if="compare" class="studio-frame-wrap">
           <div class="studio-frame-label">Original <span>{{ baseline.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.original" :failed="failedFrames.original" @retry="retryPreview"><iframe ref="originalFrame" :key="`${scene}:${previewAttempt}`" :src="frameSrc('original')" title="Original brand preview" :style="frameStyle" @load="frameLoaded(originalFrame, baseline, 'original')" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.original" :failed="failedFrames.original" @retry="retryPreview"><iframe v-for="runtime in cachedRuntimes" v-show="runtime === previewRuntime" :key="`${runtime}:${previewAttempt}`" :ref="frame => cacheFrame(frame, `original:${runtime}`)" :src="frameSrc('original', runtime)" :title="runtime === previewRuntime ? 'Original brand preview' : `Cached original ${runtime}`" :style="frameStyle" @load="runtime === previewRuntime && frameLoaded(originalFrame, baseline, 'original')" /></StudioViewport>
         </section>
         <section class="studio-frame-wrap">
           <div class="studio-frame-label">Draft <span>{{ draft.theme.label }}</span></div>
-          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.draft" :failed="failedFrames.draft" @retry="retryPreview"><iframe ref="draftFrame" :key="`${scene}:${previewAttempt}`" :src="frameSrc('draft')" title="Draft brand preview" :style="frameStyle" @load="frameLoaded(draftFrame, draft, 'draft')" /></StudioViewport>
+          <StudioViewport v-slot="{ frameStyle }" v-model:zoom="previewZoom" v-model:width="viewportWidth" v-model:height="viewportHeight" :loading="!loadedFrames.draft" :failed="failedFrames.draft" @retry="retryPreview"><iframe v-for="runtime in cachedRuntimes" v-show="runtime === previewRuntime" :key="`${runtime}:${previewAttempt}`" :ref="frame => cacheFrame(frame, `draft:${runtime}`)" :src="frameSrc('draft', runtime)" :title="runtime === previewRuntime ? 'Draft brand preview' : `Cached draft ${runtime}`" :style="frameStyle" @load="runtime === previewRuntime && frameLoaded(draftFrame, draft, 'draft')" /></StudioViewport>
         </section>
       </div>
-      <aside v-if="editing && !readOnly" class="studio-inspector" aria-label="Brand settings">
+      <StudioEditorPanel v-if="!readOnly" v-model:open="editing" :pinned="editorPinned" @restore-focus="restoreEditorFocus"><aside id="studio-editor" class="studio-inspector" aria-label="Brand editor">
         <div class="studio-inspector-header">
-          <h2>Customize</h2>
-          <UButton icon="i-lucide-x" aria-label="Close settings" color="neutral" variant="ghost" @click="closeSettings" />
+          <h2 ref="editorHeading" tabindex="-1" class="outline-none">{{ panels.find(item => item.value === panel)?.label }}</h2>
+          <div class="flex items-center gap-1"><UTooltip :text="editorPinned ? 'Unpin editor' : 'Pin editor beside preview'"><UButton class="studio-pin-editor" :icon="resolveIcon(editorPinned ? 'i-lucide-pin-off' : 'i-lucide-pin')" :aria-label="editorPinned ? 'Unpin editor' : 'Pin editor'" :aria-pressed="editorPinned" color="neutral" :variant="editorPinned ? 'soft' : 'ghost'" @click="editorPinned = !editorPinned" /></UTooltip>
+          <UButton :icon="resolveIcon('i-lucide-x')" aria-label="Close settings" color="neutral" variant="ghost" @click="closeSettings" /></div>
         </div>
-        <UAccordion v-model="panel" :items="panels" class="studio-fields">
-          <template #body="{ item: section }"><div class="studio-form-section">
+        <div class="studio-category-select p-3 border-b border-default"><USelect v-model="panel" :items="panels" aria-label="Editor category" class="w-full" /></div>
+        <div :key="panel" class="studio-fields">
+          <div v-for="section in panels.filter(item => item.value === panel)" :key="section.value" class="studio-form-section">
           <template v-if="section.value === 'identity'">
             <UFormField :error="fieldErrors['label']" label="Brand name" ><UInput :model-value="draft.theme.label" class="w-full" @change="edit(doc => { doc.theme.label = value($event) }, 'label')" /></UFormField>
             <UFormField :error="fieldErrors['claim']" label="Brand statement"><UTextarea :model-value="draft.brand.claim" :rows="3" class="w-full" @change="edit(doc => { doc.brand.claim = value($event) }, 'claim')" /></UFormField>
@@ -756,28 +901,27 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
             </div></template></UAccordion>
           </template>
           <template v-if="section.value === 'colors'">
-            <UFormField v-for="role in ['primary', 'neutral']" :key="role" :label="title(role)">
+            <UAccordion :items="[{ label: 'Surfaces and contrast', value: 'surfaces' }]"><template #body><div class="studio-form-section"><p class="studio-help">Editing {{ mode }} mode. Empty fields use defaults.</p>
+            <IdStudioColorField v-for="entry in [{ name: '--ui-bg', label: 'Page background' }, { name: '--ui-bg-elevated', label: 'Raised surface' }, { name: '--ui-text', label: 'Body text' }, { name: '--ui-border', label: 'Borders' }]" :key="entry.name" :label="entry.label" :model-value="draft.theme.cssVariables?.[mode]?.[entry.name] || ''" :error="fieldErrors[`token:${entry.name}`]" @change="token(entry.name, $event)" />
+            <p v-if="bodyContrast !== undefined" :class="bodyContrast < 4.5 ? 'text-error' : 'text-muted'" class="text-xs" role="status">Body text / page: {{ bodyContrast.toFixed(2) }}:1{{ bodyContrast < 4.5 ? ' — below 4.5:1 for normal text.' : '' }}</p>
+            <p v-else class="text-xs text-muted">Body contrast cannot be measured for these color values.</p>
+            </div></template></UAccordion>
+            <UFormField v-for="role in ['primary', 'neutral', ...studioRoles.filter(role => !['primary', 'neutral'].includes(role))]" :key="role" :label="title(role)">
               <StudioPaletteSelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :label="title(role)" :role="role" :options="paletteOptions" :colors="draft.brand.colors" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
             </UFormField>
-            <UAccordion :items="[{ label: 'More color roles', value: 'roles' }]">
-              <template #body><div class="studio-form-section">
-                <UFormField v-for="role in studioRoles.filter(role => !['primary', 'neutral'].includes(role))" :key="role" :label="title(role)">
-                  <StudioPaletteSelect :model-value="draft.theme.ui?.colors?.[role] || '__default'" :label="title(role)" :role="role" :options="paletteOptions" :colors="draft.brand.colors" @update:model-value="edit(doc => { doc.theme.ui ??= {}; doc.theme.ui.colors ??= {}; if ($event !== '__default') doc.theme.ui.colors[role] = String($event); else delete doc.theme.ui.colors[role] })" />
-                </UFormField>
-              </div></template>
-            </UAccordion>
-            <div class="flex items-center justify-between gap-2"><h3 class="text-sm font-semibold">Brand palettes</h3><UButton color="neutral" variant="soft" size="xs" icon="i-lucide-plus" @click="openPalette('create')">New palette</UButton></div>
+            <div class="flex items-center justify-between gap-2"><h3 class="text-sm font-semibold">Brand palettes</h3><UButton color="neutral" variant="soft" size="xs" :icon="resolveIcon('i-lucide-plus')" @click="openPalette('create')">New palette</UButton></div>
             <UAccordion v-model="paletteExpanded" :items="Object.entries(draft.brand.colors).map(([name, palette]) => ({ label: name, value: name, palette }))">
               <template #leading="{ item }"><span class="h-3 w-8 shrink-0 rounded ring ring-default" :style="{ background: paletteRamp(item.value, draft.brand.colors) }" /></template>
-              <template #trailing="{ item, open }"><span v-if="paletteUses(item.value).length" class="ml-auto max-w-24 truncate text-xs text-muted" :title="[...new Set(paletteUses(item.value))].join(', ')">{{ paletteUses(item.value)[0] }}<span v-if="paletteUses(item.value).length > 1"> +{{ paletteUses(item.value).length - 1 }}</span></span><UIcon name="i-lucide-chevron-down" class="size-4 shrink-0" :class="{ 'rotate-180': open }" /></template>
+              <template #trailing="{ item, open }"><span v-if="paletteUses(item.value).length" class="ml-auto max-w-24 truncate text-xs text-muted" :title="[...new Set(paletteUses(item.value))].join(', ')">{{ paletteUses(item.value)[0] }}<span v-if="paletteUses(item.value).length > 1"> +{{ paletteUses(item.value).length - 1 }}</span></span><UIcon :name="resolveIcon('i-lucide-chevron-down')" class="size-4 shrink-0" :class="{ 'rotate-180': open }" /></template>
               <template #body="{ item }">
                 <div class="space-y-3">
-                  <div class="flex justify-end"><UDropdownMenu :items="[{ label: 'Rename', icon: 'i-lucide-pencil', onSelect: () => openPalette('rename', item.value) }, { label: 'Delete palette', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => openPalette('delete', item.value) }]"><UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" :aria-label="`Actions for palette ${item.value}`" /></UDropdownMenu></div>
+                  <div class="flex justify-end"><UDropdownMenu :items="[{ label: 'Rename', icon: resolveIcon('i-lucide-pencil'), onSelect: () => openPalette('rename', item.value) }, { label: 'Delete palette', icon: resolveIcon('i-lucide-trash-2'), color: 'error', onSelect: () => openPalette('delete', item.value) }]"><UButton color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-ellipsis')" :aria-label="`Actions for palette ${item.value}`" /></UDropdownMenu></div>
                   <IdStudioColorField v-for="(color, shade) in typeof item.palette === 'string' ? { base: item.palette } : item.palette" :key="shade" :label="`${item.label} ${shade}`" :model-value="color || ''" :error="fieldErrors[`palette:${item.label}:${shade}`]" @change="paletteColor(item.label, String(shade), $event)" />
                 </div>
               </template>
             </UAccordion>
           </template>
+          <template v-if="section.value === 'icons'"><StudioIconPicker :model-value="draft.theme.ui?.icons" @update:model-value="edit(doc => { doc.theme.ui ??= {}; if ($event) doc.theme.ui.icons = $event; else delete doc.theme.ui.icons })" /></template>
           <template v-if="section.value === 'type'">
             <div v-for="role in ['sans', 'mono', 'display']" :key="role" class="space-y-2">
               <UFormField :label="{ sans: 'Body', mono: 'Code', display: 'Headings' }[role]" :error="fieldErrors[`font:${role}`]">
@@ -790,47 +934,55 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
               <UFormField v-for="role in ['sans', 'mono', 'display']" :key="role" :label="`${title(role)} font stack`" :error="fieldErrors[`font:${role}`]"><UInput :model-value="draft.theme.typography?.[role] || draft.brand.typography?.[role] || ''" class="w-full" @change="font(role, value($event))" /></UFormField>
             </div></template></UAccordion>
           </template>
-          <template v-if="section.value === 'details'">
+          <template v-if="section.value === 'styles'">
             <p class="studio-help">Editing {{ mode }} mode. Empty fields use defaults.</p>
             <UFormField label="Corner radius" :error="fieldErrors['token:--ui-radius']">
-              <UInput :model-value="draft.theme.cssVariables?.[mode]?.['--ui-radius'] || ''" placeholder="0.25rem" class="w-full" @change="token('--ui-radius', value($event))" />
-              <div class="mt-2 flex gap-1"><UButton v-for="preset in [{ label: 'Square', value: '0rem' }, { label: 'Soft', value: '0.25rem' }, { label: 'Round', value: '0.5rem' }]" :key="preset.value" color="neutral" variant="outline" size="xs" @click="token('--ui-radius', preset.value)">{{ preset.label }}</UButton></div>
+              <UInputMenu :model-value="draft.theme.cssVariables?.[mode]?.['--ui-radius'] || ''" :items="['0rem', '0.125rem', '0.25rem', '0.375rem', '0.5rem', '0.625rem', '0.75rem']" create-item="always" open-on-click clear placeholder="0.25rem" class="w-full" @update:model-value="token('--ui-radius', String($event ?? ''))" @create="token('--ui-radius', $event)">
+                <template #create-item-label="{ item }">Use {{ item }}</template>
+              </UInputMenu>
             </UFormField>
-            <IdStudioColorField v-for="entry in [{ name: '--ui-bg', label: 'Page background' }, { name: '--ui-bg-elevated', label: 'Raised surface' }, { name: '--ui-text', label: 'Body text' }, { name: '--ui-border', label: 'Borders' }]" :key="entry.name" :label="entry.label" :model-value="draft.theme.cssVariables?.[mode]?.[entry.name] || ''" :error="fieldErrors[`token:${entry.name}`]" @change="token(entry.name, $event)" />
-            <p v-if="bodyContrast !== undefined" :class="bodyContrast < 4.5 ? 'text-error' : 'text-muted'" class="text-xs" role="status">Body text / page: {{ bodyContrast.toFixed(2) }}:1{{ bodyContrast < 4.5 ? ' — below 4.5:1 for normal text.' : '' }}</p>
-            <p v-else class="text-xs text-muted">Body contrast cannot be measured for these color values.</p>
+</template>
+          <template v-if="section.value === 'styles'">
+            <p class="studio-help">Shared component defaults apply to the preview and Studio.</p>
             <p v-if="customComponents.length" class="text-xs text-muted">Component overrides are present. Their classes can take precedence over palette and style controls.</p>
             <UFormField label="Button style"><USelect :model-value="componentVariant('button') || '__default'" :items="[{ label: 'Nuxt UI default', value: '__default' }, ...['solid', 'outline', 'soft', 'subtle', 'ghost', 'link'].map(value => ({ label: value, value }))]" class="w-full" @update:model-value="defaultVariant('button', $event === '__default' ? '' : String($event))" /></UFormField>
-            <UAccordion v-if="customComponents.length" :items="[{ label: 'Component overrides', value: 'overrides' }]"><template #body><p class="studio-help">Existing overrides can affect these settings.</p><pre class="studio-code">{{ JSON.stringify(draft.theme.ui, null, 2) }}</pre></template></UAccordion>
+            <UAccordion v-if="customComponents.length" :items="[{ label: 'Component overrides', value: 'overrides' }]"><template #body><p class="studio-help">Existing overrides can affect these settings.</p><pre class="studio-code studio-source-code leading-relaxed">{{ JSON.stringify(draft.theme.ui, null, 2) }}</pre></template></UAccordion>
           </template>
         </div>
-      </template></UAccordion>
-        <p class="studio-inspector-footer" role="status">{{ saveStatus }}<span v-if="needsExport"> · Not exported</span></p>
-      </aside>
+      </div>
+      </aside></StudioEditorPanel>
     </div>
     <div class="studio-toolbar" role="toolbar" aria-label="Brand tools">
       <div class="studio-dock-settings">
-        <UTooltip text="Undo"><UButton class="studio-desktop" icon="i-lucide-undo-2" aria-label="Undo change" color="neutral" variant="ghost" :disabled="!history.length" @click="undo" /></UTooltip>
-        <UTooltip text="Redo"><UButton class="studio-desktop" icon="i-lucide-redo-2" aria-label="Redo change" color="neutral" variant="ghost" :disabled="!future.length" @click="redo" /></UTooltip>
-        <UButton ref="customizeButton" color="neutral" :variant="editing ? 'soft' : 'ghost'" icon="i-lucide-sliders-horizontal" :aria-pressed="editing" @click="customize">{{ readOnly ? 'Create brand' : 'Customize' }}</UButton>
-      </div>
-      <div class="studio-toolbar-end studio-desktop">
-        <UTooltip text="Compare original and draft"><UButton icon="i-lucide-columns-2" aria-label="Compare original brand" :aria-pressed="compare" color="neutral" :variant="compare ? 'soft' : 'ghost'" @click="compare = !compare" /></UTooltip>
-        <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" @update:width="previewZoom = 1" @update:height="previewZoom = 1" />
-        <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
-      </div>
-      <UPopover v-model:open="previewOptionsOpen">
-        <UButton color="neutral" variant="ghost" icon="i-lucide-settings-2" label="View" />
-        <template #content>
-          <div class="flex w-64 flex-col gap-4 p-4">
-            <div class="studio-view-mobile flex flex-col gap-4"><UCheckbox v-model="compare" label="Compare original brand" />
-            <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" @update:width="previewZoom = 1" @update:height="previewZoom = 1" />
-            <USelect v-model="preference" aria-label="Color mode" :items="[{ label: 'System', value: 'system' }, { label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }]" />
-            </div><USelect v-if="scene === 'components'" v-model="state" aria-label="Preview state" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" />
-            <UButton color="neutral" variant="outline" icon="i-lucide-link" @click="shareView">Copy view link</UButton>
-          </div>
+        <StudioControlGroup class="studio-history" label="Edit actions">
+        <UTooltip text="Undo"><UButton size="xs" class="studio-desktop p-1.5" :icon="resolveIcon('i-lucide-undo-2')" aria-label="Undo change" color="neutral" variant="ghost" :disabled="!history.length" @click="undo" /></UTooltip>
+        <UTooltip text="Redo"><UButton size="xs" class="studio-desktop p-1.5" :icon="resolveIcon('i-lucide-redo-2')" aria-label="Redo change" color="neutral" variant="ghost" :disabled="!future.length" @click="redo" /></UTooltip>
+        <template v-if="!readOnly">
+          <USeparator orientation="vertical" class="studio-desktop h-5 mx-1" />
+          <UTooltip :text="`Randomize ${randomScopes.find(item => item.value === randomScope)?.label.toLowerCase()}`"><UButton size="xs" class="p-1.5" :icon="resolveIcon('i-lucide-dices')" :aria-label="`Randomize ${randomScopes.find(item => item.value === randomScope)?.label.toLowerCase()}`" color="neutral" variant="ghost" @click="randomize" /></UTooltip>
+          <UDropdownMenu :items="[randomScopes.filter(item => item.value === 'all'), randomScopes.filter(item => item.value !== 'all')].map(group => group.map(item => ({ label: item.label, icon: item.icon, type: 'checkbox' as const, checked: randomScope === item.value, onSelect: () => selectRandomScope(item.value) })))"><UButton class="p-1.5" :icon="resolveIcon('i-lucide-chevron-down')" aria-label="Randomizer options" color="neutral" variant="ghost" size="xs" /></UDropdownMenu>
         </template>
-      </UPopover>
+        </StudioControlGroup>
+        <UButton ref="customizeButton" :class="{ 'studio-editor-mobile': !readOnly }" color="neutral" :variant="editing ? 'soft' : 'ghost'" :icon="resolveIcon('i-lucide-sliders-horizontal')" :aria-expanded="editing && !readOnly" aria-controls="studio-editor" @click="customize">{{ readOnly ? 'Create brand' : 'Editor' }}</UButton>
+      </div>
+      <div v-if="!readOnly" class="studio-categories" role="group" aria-label="Edit brand">
+        <UButton v-for="item in panels.filter(item => item.value !== 'identity')" :key="item.value" :data-editor-category="item.value" :icon="item.icon" color="neutral" :variant="editing && panel === item.value ? 'soft' : 'ghost'" :aria-expanded="editing && panel === item.value" aria-controls="studio-editor" @click="editing && panel === item.value ? closeSettings() : openEditor(item.value, $event)">{{ item.label }}</UButton>
+      </div>
+      <StudioControlGroup class="studio-view-tools" label="Preview controls">
+        <UPopover v-model:open="previewOptionsOpen" :content="{ align: 'end' }">
+          <UTooltip text="Preview settings"><UButton color="neutral" :variant="previewOptionsOpen ? 'soft' : 'ghost'" :icon="resolveIcon('i-lucide-sliders-horizontal')" aria-label="Preview settings" :aria-expanded="previewOptionsOpen" size="xs" class="p-1.5" /></UTooltip>
+          <template #content>
+            <div class="flex w-72 max-w-[calc(100vw-2rem)] flex-col gap-3 p-3">
+              <StudioViewportControls v-model:width="viewportWidth" v-model:height="viewportHeight" @update:width="previewZoom = 1" @update:height="previewZoom = 1" />
+              <UFormField v-if="scene === 'components'" label="Component state"><USelect v-model="state" aria-label="Preview state" class="w-full" :items="[{ label: 'Default', value: 'default' }, { label: 'Validation error', value: 'error' }]" /></UFormField>
+              <USwitch v-model="compare" label="Compare with original" :ui="{ root: 'flex-row-reverse justify-between', wrapper: 'ms-0 me-2' }" />
+              <div class="border-t border-default pt-2"><UButton color="neutral" variant="ghost" size="sm" :icon="resolveIcon('i-lucide-link')" class="w-full" @click="shareView">Copy preview link</UButton></div>
+            </div>
+          </template>
+        </UPopover>
+        <USeparator orientation="vertical" class="h-5 mx-1" />
+        <StudioColorMode v-model="preference" grouped />
+      </StudioControlGroup>
     </div>
     <UModal v-model:open="paletteOpen" :title="paletteAction === 'create' ? 'New palette' : paletteAction === 'rename' ? 'Rename palette' : 'Delete palette'">
       <template #body><form id="studio-palette-form" class="space-y-4" @submit.prevent="addPalette">
@@ -848,6 +1000,10 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <template #footer><UButton color="neutral" variant="ghost" @click="paletteOpen = false">Cancel</UButton><UButton type="submit" form="studio-palette-form" :color="paletteAction === 'delete' ? 'error' : 'primary'" :disabled="paletteAction === 'delete' ? !!paletteUses(paletteTarget).length && !replacementPalette : !!paletteNameError || (paletteAction === 'create' && !Object.keys(scale).length)">{{ paletteAction === 'create' ? 'Create palette' : paletteAction === 'rename' ? 'Save name' : 'Delete palette' }}</UButton></template>
     </UModal>
     <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
+    <UModal v-model:open="resetOpen" title="Reset appearance?" description="Restore this brand’s original colors, typography, icons, component styles and appearance settings. Your name, logos, content and custom palettes are kept. You can undo this reset.">
+      <template #footer><UButton color="neutral" variant="ghost" @click="resetOpen = false">Cancel</UButton><UButton color="neutral" @click="reset">Reset appearance</UButton></template>
+    </UModal>
+    <StudioAskAi v-model:open="askAiOpen" :document="draft" />
     <UModal v-model:open="exportOpen" :title="connected ? 'Review changes' : 'Download brand'" :ui="{ content: 'max-w-4xl h-[min(720px,calc(100dvh-2rem))]', body: 'flex min-h-0 flex-1 flex-col overflow-hidden', header: 'shrink-0', footer: 'shrink-0 flex-wrap' }">
       <template #body>
         <p class="mb-4 text-sm text-muted">{{ connected ? 'Apply to the connected project source.' : 'Choose how to use your brand.' }} <code v-if="connected">{{ sourcePath }}</code></p>
@@ -869,39 +1025,48 @@ onBeforeUnmount(() => { window.removeEventListener('message', ready); window.rem
       <template #footer><UButton v-if="connected" :loading="busySource" :disabled="!dirty || sourceConflict || Object.keys(fieldErrors).length > 0" @click="applySource">Apply changes</UButton><UButton v-if="exportTab !== 'download'" color="neutral" variant="outline" @click="exportTab = 'download'">Download options</UButton><UButton color="neutral" variant="ghost" @click="exportOpen = false">Close</UButton></template>
     </UModal>
   </main>
-  <div v-else class="studio-loading" role="status"><UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" /><span class="sr-only">Loading Studio</span></div>
+  <div v-else class="studio-loading" role="status"><UIcon :name="resolveIcon('i-lucide-loader-circle')" class="size-5 animate-spin" /><span class="sr-only">Loading Studio</span></div>
 </template>
 
 <style>
 body.id-studio-page { margin: 0; overflow: hidden; }
+/* Source inspection must stay readable even when the brand mono token is being edited. */
+.studio-source-code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 </style>
 <style scoped>
 .studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: transparent; color: var(--ui-text); }
-.studio-header { flex: none; min-height: 64px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }.studio-project-name { min-width: 0; max-width: 100%; justify-self: start; }.studio-review { justify-self: end; }
-.studio-main-menu { justify-self: start; }
-.studio-wordmark { display: flex; align-items: baseline; font-size: 30px; font-weight: 750; letter-spacing: -.06em; color: var(--ui-text-highlighted); }
-.studio-dot { color: var(--ui-primary); }
+.studio-header { flex: none; padding-inline: 24px; min-height: 64px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }.studio-project-name { min-width: 0; max-width: 100%; justify-self: start; }.studio-review { justify-self: end; }
+.studio-product { justify-self: start; white-space: nowrap; font-size: 20px; }
 
-.studio-scenes { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 9rem); align-items: center; gap: 8px; margin: auto; width: 20.5rem; min-width: 0; max-width: 60vw; padding: 4px; border-radius: 14px; background: var(--ui-bg-elevated); }.studio-scenes > * { width: 100%; min-width: 0; }
+.studio-scenes { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 19rem); align-items: center; gap: 12px; margin: auto; width: 30.75rem; min-width: 0; max-width: 70vw; --studio-scene-radius: calc(var(--ui-radius) * 3.5); }.studio-scenes > * { width: 100%; min-width: 0; }
 .studio-project-menu, .studio-mobile-control, .studio-view-mobile { display: none; }
+.studio-scenes :deep(.studio-scene-pill) { padding: 4px; border-radius: var(--studio-scene-radius); background: var(--ui-bg-elevated); }
+.studio-scenes :deep(.studio-scene-trigger) { width: 100%; min-height: 32px; padding-inline: 12px; border-radius: max(0px, calc(var(--studio-scene-radius) - 4px)); background: transparent; color: var(--ui-text-muted); cursor: pointer; transition: background-color 150ms, color 150ms; }
+.studio-scenes :deep(.studio-scene-trigger:hover) { background: transparent; color: var(--ui-text-highlighted); }
+.studio-scenes :deep(.studio-scene-trigger[aria-pressed="true"]) { background: var(--ui-bg); color: var(--ui-text-highlighted); }
 .studio-actions { display: flex; align-items: center; gap: 6px; }
-.studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: 18px; background: var(--ui-bg); }
+.studio-toolbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ui-border); border-radius: calc(var(--ui-radius) * 4.5); background: var(--ui-bg); }
 .studio-toolbar-end, .studio-dock-settings { display: flex; gap: 8px; align-items: center; }
-.studio-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); }
+.studio-workspace { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }.studio-workspace.studio-pinned { grid-template-columns: minmax(0, 1fr) 360px; }
 .studio-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }.studio-comparing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .studio-frame-wrap { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; }.studio-frame-label { display: none; }.studio-comparing .studio-frame-label { display: flex; justify-content: space-between; align-self: stretch; padding: 0 6px 6px; font-size: 11px; }.studio-frame-label span { color: var(--ui-text-muted); }
 iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; background: var(--ui-bg); }
-.studio-inspector { display: flex; flex-direction: column; border: 1px solid var(--ui-border); border-radius: 16px; min-width: 0; min-height: 0; overflow: hidden; background: var(--ui-bg); }
-.studio-inspector-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 16px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--ui-border); }
-.studio-fields { flex: 1; min-height: 0; padding: 0 16px; overflow-y: auto; overscroll-behavior: contain; }.studio-form-section { display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; }
+.studio-inspector { position: relative; inset: auto; transform: none; width: 100%; max-height: 100%; display: flex; flex-direction: column; border-radius: inherit; min-width: 0; min-height: 0; overflow: hidden; background: var(--ui-bg); }
+.studio-inspector-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; padding: 8px 12px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--ui-border); }
+.studio-fields { flex: 0 1 auto; min-height: 0; padding: 12px; overflow-y: auto; overscroll-behavior: contain; }.studio-form-section { display: flex; flex-direction: column; gap: 12px; padding-bottom: 0; }
 .studio-fields :deep(button[data-slot="trigger"]) { font-weight: 500; }
-.studio-help { font-size: 12px; line-height: 1.6; color: var(--ui-text-muted); }.studio-inspector-footer { border-top: 1px solid var(--ui-border); padding: 12px 16px; font-size: 11px; color: var(--ui-text-muted); }
+.studio-help { font-size: 12px; line-height: 1.6; color: var(--ui-text-muted); }
 .studio-code { font-size: 11px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { flex: none; max-height: 100px; overflow: auto; display: flex; gap: 12px; align-items: center; padding: 8px 12px; font-size: 13px; }
-.studio-export-code { min-height: 100%; width: max-content; min-width: 100%; padding: 20px; border-radius: 8px; background: var(--ui-bg-muted); font-size: 12px; }
-@media (max-width: 1100px) { .studio-toolbar { flex-wrap: wrap; }.studio-workspace { grid-template-columns: minmax(0, 1fr) 280px; }.studio-browsing { grid-template-columns: minmax(0, 1fr); } }
+.studio-export-code { width: max-content; min-width: 100%; padding: 20px; border-radius: calc(var(--ui-radius) * 2); background: var(--ui-bg-muted); font-size: 12px; }
+.studio-pinned .studio-inspector { position: relative; inset: auto; transform: none; width: 100%; box-shadow: none; }
+.studio-history { display: flex; align-items: center; gap: 0; }
+.studio-categories, .studio-view-tools { display: flex; align-items: center; gap: 4px; }
+.studio-pinned .studio-fields { flex: 1; }
+.studio-category-select, .studio-editor-mobile { display: none; }
+@media (max-width: 1099px) { .studio-categories { display: none; }.studio-editor-mobile { display: inline-flex; }.studio-category-select { display: block; flex-shrink: 0; } }
 @media (max-width: 700px) {
-  .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 48px; gap: 8px; }.studio-wordmark { font-size: 26px; }.studio-scenes { flex: 1; justify-content: center; gap: 4px; }.studio-scenes > * { min-width: 0; max-width: 130px; }.studio-project-actions { display: none; }.studio-project-menu { display: inline-flex; flex: none; }
-  .studio-workspace { position: relative; display: flex; }.studio-canvas { flex: 1; }.studio-inspector { position: absolute; z-index: 2; inset: 0 0 0 auto; width: min(320px, 100%); box-shadow: -12px 0 36px #0002; }
+  .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 48px; gap: 8px; }.studio-scenes { flex: 1; justify-content: center; gap: 4px; }.studio-scenes > * { min-width: 0; max-width: 130px; }.studio-project-actions { display: none; }.studio-project-menu { display: inline-flex; flex: none; }
+  .studio-dock-settings > * { flex: none; }
   .studio-view-mobile { display: flex; }.studio-mobile-control { display: inline-flex; }.studio-desktop { display: none; }.studio-toolbar { flex-wrap: nowrap; justify-content: space-between; }.studio-dock-settings { width: 100%; }.studio-dock-settings > * { flex: 1; justify-content: center; }.studio-toolbar-end { width: 100%; flex-wrap: wrap; justify-content: space-between; }.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 }
 </style>
@@ -909,17 +1074,24 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; backgro
 <style scoped>
 .studio-loading { height: 100dvh; display: grid; place-items: center; color: var(--ui-text-muted); background: var(--ui-bg); }
 @media (max-width: 900px) {
-  .studio-workspace.studio-editing { display: flex; }
-  .studio-editing .studio-canvas { display: none; }
-  .studio-inspector { position: static; width: 100%; flex: 1; box-shadow: none; }
+  .studio-workspace.studio-pinned { grid-template-columns: minmax(0, 1fr); }
+  .studio-pin-editor { display: none; }
 }
-@media (max-width: 700px) {
-  .studio-header { grid-template-columns: auto minmax(0, 1fr); }
-  .studio-scenes { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 9rem); width: 100%; max-width: none; }
+@media (max-width: 1099px) {
+  .studio-header { grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; padding: 8px; }
+  .studio-review { grid-column: 2; grid-row: 1; }
+  .studio-product { font-size: 16px; }
+  .studio-review { gap: 4px; }
+  .studio-docs-label { display: none; }
+  .studio-scenes { grid-column: 1 / -1; grid-row: 2; }
+  .studio-scenes :deep(.components-trigger) { padding-inline: 6px; }
+  .studio-scenes :deep(.templates-trigger [data-slot="leadingIcon"]) { display: none; }
+  .studio-scenes { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 19rem); width: 100%; max-width: none; gap: 8px; }
   .studio-scenes > * { width: 100%; max-width: none; }
   .studio-dock-settings { width: auto; }
 }
-@media (max-width: 480px) { .studio-menu-label { display: none; } }
+@media (max-width: 700px) { .studio-header { padding-inline: 0; }.studio-scenes { grid-template-columns: minmax(0, 1fr) 11rem; } }
+@media (max-width: 480px) { .studio-product-prefix { display: none; } }
 </style>
 
 <style>
