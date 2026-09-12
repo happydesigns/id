@@ -838,31 +838,32 @@ const resolveIcon = useStudioIcon()
       </div>
       <input ref="input" type="file" accept=".json,application/json" class="sr-only" aria-label="Open brand document" @change="openDocument">
     </header>
-    <UModal v-model:open="manageOpen" title="Manage brands" description="Saved in this browser. Repository files are unchanged." :ui="{ content: 'max-w-2xl h-[min(640px,calc(100dvh-2rem))]', body: 'min-h-0 flex-1 overflow-auto' }">
+    <UModal v-model:open="manageOpen" :title="manageTarget ? manageAction === 'delete' ? 'Delete brand' : 'Rename brand' : 'Manage brands'" description="Local brands saved in this browser." :ui="{ content: 'max-w-xl max-h-[min(640px,calc(100dvh-2rem))]', body: 'min-h-0 overflow-auto' }">
       <template #body>
-        <form v-if="manageTarget" class="space-y-4" @submit.prevent="saveManagedProject">
+        <form v-if="manageTarget" id="studio-manage-brand" class="space-y-4" @submit.prevent="saveManagedProject">
           <template v-if="manageAction === 'delete'">
             <p>Delete the local copy of <strong>{{ manageTarget.draft.theme.label }}</strong>? Its saved draft will be permanently removed.</p>
             <p class="text-sm text-muted break-words">{{ manageTarget.draft.brand.packageName || manageTarget.draft.brand.name }} · {{ new Date(manageTarget.updatedAt).toLocaleString() }}</p>
           </template>
           <UFormField v-else label="Brand name" required><UInput v-model="manageName" aria-label="Rename brand" maxlength="80" autofocus class="w-full" /></UFormField>
           <UAlert v-if="manageError" color="error" :description="manageError" />
-          <div class="flex flex-wrap gap-2"><UButton color="neutral" variant="ghost" @click="manageTarget = undefined; manageError = ''">Cancel</UButton><UButton type="submit" :color="manageAction === 'delete' ? 'error' : 'primary'">{{ manageAction === 'delete' ? 'Delete local copy' : 'Save name' }}</UButton></div>
         </form>
         <div v-else class="space-y-4">
-          <UInput v-model="manageSearch" icon="i-lucide-search" placeholder="Search saved brands…" aria-label="Search saved brands" class="w-full" />
+          <UInput v-model="manageSearch" :icon="resolveIcon('i-lucide-search')" placeholder="Search saved brands…" aria-label="Search saved brands" class="w-full" />
           <ul class="divide-y divide-default">
-            <li v-for="project in managedProjects" :key="project.id" class="py-4 space-y-3">
-              <div><p class="font-medium break-words">{{ project.draft.theme.label }}<span v-if="project.id === projectId" class="text-xs text-muted ml-2">Current</span></p><p class="text-sm text-muted break-words">{{ project.draft.brand.packageName || project.draft.brand.name }} · {{ new Date(project.updatedAt).toLocaleString() }}</p></div>
-              <div class="flex flex-wrap gap-2">
-                <UButton color="neutral" variant="outline" @click="manageOpen = false; pickBrand(() => restore(project))">Open</UButton>
-                <UDropdownMenu :items="[{ label: 'Rename', icon: 'i-lucide-pencil', onSelect: () => manageProject(project, 'rename') }, { label: 'Duplicate', icon: 'i-lucide-copy', onSelect: () => { manageOpen = false; beginCreate(project.draft) } }, { label: 'Delete local copy', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => manageProject(project, 'delete') }]"><UButton color="neutral" variant="ghost" icon="i-lucide-ellipsis" :aria-label="`Actions for ${project.draft.theme.label}`" /></UDropdownMenu>
+            <li v-for="project in managedProjects" :key="project.id" class="flex items-center gap-3 py-3">
+              <StudioBrandThumbnail :document="project.draft" />
+              <div class="min-w-0 flex-1"><div class="flex flex-wrap items-center gap-x-2 gap-y-1"><p class="min-w-0 truncate font-medium" :title="project.draft.theme.label">{{ project.draft.theme.label }}</p><UBadge v-if="project.id === projectId" color="neutral" variant="subtle" size="xs">Current</UBadge></div><p v-if="project.draft.brand.packageName && project.draft.brand.packageName !== '@example/brand'" class="truncate text-xs text-muted">{{ project.draft.brand.packageName }}</p><time class="text-xs text-muted" :datetime="new Date(project.updatedAt).toISOString()" :title="new Date(project.updatedAt).toLocaleString()">{{ new Date(project.updatedAt).toLocaleDateString(undefined, { dateStyle: 'medium' }) }}</time></div>
+              <div class="flex shrink-0 items-center gap-1">
+                <UButton v-if="project.id !== projectId" color="neutral" variant="outline" size="sm" :aria-label="`Open ${project.draft.theme.label}`" @click="manageOpen = false; pickBrand(() => restore(project))">Open</UButton>
+                <UDropdownMenu :content="{ align: 'end' }" :items="[[{ label: 'Rename', icon: resolveIcon('i-lucide-pencil'), onSelect: () => manageProject(project, 'rename') }, { label: 'Duplicate', icon: resolveIcon('i-lucide-copy'), onSelect: () => { manageOpen = false; beginCreate(project.draft) } }], [{ label: 'Delete local copy', icon: resolveIcon('i-lucide-trash-2'), color: 'error', onSelect: () => manageProject(project, 'delete') }]]"><UTooltip text="Brand actions"><UButton color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-ellipsis')" :aria-label="`Actions for ${project.draft.theme.label}`" /></UTooltip></UDropdownMenu>
               </div>
             </li>
           </ul>
-          <p v-if="!managedProjects.length" class="text-sm text-muted">{{ manageSearch ? 'No matching brands.' : 'No saved brands yet.' }}</p>
+          <UEmpty v-if="!managedProjects.length" :title="manageSearch ? 'No matching brands' : 'No saved brands yet'" :icon="resolveIcon(manageSearch ? 'i-lucide-search' : 'i-lucide-library')" size="sm" variant="naked"><template #actions><UButton v-if="manageSearch" color="neutral" variant="outline" size="sm" @click="manageSearch = ''">Clear search</UButton></template></UEmpty>
         </div>
       </template>
+      <template v-if="manageTarget" #footer><div class="flex w-full justify-end gap-2"><UButton color="neutral" variant="ghost" @click="manageTarget = undefined; manageError = ''">Cancel</UButton><UButton form="studio-manage-brand" type="submit" :color="manageAction === 'delete' ? 'error' : 'primary'">{{ manageAction === 'delete' ? 'Delete local copy' : 'Save name' }}</UButton></div></template>
     </UModal>
     <UModal v-model:open="createOpen" :title="createBase ? 'Duplicate brand' : 'Create brand'" description="Choose a name for your brand.">
       <template #body><form id="studio-create-brand" @submit.prevent="createBrand"><UFormField label="Name" :error="createError" required><UInput v-model="createName" aria-label="New brand name" autofocus maxlength="80" class="w-full" @update:model-value="createError = ''" /></UFormField></form></template>
