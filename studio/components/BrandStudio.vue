@@ -836,7 +836,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
         <NuxtLink :to="config.idStudio?.home || '/'" class="inline-flex items-center gap-2.5 rounded-md font-semibold tracking-tight text-highlighted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary" :aria-label="`${productName} home`" :title="`Back to ${productName}`">
           <UColorModeImage v-if="config.idStudio?.host?.logo" :light="config.idStudio.host.logo.light" :dark="config.idStudio.host.logo.dark" alt="" class="shrink-0 object-contain" :class="productWordmark ? 'studio-product-wordmark h-[22px] min-[481px]:h-7 w-auto' : 'size-8'" />
           <span v-else class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-inverted"><UIcon name="i-lucide-fingerprint" class="size-5" /></span>
-          <span v-if="!productWordmark || productPrefix"><span v-if="!productWordmark" class="studio-product-prefix">{{ productPrefix }}</span><span>{{ productSuffix }}</span></span>
+          <span v-if="!productWordmark"><span class="studio-product-prefix">{{ productPrefix }}</span><span>{{ productSuffix }}</span></span>
         </NuxtLink>
       </div>
       <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
