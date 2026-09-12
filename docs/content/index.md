@@ -17,10 +17,10 @@ Create brand guides that become usable Nuxt brand layers. Keep apps focused on c
   :::u-button
   ---
   size: xl
-  to: /getting-started/introduction
+  to: /studio
   trailing-icon: i-lucide-arrow-right
   ---
-  Get started
+  Open Brand Studio
   :::
 
   :::u-button

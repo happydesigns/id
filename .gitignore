@@ -2,12 +2,15 @@
 .output
 .data
 .nuxt
+.nuxt-dev
 .nitro
 .cache
 dist
 
 # Node dependencies
 node_modules
+.pnpm-store
+.agents
 
 # Logs
 logs

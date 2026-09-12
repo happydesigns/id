@@ -4,6 +4,8 @@ import { brandThemeStyleElementId, createThemeCssVars } from '../../src'
 import { useBrandTheme } from '../composables/useBrandTheme'
 
 export default defineNuxtPlugin(() => {
+  // The opt-in Studio bridge owns the theme in its isolated documents.
+  if (import.meta.client && window.parent !== window && (window.location.pathname === '/studio/preview' || new URLSearchParams(window.location.search).has('idPreview'))) return
   const brandTheme = useBrandTheme()
 
   function suppressTransitionsDuringThemeSync() {
@@ -29,6 +31,7 @@ export default defineNuxtPlugin(() => {
   }
 
   function syncClientTheme() {
+    if (document.documentElement.hasAttribute('data-id-studio-theme')) return
     const theme = brandTheme.currentTheme.value
 
     if (!theme) {
@@ -56,6 +59,7 @@ export default defineNuxtPlugin(() => {
       watch(() => brandTheme.currentTheme.value, syncClientTheme, { immediate: true })
 
       onNuxtReady(() => {
+        if (document.documentElement.hasAttribute('data-id-studio-theme')) return
         brandTheme.restorePersistedTheme()
       })
 
