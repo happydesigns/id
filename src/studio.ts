@@ -44,6 +44,12 @@ export function parseStudioDocument(input: string | unknown): StudioDocument {
   // Validate without projecting the object through a schema: projection would
   // strip properties authored by another tool or a newer compatible editor.
   const doc = JSON.parse(JSON.stringify(value)) as StudioDocument
+  // Earlier Studio icon presets persisted this malformed Material icon name.
+  // Repair only that exact value; preserve user-authored icon overrides.
+  const icons = doc.theme.ui?.icons as Record<string, unknown> | undefined
+  if (icons?.light === 'i-material-symbols:light-mode-outline-rounded') {
+    icons.light = 'i-material-symbols-light-mode-outline-rounded'
+  }
   validateBrandDefinition(doc.brand)
   validateBrandTheme(doc.theme)
   if (doc.brand.packageName && !/^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/.test(doc.brand.packageName)) throw new Error('Use a valid lowercase package name, such as @example/brand.')
