@@ -27,7 +27,28 @@ export function previewUi(host: Config, seed: Config, draft: Config): Config {
     for (const [key, value] of Object.entries(extra)) result[key] = object(value) && object(result[key]) ? merge(result[key], value) : copyConfig(value)
     return result
   }
-  return merge(merge({ colors: { primary: 'green', secondary: 'blue', success: 'green', info: 'blue', warning: 'yellow', error: 'red', neutral: 'slate' } }, draft), without(host, seed))
+  const result = merge(merge({ colors: { primary: 'green', secondary: 'blue', success: 'green', info: 'blue', warning: 'yellow', error: 'red', neutral: 'slate' } }, draft), without(host, seed))
+  // An explicit icon choice must also replace Nuxt's host-provided defaults.
+  if (object(draft.icons)) result.icons = merge(object(result.icons) ? result.icons : {}, draft.icons)
+  return result
+}
+
+/** Keep authoring controls usable while previews retain the full brand radius. */
+export function studioShellCss(doc: StudioDocument): string {
+  const variables = doc.theme.cssVariables
+  const light = variables?.light?.['--ui-radius'] || '0.25rem'
+  const dark = variables?.dark?.['--ui-radius'] || light
+  return studioPreviewCss({
+    ...doc,
+    theme: {
+      ...doc.theme,
+      cssVariables: {
+        ...variables,
+        light: { ...variables?.light, '--ui-radius': `clamp(0rem, ${light}, 0.25rem)` },
+        dark: { ...variables?.dark, '--ui-radius': `clamp(0rem, ${dark}, 0.25rem)` }
+      }
+    }
+  })
 }
 
 export function studioPreviewCss(doc: StudioDocument): string {

@@ -1,6 +1,15 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-defineProps<{ loading?: boolean, failed?: boolean }>()
+import { useStudioIcon } from "../playground-icons"
+
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+const props = defineProps<{ loading?: boolean, failed?: boolean }>()
+const showLoading = ref(false)
+watch(() => props.loading, (loading, _previous, cleanup) => {
+  showLoading.value = false
+  if (!loading) return
+  const timer = setTimeout(() => { showLoading.value = true }, 150)
+  cleanup(() => clearTimeout(timer))
+}, { immediate: true })
 defineEmits<{ retry: [] }>()
 const width = defineModel<number>('width', { required: true })
 const height = defineModel<number>('height', { required: true })
@@ -46,6 +55,8 @@ onMounted(() => {
 onBeforeUnmount(() => observer?.disconnect())
 const scale = computed(() => dragging.value ? origin.scale : width.value ? Math.min(zoom.value, available.value.width / width.value, available.value.height / height.value) : 1)
 const frameStyle = computed(() => width.value ? { width: `${width.value}px`, height: `${height.value}px`, flex: 'none', transform: `scale(${scale.value})`, transformOrigin: 'top left' } : { width: '100%', height: '100%' })
+
+const resolveIcon = useStudioIcon()
 </script>
 
 <template>
@@ -56,10 +67,10 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
       <div v-if="failed" class="viewport-loading">
         <div class="space-y-3 p-6 text-center">
           <p role="alert" class="text-sm">Preview could not load.</p>
-          <UButton color="neutral" variant="outline" icon="i-lucide-refresh-cw" @click="$emit('retry')">Retry preview</UButton>
+          <UButton color="neutral" variant="outline" :icon="resolveIcon('i-lucide-refresh-cw')" @click="$emit('retry')">Retry preview</UButton>
         </div>
       </div>
-      <div v-else-if="loading" class="viewport-loading" role="status"><UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" /><span class="sr-only">Loading preview</span></div>
+      <div v-else-if="showLoading" class="viewport-loading" role="status"><UIcon :name="resolveIcon('i-lucide-loader-circle')" class="size-5 animate-spin" /><span class="sr-only">Loading preview</span></div>
       </div>
       <button v-for="axis in width ? ['width', 'height', 'both'] : []" :key="axis" type="button" :class="['viewport-handle', `handle-${axis}`]" :aria-label="`Resize viewport ${axis}`" :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`" @pointerdown="start" @pointermove="move($event, axis)" @pointerup="dragging = false" @pointercancel="cancel" @lostpointercapture="dragging = false" @keydown="keyboard($event, axis)"><span aria-hidden="true" /></button>
     </div>
@@ -69,21 +80,21 @@ const frameStyle = computed(() => width.value ? { width: `${width.value}px`, hei
 
 <style scoped>
 .viewport-surface { position: relative; flex: 1; width: 100%; min-height: 0; display: flex; justify-content: center; overflow: hidden; }
-.viewport-responsive { box-sizing: border-box; padding: 20px; background: var(--ui-bg-muted); border-radius: 18px; }
+.viewport-responsive { box-sizing: border-box; padding: 20px; background: var(--ui-bg-muted); border-radius: calc(var(--ui-radius) * 4.5); }
 .viewport-frame { position: relative; flex: none; }
-.viewport-clip { position: absolute; inset: 0; overflow: hidden; border-radius: 18px; isolation: isolate; background: var(--ui-bg); }
-.viewport-frame::after { content: ''; position: absolute; inset: 0; border: 1px solid var(--ui-border); border-radius: 18px; pointer-events: none; z-index: 3; }
+.viewport-clip { position: absolute; inset: 0; overflow: hidden; border-radius: calc(var(--ui-radius) * 4.5); isolation: isolate; background: var(--ui-bg); }
+.viewport-frame::after { content: ''; position: absolute; inset: 0; border: 1px solid var(--ui-border); border-radius: calc(var(--ui-radius) * 4.5); pointer-events: none; z-index: 3; }
 .viewport-loading { position: absolute; inset: 0; display: grid; place-items: center; background: var(--ui-bg); color: var(--ui-text-muted); z-index: 2; }
 .viewport-handle { position: absolute; display: flex; align-items: center; justify-content: center; color: var(--ui-text-dimmed); border: 0; background: transparent; touch-action: none; z-index: 1; }
-.viewport-handle:hover, .viewport-handle:focus-visible { color: var(--ui-primary); background: var(--ui-bg-accented); border-radius: 6px; outline: none; }
+.viewport-handle:hover, .viewport-handle:focus-visible { color: var(--ui-primary); background: var(--ui-bg-accented); border-radius: calc(var(--ui-radius) * 1.5); outline: none; }
 .viewport-handle:focus-visible { box-shadow: inset 0 0 0 2px var(--ui-primary); }
 .handle-width { right: -20px; top: 0; width: 20px; height: 100%; cursor: ew-resize; }
 .handle-height { bottom: -20px; left: 0; width: 100%; height: 20px; cursor: ns-resize; }
-.handle-width span { width: 4px; height: 36px; border-radius: 4px; background: currentColor; }
-.handle-height span { height: 4px; width: 36px; border-radius: 4px; background: currentColor; }
+.handle-width span { width: 4px; height: 36px; border-radius: calc(var(--ui-radius) * 1); background: currentColor; }
+.handle-height span { height: 4px; width: 36px; border-radius: calc(var(--ui-radius) * 1); background: currentColor; }
 .handle-both { bottom: -20px; right: -20px; width: 20px; height: 20px; cursor: nwse-resize; }
-.handle-both span { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; border-bottom-right-radius: 3px; }
-.viewport-scale { position: absolute; bottom: 2px; right: 26px; font-size: 11px; color: var(--ui-text-muted); background: var(--ui-bg); border-radius: 4px; padding: 2px 4px; pointer-events: none; }
+.handle-both span { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; border-bottom-right-radius: calc(var(--ui-radius) * 0.75); }
+.viewport-scale { position: absolute; bottom: 2px; right: 26px; font-size: 11px; color: var(--ui-text-muted); background: var(--ui-bg); border-radius: calc(var(--ui-radius) * 1); padding: 2px 4px; pointer-events: none; }
 @media (pointer: coarse) {
   .viewport-responsive { padding: 28px; }
   .handle-width { width: 28px; right: -28px; }

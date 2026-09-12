@@ -41,12 +41,20 @@ export default defineNuxtPlugin({
       if (active) post({ type: 'id-studio-navigate', path: to.path })
       else post({ type: 'id-studio-ready' })
     })
-    const stopMode = watch(() => colorMode.value, value => {
-      if (!applying && active && ['light', 'dark'].includes(value)) post({ type: 'id-studio-mode', mode: value })
-    })
+    // Report user preference, not the resolved system appearance. Synchronous
+    // observation lets parent updates be suppressed without a feedback loop.
+    const stopMode = watch(() => colorMode.preference, value => {
+      if (!applying && active && ['light', 'dark', 'system'].includes(value)) post({ type: 'id-studio-mode', mode: value })
+    }, { flush: 'sync' })
+    function applyMode(data: { preference?: string, mode?: string }) {
+      const previous = applying
+      applying = true
+      colorMode.preference = ['light', 'dark', 'system'].includes(data.preference || '') ? data.preference! : data.mode === 'dark' ? 'dark' : 'light'
+      applying = previous
+    }
     async function receive(event: MessageEvent) {
       if (event.source === window.parent && event.origin === window.location.origin && event.data?.type === 'id-studio-color-mode') {
-        colorMode.preference = event.data.mode === 'dark' ? 'dark' : 'light'
+        applyMode(event.data)
         return
       }
       if (event.source !== window.parent || event.origin !== window.location.origin || event.data?.type !== 'id-studio-preview' || event.data.scene !== template!.id) return
@@ -59,7 +67,7 @@ export default defineNuxtPlugin({
         config.brand = { name: doc.theme.label ?? doc.brand.name, assets: doc.brand.assets }
         if (config.id) { config.id.theme = doc.theme; config.id.themes = []; config.id.assets = doc.brand.assets }
         style.value = studioPreviewCss(doc)
-        colorMode.preference = event.data.mode === 'dark' ? 'dark' : 'light'
+        applyMode(event.data)
         active = true
         if (withinStudioRoute(event.data.path, template!.routePrefix!) && router.currentRoute.value.path !== event.data.path) await router.replace({ path: event.data.path, query: initial.query })
         await nextTick()
@@ -68,11 +76,13 @@ export default defineNuxtPlugin({
       } catch { post({ type: 'id-studio-preview-error', message: 'The documentation preview could not apply this brand.' }) }
       finally { applying = false }
     }
+    const notifyPointer = () => post({ type: 'id-studio-pointer' })
+    window.document.addEventListener('pointerdown', notifyPointer, true)
     window.addEventListener('message', receive)
     onNuxtReady(() => {
       if (pendingMessage) { receive(pendingMessage); pendingMessage = undefined }
       else post({ type: 'id-studio-ready' })
     })
-    if (import.meta.hot) import.meta.hot.dispose(() => { window.removeEventListener('message', receive); stopNavigation(); stopAfter(); stopMode() })
+    if (import.meta.hot) import.meta.hot.dispose(() => { window.document.removeEventListener('pointerdown', notifyPointer, true); window.removeEventListener('message', receive); stopNavigation(); stopAfter(); stopMode() })
   }
 })

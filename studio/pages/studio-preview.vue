@@ -30,7 +30,7 @@ useHead({ style: [{ key: 'id-studio-preview', textContent: style }] })
 function receive(event: MessageEvent) {
   if (event.origin === window.location.origin && event.source === window.parent && event.data?.type === 'id-studio-color-mode') {
     mode.value = event.data.mode === 'dark' ? 'dark' : 'light'
-    colorMode.preference = mode.value
+    colorMode.preference = ['light', 'dark', 'system'].includes(event.data.preference) ? event.data.preference : mode.value
     return
   }
   if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'id-studio-preview') return
@@ -50,7 +50,7 @@ function receive(event: MessageEvent) {
       identity.assets = doc.brand.assets
     }
     mode.value = event.data.mode === 'dark' ? 'dark' : 'light'
-    colorMode.preference = mode.value
+    colorMode.preference = ['light', 'dark', 'system'].includes(event.data.preference) ? event.data.preference : mode.value
     window.document.documentElement.classList.toggle('dark', mode.value === 'dark')
     window.document.documentElement.classList.toggle('light', mode.value === 'light')
     // Remove values the host runtime applied inline; the complete frame CSS
@@ -74,11 +74,13 @@ function receive(event: MessageEvent) {
     })))
   } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Preview unavailable.'; window.parent.postMessage({ type: 'id-studio-preview-error' }, window.location.origin) }
 }
+function notifyPointer() { window.parent.postMessage({ type: 'id-studio-pointer' }, window.location.origin) }
 onMounted(() => {
+  window.document.addEventListener('pointerdown', notifyPointer, true)
   window.addEventListener('message', receive)
   window.parent.postMessage({ type: 'id-studio-ready', frame: route.query.frame }, window.location.origin)
 })
-onBeforeUnmount(() => window.removeEventListener('message', receive))
+onBeforeUnmount(() => { window.removeEventListener('message', receive); window.document.removeEventListener('pointerdown', notifyPointer, true) })
 </script>
 
 <template>

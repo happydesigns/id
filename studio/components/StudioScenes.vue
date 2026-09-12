@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useStudioIcon } from '../playground-icons'
 import { computed, ref } from 'vue'
 import type { StudioDocument, StudioScene } from '../../src/studio'
 
@@ -12,6 +13,8 @@ const logo = computed(() => {
   const logos = props.document.brand.assets?.logos
   return (props.mode === 'dark' ? logos?.wordmarkInverse : undefined) ?? logos?.wordmark ?? logos?.logo
 })
+
+const resolveIcon = useStudioIcon()
 </script>
 
 <template>
@@ -41,7 +44,7 @@ const logo = computed(() => {
       </UPageHero>
       <UPageSection id="features" title="Project tools" :ui="{ container: 'py-10 sm:py-12 lg:py-12', title: 'text-2xl sm:text-3xl lg:text-3xl' }">
         <UPageGrid>
-          <UPageCard v-for="item in [{ title: 'Tasks', description: 'Assign owners and due dates. Filter by status to find unfinished work.', icon: 'i-lucide-list-checks' }, { title: 'Files', description: 'Keep briefs, designs and exports alongside the project.', icon: 'i-lucide-folder' }, { title: 'Activity', description: 'Review recent updates and decisions from your team.', icon: 'i-lucide-history' }]" :key="item.title" :title="item.title" :description="item.description" :icon="item.icon" />
+          <UPageCard v-for="item in [{ title: 'Tasks', description: 'Assign owners and due dates. Filter by status to find unfinished work.', icon: resolveIcon('i-lucide-list-checks') }, { title: 'Files', description: 'Keep briefs, designs and exports alongside the project.', icon: resolveIcon('i-lucide-folder') }, { title: 'Activity', description: 'Review recent updates and decisions from your team.', icon: resolveIcon('i-lucide-history') }]" :key="item.title" :title="item.title" :description="item.description" :icon="item.icon" />
         </UPageGrid>
       </UPageSection>
       <UModal v-model:open="open" title="Create a project" description="Choose a name for your project.">
