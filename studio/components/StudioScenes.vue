@@ -34,7 +34,7 @@ const resolveIcon = useStudioIcon()
       </div>
     </header>
 
-    <IdStudioComponents v-if="scene === 'components'" :state="state" />
+    <LazyIdStudioComponents v-if="scene === 'components'" :state="state" />
     <template v-else-if="scene === 'landing'">
       <UPageHero title="Your projects, in one place" :description="document.brand.claim || 'Organize tasks, share files and track deadlines with your team.'" :ui="{ container: 'py-10 sm:py-16 lg:py-20' }">
         <template #links>
