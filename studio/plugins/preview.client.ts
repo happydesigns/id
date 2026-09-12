@@ -11,6 +11,7 @@ export default defineNuxtPlugin({
   setup(nuxtApp) {
     const router = useRouter()
     const initial = router.currentRoute.value
+    const thumbnail = initial.query.frame === 'thumbnail'
     if (window.parent === window || typeof initial.query.idPreview !== 'string') return
     const config = useAppConfig() as unknown as {
       ui: Record<string, unknown>
@@ -51,7 +52,7 @@ export default defineNuxtPlugin({
     function applyMode(data: { preference?: string, mode?: string }) {
       const previous = applying
       applying = true
-      colorMode.preference = ['light', 'dark', 'system'].includes(data.preference || '') ? data.preference! : data.mode === 'dark' ? 'dark' : 'light'
+      if (!thumbnail) colorMode.preference = ['light', 'dark', 'system'].includes(data.preference || '') ? data.preference! : data.mode === 'dark' ? 'dark' : 'light'
       applying = previous
     }
     async function receive(event: MessageEvent) {

@@ -849,7 +849,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
           <template #content-bottom="{ sub }"><p v-if="!sub && !readOnly && !storedLocally" class="border-t border-default px-4 py-3 text-xs text-warning" role="status">Changes could not be saved in this browser.</p></template>
         </UDropdownMenu>
         </div>
-        <StudioTemplatePicker v-model="scene" v-model:open="templatePickerOpen" :templates="templates" />
+        <StudioTemplatePicker v-model="scene" v-model:open="templatePickerOpen" :templates="templates" :document="draft" :mode="mode" />
       </div>
       <div class="studio-review flex items-center gap-2">
         <UTooltip text="Documentation"><UButton :to="config.idStudio?.documentation || config.idStudio?.home || '/'" target="_blank" color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-book-open')" aria-label="Documentation (opens in a new tab)"><span class="studio-docs-label">Docs</span></UButton></UTooltip>
