@@ -8,6 +8,7 @@ const emit = defineEmits<{ restoreFocus: [] }>()
 const wide = useMediaQuery('(min-width: 1100px)')
 const docked = computed(() => props.pinned && wide.value)
 const [DefineContent, Content] = createReusableTemplate()
+const content = { 'aria-label': 'Brand editor', side: 'top' as const, align: 'center' as const, sideOffset: 0, collisionPadding: 12, onInteractOutside: interactOutside, onCloseAutoFocus: closeAutoFocus }
 let outside = false
 function interactOutside(event: CustomEvent<{ originalEvent: Event }>) {
   const target = event.detail.originalEvent.target
@@ -25,7 +26,7 @@ function closeAutoFocus(event: Event) {
 <template>
   <DefineContent><slot /></DefineContent>
   <div v-if="docked && open" class="studio-editor-docked" @keydown.esc="if (!$event.defaultPrevented) { open = false; emit('restoreFocus') }"><Content /></div>
-  <UPopover v-else-if="!docked" v-model:open="open" :portal="false" :content="{ 'aria-label': 'Brand editor', side: 'top', align: 'center', sideOffset: 0, collisionPadding: 12, onInteractOutside: interactOutside, onCloseAutoFocus: closeAutoFocus }" :ui="{ content: 'studio-editor-overlay flex flex-col w-80 max-w-[calc(100vw-2rem)] max-h-[min(80dvh,var(--reka-popover-content-available-height))] overflow-hidden' }">
+  <UPopover v-else-if="!docked" v-model:open="open" :portal="false" :content="content" :ui="{ content: 'studio-editor-overlay flex flex-col w-80 max-w-[calc(100vw-2rem)] max-h-[min(80dvh,var(--reka-popover-content-available-height))] overflow-hidden' }">
     <template #anchor><span class="studio-editor-anchor" aria-hidden="true" /></template>
     <template #content><Content /></template>
   </UPopover>

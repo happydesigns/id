@@ -63,7 +63,8 @@ const viewportWidth = ref(viewportDimension(route.query.width, route.query.mobil
 const viewportHeight = ref(viewportDimension(route.query.height, 844))
 const editing = ref(typeof route.query.editor === 'string' || route.query.browse === 'false')
 const editorPinned = ref(route.query.docked === 'true')
-function editorCategory(value: unknown) { return ['details', 'components'].includes(String(value)) ? 'styles' : ['identity', 'colors', 'type', 'icons', 'styles'].includes(String(value)) ? String(value) : 'colors' }
+type EditorCategory = typeof editorCategories[number]['value']
+function editorCategory(value: unknown): EditorCategory { return ['details', 'components'].includes(String(value)) ? 'styles' : editorCategories.some(item => item.value === value) ? value as EditorCategory : 'colors' }
 const panel = ref(editorCategory(route.query.editor))
 const editorHeading = ref<HTMLElement>()
 let editorTrigger: HTMLElement | undefined
@@ -272,7 +273,7 @@ watch([editing, panel, editorPinned], () => {
 })
 function openEditor(category: string, event?: Event) {
   editorTrigger = event?.currentTarget as HTMLElement | undefined
-  panel.value = category
+  panel.value = editorCategory(category)
   if (readOnly.value) { beginCreate(); return }
   editing.value = true
   nextTick(() => editorHeading.value?.focus())
@@ -397,7 +398,7 @@ function randomize() {
     }
     if (['icons', 'all'].includes(randomScope.value)) {
       doc.theme.ui ??= {}
-      const current = Object.keys(themeIcons).find(key => themeIcons[key as ThemeIcons].search === doc.theme.ui?.icons?.search) || 'lucide'
+      const current = Object.keys(themeIcons).find(key => themeIcons[key as ThemeIcons].search === documentIcons(doc)?.search) || 'lucide'
       doc.theme.ui.icons = { ...themeIcons[pick(Object.keys(themeIcons), current) as ThemeIcons] }
     }
     if (['styles', 'all'].includes(randomScope.value)) {
@@ -670,7 +671,7 @@ function addPalette() {
       const next = paletteAction.value === 'rename' ? name : replacementPalette.value
       if (paletteAction.value === 'rename') doc.brand.colors[next] = doc.brand.colors[previous]!
       for (const roles of [doc.theme.ui?.colors, doc.brand.roles]) {
-        for (const [role, value] of Object.entries(roles || {})) if (value === previous) roles![role] = next
+        for (const [role, value] of Object.entries(roles || {})) if (value === previous) Object.assign(roles!, { [role]: next })
       }
       const tokenName = previous.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
       const tokenPattern = new RegExp(`--color-${tokenName}-(?:50|100|200|300|400|500|600|700|800|900|950)(?![\\w-])`, 'g')
@@ -811,6 +812,10 @@ watch([mode, preference], ([value, selected]) => {
 onBeforeUnmount(() => { window.removeEventListener('message', ready); window.removeEventListener('beforeunload', beforeUnload) })
 
 const resolveIcon = useStudioIcon()
+function documentIcons(doc: StudioDocument): Record<string, string> | undefined {
+  const icons = doc.theme.ui?.icons
+  return icons && typeof icons === 'object' ? icons as Record<string, string> : undefined
+}
 </script>
 
 <template>
@@ -923,7 +928,7 @@ const resolveIcon = useStudioIcon()
               </template>
             </UAccordion>
           </template>
-          <template v-if="section.value === 'icons'"><StudioIconPicker :model-value="draft.theme.ui?.icons" @update:model-value="edit(doc => { doc.theme.ui ??= {}; if ($event) doc.theme.ui.icons = $event; else delete doc.theme.ui.icons })" /></template>
+          <template v-if="section.value === 'icons'"><StudioIconPicker :model-value="documentIcons(draft)" @update:model-value="edit(doc => { doc.theme.ui ??= {}; if ($event) doc.theme.ui.icons = $event; else delete doc.theme.ui.icons })" /></template>
           <template v-if="section.value === 'type'">
             <div v-for="role in ['sans', 'mono', 'display']" :key="role" class="space-y-2">
               <UFormField :label="{ sans: 'Body', mono: 'Code', display: 'Headings' }[role]" :error="fieldErrors[`font:${role}`]">
