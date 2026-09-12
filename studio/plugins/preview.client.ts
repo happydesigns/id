@@ -38,8 +38,10 @@ export default defineNuxtPlugin({
     })
     const stopAfter = router.afterEach((to, _from, failure) => {
       if (failure) return
-      if (active) post({ type: 'id-studio-navigate', path: to.path })
-      else post({ type: 'id-studio-ready' })
+      // Parent-driven navigation already represents Studio's state. Echoing it
+      // can send an older path back while another frame is still catching up.
+      if (active && !applying) post({ type: 'id-studio-navigate', path: to.path })
+      else if (!active) post({ type: 'id-studio-ready' })
     })
     // Report user preference, not the resolved system appearance. Synchronous
     // observation lets parent updates be suppressed without a feedback loop.
