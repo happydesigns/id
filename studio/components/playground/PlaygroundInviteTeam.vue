@@ -30,14 +30,14 @@ const link = 'https://app.nuxt.com/invite/x8f2k'
 
       <div class="space-y-2">
         <div v-for="(member, index) in members" :key="index" class="flex items-center gap-2">
-          <UInput v-model="member.email" type="email" class="flex-1" />
-          <USelect v-model="member.role" :items="roles" class="w-28" />
+          <UInput v-model="member.email" type="email" :aria-label="`Team member ${index + 1} email`" class="flex-1" />
+          <USelect v-model="member.role" :items="roles" :aria-label="`Team member ${index + 1} role`" class="w-28" />
         </div>
       </div>
 
       <USeparator label="Or share a link" />
 
-      <UInput :model-value="link" readonly class="w-full">
+      <UInput :model-value="link" aria-label="Team invitation link" readonly class="w-full">
         <template #trailing>
           <UButton
             :icon="appConfig.ui.icons.copy"

@@ -14,17 +14,17 @@ const groups = ref<CommandPaletteGroup<CommandPaletteItem>[]>([
       {
         label: 'Benjamin Canac',
         suffix: 'benjamincanac',
-        avatar: { src: 'https://github.com/benjamincanac.png', loading: 'lazy' }
+        avatar: { src: 'https://github.com/benjamincanac.png', alt: '', loading: 'lazy' }
       },
       {
         label: 'Romain Hamel',
         suffix: 'romhml',
-        avatar: { src: 'https://github.com/romhml.png', loading: 'lazy' }
+        avatar: { src: 'https://github.com/romhml.png', alt: '', loading: 'lazy' }
       },
       {
         label: 'Neil Richter',
         suffix: 'noook',
-        avatar: { src: 'https://github.com/noook.png', loading: 'lazy' }
+        avatar: { src: 'https://github.com/noook.png', alt: '', loading: 'lazy' }
       }
     ]
   },
@@ -64,5 +64,5 @@ const groups = ref<CommandPaletteGroup<CommandPaletteItem>[]>([
 </script>
 
 <template>
-  <UCommandPalette :groups="groups" placeholder="Search users and actions..." :autofocus="false" class="h-80" />
+  <UCommandPalette :groups="groups" placeholder="Search users and actions..." :autofocus="false" :ui="{ itemLabelSuffix: 'text-muted' }" class="h-80" />
 </template>
