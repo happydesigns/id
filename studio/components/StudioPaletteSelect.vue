@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useStudioIcon } from "../playground-icons"
+
 import { computed, ref, watch } from 'vue'
 import { paletteRamp, paletteSwatch, rolePalettes } from '../palette'
 
@@ -20,11 +22,13 @@ const groups = computed(() => {
   ].filter(group => group.items.length)
 })
 function select(value: string) { model.value = value; open.value = false }
+
+const resolveIcon = useStudioIcon()
 </script>
 
 <template>
   <UPopover v-model:open="open" :content="{ align: 'start' }">
-    <UButton color="neutral" variant="outline" trailing-icon="i-lucide-chevron-down" :aria-label="label" class="w-full" :ui="{ trailingIcon: 'ms-auto' }">
+    <UButton color="neutral" variant="outline" :trailing-icon="resolveIcon('i-lucide-chevron-down')" :aria-label="label" class="w-full" :ui="{ trailingIcon: 'ms-auto' }">
       <template #leading><span class="size-3 shrink-0 rounded-full ring ring-default" :class="{ 'bg-elevated': model === '__default' }" :style="{ background: paletteSwatch(model, colors) }" /></template>
       <span class="capitalize">{{ model === '__default' ? 'Nuxt UI default' : model }}</span>
     </UButton>

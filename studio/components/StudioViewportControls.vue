@@ -1,45 +1,44 @@
 <script setup lang="ts">
+import { useStudioIcon } from "../playground-icons"
+
 import { computed, watch } from 'vue'
 const width = defineModel<number>('width', { required: true })
 const height = defineModel<number>('height', { required: true })
 let lastSize = { width: 390, height: 844 }
 watch([width, height], ([w, h]) => { if (w) lastSize = { width: w, height: h } }, { immediate: true, flush: 'sync' })
-function toggle() {
-  if (width.value) width.value = 0
-  else { height.value = lastSize.height; width.value = lastSize.width }
-}
 const presets = [
-  { label: 'Mobile S', value: 'small', width: 320, height: 568 },
-  { label: 'Mobile', value: 'mobile', width: 390, height: 844 },
-  { label: 'Tablet', value: 'tablet', width: 768, height: 1024 },
-  { label: 'Laptop', value: 'laptop', width: 1280, height: 800 },
-  { label: 'Desktop', value: 'desktop', width: 1440, height: 900 },
-  { label: 'Custom', value: 'custom', width: 1024, height: 768 }
+  { label: 'Mobile S', value: 'small', get icon() { return resolveIcon('i-lucide-smartphone') }, width: 320, height: 568 },
+  { label: 'Mobile', value: 'mobile', get icon() { return resolveIcon('i-lucide-smartphone') }, width: 390, height: 844 },
+  { label: 'Tablet', value: 'tablet', get icon() { return resolveIcon('i-lucide-tablet') }, width: 768, height: 1024 },
+  { label: 'Laptop', value: 'laptop', get icon() { return resolveIcon('i-lucide-laptop') }, width: 1280, height: 800 },
+  { label: 'Desktop', value: 'desktop', get icon() { return resolveIcon('i-lucide-monitor') }, width: 1440, height: 900 },
+  { label: 'Custom', value: 'custom', get icon() { return resolveIcon('i-lucide-sliders-horizontal') }, width: 1024, height: 768 }
 ]
 const selected = computed(() => !width.value ? 'auto' : presets.find(item => item.value !== 'custom' && item.width === width.value && item.height === height.value)?.value || 'custom')
 function select(value: string) {
+  if (value === 'auto') { width.value = 0; return }
+  if (value === 'custom' && !width.value) { height.value = lastSize.height; width.value = lastSize.width; return }
   const preset = presets.find(item => item.value === value)
   if (preset && (value !== 'custom' || !width.value)) { width.value = preset.width; height.value = preset.height }
 }
-function dimension(axis: 'width' | 'height', event: Event) {
-  const target = event.target as HTMLInputElement
-  const number = Number(target.value)
+function dimension(axis: 'width' | 'height', number: number | null | undefined) {
   const current = axis === 'width' ? width : height
-  if (Number.isFinite(number) && number >= 240 && number <= 3840) current.value = Math.round(number)
-  target.value = String(current.value)
+  if (typeof number === 'number' && Number.isFinite(number)) current.value = Math.min(3840, Math.max(240, Math.round(number)))
 }
 function rotate() { const previous = width.value; width.value = height.value; height.value = previous }
+
+const resolveIcon = useStudioIcon()
 </script>
 
 <template>
   <div class="viewport-controls">
-    <UTooltip :text="width ? 'Return to standard preview' : 'Responsive preview'"><UButton icon="i-lucide-tablet-smartphone" aria-label="Responsive preview" :aria-pressed="!!width" color="neutral" :variant="width ? 'soft' : 'ghost'" @click="toggle" /></UTooltip>
-    <USelect v-if="width" :model-value="selected" :items="presets" aria-label="Preview width" class="max-w-48" :ui="{ content: 'min-w-64 max-w-[calc(100vw-2rem)]', itemLabel: 'whitespace-normal' }" @update:model-value="select(String($event))" />
-    <div v-if="width" class="flex items-center gap-1">
-      <UInput :model-value="width" type="number" :min="240" :max="3840" aria-label="Viewport width" class="w-20" @change="dimension('width', $event)" />
+    <UFormField label="Viewport" class="w-full"><USelect :model-value="selected" :items="[{ label: 'Auto', value: 'auto', icon: resolveIcon('i-lucide-maximize') }, { type: 'separator' }, ...presets]" aria-label="Viewport size" class="w-full" @update:model-value="select(String($event))" /></UFormField>
+    <div v-if="width" class="flex w-full items-center gap-2">
+      <UInputNumber :model-value="width" :min="240" :max="3840" :step="1" :increment="false" :decrement="false" aria-label="Viewport width" class="min-w-0 flex-1" @update:model-value="dimension('width', $event)" />
       <span class="text-muted" aria-hidden="true">×</span>
-      <UInput :model-value="height" type="number" :min="240" :max="3840" aria-label="Viewport height" class="w-20" @change="dimension('height', $event)" />
-      <UTooltip text="Rotate viewport"><UButton icon="i-lucide-rotate-cw" aria-label="Rotate viewport" color="neutral" variant="ghost" @click="rotate" /></UTooltip>
+      <UInputNumber :model-value="height" :min="240" :max="3840" :step="1" :increment="false" :decrement="false" aria-label="Viewport height" class="min-w-0 flex-1" @update:model-value="dimension('height', $event)" />
+      <span class="text-xs text-muted">px</span>
+      <UTooltip text="Rotate viewport"><UButton :icon="resolveIcon('i-lucide-rotate-cw')" aria-label="Rotate viewport" color="neutral" variant="ghost" @click="rotate" /></UTooltip>
     </div>
   </div>
 </template>
