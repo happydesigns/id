@@ -12,6 +12,14 @@ export default defineNuxtConfig({
   components: [
     {
       path: resolve(currentDir, './components'),
+      pattern: 'BrandReference.vue',
+      pathPrefix: false,
+      prefix: 'Id',
+      global: true
+    },
+    {
+      path: resolve(currentDir, './components'),
+      ignore: ['BrandReference.vue'],
       pathPrefix: false,
       prefix: 'Id'
     }

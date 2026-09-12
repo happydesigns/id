@@ -10,6 +10,10 @@ useSeoMeta({ robots: 'noindex, nofollow' })
 const route = useRoute()
 const appConfig = useAppConfig()
 const colorMode = useColorMode()
+function applyMode(preference: unknown) {
+  // Thumbnails must not overwrite the user's persisted System preference.
+  if (route.query.frame !== 'thumbnail') colorMode.preference = ['light', 'dark', 'system'].includes(String(preference)) ? String(preference) : mode.value
+}
 const document = ref<StudioDocument>()
 const templates = studioTemplates((appConfig as unknown as { idStudio?: { templates?: unknown } }).idStudio?.templates)
 const scene = ref('components')
@@ -30,7 +34,7 @@ useHead({ style: [{ key: 'id-studio-preview', textContent: style }] })
 function receive(event: MessageEvent) {
   if (event.origin === window.location.origin && event.source === window.parent && event.data?.type === 'id-studio-color-mode') {
     mode.value = event.data.mode === 'dark' ? 'dark' : 'light'
-    colorMode.preference = ['light', 'dark', 'system'].includes(event.data.preference) ? event.data.preference : mode.value
+    applyMode(event.data.preference)
     return
   }
   if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'id-studio-preview') return
@@ -50,7 +54,7 @@ function receive(event: MessageEvent) {
       identity.assets = doc.brand.assets
     }
     mode.value = event.data.mode === 'dark' ? 'dark' : 'light'
-    colorMode.preference = ['light', 'dark', 'system'].includes(event.data.preference) ? event.data.preference : mode.value
+    applyMode(event.data.preference)
     window.document.documentElement.classList.toggle('dark', mode.value === 'dark')
     window.document.documentElement.classList.toggle('light', mode.value === 'light')
     // Remove values the host runtime applied inline; the complete frame CSS

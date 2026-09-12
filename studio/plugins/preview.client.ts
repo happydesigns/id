@@ -11,6 +11,7 @@ export default defineNuxtPlugin({
   setup(nuxtApp) {
     const router = useRouter()
     const initial = router.currentRoute.value
+    const thumbnail = initial.query.frame === 'thumbnail'
     if (window.parent === window || typeof initial.query.idPreview !== 'string') return
     const config = useAppConfig() as unknown as {
       ui: Record<string, unknown>
@@ -38,8 +39,10 @@ export default defineNuxtPlugin({
     })
     const stopAfter = router.afterEach((to, _from, failure) => {
       if (failure) return
-      if (active) post({ type: 'id-studio-navigate', path: to.path })
-      else post({ type: 'id-studio-ready' })
+      // Parent-driven navigation already represents Studio's state. Echoing it
+      // can send an older path back while another frame is still catching up.
+      if (active && !applying) post({ type: 'id-studio-navigate', path: to.path })
+      else if (!active) post({ type: 'id-studio-ready' })
     })
     // Report user preference, not the resolved system appearance. Synchronous
     // observation lets parent updates be suppressed without a feedback loop.
@@ -49,7 +52,7 @@ export default defineNuxtPlugin({
     function applyMode(data: { preference?: string, mode?: string }) {
       const previous = applying
       applying = true
-      colorMode.preference = ['light', 'dark', 'system'].includes(data.preference || '') ? data.preference! : data.mode === 'dark' ? 'dark' : 'light'
+      if (!thumbnail) colorMode.preference = ['light', 'dark', 'system'].includes(data.preference || '') ? data.preference! : data.mode === 'dark' ? 'dark' : 'light'
       applying = previous
     }
     async function receive(event: MessageEvent) {
@@ -65,6 +68,8 @@ export default defineNuxtPlugin({
         config.ui = previewUi(hostUi, seedUi, doc.theme.ui ?? {})
         config.header = docusBrandHeader(doc, header)
         config.brand = { name: doc.theme.label ?? doc.brand.name, assets: doc.brand.assets }
+        // Guide components must describe the same source as the rendered draft.
+        if (config.idStudio) config.idStudio.document = doc
         if (config.id) { config.id.theme = doc.theme; config.id.themes = []; config.id.assets = doc.brand.assets }
         style.value = studioPreviewCss(doc)
         applyMode(event.data)

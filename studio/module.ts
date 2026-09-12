@@ -1,4 +1,4 @@
-import { addServerHandler, createResolver, defineNuxtModule } from '@nuxt/kit'
+import { addRouteMiddleware, addServerHandler, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { randomUUID } from 'node:crypto'
 import { isAbsolute } from 'node:path'
 
@@ -6,6 +6,7 @@ export default defineNuxtModule({
   meta: { name: '@happydesigns/id-studio-project' },
   setup(_options, nuxt) {
     const { resolve } = createResolver(import.meta.url)
+    addRouteMiddleware({ name: 'id-studio-thumbnail-mode', path: resolve('./middleware/thumbnail-mode'), global: true })
     nuxt.options.nitro.publicAssets ||= []
     nuxt.options.nitro.publicAssets.push({ dir: resolve('./public') })
     const source = nuxt.options.runtimeConfig.idStudioSource

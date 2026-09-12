@@ -26,7 +26,12 @@ import type { StudioDocument } from '../../src/studio'
 useHead({ bodyAttrs: { class: 'id-studio-page' } })
 const route = useRoute()
 const router = useRouter()
-const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, brands?: Record<string, StudioDocument>, sourcePath?: string, home?: string, templates?: unknown, packageAsset?: string } }
+const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, brands?: Record<string, StudioDocument>, sourcePath?: string, home?: string, documentation?: string, host?: { name: string, logo?: { light: string, dark: string, kind?: 'symbol' | 'wordmark' } }, templates?: unknown, packageAsset?: string } }
+const productName = config.idStudio?.host?.name || 'happydesigns/id'
+const productSlash = productName.lastIndexOf('/')
+const productPrefix = productSlash < 0 ? '' : productName.slice(0, productSlash)
+const productSuffix = productSlash < 0 ? productName : productName.slice(productSlash)
+const productWordmark = config.idStudio?.host?.logo?.kind === 'wordmark'
 const seed = config.idStudio?.document ? parseStudioDocument(config.idStudio.document) : createBlankStudioDocument()
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value))
 const baseline = ref(clone(seed))
@@ -86,6 +91,12 @@ const exportTab = ref('changes')
 const codeFormat = ref('source')
 const busy = ref(false)
 const pending = ref<(() => void) | null>(null)
+const leaving = ref<((leave: boolean) => void) | null>(null)
+function finishLeaving(leave: boolean) { const resolve = leaving.value; leaving.value = null; resolve?.(leave) }
+onBeforeRouteLeave(() => {
+  if (!needsExport.value || storedLocally.value) return true
+  return new Promise<boolean>(resolve => { leaving.value = resolve })
+})
 const input = ref<HTMLInputElement>()
 const frameCache = ref<Record<string, HTMLIFrameElement | undefined>>({})
 const originalFrame = computed(() => frameCache.value[`original:${previewRuntime.value}`])
@@ -821,9 +832,12 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
 <template>
   <main v-if="storageReady" class="studio-shell" :data-mode="mode" aria-label="Brand Studio">
     <header class="studio-header">
-      <div class="studio-product inline-flex items-center gap-2.5 font-semibold tracking-tight text-highlighted" aria-label="happydesigns/id" title="happydesigns/id">
-        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-inverted"><UIcon name="i-lucide-fingerprint" class="size-5" /></span>
-        <span><span class="studio-product-prefix">happydesigns</span><span class="text-primary">/id</span></span>
+      <div class="studio-product inline-flex items-center gap-2.5">
+        <NuxtLink :to="config.idStudio?.home || '/'" class="inline-flex items-center gap-2.5 rounded-md font-semibold tracking-tight text-highlighted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary" :aria-label="`${productName} home`" :title="`Back to ${productName}`">
+          <UColorModeImage v-if="config.idStudio?.host?.logo" :light="config.idStudio.host.logo.light" :dark="config.idStudio.host.logo.dark" alt="" class="shrink-0 object-contain" :class="productWordmark ? 'studio-product-wordmark h-[22px] min-[481px]:h-7 w-auto' : 'size-8'" />
+          <span v-else class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-inverted"><UIcon name="i-lucide-fingerprint" class="size-5" /></span>
+          <span v-if="!productWordmark"><span class="studio-product-prefix">{{ productPrefix }}</span><span>{{ productSuffix }}</span></span>
+        </NuxtLink>
       </div>
       <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
@@ -835,10 +849,10 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
           <template #content-bottom="{ sub }"><p v-if="!sub && !readOnly && !storedLocally" class="border-t border-default px-4 py-3 text-xs text-warning" role="status">Changes could not be saved in this browser.</p></template>
         </UDropdownMenu>
         </div>
-        <StudioTemplatePicker v-model="scene" v-model:open="templatePickerOpen" :templates="templates" />
+        <StudioTemplatePicker v-model="scene" v-model:open="templatePickerOpen" :templates="templates" :document="draft" :mode="mode" />
       </div>
       <div class="studio-review flex items-center gap-2">
-        <UTooltip text="Documentation"><UButton :to="config.idStudio?.home || '/'" target="_blank" color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-book-open')" aria-label="Documentation (opens in a new tab)"><span class="studio-docs-label">Docs</span></UButton></UTooltip>
+        <UTooltip text="Documentation"><UButton :to="config.idStudio?.documentation || config.idStudio?.home || '/'" target="_blank" color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-book-open')" aria-label="Documentation (opens in a new tab)"><span class="studio-docs-label">Docs</span></UButton></UTooltip>
         <UButton color="neutral" variant="outline" @click="askAiOpen = true">Ask AI</UButton>
         <UButton color="neutral" variant="solid" @click="exportTab = 'download'; exportOpen = true">Export</UButton>
       </div>
@@ -1007,6 +1021,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
       <template #footer><UButton color="neutral" variant="ghost" @click="paletteOpen = false">Cancel</UButton><UButton type="submit" form="studio-palette-form" :color="paletteAction === 'delete' ? 'error' : 'primary'" :disabled="paletteAction === 'delete' ? !!paletteUses(paletteTarget).length && !replacementPalette : !!paletteNameError || (paletteAction === 'create' && !Object.keys(scale).length)">{{ paletteAction === 'create' ? 'Create palette' : paletteAction === 'rename' ? 'Save name' : 'Delete palette' }}</UButton></template>
     </UModal>
     <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
+    <UModal :open="!!leaving" title="Leave Studio?" description="Your changes could not be saved in this browser. Export them before leaving to keep them." @update:open="finishLeaving(false)"><template #footer><UButton color="neutral" variant="outline" @click="finishLeaving(false)">Keep editing</UButton><UButton @click="finishLeaving(true)">Leave Studio</UButton></template></UModal>
     <UModal v-model:open="resetOpen" title="Reset appearance?" description="Restore this brand’s original colors, typography, icons, component styles and appearance settings. Your name, logos, content and custom palettes are kept. You can undo this reset.">
       <template #footer><UButton color="neutral" variant="ghost" @click="resetOpen = false">Cancel</UButton><UButton color="neutral" @click="reset">Reset appearance</UButton></template>
     </UModal>
