@@ -82,6 +82,7 @@ watch(error, message => {
 const exportOpen = ref(false)
 const askAiOpen = ref(false)
 const exportTab = ref('changes')
+const codeFormat = ref('source')
 const busy = ref(false)
 const pending = ref<(() => void) | null>(null)
 const input = ref<HTMLInputElement>()
@@ -326,7 +327,7 @@ const projectPrefix = 'id-studio:project:2:'
 const lastProjectKey = `${storageKey}:active`
 const needsExport = computed(() => diffStudioDocuments(exported.value || baseline.value, draft.value).length > 0)
 const sourcePath = computed(() => draft.value.brand.name === seed.brand.name ? config.idStudio?.sourcePath || 'brand.studio.json' : 'brand.studio.json')
-const output = computed(() => exportTab.value === 'changes' ? JSON.stringify(changes.value, null, 2) : exportTab.value === 'css' ? createStudioProject(draft.value)['app/assets/css/brand.css'] : JSON.stringify(draft.value, null, 2))
+const output = computed(() => exportTab.value === 'changes' ? JSON.stringify(changes.value, null, 2) : codeFormat.value === 'css' ? createStudioProject(draft.value)['app/assets/css/brand.css'] : JSON.stringify(draft.value, null, 2))
 const customComponents = computed(() => Object.keys(draft.value.theme.ui ?? {}).filter(key => !['colors', 'icons'].includes(key)))
 
 function edit(change: (doc: StudioDocument) => void, field?: string) {
@@ -1005,25 +1006,25 @@ const resolveIcon = useStudioIcon()
       <template #footer><UButton color="neutral" variant="ghost" @click="resetOpen = false">Cancel</UButton><UButton color="neutral" @click="reset">Reset appearance</UButton></template>
     </UModal>
     <StudioAskAi v-model:open="askAiOpen" :document="draft" />
-    <UModal v-model:open="exportOpen" :title="connected ? 'Review changes' : 'Download brand'" :ui="{ content: 'max-w-4xl h-[min(720px,calc(100dvh-2rem))]', body: 'flex min-h-0 flex-1 flex-col overflow-hidden', header: 'shrink-0', footer: 'shrink-0 flex-wrap' }">
+    <UModal v-model:open="exportOpen" title="Export brand" :ui="{ content: 'max-w-4xl max-h-[min(720px,calc(100dvh-2rem))]', body: 'flex min-h-0 flex-1 flex-col overflow-hidden', header: 'shrink-0', footer: 'shrink-0 flex-wrap' }">
       <template #body>
         <p class="mb-4 text-sm text-muted">{{ connected ? 'Apply to the connected project source.' : 'Choose how to use your brand.' }} <code v-if="connected">{{ sourcePath }}</code></p>
         <UAlert v-if="sourceConflict" color="warning" title="Source changed" description="Your draft is preserved. Download it before reopening the project to resolve the conflict." class="mb-4" />
-        <UTabs v-model="exportTab" :items="[{ label: 'Download', value: 'download' }, { label: 'Changes', value: 'changes' }, { label: 'Source', value: 'source' }, { label: 'CSS', value: 'css' }]" variant="link" :ui="{ root: 'flex min-h-0 flex-1 flex-col', list: 'shrink-0 justify-start', trigger: 'flex-none', content: 'min-h-0 flex-1 overflow-auto' }">
+        <UTabs v-model="exportTab" :items="[{ label: 'Export', value: 'download' }, { label: 'Changes', value: 'changes' }, { label: 'Code', value: 'code' }]" variant="link" :ui="{ root: 'flex min-h-0 flex-col', list: 'shrink-0 justify-start', trigger: 'flex-none', content: 'min-h-0 overflow-auto p-px' }">
         <template #content="{ item }">
-        <div v-if="item.value === 'download'" class="grid gap-4 py-4 sm:grid-cols-2">
-          <UCard><h3 class="font-semibold">Brand file</h3><p class="mt-2 mb-4 text-sm text-muted">Reopen and continue editing in Studio, or share your brand with another author.</p><UButton color="neutral" variant="outline" icon="i-lucide-download" @click="exportSource">Download JSON</UButton></UCard>
-          <UCard><h3 class="font-semibold">Nuxt project</h3><p class="mt-2 mb-4 text-sm text-muted">A reusable Nuxt UI brand layer with a Studio playground.</p><UButton color="neutral" variant="outline" icon="i-lucide-download" :loading="busy" @click="exportProject">Download ZIP</UButton><p class="mt-4 text-xs text-muted">Add custom fonts and capabilities in the generated project. Custom Vue components are not included.</p></UCard>
+        <div v-if="item.value === 'download'" class="grid gap-4 py-3 sm:grid-cols-2">
+          <UCard><h3 class="font-semibold">Brand file</h3><p class="mt-2 mb-4 text-sm text-muted">Reopen and continue editing in Studio, or share your brand with another author.</p><UButton color="neutral" variant="outline" :icon="resolveIcon('i-lucide-download')" @click="exportSource">Download JSON</UButton></UCard>
+          <UCard><h3 class="font-semibold">Nuxt project</h3><p class="mt-2 mb-4 text-sm text-muted">A reusable Nuxt UI brand layer with a Studio playground.</p><UButton color="neutral" variant="outline" :icon="resolveIcon('i-lucide-download')" :loading="busy" @click="exportProject">Download ZIP</UButton><p class="mt-4 text-xs text-muted">Add custom fonts and capabilities in the generated project. Custom Vue components are not included.</p></UCard>
         </div>
         <div v-else-if="item.value === 'changes'" class="mb-4 divide-y divide-default">
           <p v-if="!changes.length" class="text-sm text-muted">No changes to apply.</p>
           <div v-for="change in changes" :key="change.path" class="py-2 text-sm"><p class="font-medium">{{ changeLabel(change.path) }}</p><div class="mt-1 whitespace-pre-wrap break-words text-muted">{{ changeValue(change.before) }} → {{ changeValue(change.after) }}</div><code class="mt-1 block break-all text-xs text-dimmed">{{ change.path }}</code></div>
         </div>
-        <pre v-else class="studio-export-code">{{ output }}</pre>
+        <div v-else><USelect v-model="codeFormat" aria-label="Code format" :items="[{ label: 'Brand JSON', value: 'source' }, { label: 'CSS', value: 'css' }]" class="mb-3 w-40" /><pre class="studio-export-code studio-source-code leading-relaxed">{{ output }}</pre></div>
         </template></UTabs>
 
       </template>
-      <template #footer><UButton v-if="connected" :loading="busySource" :disabled="!dirty || sourceConflict || Object.keys(fieldErrors).length > 0" @click="applySource">Apply changes</UButton><UButton v-if="exportTab !== 'download'" color="neutral" variant="outline" @click="exportTab = 'download'">Download options</UButton><UButton color="neutral" variant="ghost" @click="exportOpen = false">Close</UButton></template>
+      <template #footer><UButton v-if="connected" :loading="busySource" :disabled="!dirty || sourceConflict || Object.keys(fieldErrors).length > 0" @click="applySource">Apply changes</UButton><UButton v-if="exportTab !== 'download'" color="neutral" variant="outline" @click="exportTab = 'download'">Export options</UButton><UButton color="neutral" variant="ghost" @click="exportOpen = false">Close</UButton></template>
     </UModal>
   </main>
   <div v-else class="studio-loading" role="status"><UIcon :name="resolveIcon('i-lucide-loader-circle')" class="size-5 animate-spin" /><span class="sr-only">Loading Studio</span></div>
