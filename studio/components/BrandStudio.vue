@@ -26,11 +26,12 @@ import type { StudioDocument } from '../../src/studio'
 useHead({ bodyAttrs: { class: 'id-studio-page' } })
 const route = useRoute()
 const router = useRouter()
-const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, brands?: Record<string, StudioDocument>, sourcePath?: string, home?: string, documentation?: string, host?: { name: string, logo?: { light: string, dark: string } }, templates?: unknown, packageAsset?: string } }
+const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, brands?: Record<string, StudioDocument>, sourcePath?: string, home?: string, documentation?: string, host?: { name: string, logo?: { light: string, dark: string, kind?: 'symbol' | 'wordmark' } }, templates?: unknown, packageAsset?: string } }
 const productName = config.idStudio?.host?.name || 'happydesigns/id'
 const productSlash = productName.lastIndexOf('/')
 const productPrefix = productSlash < 0 ? '' : productName.slice(0, productSlash)
 const productSuffix = productSlash < 0 ? productName : productName.slice(productSlash)
+const productWordmark = config.idStudio?.host?.logo?.kind === 'wordmark'
 const seed = config.idStudio?.document ? parseStudioDocument(config.idStudio.document) : createBlankStudioDocument()
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value))
 const baseline = ref(clone(seed))
@@ -833,11 +834,10 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
     <header class="studio-header">
       <div class="studio-product inline-flex items-center gap-2.5">
         <NuxtLink :to="config.idStudio?.home || '/'" class="inline-flex items-center gap-2.5 rounded-md font-semibold tracking-tight text-highlighted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary" :aria-label="`${productName} home`" :title="`Back to ${productName}`">
-          <UColorModeImage v-if="config.idStudio?.host?.logo" :light="config.idStudio.host.logo.light" :dark="config.idStudio.host.logo.dark" alt="" class="size-8 shrink-0 object-contain" />
+          <UColorModeImage v-if="config.idStudio?.host?.logo" :light="config.idStudio.host.logo.light" :dark="config.idStudio.host.logo.dark" alt="" class="shrink-0 object-contain" :class="productWordmark ? 'studio-product-wordmark h-[22px] min-[481px]:h-7 w-auto' : 'size-8'" />
           <span v-else class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-inverted"><UIcon name="i-lucide-fingerprint" class="size-5" /></span>
-          <span><span class="studio-product-prefix">{{ productPrefix }}</span><span :class="{ 'text-primary': productPrefix }">{{ productSuffix }}</span></span>
+          <span v-if="!productWordmark || productPrefix"><span v-if="!productWordmark" class="studio-product-prefix">{{ productPrefix }}</span><span>{{ productSuffix }}</span></span>
         </NuxtLink>
-        <span class="studio-product-context text-xs font-medium text-muted">Studio</span>
       </div>
       <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
@@ -1113,7 +1113,6 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; backgro
   .studio-dock-settings { width: auto; }
 }
 @media (max-width: 700px) { .studio-header { padding-inline: 0; }.studio-scenes { grid-template-columns: minmax(0, 1fr) 11rem; } }
-@media (max-width: 1100px) { .studio-product-context { display: none; } }
 @media (max-width: 480px) { .studio-product-prefix { display: none; } }
 </style>
 
