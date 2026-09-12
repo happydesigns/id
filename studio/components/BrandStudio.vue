@@ -1056,7 +1056,7 @@ body.id-studio-page { margin: 0; overflow: hidden; }
 .studio-source-code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 </style>
 <style scoped>
-.studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 0 20px 12px; display: flex; flex-direction: column; gap: 10px; background: transparent; color: var(--ui-text); }
+.studio-shell { box-sizing: border-box; height: 100dvh; max-width: 1680px; margin: auto; padding: 10px 20px 12px; display: flex; flex-direction: column; gap: 10px; background: transparent; color: var(--ui-text); }
 .studio-header { flex: none; padding-inline: 24px; min-height: 64px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }.studio-project-name { min-width: 0; max-width: 100%; justify-self: start; }.studio-review { justify-self: end; }
 .studio-product { justify-self: start; white-space: nowrap; font-size: 20px; }
 
@@ -1087,7 +1087,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; backgro
 .studio-category-select, .studio-editor-mobile { display: none; }
 @media (max-width: 1099px) { .studio-categories { display: none; }.studio-editor-mobile { display: inline-flex; }.studio-category-select { display: block; flex-shrink: 0; } }
 @media (max-width: 700px) {
-  .studio-shell { padding: 0 8px 8px; gap: 8px; }.studio-header { min-height: 48px; gap: 8px; }.studio-scenes { flex: 1; justify-content: center; gap: 4px; }.studio-scenes > * { min-width: 0; max-width: 130px; }.studio-project-actions { display: none; }.studio-project-menu { display: inline-flex; flex: none; }
+  .studio-shell { padding: 8px; gap: 8px; }.studio-header { min-height: 48px; gap: 8px; }.studio-scenes { flex: 1; justify-content: center; gap: 4px; }.studio-scenes > * { min-width: 0; max-width: 130px; }.studio-project-actions { display: none; }.studio-project-menu { display: inline-flex; flex: none; }
   .studio-dock-settings > * { flex: none; }
   .studio-view-mobile { display: flex; }.studio-mobile-control { display: inline-flex; }.studio-desktop { display: none; }.studio-toolbar { flex-wrap: nowrap; justify-content: space-between; }.studio-dock-settings { width: 100%; }.studio-dock-settings > * { flex: 1; justify-content: center; }.studio-toolbar-end { width: 100%; flex-wrap: wrap; justify-content: space-between; }.studio-comparing { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 }
