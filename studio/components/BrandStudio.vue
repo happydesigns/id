@@ -846,7 +846,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
           <UButton color="neutral" variant="ghost" :trailing-icon="resolveIcon('i-lucide-chevron-down')" aria-label="Brand picker" class="studio-project-name studio-scene-trigger" :ui="{ trailingIcon: 'ms-auto shrink-0' }"><span class="truncate">{{ draft.theme.label }}</span></UButton>
           <template #brand-leading="{ item }"><StudioBrandThumbnail :document="item.document" /></template>
           <template #brand-trailing="{ item }"><UIcon v-if="item.checked" :name="resolveIcon('i-lucide-check')" class="size-4 shrink-0" /></template>
-          <template #content-bottom="{ sub }"><p v-if="!sub && !readOnly && !storedLocally" class="border-t border-default px-4 py-3 text-xs text-warning" role="status">Changes could not be saved in this browser.</p></template>
+          <template #content-bottom="{ sub }"><p v-if="!sub && !readOnly && needsExport && !storedLocally" class="border-t border-default px-4 py-3 text-xs text-warning" role="status">Changes could not be saved in this browser.</p></template>
         </UDropdownMenu>
         </div>
         <StudioTemplatePicker v-model="scene" v-model:open="templatePickerOpen" :templates="templates" :document="draft" :mode="mode" />
