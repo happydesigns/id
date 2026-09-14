@@ -17,6 +17,7 @@ const reference = computed(() => {
 const show = (section: string) => props.section === 'all' || props.section === section
 const imageAsset = (src?: string) => !!src && /\.(svg|png|jpe?g|webp|avif|gif)$/i.test(src)
 const colorMode = useColorMode()
+const mounted = ref(false)
 const contrastRoot = ref<HTMLElement>()
 const contrastPairs = ['--ui-text', '--ui-text-muted', '--ui-primary', '--ui-error']
 const ratios = ref<Record<string, number | undefined>>({})
@@ -40,7 +41,10 @@ async function measureContrast() {
     }))
   })
 }
-onMounted(measureContrast)
+onMounted(() => {
+  mounted.value = true
+  void measureContrast()
+})
 watch([reference, () => colorMode.value], measureContrast)
 </script>
 
@@ -86,7 +90,7 @@ watch([reference, () => colorMode.value], measureContrast)
         </div>
       </section>
       <section ref="contrastRoot" aria-label="Text contrast" class="space-y-3">
-        <h2 class="text-xl font-semibold text-highlighted">Text contrast · {{ colorMode.value }}</h2>
+        <h2 class="text-xl font-semibold text-highlighted">Text contrast<span v-if="mounted"> · {{ colorMode.value }}</span></h2>
         <p class="text-sm text-muted">Selected opaque text colors against the current default surface. Normal text needs at least 4.5:1. These checks do not assess every component or interaction state.</p>
         <ul class="grid gap-3 sm:grid-cols-2">
           <li v-for="pair in contrastPairs" :key="pair" class="space-y-2 rounded-lg border border-default p-3 text-sm">
