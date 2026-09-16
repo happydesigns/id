@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useColorMode } from '#imports'
+import { UColorModeImage } from '#components'
 import { computed } from 'vue'
 import { useBrandAssets } from '../composables/useBrandAssets'
 import type { BrandAsset } from '../../src'
@@ -21,23 +21,19 @@ const props = withDefaults(defineProps<{
 })
 
 const brandAssets = useBrandAssets()
-const colorMode = useColorMode() as { value: string }
-
-const resolvedMedia = computed<BrandAsset['media'] | undefined>(() => {
-  if (props.media !== 'auto') {
-    return props.media
-  }
-
-  return colorMode.value === 'dark' ? 'dark' : 'light'
-})
-
 const logo = computed(() => {
   return brandAssets.resolveAsset({
     role: props.role,
     variant: props.variant,
-    media: resolvedMedia.value
+    media: props.media === 'auto' ? 'light' : props.media
   })
 })
+
+const darkLogo = computed(() => brandAssets.resolveAsset({
+  role: props.role,
+  variant: props.variant,
+  media: 'dark'
+}))
 
 const brandLabel = computed(() => {
   return props.label ?? brandAssets.brandLabel.value
@@ -45,8 +41,15 @@ const brandLabel = computed(() => {
 </script>
 
 <template>
+  <UColorModeImage
+    v-if="media === 'auto' && logo && darkLogo"
+    :light="logo.src"
+    :dark="darkLogo.src"
+    :alt="alt ?? logo.alt ?? logo.name"
+    class="h-8 w-auto"
+  />
   <img
-    v-if="logo"
+    v-else-if="logo"
     :src="logo.src"
     :alt="alt ?? logo.alt ?? logo.name"
     class="h-8 w-auto"
