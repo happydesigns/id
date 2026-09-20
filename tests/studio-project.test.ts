@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { createBlankStudioDocument, createStudioProject } from '../src/studio'
+import { createBlankStudioDocument, createStudioProject, createStudioRuntimeFiles } from '../src/studio'
 import { readStudioSource, writeStudioSource } from '../studio/source'
 import { previewUi } from '../studio/preview'
 import { studioTemplates, withinStudioRoute } from '../studio/templates'
@@ -66,6 +66,11 @@ describe('connected brand source', () => {
 })
 
 describe('native runtime and real previews', () => {
+  it('keeps older generated projects compatible until explicitly migrated', () => {
+    const document = createBlankStudioDocument()
+    expect(createStudioRuntimeFiles(document)['app/assets/css/brand.css']).toContain('@import "tailwindcss"')
+    expect(createStudioRuntimeFiles(document, { styles: 'fragment' })['app/assets/css/brand.css']).not.toContain('@import')
+  })
   it('exports runtime files without an id runtime import and with optional authoring dependencies', () => {
     const files = createStudioProject(createBlankStudioDocument())
     expect(files['nuxt.config.ts']).not.toContain('@happydesigns/id')
@@ -79,6 +84,13 @@ describe('native runtime and real previews', () => {
     expect(pkg.dependencies['@happydesigns/id']).toBeUndefined()
     expect(pkg.devDependencies['@happydesigns/id']).toBeTruthy()
     expect(pkg.exports['.']).toBe('./nuxt.config.ts')
+    expect(pkg.exports['./styles.css']).toBe('./app/assets/css/brand.css')
+    expect(files['nuxt.config.ts']).not.toContain('css:')
+    expect(files['app/assets/css/brand.css']).not.toMatch(/@import|@source/)
+    expect(files['app/assets/css/brand.css']).toContain('@theme static')
+    expect(files['playground/app/app.css']).toBe('@import "../../app/assets/css/brand.css";\n')
+    expect(files['playground/content/docs/1.introduction.md']).toContain('/styles.css')
+    expect(files['scripts/generate-brand.mjs']).toContain("createStudioRuntimeFiles(source, { styles: 'fragment' })")
     expect(pkg.files).not.toContain('playground')
   })
   it('keeps consumer overrides while removing the previous brand', () => {
