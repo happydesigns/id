@@ -5,6 +5,8 @@ for (const [index, brand] of ['violet', 'amber'].entries()) test('same applicati
   await page.getByRole('button', { name: 'Continue 0', exact: true }).click()
   const action = page.getByRole('button', { name: 'Continue 1', exact: true })
   await expect(action).toBeVisible()
+  // Check the resting brand color after the interaction, not Nuxt UI's hover tint.
+  await page.getByRole('heading', { name: 'Independent consumer', exact: true }).hover()
   await expect(page.getByRole('main')).toHaveCSS('font-family', brand === 'violet' ? 'Georgia, serif' : 'Arial, sans-serif')
   await expect(action).toHaveCSS('background-color', brand === 'violet' ? 'rgb(124, 58, 237)' : 'rgb(180, 83, 9)')
   await expect(page.getByRole('img', { name: brand })).toHaveAttribute('src', '/' + brand + '-wordmark.svg')
