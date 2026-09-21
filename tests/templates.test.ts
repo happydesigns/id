@@ -70,10 +70,10 @@ describe('starter templates', () => {
 
     expect(existsSync(join(rootDir, 'templates/brand-layer/app/app.vue'))).toBe(false)
     expect(existsSync(join(rootDir, 'templates/brand-layer/app/pages/index.vue'))).toBe(false)
-    expect(readTemplateFile('brand-layer', 'app/app.config.ts')).toContain("from '../brand'")
-    expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("extends: ['@happydesigns/id/nuxt']")
+    expect(readTemplateFile('brand-layer', 'app/app.config.ts')).not.toContain('import')
+    expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("modules: ['@nuxt/ui']")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).not.toContain('docus')
-    expect(readTemplateFile('brand-layer', 'docs/nuxt.config.ts')).toContain("extends: ['..', '@happydesigns/id/guide', 'docus']")
+    expect(readTemplateFile('brand-layer', 'docs/nuxt.config.ts')).toContain("extends: ['..', '@happydesigns/id/nuxt', '@happydesigns/id/guide', 'docus']")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("prefix: 'Brand'")
     expect(readTemplateFile('brand-layer', 'docs/content/index.md')).toContain('::brand-logo')
     expect(readTemplateFile('brand-layer', 'docs/content/index.md')).toContain('rel: noopener noreferrer')
@@ -85,10 +85,10 @@ describe('starter templates', () => {
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain("role: 'appIcon'")
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain("media: 'any'")
     expect(readTemplateFile('brand-layer', 'brand.ts')).toContain("alt: 'Example Brand'")
-    expect(readTemplateFile('brand-layer', 'app/app.config.ts')).toContain('assets: brandRuntimeAssets')
+    expect(readTemplateFile('brand-layer', 'app/app.config.ts')).not.toContain('@happydesigns/id')
     expect(readTemplateFile('brand-layer', 'app/app.config.ts')).not.toContain('guide: brandGuide')
     expect(readTemplateFile('brand-layer', 'docs/app/app.config.ts')).toContain('guide: brandGuide')
-    expect(readTemplateFile('brand-layer', 'app/components/Logo.vue')).toContain('<IdLogo')
+    expect(readTemplateFile('brand-layer', 'app/components/Logo.vue')).toContain('<img')
   })
 
   it('keeps guide-only components out of the runtime layer', () => {

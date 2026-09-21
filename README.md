@@ -136,7 +136,7 @@ pnpm docs:build
 
 The Studio supports an optional host catalog in `appConfig.idStudio.templates`.
 Capabilities keep their name and runtime ownership; **Templates** is the Studio's
-presentation of complete example applications. Landing is included. Docs uses the host’s real Docus routes, registered with `route` and `routePrefix`; it has no duplicated page implementation.
+presentation of complete example applications. Landing is included. Docs uses the hostâ€™s real Docus routes, registered with `route` and `routePrefix`; it has no duplicated page implementation.
 
 A capability may publish an opt-in Nuxt layer that registers an async global
 component, its fixtures and this catalog entry:
@@ -171,4 +171,4 @@ that application. The Studio has no dependency on Course or another capability.
 The capability playground should consume the exact same component and fixtures;
 maintain one scenario, not separate Studio and playground implementations.
 
-Studio exports native Nuxt UI layers whose consumers do not need the id runtime. Extend the layer for app config/components and import its public `styles.css` fragment after Tailwind and Nuxt UI in the application's CSS entry. New native layers do not auto-register CSS. Docus hosts import the fragment through `app/app.css`; Docus owns the framework entry. Legacy runtime exports and older handwritten templates retain their existing contract and require an explicit migration. A local authoring host may opt into one fixed JSON source through private `runtimeConfig.idStudioSource`; only the development server offers reviewed, revision-checked Apply. See [Brand Studio](docs/content/3.guides/6.brand-studio.md) for route previews, generation and export compatibility.
+Studio exports native Nuxt UI layers whose consumers do not need the id runtime. Extend the layer for app config/components and import its public `styles.css` fragment after Tailwind and Nuxt UI in the application's CSS entry. New native layers do not auto-register CSS. Docus hosts import the fragment through `app/app.css`; Docus owns the framework entry. Legacy runtime exports retain their existing contract and require an explicit migration. The handwritten brand-layer starter uses the same native runtime boundary. A local authoring host may opt into one fixed JSON source through private `runtimeConfig.idStudioSource`; only the development server offers reviewed, revision-checked Apply. See [Brand Studio](docs/content/3.guides/6.brand-studio.md) for route previews, generation and export compatibility.

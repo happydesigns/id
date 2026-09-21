@@ -1,5 +1,4 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+/* Import after Tailwind and Nuxt UI in the consuming application. */
 
 @theme static {
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;

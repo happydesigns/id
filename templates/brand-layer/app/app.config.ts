@@ -1,13 +1,5 @@
-import { createNuxtUiAppConfig } from '@happydesigns/id'
-import { brandRuntimeAssets, brandTheme } from '../brand'
-
-const nuxtUiConfig = createNuxtUiAppConfig(brandTheme)
-
+// Native runtime data. Authoring helpers belong in docs or build scripts.
 export default defineAppConfig({
-  id: {
-    name: brandTheme.name,
-    theme: brandTheme,
-    assets: brandRuntimeAssets
-  },
-  ui: nuxtUiConfig.ui
+  ui: { colors: { primary: 'brand', neutral: 'slate' } },
+  brand: { name: 'Example Brand' }
 })

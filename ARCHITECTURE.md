@@ -35,7 +35,7 @@ Use the smallest branding mechanism that fits the required change.
 
 Full brand layers are the default for deployable branded products. They can own assets, layout wrappers, app metadata, public files, Nuxt UI defaults, CSS, docs styling, and brand primitives.
 
-Each brand layer should expose one primary `id.theme` through `app.config.ts`. Runtime theme lists are for switching visual roles without rebuild overhead. They can own CSS variables, Nuxt UI semantic color mappings, typography variables, and component default variants that use stable compiled classes.
+New brand layers expose native `ui` app config, assets and an explicit `styles.css` fragment. The root never imports ID helpers at runtime or auto-registers framework CSS. Consumers import the fragment after Tailwind/Nuxt UI; Docus imports it through `app/app.css`. Guide and Studio remain optional authoring dependencies. Existing identity-runtime layers may expose one primary `id.theme` through `app.config.ts`. Runtime theme lists are for switching visual roles without rebuild overhead. They can own CSS variables, Nuxt UI semantic color mappings, typography variables, and component default variants that use stable compiled classes.
 
 Reusable brand repositories should keep identity data in a normal source file such as `brand.ts` and wire that data into Nuxt through `app.config.ts`. This keeps Nuxt's app-config model as the integration point without making Nuxt config the only place where a brand guide can be authored, tested, or exported.
 
@@ -62,7 +62,7 @@ Runtime themes cannot guarantee:
 
 ## Package Boundary
 
-The npm package publishes built JavaScript and declarations from `dist/` for the TypeScript API, theme subpaths, and Nuxt module. The Nuxt layer export stays as `nuxt.layer.config.ts`, matching Docus-style layer packages where Nuxt loads the layer source directly. Runtime layer files are shipped both as source for the layer and copied into `dist/app` for the built module.
+The npm package publishes built JavaScript and declarations from `dist/` for the TypeScript API, theme subpaths, and Nuxt module. The Nuxt layer export stays as `nuxt.layer.config.mjs`, matching Docus-style layer packages where Nuxt loads the layer source directly. Runtime layer files are shipped both as source for the layer and copied into `dist/app` for the built module.
 
 `nuxt.config.ts` is intentionally a repository-development config. It imports the public layer config and can add `@nuxt/eslint` and other local tooling because it is not the `./nuxt` package export. Consumers extending `@happydesigns/id/nuxt` inherit only Nuxt UI, runtime `Id` components, identity CSS, and theme behavior. Guide applications opt into `@happydesigns/id/guide`; Docus-specific CSS generation and markdown highlighting remain owned by Docus.
 

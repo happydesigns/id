@@ -5,7 +5,7 @@ import { defineNuxtConfig } from 'nuxt/config'
 const currentDir = dirname(fileURLToPath(import.meta.url))
 
 export default defineNuxtConfig({
-  extends: ['@happydesigns/id/nuxt'],
+  modules: ['@nuxt/ui'],
 
   $meta: {
     name: '@example/brand'
@@ -17,10 +17,6 @@ export default defineNuxtConfig({
       pathPrefix: false,
       prefix: 'Brand'
     }
-  ],
-
-  css: [
-    resolve(currentDir, './app/assets/css/brand.css')
   ],
 
   app: {

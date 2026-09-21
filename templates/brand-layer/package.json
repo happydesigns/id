@@ -6,7 +6,8 @@
   "description": "Nuxt UI brand layer generated from @happydesigns/id.",
   "main": "./nuxt.config.ts",
   "exports": {
-    ".": "./nuxt.config.ts"
+    ".": "./nuxt.config.ts",
+    "./styles.css": "./app/assets/css/brand.css"
   },
   "scripts": {
     "dev": "nuxt dev docs",
@@ -18,7 +19,6 @@
     "verify": "pnpm typecheck && pnpm build"
   },
   "dependencies": {
-    "@happydesigns/id": "^0.1.0",
     "@nuxt/ui": "^4.10.0",
     "nuxt": "^4.5.2",
     "tailwindcss": "^4.3.3"
@@ -26,6 +26,13 @@
   "devDependencies": {
     "docus": "^5.12.3",
     "typescript": "^6.0.3",
-    "vue-tsc": "^3.3.10"
-  }
+    "vue-tsc": "^3.3.10",
+    "@happydesigns/id": "^0.1.0"
+  },
+  "files": [
+    "app",
+    "public",
+    "nuxt.config.ts",
+    "README.md"
+  ]
 }

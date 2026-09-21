@@ -1,34 +1,17 @@
-# Brand layer starter
+# Native brand layer
 
-Starter for a Nuxt UI brand layer powered by `@happydesigns/id`.
+Consumers extend `@example/brand` and import `@example/brand/styles.css` after Tailwind and Nuxt UI in their own CSS entry. The root supplies native app config, components and assets, without the ID runtime, Guide or Studio. It does not register CSS automatically.
 
-## Use
-
-```bash
-npx giget@latest gh:happydesigns/id/templates/brand-layer my-brand
-cd my-brand
-pnpm install
-pnpm dev
+```ts
+export default defineNuxtConfig({ extends: ['@example/brand'] })
 ```
 
-Nuxt's CLI accepts the same GitHub template source:
-
-```bash
-pnpm create nuxt@latest my-brand --template gh:happydesigns/id/templates/brand-layer
+```css
+@import "tailwindcss";
+@import "@nuxt/ui";
+@import "@example/brand/styles.css";
 ```
 
-## Apply in a Nuxt app
+`docs/` is the separate Docus consumer. Docus owns its framework CSS entry; `docs/app/app.css` imports only the brand fragment. `brand.ts` contains guide/authoring data and is not imported by the published runtime. Keep runtime app config and CSS aligned when editing this handwritten starter. For single-source generation use Studio's New project export instead.
 
-```ts [nuxt.config.ts]
-export default defineNuxtConfig({
-  extends: ['@example/brand']
-})
-```
-
-This starter is for full build-time branding: assets, metadata, CSS variables, Nuxt UI defaults, and optional brand primitives. Replace the placeholder `brandIdentity` definition in `brand.ts`; it owns the structured runtime assets alongside the neutral colors and typography. The definition is mapped through the Nuxt UI adapter, and other adapters remain normal TypeScript modules when a second target needs the same brand data.
-
-Runtime app config receives only the theme and runtime assets. The exported `brandGuide` remains available for a dedicated guide application but is not shipped automatically to every consuming app.
-
-The repository root is the public Nuxt layer. It contains only consumer-safe app config, CSS, assets, and reusable brand components. The separate Docus application in `docs/` extends that root, adds `id.guide`, and renders the reference pages. Consumers always extend the package or repository root, never `docs/`.
-
-`pnpm dev` and `pnpm build` target the reference app. `pnpm typecheck` checks the public layer in isolation, and `pnpm verify` checks both boundaries. The reference homepage renders `BrandLogo`, which is inherited from the root layer and backed by `IdLogo`.
+Install the reviewed ID package as a development dependency. Run `pnpm dev` for Docus and `pnpm verify` for typecheck/build. Studio is optional: extend `@happydesigns/id/studio` in docs only and provide `appConfig.idStudio`. Use Docus AppHeaderCTA/AppFooterLeft slots to link to `/studio`; retain any individual homepage. No custom header/footer replacement is required.
