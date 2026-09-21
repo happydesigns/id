@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.2.0
+
+- Make Studio with templates the default authoring host; Docus documentation is an explicit export option (`guide: true`). Existing guide integrations remain supported.
+- Verify identical application source with two independent native brands, including fonts, colors, light/dark assets and interactions.
+- Build and exercise the exported Studio without Docus.
+
+Upgrade: replace the pinned ID archive and regenerate the lockfile. Existing guide hosts keep their explicit Docus/Guide extensions. Code expecting documentation from `createStudioProject` must now pass `{ guide: true }`; native runtime output and version-1 source documents remain compatible. Remove targeted form ClientOnly workarounds only after the upgraded consumer passes production checks.
+
+
 - Fix production Guide hydration IDs by preserving Vue hook registration during Nuxt client optimization; require passing form-label and tab-panel regression checks.
 
 - Make native Nuxt UI brand output the recommended application boundary; keep Studio and Docus optional.

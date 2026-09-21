@@ -2,7 +2,7 @@
 
 The Verify workflow runs for pull requests, main, version tags and manual dispatch. It installs the committed pnpm lockfile, runs lint/unit/type checks, packs ID, builds an isolated native consumer and runs production browser checks. Passing runs retain the package and SHA-256 checksum as a versioned artifact.
 
-The native consumer check installs the actual ID tarball into a fresh authoring project outside this workspace, generates and packs a brand, then builds a second application from that brand archive. That application must contain neither ID nor Docus. This checks the published package boundary rather than sibling checkout imports. Fresh consumer dependencies resolve independently of the workspace lockfile, deliberately detecting compatibility failures; the retained temporary fixture includes its lockfile for diagnosis.
+The native consumer check installs the actual ID tarball into a fresh authoring project outside this workspace, generates and packs two brands, then builds identical application source against each brand archive. Browser checks verify primary colors, fonts, mode-specific assets and behavior. The exported minimal Studio host is also built and exercised without Docus. That application must contain neither ID nor Docus. This checks the published package boundary rather than sibling checkout imports. Fresh consumer dependencies resolve independently of the workspace lockfile, deliberately detecting compatibility failures; the retained temporary fixture includes its lockfile for diagnosis.
 
 ## Commands
 

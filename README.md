@@ -12,7 +12,7 @@ The supported path is Studio source → generated native brand → consuming Nux
 
 ## What it provides
 
-- A visual Studio for brand projects, with shared component scenarios and real Docus route previews.
+- A visual Studio for brand projects, with shared component scenarios, Landing and optional capability templates.
 - Native Nuxt UI exports: CSS, app config and assets; consumers do not need the editor runtime.
 - Reviewed local source updates in development, plus portable JSON and project downloads.
 - A neutral typed brand definition plus a small public adapter contract.
@@ -30,7 +30,7 @@ The supported path is Studio source → generated native brand → consuming Nux
 
 ## Install
 
-For a new brand, use Studio and download **New project**. The project contains a standard Nuxt UI layer and an optional Studio/Docus playground. Consumers extend the generated brand; `id` is only an authoring dependency.
+For a new brand, use Studio and download **New project**. The project contains a standard Nuxt UI layer and a Studio playground. Select **Include Docus guide** only when the project also needs documentation. Consumers extend the generated brand; `id` is only an authoring dependency.
 
 To add Studio to an existing Nuxt UI project:
 
@@ -151,8 +151,8 @@ component, its fixtures and this catalog entry:
 export default defineAppConfig({
   idStudio: {
     templates: {
-      academy: {
-        label: 'Academy',
+      course: {
+        label: 'Course',
         description: 'A complete learning scenario.',
         owner: '@happydesigns/course-nuxt',
         component: 'CourseAcademyPreview',
@@ -178,3 +178,7 @@ The capability playground should consume the exact same component and fixtures;
 maintain one scenario, not separate Studio and playground implementations.
 
 Studio exports native Nuxt UI layers whose consumers do not need the id runtime. Extend the layer for app config/components and import its public `styles.css` fragment after Tailwind and Nuxt UI in the application's CSS entry. New native layers do not auto-register CSS. Docus hosts import the fragment through `app/app.css`; Docus owns the framework entry. Legacy runtime exports retain their existing contract and require an explicit migration. The handwritten brand-layer starter uses the same native runtime boundary. A local authoring host may opt into one fixed JSON source through private `runtimeConfig.idStudioSource`; only the development server offers reviewed, revision-checked Apply. See [Brand Studio](docs/content/3.guides/6.brand-studio.md) for route previews, generation and export compatibility.
+
+## Optional documentation
+
+Studio is the default authoring surface. Docus is an explicit host extension, not a requirement for Studio, templates or generated brand consumers. Existing guides keep using the separate `@happydesigns/id/guide` layer alongside `docus`. The project generator accepts `{ guide: true }` for that opt-in; its default output contains no Docus dependency or documentation routes.

@@ -1,7 +1,7 @@
 {
   "name": "@happydesigns/id",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "packageManager": "pnpm@11.9.0",
   "author": "happydesigns",
@@ -88,7 +88,8 @@
     "nuxt.layer.config.mjs",
     "README.md",
     "LICENSE",
-    "scripts/prepare-studio-package.mjs"
+    "scripts/prepare-studio-package.mjs",
+    "templates/brand-layer/playground"
   ],
   "publishConfig": {
     "access": "public"

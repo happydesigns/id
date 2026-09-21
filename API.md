@@ -140,7 +140,7 @@ The @happydesigns/id/studio layer adds /studio and /studio/preview to an authori
 
 The @happydesigns/id/studio/core export provides StudioDocument, parseStudioDocument, createStudioDocument, createBlankStudioDocument, diffStudioDocuments, createStudioCss, createStudioRuntimeFiles, createStudioProject and createStudioArchive. A version-1 document contains brand and theme plus preserved JSON metadata. Import validates JSON, CSS-value boundaries and local asset paths; it never evaluates source code. Projects export a runtime layer and an optional playground with tested framework versions.
 
-`createStudioRuntimeFiles(document)` returns generated native app config, CSS and asset metadata. `createStudioProject(document, { bundledPackage?, legacyRuntime? })` adds a native layer and optional Docus/Studio playground; `legacyRuntime: true` retains the previous id-runtime export. The route catalog accepts `{ label, owner?, route, routePrefix }` for real host previews alongside the async-component contract. Private `runtimeConfig.idStudioSource` explicitly opts a local development host into a fixed JSON source writer. The browser cannot choose the path.
+`createStudioRuntimeFiles(document)` returns generated native app config, CSS and asset metadata. `createStudioProject(document, { bundledPackage?, legacyRuntime?, guide? })` adds a native layer and Studio playground, with Docus available through `guide: true`; `legacyRuntime: true` retains the previous id-runtime export. The route catalog accepts `{ label, owner?, route, routePrefix }` for real host previews alongside the async-component contract. Private `runtimeConfig.idStudioSource` explicitly opts a local development host into a fixed JSON source writer. The browser cannot choose the path.
 
 ## Guide messages and authoring host
 
@@ -151,3 +151,7 @@ The @happydesigns/id/studio/core export provides StudioDocument, parseStudioDocu
 `StudioHostConfig` types the existing `idStudio` host configuration (also exported from studio/core). It contains document, brands, sourcePath, home, documentation, host, templates and optional packageAsset. It is trusted app configuration, not imported brand data.
 
 Use `IdStudioLink` with an optional translated label inside Docus AppHeaderCTA and AppFooterLeft. It renders a native neutral button only when the Studio route is installed. Docus keeps its header, footer and mobile navigation; customers keep their landingpage. Backlinks use idStudio.home and documentation.
+
+## Project generation options
+
+`createStudioProject(document, { bundledPackage?, legacyRuntime?, guide? })` generates a native Nuxt UI layer and a minimal Studio host by default. `guide: true` adds Docus and the source-derived reference documentation to that authoring host. It does not change the published brand runtime. `legacyRuntime: true` preserves the older runtime project format and takes precedence.

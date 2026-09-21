@@ -39,7 +39,7 @@ New brand layers expose native `ui` app config, assets and an explicit `styles.c
 
 Reusable brand repositories should keep identity data in a normal source file such as `brand.ts` and wire that data into Nuxt through `app.config.ts`. This keeps Nuxt's app-config model as the integration point without making Nuxt config the only place where a brand guide can be authored, tested, or exported.
 
-The canonical reusable brand repository exposes its public Nuxt layer from the repository and package root. A separate `docs/` Docus app extends that root and owns guide-only app config, pages, prose, and examples. Downstream apps extend the root, never the documentation app. This topology keeps the reference guide useful as an integration consumer without publishing Docus or guide content as runtime branding.
+The canonical reusable brand repository exposes its public Nuxt layer from the repository and package root. An optional separate `docs/` Docus app extends that root and owns guide-only app config, pages, prose, and examples. Studio is the minimal authoring host. Downstream apps extend the root, never the documentation app. This topology keeps the reference guide useful as an integration consumer without publishing Docus or guide content as runtime branding.
 
 The neutral brand definition owns named colors, optional free-form role aliases, open typography roles, and optional structured runtime assets. `BrandAssets` is independent from guide content. Adapters own target roles and output. `id` maintains the Nuxt UI adapter and a small CSS-variable reference adapter; user adapters remain ordinary TypeScript modules. There is no adapter registry or discovery runtime.
 
@@ -91,7 +91,7 @@ Original and draft render in separate same-origin frames. Messages require the p
 
 `brand.studio.json` is the editable source. Unknown JSON fields and custom component configuration survive a round trip. The importer accepts data only and rejects executable objects, prototype properties, remote assets and CSS injection. Exported projects regenerate CSS and scan their source for custom classes. Custom components, external fonts and app-specific utilities are not inferred from a token document.
 
-Studio now generates native runtime CSS, app config and assets through `createStudioRuntimeFiles`. The exported optional playground contains Docus and Studio as development dependencies. Existing runtime consumers and `{ legacyRuntime: true }` exports remain supported. `studio/module.ts` registers the fixed-source writer only during local development; `studio/source.ts` validates and replaces the source after a revision check. Hosts own regeneration of derived artifacts. `studio/plugins/preview.client.ts` applies drafts after hydration to real, bounded host routes and preserves consumer UI overrides.
+Studio now generates native runtime CSS, app config and assets through `createStudioRuntimeFiles`. The exported playground contains Studio as a development dependency. Docus, guide components and documentation routes are generated only with the explicit `guide: true` option. Existing runtime consumers and `{ legacyRuntime: true }` exports remain supported. `studio/module.ts` registers the fixed-source writer only during local development; `studio/source.ts` validates and replaces the source after a revision check. Hosts own regeneration of derived artifacts. `studio/plugins/preview.client.ts` applies drafts after hydration to real, bounded host routes and preserves consumer UI overrides.
 
 ## Validated framework baseline
 
