@@ -24,8 +24,8 @@ The native check retains its temporary directory and prints its location. Browse
 
 Until registry publication, consumers may install the reviewed release tarball as an exact file dependency with a committed lockfile. A checksum identifies the archive bytes; package.json identifies the API version. Do not silently replace an existing released archive.
 
-## Integration limitations
+## Integration compatibility
 
-GUIDE-001 is the Docus-host server/client ID mismatch documented in tests/fixtures/guide/README.md. Its label-association assertions for both direct Vue and MDC routes are marked as expected failures, not ignored: if it starts passing, CI reports an unexpected pass and requires reviewing/removing the expectation and consumer workarounds. New unrelated failures are not exempted.
+GUIDE-001 is resolved by preserving Vue's onServerPrefetch registration in the Guide production client. See tests/fixtures/guide/README.md for the minimal reproduction and reason. The form-label and tab-panel assertions are now required success tests. Do not restore expected failures to accommodate a dependency update.
 
-The release gate checks a direct Vue guide page separately from the MDC rendering path. Native Tabs demonstrations currently expose labels without complete example content; hosts that need tab panels supply native content slots. Neither limitation is a reason to duplicate Nuxt UI components or replace the Docus shell.
+Native Tabs demonstrations with labels only still need actual content slots when a host wants meaningful tab-panel content. This is independent of hydration.

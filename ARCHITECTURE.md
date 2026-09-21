@@ -97,7 +97,7 @@ Studio now generates native runtime CSS, app config and assets through `createSt
 
 The generated native projects pin Nuxt 4.5.2, Nuxt UI 4.10.0, Tailwind CSS 4.3.3 and Docus 5.12.3. The workspace lockfile is the tested dependency graph; declared compatible ranges are not evidence that every newer combination has passed visual or hydration checks. Guide/Studio integration is tested independently from a native packed-brand consumer. Customer upgrades need their own consuming-app checks. Keep the package together; native runtime output does not require physically splitting the authoring package.
 
-The workspace pins Tiptap's editor family together at 3.30.1 after a mixed core/extension graph failed production bundling. This is an authoring test-workspace constraint, not a new dependency of native brand consumers. The Docus/MDC fixture records the remaining SSR ID limitation; keep targeted consumer workarounds until that check passes.
+The workspace pins Tiptap's editor family together at 3.30.1 after a mixed core/extension graph failed production bundling. This is an authoring test-workspace constraint, not a new dependency of native brand consumers. The Guide layer preserves Vue's onServerPrefetch registration in production client builds because it delimits useId ranges. The production fixture verifies form and tab associations without ClientOnly, through both MDC and direct Vue.
 
 ## Evolution policy
 
