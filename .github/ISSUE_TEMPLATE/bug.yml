@@ -1,0 +1,24 @@
+name: Bug report
+description: Report a reproducible problem with ID.
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Versions and environment
+      description: ID, Node, Nuxt, Nuxt UI, package manager and operating system. Include Docus when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link a small repository or provide the exact setup and steps. Use public sample brand data.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include relevant errors. Remove secrets and private brand data.
+    validations:
+      required: true
