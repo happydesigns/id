@@ -34,7 +34,7 @@ function statusMeta(status: ComponentCoverageStatus) {
 
 <template>
   <div class="not-prose my-6 overflow-hidden rounded-sm border border-default bg-default">
-    <div v-if="coverageItems.length" class="overflow-x-auto">
+    <div v-if="coverageItems.length" role="region" :aria-label="caption" tabindex="0" class="overflow-x-auto focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2">
       <table class="min-w-full divide-y divide-default text-left text-sm">
         <caption class="sr-only">
           {{ caption }}
