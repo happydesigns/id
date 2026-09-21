@@ -87,7 +87,7 @@ export default defineNuxtConfig({
 - A neutral brand definition stores named colors, optional free roles, freely named typography roles, and structured runtime assets once. `sans`, `mono`, and `display` are useful typography conventions, not a closed vocabulary.
 - Nuxt UI mappings turn those values into component defaults and theme variables. Existing adapter helpers remain compatible utilities; additional design-system runtimes and editors are outside the supported product.
 - Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
-- A primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
+- For existing identity-runtime integrations, a primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
 - A reusable brand source file such as `brand.ts` for package-owned identity data, with theme and guide exports wired into Nuxt through `app.config.ts`.
 - Optional runtime theme lists for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
 
@@ -136,7 +136,7 @@ pnpm docs:build
 
 The Studio supports an optional host catalog in `appConfig.idStudio.templates`.
 Capabilities keep their name and runtime ownership; **Templates** is the Studio's
-presentation of complete example applications. Landing is included. Docs uses the hostâ€™s real Docus routes, registered with `route` and `routePrefix`; it has no duplicated page implementation.
+presentation of complete example applications. Landing is included. Docs uses the host’s real Docus routes, registered with `route` and `routePrefix`; it has no duplicated page implementation.
 
 A capability may publish an opt-in Nuxt layer that registers an async global
 component, its fixtures and this catalog entry:
