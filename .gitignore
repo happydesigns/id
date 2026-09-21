@@ -37,3 +37,6 @@ logs
 # Browser test artifacts
 playwright-report
 test-results
+
+# Starter assets bundled for browser and Node exports
+src/project-templates.generated.ts

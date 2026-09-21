@@ -103,6 +103,18 @@ rmSync(distDir, {
   recursive: true
 })
 
+const projectTemplates = {}
+for (const variant of ['native', 'guide', 'legacy']) {
+  const directory = join(rootDir, 'templates/project', variant)
+  projectTemplates[variant] = Object.fromEntries(listFiles(directory).sort().map(file => [
+    file.slice(directory.length + 1).replaceAll('\\', '/'), readFileSync(file, 'utf8').replaceAll('\r\n', '\n')
+  ]))
+}
+writeFileSync(join(rootDir, 'src/project-templates.generated.ts'),
+  '// Generated from templates/project by build:package. Do not edit.\n'
+  + 'export const projectTemplates: Record<"native" | "guide" | "legacy", Record<string, string>> = '
+  + JSON.stringify(projectTemplates, null, 2) + '\n')
+
 run(process.execPath, [tscBin, '-p', 'tsconfig.package.json'])
 copyRuntimeFiles()
 
@@ -110,4 +122,16 @@ for (const file of listFiles(distDir)) {
   if (file.endsWith('.js') || file.endsWith('.d.ts')) {
     rewriteImports(file)
   }
+}
+
+// This example consumes the public generator; its runtime is not hand-maintained.
+const { createStudioDocument, createStudioRuntimeFiles } = await import('../dist/src/studio.js')
+const { brandIdentity, brandTheme } = await import('../templates/brand-layer/brand.ts')
+const document = createStudioDocument(brandIdentity, brandTheme)
+const templateDir = join(rootDir, 'templates/brand-layer')
+writeFileSync(join(templateDir, 'brand.studio.json'), JSON.stringify(document, null, 2) + '\n')
+for (const [path, contents] of Object.entries(createStudioRuntimeFiles(document, { styles: 'fragment' }))) {
+  const target = join(templateDir, path)
+  mkdirSync(dirname(target), { recursive: true })
+  writeFileSync(target, contents)
 }

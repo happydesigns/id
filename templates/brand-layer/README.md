@@ -12,7 +12,7 @@ export default defineNuxtConfig({ extends: ['@example/brand'] })
 @import "@example/brand/styles.css";
 ```
 
-`docs/` is the separate Docus consumer. Docus owns its framework CSS entry; `docs/app/app.css` imports only the brand fragment. `brand.ts` contains guide/authoring data and is not imported by the published runtime. Keep runtime app config and CSS aligned when editing this handwritten starter. For single-source generation use Studio's New project export instead.
+`docs/` is the separate Docus consumer. Docus owns its framework CSS entry; `docs/app/app.css` imports only the brand fragment. `brand.ts` contains guide/authoring data and is not imported by the published runtime. The repository package build derives app config, CSS, asset metadata and brand.studio.json from brand.ts through the same public generator used by Studio. Do not edit those generated files. This directory is an integration example; use Studio's New project export for a standalone brand with its own generation script.
 
 Install the reviewed ID package as a development dependency. Run `pnpm dev` for the minimal Studio playground and `pnpm verify` for typecheck/build. Add configured templates through `appConfig.idStudio.templates`.
 

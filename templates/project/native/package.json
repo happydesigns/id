@@ -1,0 +1,33 @@
+{
+  "name": "@example/brand",
+  "private": true,
+  "type": "module",
+  "main": "./nuxt.config.ts",
+  "exports": {
+    ".": "./nuxt.config.ts",
+    "./styles.css": "./app/assets/css/brand.css"
+  },
+  "files": [
+    "app",
+    "public",
+    "nuxt.config.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "generate:brand": "node scripts/generate-brand.mjs",
+    "predev": "node scripts/generate-brand.mjs",
+    "dev": "nuxt dev playground",
+    "prebuild": "node scripts/generate-brand.mjs",
+    "build": "nuxt build playground"
+  },
+  "dependencies": {
+    "@nuxt/ui": "4.10.0",
+    "tailwindcss": "4.3.3"
+  },
+  "devDependencies": {
+    "@happydesigns/id": "^0.2.0",
+    "nuxt": "4.5.2",
+    "@iconify-json/lucide": "^1.2.123",
+    "@iconify-json/vscode-icons": "^1.2.61"
+  }
+}

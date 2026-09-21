@@ -73,7 +73,7 @@ describe('starter templates', () => {
 
     expect(existsSync(join(rootDir, 'templates/brand-layer/app/app.vue'))).toBe(false)
     expect(existsSync(join(rootDir, 'templates/brand-layer/app/pages/index.vue'))).toBe(false)
-    expect(readTemplateFile('brand-layer', 'app/app.config.ts')).not.toContain('import')
+    expect(readTemplateFile('brand-layer', 'app/app.config.ts')).toContain('Generated from brand.studio.json')
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).toContain("modules: ['@nuxt/ui']")
     expect(readTemplateFile('brand-layer', 'nuxt.config.ts')).not.toContain('docus')
     expect(readTemplateFile('brand-layer', 'docs/nuxt.config.ts')).toContain("extends: ['..', '@happydesigns/id/nuxt', '@happydesigns/id/guide', 'docus']")

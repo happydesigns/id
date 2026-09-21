@@ -92,7 +92,7 @@ describe('native runtime and real previews', () => {
     expect(files['playground/content/docs/1.introduction.md']).toBeUndefined()
     expect(pkg.devDependencies.docus).toBeUndefined()
     expect(pkg.devDependencies['@takumi-rs/core']).toBeUndefined()
-    expect(files['scripts/generate-brand.mjs']).toContain("createStudioRuntimeFiles(source, { styles: 'fragment' })")
+    expect(files['scripts/generate-brand.mjs']).toMatch(/createStudioRuntimeFiles\(source,\s*\{\s*styles: 'fragment'\s*\}\)/)
     expect(pkg.files).not.toContain('playground')
   })
   it('keeps consumer overrides while removing the previous brand', () => {

@@ -75,6 +75,7 @@
     "templates/brand-layer/docs/tsconfig.json",
     "templates/brand-layer/public",
     "templates/brand-layer/brand.ts",
+    "templates/brand-layer/brand.studio.json",
     "templates/brand-layer/nuxt.config.ts",
     "templates/brand-layer/package.json",
     "templates/brand-layer/README.md",
