@@ -87,3 +87,8 @@ for (const colorScheme of ['light', 'dark'] as const) {
     })
   }
 }
+
+test('production never exposes the configured Studio writer', async ({ request }) => {
+  const response = await request.get('/api/id-studio/source')
+  expect(response.status()).toBe(404)
+})
