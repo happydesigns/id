@@ -17,10 +17,15 @@ The native check retains its temporary directory and prints its location. Browse
 
 ## Versioned delivery
 
-1. Review the public API and generated output changes. Update package.json with an appropriate version and record upgrade instructions in CHANGELOG.md. Existing source documents must remain importable unless an explicit migration accompanies the change.
-2. Run the checks above. Merge the reviewed release commit.
-3. Push a vVERSION tag matching package.json. The workflow rejects mismatched tags, repeats verification and prepares a draft GitHub release with the exact package and checksum.
-4. Review the draft and its upgrade instructions before publication. npm publication remains a separate explicitly authorized step; this workflow requires no npm credentials.
+1. Use Conventional Commits. Run `pnpm release:preview` to inspect the generated entries without changing files, versions, tags or remote releases. Review public API compatibility and the proposed version.
+2. If useful, commit a short `release-notes/VERSION.md` with Highlights and Upgrade notes. It is prepended to the generated changelog in GitHub, not a replacement for it. This file must be ready before release preparation so the worktree stays clean.
+3. From a clean worktree run `pnpm release --patch` (or the reviewed `--minor`, `--major`, or `--prerelease` choice). Changelogen generates the version, CHANGELOG.md, `chore(release): vVERSION` commit and annotated tag together. Do not hand-edit the version or manually tag a later test commit. Preparation does not push, publish to GitHub or publish to npm.
+4. Review the generated commit and tag, then push the branch and its tag through the approved repository process (`git push --follow-tags` when authorized). Tag CI repeats all checks, verifies version and release-commit agreement, and automatically publishes a GitHub release containing the exact CI-built archive, checksum and that version's generated changelog. Prerelease tags produce prereleases. There is no separate GitHub-generated changelog and no manual draft-publishing step.
+5. Registry publication remains a separate explicitly authorized step. This workflow needs no npm credentials and never deploys. A retry fails if a release already exists; do not overwrite its assets or move its tag.
+
+ID has one versioned package; its private documentation and playground workspaces do not require Changesets. The ecosystem default is Changelogen; Changesets is an option when a repository releases multiple packages with independent or linked versions.
+
+The existing `v0.2.0` tag predates this workflow and is intentionally not moved or rewritten. Its original tag workflow may create a draft; migrating that existing release is a separate reviewed operation. Subsequent versions must use the Changelogen flow above.
 
 Until registry publication, consumers may install the reviewed release tarball as an exact file dependency with a committed lockfile. A checksum identifies the archive bytes; package.json identifies the API version. Do not silently replace an existing released archive.
 

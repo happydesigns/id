@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -34,6 +36,13 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           if [[ "$GITHUB_REF_TYPE" == tag && "$GITHUB_REF_NAME" != "v$VERSION" ]]; then
             echo "Release tag must match package.json"; exit 1
+          fi
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            SUBJECT=$(git log -1 --format=%s)
+            if [[ "$SUBJECT" != "chore(release): v$VERSION" ]]; then
+              echo "Release tag must point to the Changelogen release commit"; exit 1
+            fi
+            node scripts/release-notes.mjs "$VERSION" > .output/studio-package/RELEASE_NOTES.md
           fi
           cd .output/studio-package
           mv id.tgz "id-$VERSION.tgz"
@@ -62,7 +71,13 @@ jobs:
         with:
           name: id-package-${{ github.sha }}
           path: release-package
-      - name: Prepare draft release
+      - name: Publish verified GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" release-package/* --verify-tag --draft --generate-notes
+        shell: bash
+        run: |
+          cd release-package
+          sha256sum --check SHA256SUMS
+          FLAGS=()
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then FLAGS+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" id-*.tgz SHA256SUMS --verify-tag --title "$GITHUB_REF_NAME" --notes-file RELEASE_NOTES.md "${FLAGS[@]}"

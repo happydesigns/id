@@ -112,7 +112,10 @@
     "verify": "pnpm lint && pnpm test && pnpm typecheck",
     "pack:studio": "pnpm build:package && pnpm --config.ignore-scripts=true pack --out .output/studio-package/id.tgz",
     "check:native": "node scripts/check-native.mjs",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "release:preview": "changelogen --no-output",
+    "release": "pnpm verify && changelogen --release --no-github --clean",
+    "release:notes": "node scripts/release-notes.mjs"
   },
   "dependencies": {
     "@nuxt/kit": "^4.5.2",
@@ -131,6 +134,7 @@
     "@nuxt/eslint": "^1.17.0",
     "@playwright/test": "1.63.0",
     "@vue/compiler-sfc": "^3.5.41",
+    "changelogen": "^0.6.2",
     "docus": "^5.12.3",
     "eslint": "^10.8.1",
     "tailwindcss": "^4.3.3",
