@@ -221,3 +221,5 @@ export function createStudioArchive(files: Record<string, string | Uint8Array>):
   for (const chunk of [...chunks, ...central, end]) { result.set(chunk, position); position += chunk.length }
   return result
 }
+
+export type { StudioHostConfig } from './studio-host'

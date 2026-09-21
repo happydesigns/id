@@ -141,3 +141,13 @@ The @happydesigns/id/studio layer adds /studio and /studio/preview to an authori
 The @happydesigns/id/studio/core export provides StudioDocument, parseStudioDocument, createStudioDocument, createBlankStudioDocument, diffStudioDocuments, createStudioCss, createStudioRuntimeFiles, createStudioProject and createStudioArchive. A version-1 document contains brand and theme plus preserved JSON metadata. Import validates JSON, CSS-value boundaries and local asset paths; it never evaluates source code. Projects export a runtime layer and an optional playground with tested framework versions.
 
 `createStudioRuntimeFiles(document)` returns generated native app config, CSS and asset metadata. `createStudioProject(document, { bundledPackage?, legacyRuntime? })` adds a native layer and optional Docus/Studio playground; `legacyRuntime: true` retains the previous id-runtime export. The route catalog accepts `{ label, owner?, route, routePrefix }` for real host previews alongside the async-component contract. Private `runtimeConfig.idStudioSource` explicitly opts a local development host into a fixed JSON source writer. The browser cannot choose the path.
+
+## Guide messages and authoring host
+
+`componentExampleMessages` exposes the English fallback catalog. `resolveComponentExampleMessage` (`messages, key`) resolves optional `ComponentExampleMessages` overrides per key. Pass `messages` through `IdComponentExample` context. Actions, forms, navigation, data and overlays are covered; other families retain their existing copy contracts. Nuxt UI built-in labels use its own locale configuration. Model values, technical component names and routes are never translated.
+
+`ComponentCoverageLabels` overrides headers and per-status label/description; `resolveComponentCoverageStatus` (`status, labels`) retains colors and missing English values. `caption` and `emptyText` stay separate props.
+
+`StudioHostConfig` types the existing `idStudio` host configuration (also exported from studio/core). It contains document, brands, sourcePath, home, documentation, host, templates and optional packageAsset. It is trusted app configuration, not imported brand data.
+
+Use `IdStudioLink` with an optional translated label inside Docus AppHeaderCTA and AppFooterLeft. It renders a native neutral button only when the Studio route is installed. Docus keeps its header, footer and mobile navigation; customers keep their landingpage. Backlinks use idStudio.home and documentation.

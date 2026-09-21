@@ -139,3 +139,10 @@ export {
   validateBrandTheme
 } from './validation'
 export { createBrandReference } from './guide-reference'
+
+export { componentExampleMessages, resolveComponentExampleMessage } from './component-example-messages'
+export type { ComponentExampleMessages, ComponentExampleMessageKey } from './component-example-messages'
+export { resolveComponentCoverageStatus } from './component-coverage'
+export type { ComponentCoverageLabels } from './component-coverage'
+
+export type { StudioHostConfig } from './studio-host'

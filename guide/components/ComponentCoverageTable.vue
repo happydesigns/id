@@ -2,17 +2,20 @@
 import { useAppConfig } from '#imports'
 import { computed } from 'vue'
 import {
-  componentCoverageStatusMeta,
+  resolveComponentCoverageStatus,
+  type ComponentCoverageLabels,
   normalizeComponentCoverage,
   type ComponentCoverageStatus
 } from '../../src/component-coverage'
 import type { BrandComponentCoverage, BrandGuideConfig } from '../../src'
 
 const props = withDefaults(defineProps<{
+  labels?: ComponentCoverageLabels
   items?: BrandComponentCoverage[]
   caption?: string
   emptyText?: string
 }>(), {
+  labels: undefined,
   items: undefined,
   caption: 'Component coverage',
   emptyText: 'No component coverage entries are configured yet.'
@@ -25,7 +28,7 @@ const coverageItems = computed(() => normalizeComponentCoverage(
 ))
 
 function statusMeta(status: ComponentCoverageStatus) {
-  return componentCoverageStatusMeta[status]
+  return resolveComponentCoverageStatus(status, props.labels)
 }
 </script>
 
@@ -39,16 +42,16 @@ function statusMeta(status: ComponentCoverageStatus) {
         <thead class="bg-muted/60 text-xs uppercase text-muted">
           <tr>
             <th scope="col" class="px-4 py-3 font-medium">
-              Family
+              {{ labels?.family ?? 'Family' }}
             </th>
             <th scope="col" class="px-4 py-3 font-medium">
-              Components
+              {{ labels?.components ?? 'Components' }}
             </th>
             <th scope="col" class="px-4 py-3 font-medium">
-              Status
+              {{ labels?.status ?? 'Status' }}
             </th>
             <th scope="col" class="px-4 py-3 font-medium">
-              Notes
+              {{ labels?.notes ?? 'Notes' }}
             </th>
           </tr>
         </thead>

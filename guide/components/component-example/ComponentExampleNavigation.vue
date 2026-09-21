@@ -1,61 +1,64 @@
 <script setup lang="ts">
-import type { ComponentExampleContext } from '../../../src/component-examples'
+import { computed } from 'vue'
+import { resolveComponentExampleMessage, type ComponentExampleMessageKey, type ComponentExampleContext } from '../../../src/component-examples'
 
 const props = defineProps<{
   name: string
   context: ComponentExampleContext
 }>()
 
-const navigationItems = [
-  { label: 'Colors', icon: 'i-lucide-palette', to: props.context.paths.colors },
-  { label: 'Typography', icon: 'i-lucide-type', to: props.context.paths.typography },
-  { label: 'Components', icon: 'i-lucide-component', to: props.context.paths.components, active: true }
-]
+const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(props.context.messages, key)
 
-const breadcrumbItems = [
-  { label: 'Docs', to: props.context.paths.docs },
-  { label: 'Components', to: props.context.paths.components },
-  { label: 'Navigation' }
-]
+const navigationItems = computed(() => [
+  { label: t('navigation.colors'), icon: 'i-lucide-palette', to: props.context.paths.colors },
+  { label: t('navigation.typography'), icon: 'i-lucide-type', to: props.context.paths.typography },
+  { label: t('navigation.components'), icon: 'i-lucide-component', to: props.context.paths.components, active: true }
+])
 
-const tabs = [
-  { label: 'Overview', icon: 'i-lucide-layout-grid' },
-  { label: 'Usage', icon: 'i-lucide-list-checks' },
-  { label: 'Tokens', icon: 'i-lucide-code-2' }
-]
+const breadcrumbItems = computed(() => [
+  { label: t('navigation.docs'), to: props.context.paths.docs },
+  { label: t('navigation.components'), to: props.context.paths.components },
+  { label: t('navigation.navigation') }
+])
 
-const stepperItems = [
-  { title: 'Base', description: 'Set spacing, type, and color roles.' },
-  { title: 'Identity', description: 'Choose the right mark and voice.' },
-  { title: 'Interface', description: 'Apply the system through components.' }
-]
+const tabs = computed(() => [
+  { label: t('navigation.overview'), icon: 'i-lucide-layout-grid' },
+  { label: t('navigation.usage'), icon: 'i-lucide-list-checks' },
+  { label: t('navigation.tokens'), icon: 'i-lucide-code-2' }
+])
 
-const accordionItems = [
+const stepperItems = computed(() => [
+  { title: t('navigation.base'), description: t('navigation.set_spacing_type_and_color_roles') },
+  { title: t('navigation.identity'), description: t('navigation.choose_the_right_mark_and_voice') },
+  { title: t('navigation.interface'), description: t('navigation.apply_the_system_through_components') }
+])
+
+const accordionItems = computed(() => [
   {
-    label: 'Where should accent color appear?',
+    label: t('navigation.where_should_accent_color_appear'),
     icon: 'i-lucide-sparkles',
-    content: 'Use accent color for focus, active states, and precise emphasis. Avoid making it the only hierarchy tool.'
+    content: t('navigation.use_accent_color_for_focus_active_states_and_precise_emphasis_avoid_making_it_the_only_hierarchy_tool')
   },
   {
-    label: 'What should stay neutral?',
+    label: t('navigation.what_should_stay_neutral'),
     icon: 'i-lucide-square',
-    content: 'Panels, forms, tables, and navigation surfaces should use semantic neutral surfaces and visible borders.'
+    content: t('navigation.panels_forms_tables_and_navigation_surfaces_should_use_semantic_neutral_surfaces_and_visible_borders')
   }
-]
+])
 
-const commandGroups = [
+const commandGroups = computed(() => [
   {
     id: 'docs',
-    label: 'Docs',
+    label: t('navigation.docs'),
     items: [
-      { label: 'Open colors', icon: 'i-lucide-palette' },
-      { label: 'Open logos', icon: 'i-lucide-badge-check' },
-      { label: 'Open components', icon: 'i-lucide-component' }
+      { label: t('navigation.open_colors'), icon: 'i-lucide-palette' },
+      { label: t('navigation.open_logos'), icon: 'i-lucide-badge-check' },
+      { label: t('navigation.open_components'), icon: 'i-lucide-component' }
     ]
   }
-]
+])
 
-const treeItems = [
+const treeItems = computed(() => [
   {
     label: 'brand/',
     icon: 'i-lucide-folder',
@@ -73,7 +76,7 @@ const treeItems = [
       }
     ]
   }
-]
+])
 </script>
 
 <template>
@@ -90,7 +93,7 @@ const treeItems = [
       :to="props.context.paths.components"
       class="inline-flex items-center gap-2 text-primary hover:text-primary"
     >
-      Open component system
+      {{ t('navigation.open_component_system') }}
       <UIcon name="i-lucide-arrow-right" class="size-4" />
     </ULink>
   </div>
@@ -100,7 +103,7 @@ const treeItems = [
     :to="props.context.paths.components"
     class="inline-flex items-center gap-2 text-primary hover:text-primary"
   >
-    Open component system
+    {{ t('navigation.open_component_system') }}
     <UIcon name="i-lucide-arrow-right" class="size-4" />
   </ULink>
 
@@ -156,21 +159,21 @@ const treeItems = [
   <div v-else-if="props.name === 'navigation-structure-pattern'" class="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
     <div class="space-y-4">
       <p class="text-sm font-semibold text-highlighted">
-        Ordered guidance
+        {{ t('navigation.ordered_guidance') }}
       </p>
       <UStepper :items="stepperItems" orientation="vertical" class="max-w-md" />
     </div>
     <div class="space-y-5">
       <div class="space-y-3">
         <p class="text-sm font-semibold text-highlighted">
-          Optional detail
+          {{ t('navigation.optional_detail') }}
         </p>
         <UAccordion :items="accordionItems" />
       </div>
       <div class="grid gap-5">
         <div class="space-y-3">
           <p class="text-sm font-semibold text-highlighted">
-            List position
+            {{ t('navigation.list_position') }}
           </p>
           <div class="overflow-x-auto pb-1">
             <UPagination :page="2" :total="30" :items-per-page="10" />
@@ -178,7 +181,7 @@ const treeItems = [
         </div>
         <div class="space-y-3">
           <p class="text-sm font-semibold text-highlighted">
-            Nested content
+            {{ t('navigation.nested_content') }}
           </p>
           <UTree :items="treeItems" class="max-w-sm" />
         </div>
@@ -193,7 +196,7 @@ const treeItems = [
       class="max-h-72"
     />
     <p class="text-sm text-muted">
-      Command palettes are useful when a product has enough destinations or commands to justify fast search.
+      {{ t('navigation.command_palettes_are_useful_when_a_product_has_enough_destinations_or_commands_to_justify_fast_search') }}
     </p>
   </div>
 </template>

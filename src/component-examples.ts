@@ -1,3 +1,7 @@
+import type { ComponentExampleMessages } from './component-example-messages'
+export { componentExampleMessages, resolveComponentExampleMessage } from './component-example-messages'
+export type { ComponentExampleMessages, ComponentExampleMessageKey } from './component-example-messages'
+
 export type ComponentExampleFrame = 'default' | 'none'
 
 export type ComponentExampleFamily =
@@ -58,6 +62,7 @@ export type ComponentExampleCopy = {
 }
 
 export type ComponentExampleContext = {
+  messages?: ComponentExampleMessages
   brandName: string
   packageName: string
   accentColor: string
@@ -341,6 +346,7 @@ export function createComponentExampleContext(input: ComponentExampleContextInpu
   return {
     brandName,
     packageName,
+    messages: input.messages,
     accentColor: input.accentColor ?? '#3B82F6',
     logoAlt: input.logoAlt ?? `${brandName} symbol`,
     assets: {

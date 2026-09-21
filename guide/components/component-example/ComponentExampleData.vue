@@ -1,42 +1,45 @@
 <script setup lang="ts">
-import type { ComponentExampleContext } from '../../../src/component-examples'
+import { computed } from 'vue'
+import { resolveComponentExampleMessage, type ComponentExampleMessageKey, type ComponentExampleContext } from '../../../src/component-examples'
 
 const props = defineProps<{
   name: string
   context: ComponentExampleContext
 }>()
 
-const tableData = [
-  { name: 'Button', role: 'Action', status: 'Styled' },
-  { name: 'Input', role: 'Data entry', status: 'Styled' },
-  { name: 'Alert', role: 'Feedback', status: 'Styled' }
-]
+const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(props.context.messages, key)
 
-const tableColumns = [
-  { accessorKey: 'name', header: 'Component' },
-  { accessorKey: 'role', header: 'Role' },
-  { accessorKey: 'status', header: 'Status' }
-]
+const tableData = computed(() => [
+  { name: 'Button', role: t('data.action'), status: t('data.styled') },
+  { name: 'Input', role: t('data.data_entry'), status: t('data.styled') },
+  { name: 'Alert', role: t('data.feedback'), status: t('data.styled') }
+])
 
-const timelineItems = [
-  { title: 'Tokens', description: 'Set semantic roles.', icon: 'i-lucide-swatch-book' },
-  { title: 'Components', description: 'Apply shared behavior.', icon: 'i-lucide-component' },
-  { title: 'Review', description: 'Check contrast and copy.', icon: 'i-lucide-circle-check' }
-]
+const tableColumns = computed(() => [
+  { accessorKey: 'name', header: t('data.component') },
+  { accessorKey: 'role', header: t('data.role') },
+  { accessorKey: 'status', header: t('forms.reviewStatus') }
+])
 
-const carouselItems = [
-  { title: 'Color', icon: 'i-lucide-palette' },
-  { title: 'Type', icon: 'i-lucide-type' },
-  { title: 'Logo', icon: 'i-lucide-badge-check' }
-]
+const timelineItems = computed(() => [
+  { title: t('data.tokens'), description: t('data.set_semantic_roles'), icon: 'i-lucide-swatch-book' },
+  { title: t('data.components'), description: t('data.apply_shared_behavior'), icon: 'i-lucide-component' },
+  { title: t('data.review'), description: t('data.check_contrast_and_copy'), icon: 'i-lucide-circle-check' }
+])
 
-const listboxItems = [
-  { label: 'Colors', value: 'colors' },
-  { label: 'Typography', value: 'typography' },
-  { label: 'Logos', value: 'logos' },
-  { label: 'Components', value: 'components' },
-  { label: 'Voice', value: 'voice' }
-]
+const carouselItems = computed(() => [
+  { title: t('data.color'), icon: 'i-lucide-palette' },
+  { title: t('data.type'), icon: 'i-lucide-type' },
+  { title: t('data.logo'), icon: 'i-lucide-badge-check' }
+])
+
+const listboxItems = computed(() => [
+  { label: t('data.colors'), value: 'colors' },
+  { label: t('data.typography'), value: 'typography' },
+  { label: t('data.logos'), value: 'logos' },
+  { label: t('data.components'), value: 'components' },
+  { label: t('data.voice'), value: 'voice' }
+])
 </script>
 
 <template>
@@ -53,7 +56,7 @@ const listboxItems = [
     />
     <div class="flex flex-wrap items-center gap-2 text-sm text-muted">
       <UIcon name="i-lucide-circle-check" class="size-4 text-success" />
-      Tables should make comparison easier before color or badges are added.
+      {{ t('data.tables_should_make_comparison_easier_before_color_or_badges_are_added') }}
     </div>
   </div>
 
@@ -63,17 +66,17 @@ const listboxItems = [
     :ui="{ body: 'p-4' }"
   >
     <p class="font-semibold text-highlighted">
-      Reusable pattern
+      {{ t('data.reusable_pattern') }}
     </p>
     <p class="mt-1 text-sm text-muted">
-      Cards contain one object, decision, or tool.
+      {{ t('data.cards_contain_one_object_decision_or_tool') }}
     </p>
   </UCard>
 
   <UPageCard
     v-else-if="props.name === 'page-card'"
-    title="Reusable pattern"
-    description="Use page cards for repeated navigation or documentation entries."
+    :title="t('data.reusable_pattern')"
+    :description="t('data.use_page_cards_for_repeated_navigation_or_documentation_entries')"
     icon="i-lucide-layout-grid"
     :to="props.context.paths.components"
   />
@@ -108,10 +111,10 @@ const listboxItems = [
       <div class="flex items-start justify-between gap-4">
         <div>
           <p class="font-semibold text-highlighted">
-            Reusable pattern
+            {{ t('data.reusable_pattern') }}
           </p>
           <p class="mt-1 text-sm text-muted">
-            A card contains one object, decision, or tool.
+            {{ t('data.a_card_contains_one_object_decision_or_tool') }}
           </p>
         </div>
         <UAvatarGroup>
@@ -126,8 +129,8 @@ const listboxItems = [
       </div>
     </UCard>
     <UPageCard
-      title="Component family"
-      description="Page cards work for linked or repeated page-level entries."
+      :title="t('data.component_family')"
+      :description="t('data.page_cards_work_for_linked_or_repeated_page_level_entries')"
       icon="i-lucide-layout-grid"
       :to="props.context.paths.components"
     />
@@ -141,7 +144,7 @@ const listboxItems = [
   </div>
 
   <div v-else-if="props.name === 'separator'" class="space-y-4">
-    <USeparator label="Token" />
+    <USeparator :label="t('data.token')" />
     <div class="rounded-sm bg-muted px-4 py-3 font-mono text-sm text-toned">
       --ui-primary: primary
     </div>
@@ -150,7 +153,7 @@ const listboxItems = [
   <div v-else-if="props.name === 'collapsible'" class="space-y-3">
     <UCollapsible>
       <UButton
-        label="Show token detail"
+        :label="t('data.show_token_detail')"
         color="neutral"
         variant="outline"
         trailing-icon="i-lucide-chevron-down"
@@ -195,7 +198,7 @@ const listboxItems = [
           {{ item.label }}
         </p>
         <p class="mt-1 text-sm text-muted">
-          Overflow remains reachable without stretching the page.
+          {{ t('data.overflow_remains_reachable_without_stretching_the_page') }}
         </p>
       </UCard>
     </div>
@@ -204,14 +207,14 @@ const listboxItems = [
   <div v-else-if="props.name === 'structure-sequence-pattern'" class="grid gap-7 md:grid-cols-2">
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
-        Optional detail
+        {{ t('data.optional_detail') }}
       </p>
       <p class="text-sm text-muted">
-        Keep supporting notes close without making the first read heavier.
+        {{ t('data.keep_supporting_notes_close_without_making_the_first_read_heavier') }}
       </p>
       <UCollapsible>
         <UButton
-          label="Show token detail"
+          :label="t('data.show_token_detail')"
           color="neutral"
           variant="outline"
           trailing-icon="i-lucide-chevron-down"
@@ -225,19 +228,19 @@ const listboxItems = [
     </div>
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
-        Ordered history
+        {{ t('data.ordered_history') }}
       </p>
       <p class="text-sm text-muted">
-        Use timelines when sequence explains the decision.
+        {{ t('data.use_timelines_when_sequence_explains_the_decision') }}
       </p>
       <UTimeline :items="timelineItems" size="sm" />
     </div>
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
-        Comparable previews
+        {{ t('data.comparable_previews') }}
       </p>
       <p class="text-sm text-muted">
-        Use carousels when nearby items are useful to compare.
+        {{ t('data.use_carousels_when_nearby_items_are_useful_to_compare') }}
       </p>
       <UCarousel
         v-slot="{ item }"
@@ -253,10 +256,10 @@ const listboxItems = [
     </div>
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
-        Overflow reference
+        {{ t('data.overflow_reference') }}
       </p>
       <p class="text-sm text-muted">
-        Scroll long reference lists without stretching the page.
+        {{ t('data.scroll_long_reference_lists_without_stretching_the_page') }}
       </p>
       <UScrollArea class="h-32 rounded-sm border border-default bg-default">
         <div class="divide-y divide-default">
@@ -269,7 +272,7 @@ const listboxItems = [
               {{ item.label }}
             </p>
             <p class="mt-0.5 text-sm text-muted">
-              Reference content stays reachable.
+              {{ t('data.reference_content_stays_reachable') }}
             </p>
           </div>
         </div>

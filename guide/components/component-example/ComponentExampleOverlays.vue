@@ -1,103 +1,108 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { resolveComponentExampleMessage, type ComponentExampleMessageKey, type ComponentExampleContext } from '../../../src/component-examples'
 const props = defineProps<{
+  context: ComponentExampleContext
   name: string
 }>()
 
-const dropdownItems = [
+const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(props.context.messages, key)
+
+const dropdownItems = computed(() => [
   [
-    { label: 'Copy token', icon: 'i-lucide-copy' },
-    { label: 'Open docs', icon: 'i-lucide-arrow-up-right' }
+    { label: t('overlays.copy_token'), icon: 'i-lucide-copy' },
+    { label: t('overlays.open_docs'), icon: 'i-lucide-arrow-up-right' }
   ],
   [
-    { label: 'Archive pattern', icon: 'i-lucide-archive' }
+    { label: t('overlays.archive_pattern'), icon: 'i-lucide-archive' }
   ]
-]
+])
 </script>
 
 <template>
   <UModal
     v-if="props.name === 'modal'"
-    title="Review pattern"
-    description="Use modals for focused decisions."
+    :title="t('overlays.review_pattern')"
+    :description="t('overlays.use_modals_for_focused_decisions')"
   >
-    <UButton label="Open modal" color="neutral" variant="outline" />
+    <UButton :label="t('overlays.open_modal')" color="neutral" variant="outline" />
     <template #body>
       <p class="text-sm text-muted">
-        Modal content should stay direct and easy to close.
+        {{ t('overlays.modal_content_should_stay_direct_and_easy_to_close') }}
       </p>
     </template>
     <template #footer>
-      <UButton label="Save" />
-      <UButton label="Cancel" color="neutral" variant="outline" />
+      <UButton :label="t('actions.save')" />
+      <UButton :label="t('actions.cancel')" color="neutral" variant="outline" />
     </template>
   </UModal>
 
   <USlideover
     v-else-if="props.name === 'slideover'"
-    title="Pattern notes"
-    description="Use slideovers for contextual supporting work."
+    :title="t('overlays.pattern_notes')"
+    :description="t('overlays.use_slideovers_for_contextual_supporting_work')"
   >
-    <UButton label="Open slideover" color="neutral" variant="outline" />
+    <UButton :label="t('overlays.open_slideover')" color="neutral" variant="outline" />
     <template #body>
       <p class="text-sm text-muted">
-        Slideovers support the page instead of replacing it.
+        {{ t('overlays.slideovers_support_the_page_instead_of_replacing_it') }}
       </p>
     </template>
   </USlideover>
 
   <UDrawer
     v-else-if="props.name === 'drawer'"
-    title="Mobile settings"
-    description="Use drawers when the interaction starts near a screen edge."
+    :title="t('overlays.mobile_settings')"
+    :description="t('overlays.use_drawers_when_the_interaction_starts_near_a_screen_edge')"
   >
-    <UButton label="Open drawer" color="neutral" variant="outline" />
+    <UButton :label="t('overlays.open_drawer')" color="neutral" variant="outline" />
     <template #body>
       <p class="text-sm text-muted">
-        Drawer content should stay short and easy to dismiss.
+        {{ t('overlays.drawer_content_should_stay_short_and_easy_to_dismiss') }}
       </p>
     </template>
   </UDrawer>
 
   <div v-else-if="props.name === 'overlay-focused-pattern'" class="grid gap-3 sm:grid-cols-3">
-    <UModal title="Review pattern" description="Use modals for focused decisions.">
-      <UButton label="Open modal" color="neutral" variant="outline" block />
+    <UModal :title="t('overlays.review_pattern')" :description="t('overlays.use_modals_for_focused_decisions')">
+      <UButton :label="t('overlays.open_modal')" color="neutral" variant="outline" block />
       <template #body>
         <p class="text-sm text-muted">
-          Modal content should stay direct and easy to close.
+          {{ t('overlays.modal_content_should_stay_direct_and_easy_to_close') }}
         </p>
       </template>
       <template #footer>
-        <UButton label="Save" />
-        <UButton label="Cancel" color="neutral" variant="outline" />
+        <UButton :label="t('actions.save')" />
+        <UButton :label="t('actions.cancel')" color="neutral" variant="outline" />
       </template>
     </UModal>
-    <USlideover title="Pattern notes" description="Use slideovers for contextual supporting work.">
-      <UButton label="Open slideover" color="neutral" variant="outline" block />
+    <USlideover :title="t('overlays.pattern_notes')" :description="t('overlays.use_slideovers_for_contextual_supporting_work')">
+      <UButton :label="t('overlays.open_slideover')" color="neutral" variant="outline" block />
       <template #body>
         <p class="text-sm text-muted">
-          Slideovers support the page instead of replacing it.
+          {{ t('overlays.slideovers_support_the_page_instead_of_replacing_it') }}
         </p>
       </template>
     </USlideover>
-    <UDrawer title="Mobile settings" description="Use drawers for compact edge-based flows.">
-      <UButton label="Open drawer" color="neutral" variant="outline" block />
+    <UDrawer :title="t('overlays.mobile_settings')" :description="t('overlays.use_drawers_for_compact_edge_based_flows')">
+      <UButton :label="t('overlays.open_drawer')" color="neutral" variant="outline" block />
       <template #body>
         <p class="text-sm text-muted">
-          Drawer content should stay short and easy to dismiss.
+          {{ t('overlays.drawer_content_should_stay_short_and_easy_to_dismiss') }}
         </p>
       </template>
     </UDrawer>
   </div>
 
   <UPopover v-else-if="props.name === 'popover'">
-    <UButton label="Open popover" color="neutral" variant="outline" />
+    <UButton :label="t('overlays.open_popover')" color="neutral" variant="outline" />
     <template #content>
       <div class="w-56 p-4">
         <p class="font-semibold text-highlighted">
-          Compact detail
+          {{ t('overlays.compact_detail') }}
         </p>
         <p class="mt-1 text-sm text-muted">
-          Popovers are useful for small supporting choices.
+          {{ t('overlays.popovers_are_useful_for_small_supporting_choices') }}
         </p>
       </div>
     </template>
@@ -108,7 +113,7 @@ const dropdownItems = [
     :items="dropdownItems"
   >
     <UButton
-      label="Open menu"
+      :label="t('overlays.open_menu')"
       color="neutral"
       variant="outline"
       trailing-icon="i-lucide-chevron-down"
@@ -120,28 +125,28 @@ const dropdownItems = [
     :items="dropdownItems"
   >
     <div class="flex min-h-20 items-center justify-center rounded-sm border border-dashed border-default px-3 text-sm text-muted">
-      Right-click area
+      {{ t('overlays.right_click_area') }}
     </div>
   </UContextMenu>
 
   <div v-else-if="props.name === 'overlay-context-pattern'" class="flex flex-wrap items-center gap-3">
     <UPopover>
-      <UButton label="Open popover" color="neutral" variant="outline" />
+      <UButton :label="t('overlays.open_popover')" color="neutral" variant="outline" />
       <template #content>
         <div class="w-56 p-4">
           <p class="font-semibold text-highlighted">
-            Compact detail
+            {{ t('overlays.compact_detail') }}
           </p>
           <p class="mt-1 text-sm text-muted">
-            Popovers are useful for small supporting choices.
+            {{ t('overlays.popovers_are_useful_for_small_supporting_choices') }}
           </p>
         </div>
       </template>
     </UPopover>
-    <UTooltip text="Clarify compact controls, not required instructions.">
+    <UTooltip :text="t('overlays.clarify_compact_controls_not_required_instructions')">
       <UButton
         icon="i-lucide-info"
-        label="Hover for hint"
+        :label="t('overlays.hover_for_hint')"
         color="neutral"
         variant="outline"
       />
@@ -151,11 +156,11 @@ const dropdownItems = [
   <div v-else-if="props.name === 'overlay-menu-pattern'" class="grid gap-4 sm:grid-cols-2">
     <div class="space-y-3">
       <p class="text-sm font-semibold text-highlighted">
-        Explicit menu
+        {{ t('overlays.explicit_menu') }}
       </p>
       <UDropdownMenu :items="dropdownItems">
         <UButton
-          label="Open menu"
+          :label="t('overlays.open_menu')"
           color="neutral"
           variant="outline"
           trailing-icon="i-lucide-chevron-down"
@@ -164,11 +169,11 @@ const dropdownItems = [
     </div>
     <div class="space-y-3">
       <p class="text-sm font-semibold text-highlighted">
-        Context menu
+        {{ t('overlays.context_menu') }}
       </p>
       <UContextMenu :items="dropdownItems">
         <div class="flex min-h-20 items-center justify-center rounded-sm border border-dashed border-default px-3 text-sm text-muted">
-          Right-click area
+          {{ t('overlays.right_click_area') }}
         </div>
       </UContextMenu>
     </div>

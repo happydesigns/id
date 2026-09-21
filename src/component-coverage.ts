@@ -66,3 +66,21 @@ export function summarizeComponentCoverage(items?: readonly BrandComponentCovera
     byStatus
   }
 }
+
+/** Optional presentation overrides; coverage status values remain stable. */
+export type ComponentCoverageLabels = {
+  family?: string
+  components?: string
+  status?: string
+  notes?: string
+  statuses?: Partial<Record<ComponentCoverageStatus, { label?: string, description?: string }>>
+}
+
+export function resolveComponentCoverageStatus(status: ComponentCoverageStatus, labels?: ComponentCoverageLabels): ComponentCoverageStatusMeta {
+  const fallback = componentCoverageStatusMeta[status]
+  return {
+    ...fallback,
+    label: labels?.statuses?.[status]?.label ?? fallback.label,
+    description: labels?.statuses?.[status]?.description ?? fallback.description
+  }
+}

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { ComponentExampleContext } from '../../../src/component-examples'
+import { resolveComponentExampleMessage, type ComponentExampleMessageKey, type ComponentExampleContext } from '../../../src/component-examples'
 
 const props = defineProps<{
   name: string
   context: ComponentExampleContext
 }>()
+
+const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(props.context.messages, key)
 </script>
 
 <template>
@@ -13,17 +15,17 @@ const props = defineProps<{
     class="flex flex-wrap items-center gap-3"
   >
     <UButton
-      label="Save changes"
+      :label="t('actions.save_changes')"
       icon="i-lucide-save"
     />
     <UButton
-      label="Review pattern"
+      :label="t('actions.review_pattern')"
       color="neutral"
       variant="outline"
     />
-    <UTooltip text="Open component docs">
+    <UTooltip :text="t('actions.open_component_docs')">
       <UButton
-        aria-label="Open docs"
+        :aria-label="t('actions.open_docs')"
         icon="i-lucide-arrow-up-right"
         color="neutral"
         variant="ghost"
@@ -37,7 +39,7 @@ const props = defineProps<{
   >
     <div class="flex flex-wrap items-center gap-3">
       <UButton
-        label="Review queue"
+        :label="t('actions.review_queue')"
         color="neutral"
         variant="outline"
       >
@@ -52,17 +54,17 @@ const props = defineProps<{
         </template>
       </UButton>
       <UBadge color="primary" variant="subtle">
-        Active
+        {{ t('actions.active') }}
       </UBadge>
       <UBadge color="secondary" variant="outline">
-        Editorial
+        {{ t('actions.editorial') }}
       </UBadge>
       <UBadge color="success" variant="subtle">
-        Ready
+        {{ t('actions.ready') }}
       </UBadge>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      <span class="text-sm text-muted">Assigned</span>
+      <span class="text-sm text-muted">{{ t('actions.assigned') }}</span>
       <UChip inset color="success">
         <UAvatar
           :src="props.context.assets.symbol"
@@ -71,9 +73,9 @@ const props = defineProps<{
           size="xs"
         />
       </UChip>
-      <span class="text-sm text-muted">Open search</span>
-      <UKbd>Ctrl</UKbd>
-      <UKbd>K</UKbd>
+      <span class="text-sm text-muted">{{ t('actions.open_search') }}</span>
+      <UKbd>{{ t('actions.ctrl') }}</UKbd>
+      <UKbd>{{ t('actions.k') }}</UKbd>
     </div>
   </div>
 
@@ -82,16 +84,16 @@ const props = defineProps<{
     class="flex flex-wrap items-center gap-3"
   >
     <UButton
-      label="Save changes"
+      :label="t('actions.save_changes')"
       icon="i-lucide-save"
     />
     <UButton
-      label="Review pattern"
+      :label="t('actions.review_pattern')"
       color="neutral"
       variant="outline"
     />
     <UButton
-      aria-label="Open docs"
+      :aria-label="t('actions.open_docs')"
       icon="i-lucide-arrow-up-right"
       color="neutral"
       variant="ghost"
@@ -103,16 +105,16 @@ const props = defineProps<{
     class="flex flex-wrap items-center gap-2"
   >
     <UBadge color="primary" variant="subtle">
-      Active
+      {{ t('actions.active') }}
     </UBadge>
     <UBadge color="secondary" variant="outline">
-      Editorial
+      {{ t('actions.editorial') }}
     </UBadge>
     <UBadge color="success" variant="subtle">
-      Ready
+      {{ t('actions.ready') }}
     </UBadge>
     <UBadge color="warning" variant="subtle">
-      Check contrast
+      {{ t('actions.check_contrast') }}
     </UBadge>
   </div>
 
@@ -127,7 +129,7 @@ const props = defineProps<{
       position="top-right"
     >
       <UButton
-        aria-label="Review alerts"
+        :aria-label="t('actions.review_alerts')"
         icon="i-lucide-bell"
         color="neutral"
         variant="outline"
@@ -155,7 +157,7 @@ const props = defineProps<{
       color="neutral"
       variant="outline"
       icon="i-lucide-copy"
-      aria-label="Copy package"
+      :aria-label="t('actions.copy_package')"
     />
   </UFieldGroup>
 
@@ -163,20 +165,20 @@ const props = defineProps<{
     v-else-if="props.name === 'kbd'"
     class="flex flex-wrap items-center gap-2"
   >
-    <span class="text-sm text-muted">Open search</span>
-    <UKbd>Ctrl</UKbd>
-    <UKbd>K</UKbd>
+    <span class="text-sm text-muted">{{ t('actions.open_search') }}</span>
+    <UKbd>{{ t('actions.ctrl') }}</UKbd>
+    <UKbd>{{ t('actions.k') }}</UKbd>
   </div>
 
   <UTooltip
     v-else-if="props.name === 'tooltip'"
-    text="Open component docs"
+    :text="t('actions.open_component_docs')"
   >
     <UButton
       icon="i-lucide-arrow-up-right"
       color="neutral"
       variant="outline"
-      label="Hover for hint"
+      :label="t('actions.hover_for_hint')"
     />
   </UTooltip>
 </template>

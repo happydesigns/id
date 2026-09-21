@@ -79,6 +79,7 @@ const exampleClass = computed(() => [
 
       <ComponentExampleOverlays
         v-else-if="example?.family === 'overlays'"
+        :context="context"
         :name="props.name"
       />
 

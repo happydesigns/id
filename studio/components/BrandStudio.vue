@@ -22,11 +22,12 @@ import { createStudioPalette, parseStudioSession, contrastRatio } from '../edito
 import type { StudioSession } from '../editor'
 import { studioTemplates, withinStudioRoute } from '../templates'
 import type { StudioDocument } from '../../src/studio'
+import type { StudioHostConfig } from '../../src/studio-host'
 
 useHead({ bodyAttrs: { class: 'id-studio-page' } })
 const route = useRoute()
 const router = useRouter()
-const config = useAppConfig() as unknown as { idStudio?: { document?: StudioDocument, brands?: Record<string, StudioDocument>, sourcePath?: string, home?: string, documentation?: string, host?: { name: string, logo?: { light: string, dark: string, kind?: 'symbol' | 'wordmark' } }, templates?: unknown, packageAsset?: string } }
+const config = useAppConfig() as unknown as { idStudio?: StudioHostConfig }
 const productName = config.idStudio?.host?.name || 'happydesigns/id'
 const productSlash = productName.lastIndexOf('/')
 const productPrefix = productSlash < 0 ? '' : productName.slice(0, productSlash)
@@ -124,7 +125,7 @@ const projects = ref<StudioSession[]>([])
 const brandPickerOpen = ref(false)
 const templatePickerOpen = ref(false)
 const brandSearch = ref('')
-const brandSearchInput = { placeholder: 'Search brands…', 'aria-label': 'Search brands' }
+const brandSearchInput = { placeholder: 'Search brandsâ€¦', 'aria-label': 'Search brands' }
 const createOpen = ref(false)
 const createName = ref('')
 const createError = ref('')
@@ -164,7 +165,7 @@ function saveManagedProject() {
       }
     } else {
       const name = manageName.value.trim()
-      if (!name || name.length > 80) { manageError.value = 'Enter a name of 1–80 characters.'; return }
+      if (!name || name.length > 80) { manageError.value = 'Enter a name of 1â€“80 characters.'; return }
       if ([...catalog.map(item => item.document.theme.label), ...projects.value.filter(item => item.id !== project.id).map(item => item.draft.theme.label)].some(label => label.trim().toLocaleLowerCase() === name.toLocaleLowerCase())) { manageError.value = 'A brand with this name already exists.'; return }
       const renamed = clone(project)
       renamed.draft.theme.label = name
@@ -213,11 +214,11 @@ const customizeButton = ref<{ $el?: HTMLElement }>()
 const logoRole = ref('wordmark')
 const currentLogo = computed(() => draft.value.brand.assets?.logos?.[logoRole.value])
 function removeLogo() { edit(doc => { if (doc.brand.assets?.logos) Reflect.deleteProperty(doc.brand.assets.logos, logoRole.value) }) }
-const logoRoles = [{ label: 'Wordmark · light', value: 'wordmark' }, { label: 'Wordmark · dark', value: 'wordmarkInverse' }, { label: 'Symbol · light', value: 'logo' }, { label: 'Symbol · dark', value: 'logoInverse' }]
+const logoRoles = [{ label: 'Wordmark Â· light', value: 'wordmark' }, { label: 'Wordmark Â· dark', value: 'wordmarkInverse' }, { label: 'Symbol Â· light', value: 'logo' }, { label: 'Symbol Â· dark', value: 'logoInverse' }]
 function brandAction(action: () => void) { brandPickerOpen.value = false; action() }
 const brandActions = computed(() => [
   [{ label: 'Create new brand', icon: resolveIcon('i-lucide-plus'), onSelect: () => brandAction(() => beginCreate()) }, { label: 'Import brand', icon: resolveIcon('i-lucide-folder-open'), onSelect: () => brandAction(() => input.value?.click()) }, { label: 'Duplicate brand', icon: resolveIcon('i-lucide-copy'), onSelect: () => brandAction(() => beginCreate(draft.value)) }, { label: 'Manage brands', icon: resolveIcon('i-lucide-library'), onSelect: () => brandAction(openManager) }],
-  [{ label: 'Reset appearance…', icon: resolveIcon('i-lucide-rotate-ccw'), disabled: readOnly.value || !dirty.value, onSelect: () => brandAction(() => { resetOpen.value = true }) }, { label: 'Open connected project', icon: resolveIcon('i-lucide-folder-sync'), disabled: !writerToken, onSelect: () => brandAction(() => guard(() => loadSource(true))) }]
+  [{ label: 'Reset appearanceâ€¦', icon: resolveIcon('i-lucide-rotate-ccw'), disabled: readOnly.value || !dirty.value, onSelect: () => brandAction(() => { resetOpen.value = true }) }, { label: 'Open connected project', icon: resolveIcon('i-lucide-folder-sync'), disabled: !writerToken, onSelect: () => brandAction(() => guard(() => loadSource(true))) }]
 ])
 function brandDescription(doc: StudioDocument) {
   return doc.brand.packageName && doc.brand.packageName !== '@example/brand' ? doc.brand.packageName : 'Local brand'
@@ -226,7 +227,7 @@ const brandGroups = computed(() => [
   { id: 'brands', label: 'Brands', items: catalog.map(item => {
     const key = catalogPrefix + item.key
     const saved = projects.value.find(project => project.catalogKey === key)
-    return { document: key === catalogKey.value ? draft.value : saved?.draft || item.document, label: key === catalogKey.value ? draft.value.theme.label : saved?.draft.theme.label || item.document.theme.label, icon: key === catalogKey.value ? 'i-lucide-check' : 'i-lucide-palette', description: item.key === 'nuxt-ui' ? 'Starting point' : key === catalogKey.value && connected.value ? 'Connected project' : saved ? 'Browser draft · ' + (item.document.brand.packageName || item.document.brand.name) : 'Configured brand · ' + (item.document.brand.packageName || item.document.brand.name), keywords: item.document.brand.packageName, onSelect: () => pickBrand(() => selectCatalog(item.key)) }
+    return { document: key === catalogKey.value ? draft.value : saved?.draft || item.document, label: key === catalogKey.value ? draft.value.theme.label : saved?.draft.theme.label || item.document.theme.label, icon: key === catalogKey.value ? 'i-lucide-check' : 'i-lucide-palette', description: item.key === 'nuxt-ui' ? 'Starting point' : key === catalogKey.value && connected.value ? 'Connected project' : saved ? 'Browser draft Â· ' + (item.document.brand.packageName || item.document.brand.name) : 'Configured brand Â· ' + (item.document.brand.packageName || item.document.brand.name), keywords: item.document.brand.packageName, onSelect: () => pickBrand(() => selectCatalog(item.key)) }
   }) },
   { id: 'local', label: 'Saved in this browser', items: projects.value.filter(project => !catalog.some(item => project.catalogKey === catalogPrefix + item.key)).map(project => ({ document: project.id === projectId.value ? draft.value : project.draft, label: project.draft.theme.label, description: brandDescription(project.id === projectId.value ? draft.value : project.draft), icon: project.id === projectId.value ? 'i-lucide-check' : 'i-lucide-palette', keywords: project.draft.brand.packageName, onSelect: () => pickBrand(() => restore(project)) })) }
 ])
@@ -302,7 +303,7 @@ function fontOptions(role: string) {
 function title(value: string) { return value.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[-_]/g, ' ').replace(/^./, letter => letter.toUpperCase()) }
 function changeLabel(path: string) {
   if (path.startsWith('theme.ui.colors.')) return `${title(path.slice('theme.ui.colors.'.length))} color`
-  return ({ 'theme.label': 'Brand name', 'brand.name': 'Identifier', 'brand.packageName': 'Package name', 'brand.claim': 'Brand statement' } as Record<string, string>)[path] || title(path.split('.').slice(-2).join(' · '))
+  return ({ 'theme.label': 'Brand name', 'brand.name': 'Identifier', 'brand.packageName': 'Package name', 'brand.claim': 'Brand statement' } as Record<string, string>)[path] || title(path.split('.').slice(-2).join(' Â· '))
 }
 function changeValue(value: unknown) { return value == null ? 'Inherited' : typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value) }
 const fontPresets = [{ label: 'System sans', value: 'system-ui, sans-serif' }, { label: 'System serif', value: 'Georgia, serif' }, { label: 'System mono', value: 'ui-monospace, monospace' }]
@@ -350,7 +351,7 @@ function edit(change: (doc: StudioDocument) => void, field?: string) {
     change(next)
     if (next.theme.label !== draft.value.theme.label) {
       const name = next.theme.label.trim()
-      if (!name || name.length > 80) throw new Error('Enter a name of 1–80 characters.')
+      if (!name || name.length > 80) throw new Error('Enter a name of 1â€“80 characters.')
       const labels = [...catalog.filter(item => catalogPrefix + item.key !== catalogKey.value).map(item => item.document.theme.label), ...projects.value.filter(item => item.id !== projectId.value).map(item => item.draft.theme.label)]
       if (labels.some(label => label.trim().toLocaleLowerCase() === name.toLocaleLowerCase())) throw new Error('A brand with this name already exists.')
       next.theme.label = name
@@ -712,7 +713,7 @@ function paletteColor(name: string, shade: string, color: string) {
   }, field)
 }
 async function shareView() {
-  try { await navigator.clipboard.writeText(window.location.href); notice.value = 'View link copied. It uses the recipient’s brand, not your local draft.' }
+  try { await navigator.clipboard.writeText(window.location.href); notice.value = 'View link copied. It uses the recipientâ€™s brand, not your local draft.' }
   catch { notice.value = 'Copy the current address to share this view. Local brand data is not included.' }
 }
 let applyingQuery = false
@@ -839,7 +840,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
           <span v-if="!productWordmark"><span class="studio-product-prefix">{{ productPrefix }}</span><span>{{ productSuffix }}</span></span>
         </NuxtLink>
       </div>
-      <h1 class="sr-only">{{ draft.theme.label }} — Brand Studio</h1>
+      <h1 class="sr-only">{{ draft.theme.label }} â€” Brand Studio</h1>
       <div class="studio-scenes" aria-label="Preview scene">
         <div class="studio-scene-pill" role="group" aria-label="Brand selection">
         <UDropdownMenu v-model:open="brandPickerOpen" v-model:search-term="brandSearch" :items="brandMenuItems" :filter="brandSearchInput" ignore-filter :modal="false" :content="{ align: 'start' }" :ui="{ content: 'w-80 max-w-[calc(100vw-2rem)]', viewport: 'max-h-[min(65dvh,28rem)]', item: 'gap-3 px-3 py-2.5', itemDescription: 'truncate' }">
@@ -863,13 +864,13 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
         <form v-if="manageTarget" id="studio-manage-brand" class="space-y-4" @submit.prevent="saveManagedProject">
           <template v-if="manageAction === 'delete'">
             <p>Delete the local copy of <strong>{{ manageTarget.draft.theme.label }}</strong>? Its saved draft will be permanently removed.</p>
-            <p class="text-sm text-muted break-words">{{ manageTarget.draft.brand.packageName || manageTarget.draft.brand.name }} · {{ new Date(manageTarget.updatedAt).toLocaleString() }}</p>
+            <p class="text-sm text-muted break-words">{{ manageTarget.draft.brand.packageName || manageTarget.draft.brand.name }} Â· {{ new Date(manageTarget.updatedAt).toLocaleString() }}</p>
           </template>
           <UFormField v-else label="Brand name" required><UInput v-model="manageName" aria-label="Rename brand" maxlength="80" autofocus class="w-full" /></UFormField>
           <UAlert v-if="manageError" color="error" :description="manageError" />
         </form>
         <div v-else class="space-y-4">
-          <UInput v-model="manageSearch" :icon="resolveIcon('i-lucide-search')" placeholder="Search saved brands…" aria-label="Search saved brands" class="w-full" />
+          <UInput v-model="manageSearch" :icon="resolveIcon('i-lucide-search')" placeholder="Search saved brandsâ€¦" aria-label="Search saved brands" class="w-full" />
           <ul class="divide-y divide-default">
             <li v-for="project in managedProjects" :key="project.id" class="flex items-center gap-3 py-3">
               <StudioBrandThumbnail :document="project.draft" />
@@ -914,7 +915,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
             <UFormField :error="fieldErrors['claim']" label="Brand statement"><UTextarea :model-value="draft.brand.claim" :rows="3" class="w-full" @change="edit(doc => { doc.brand.claim = value($event) }, 'claim')" /></UFormField>
             <UFormField label="Logo"><USelect v-model="logoRole" :items="logoRoles" class="w-full" /></UFormField>
             <div v-if="currentLogo" class="rounded border border-default p-4" :class="logoRole.endsWith('Inverse') ? 'bg-gray-900' : 'bg-white'"><img :src="currentLogo.src" :alt="currentLogo.alt || 'Brand logo'" class="mx-auto max-h-16 max-w-full" ></div>
-            <UFileUpload :key="logoRole" accept="image/png,image/jpeg,image/webp" label="Upload image" description="PNG, JPEG or WebP · up to 2 MB" :preview="false" @update:model-value="addLogo" />
+            <UFileUpload :key="logoRole" accept="image/png,image/jpeg,image/webp" label="Upload image" description="PNG, JPEG or WebP Â· up to 2 MB" :preview="false" @update:model-value="addLogo" />
             <UButton v-if="currentLogo" color="neutral" variant="link" @click="removeLogo">Remove image</UButton>
             <UAccordion :items="[{ label: 'Advanced', value: 'metadata' }]"><template #body><div class="studio-form-section">
             <UFormField :error="fieldErrors['identifier']" label="Identifier" help="Lowercase letters, numbers and hyphens"><UInput :model-value="draft.brand.name" class="w-full" @change="edit(doc => { doc.brand.name = value($event); doc.theme.name = value($event) }, 'identifier')" /></UFormField>
@@ -924,7 +925,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
           <template v-if="section.value === 'colors'">
             <UAccordion :items="[{ label: 'Surfaces and contrast', value: 'surfaces' }]"><template #body><div class="studio-form-section"><p class="studio-help">Editing {{ mode }} mode. Empty fields use defaults.</p>
             <IdStudioColorField v-for="entry in [{ name: '--ui-bg', label: 'Page background' }, { name: '--ui-bg-elevated', label: 'Raised surface' }, { name: '--ui-text', label: 'Body text' }, { name: '--ui-border', label: 'Borders' }]" :key="entry.name" :label="entry.label" :model-value="draft.theme.cssVariables?.[mode]?.[entry.name] || ''" :error="fieldErrors[`token:${entry.name}`]" @change="token(entry.name, $event)" />
-            <p v-if="bodyContrast !== undefined" :class="bodyContrast < 4.5 ? 'text-error' : 'text-muted'" class="text-xs" role="status">Body text / page: {{ bodyContrast.toFixed(2) }}:1{{ bodyContrast < 4.5 ? ' — below 4.5:1 for normal text.' : '' }}</p>
+            <p v-if="bodyContrast !== undefined" :class="bodyContrast < 4.5 ? 'text-error' : 'text-muted'" class="text-xs" role="status">Body text / page: {{ bodyContrast.toFixed(2) }}:1{{ bodyContrast < 4.5 ? ' â€” below 4.5:1 for normal text.' : '' }}</p>
             <p v-else class="text-xs text-muted">Body contrast cannot be measured for these color values.</p>
             </div></template></UAccordion>
             <UFormField v-for="role in ['primary', 'neutral', ...studioRoles.filter(role => !['primary', 'neutral'].includes(role))]" :key="role" :label="title(role)">
@@ -1022,7 +1023,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
     </UModal>
     <UModal :open="!!pending" title="Replace this draft?" description="Export your changes first if you want to keep them." @update:open="pending = null"><template #footer><UButton color="neutral" variant="outline" @click="pending = null">Keep editing</UButton><UButton @click="acceptReplacement">Replace draft</UButton></template></UModal>
     <UModal :open="!!leaving" title="Leave Studio?" description="Your changes could not be saved in this browser. Export them before leaving to keep them." @update:open="finishLeaving(false)"><template #footer><UButton color="neutral" variant="outline" @click="finishLeaving(false)">Keep editing</UButton><UButton @click="finishLeaving(true)">Leave Studio</UButton></template></UModal>
-    <UModal v-model:open="resetOpen" title="Reset appearance?" description="Restore this brand’s original colors, typography, icons, component styles and appearance settings. Your name, logos, content and custom palettes are kept. You can undo this reset.">
+    <UModal v-model:open="resetOpen" title="Reset appearance?" description="Restore this brandâ€™s original colors, typography, icons, component styles and appearance settings. Your name, logos, content and custom palettes are kept. You can undo this reset.">
       <template #footer><UButton color="neutral" variant="ghost" @click="resetOpen = false">Cancel</UButton><UButton color="neutral" @click="reset">Reset appearance</UButton></template>
     </UModal>
     <StudioAskAi v-model:open="askAiOpen" :document="draft" />
@@ -1038,7 +1039,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
         </div>
         <div v-else-if="item.value === 'changes'" class="mb-4 divide-y divide-default">
           <p v-if="!changes.length" class="text-sm text-muted">No changes to apply.</p>
-          <div v-for="change in changes" :key="change.path" class="py-2 text-sm"><p class="font-medium">{{ changeLabel(change.path) }}</p><div class="mt-1 whitespace-pre-wrap break-words text-muted">{{ changeValue(change.before) }} → {{ changeValue(change.after) }}</div><code class="mt-1 block break-all text-xs text-dimmed">{{ change.path }}</code></div>
+          <div v-for="change in changes" :key="change.path" class="py-2 text-sm"><p class="font-medium">{{ changeLabel(change.path) }}</p><div class="mt-1 whitespace-pre-wrap break-words text-muted">{{ changeValue(change.before) }} â†’ {{ changeValue(change.after) }}</div><code class="mt-1 block break-all text-xs text-dimmed">{{ change.path }}</code></div>
         </div>
         <div v-else><USelect v-model="codeFormat" aria-label="Code format" :items="[{ label: 'Brand JSON', value: 'source' }, { label: 'CSS', value: 'css' }]" class="mb-3 w-40" /><pre class="studio-export-code studio-source-code leading-relaxed">{{ output }}</pre></div>
         </template></UTabs>
