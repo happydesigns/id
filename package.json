@@ -87,7 +87,8 @@
     "nuxt.layer.config.ts",
     "nuxt.layer.config.mjs",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "scripts/prepare-studio-package.mjs"
   ],
   "publishConfig": {
     "access": "public"
@@ -132,5 +133,8 @@
     "vitest": "^4.1.10",
     "vue-tsc": "^3.3.10",
     "zod-to-json-schema": "^3.25.2"
+  },
+  "bin": {
+    "id-studio-package": "./scripts/prepare-studio-package.mjs"
   }
 }
