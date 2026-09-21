@@ -15,17 +15,17 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
     class="flex flex-wrap items-center gap-3"
   >
     <UButton
-      :label="t('actions.save_changes')"
+      :label="t('actions.saveChanges')"
       icon="i-lucide-save"
     />
     <UButton
-      :label="t('actions.review_pattern')"
+      :label="t('actions.reviewPattern')"
       color="neutral"
       variant="outline"
     />
-    <UTooltip :text="t('actions.open_component_docs')">
+    <UTooltip :text="t('actions.openComponentDocs')">
       <UButton
-        :aria-label="t('actions.open_docs')"
+        :aria-label="t('actions.openDocs')"
         icon="i-lucide-arrow-up-right"
         color="neutral"
         variant="ghost"
@@ -39,7 +39,7 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
   >
     <div class="flex flex-wrap items-center gap-3">
       <UButton
-        :label="t('actions.review_queue')"
+        :label="t('actions.reviewQueue')"
         color="neutral"
         variant="outline"
       >
@@ -73,7 +73,7 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
           size="xs"
         />
       </UChip>
-      <span class="text-sm text-muted">{{ t('actions.open_search') }}</span>
+      <span class="text-sm text-muted">{{ t('actions.openSearch') }}</span>
       <UKbd>{{ t('actions.ctrl') }}</UKbd>
       <UKbd>{{ t('actions.k') }}</UKbd>
     </div>
@@ -84,16 +84,16 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
     class="flex flex-wrap items-center gap-3"
   >
     <UButton
-      :label="t('actions.save_changes')"
+      :label="t('actions.saveChanges')"
       icon="i-lucide-save"
     />
     <UButton
-      :label="t('actions.review_pattern')"
+      :label="t('actions.reviewPattern')"
       color="neutral"
       variant="outline"
     />
     <UButton
-      :aria-label="t('actions.open_docs')"
+      :aria-label="t('actions.openDocs')"
       icon="i-lucide-arrow-up-right"
       color="neutral"
       variant="ghost"
@@ -114,7 +114,7 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
       {{ t('actions.ready') }}
     </UBadge>
     <UBadge color="warning" variant="subtle">
-      {{ t('actions.check_contrast') }}
+      {{ t('actions.checkContrast') }}
     </UBadge>
   </div>
 
@@ -129,7 +129,7 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
       position="top-right"
     >
       <UButton
-        :aria-label="t('actions.review_alerts')"
+        :aria-label="t('actions.reviewAlerts')"
         icon="i-lucide-bell"
         color="neutral"
         variant="outline"
@@ -157,7 +157,7 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
       color="neutral"
       variant="outline"
       icon="i-lucide-copy"
-      :aria-label="t('actions.copy_package')"
+      :aria-label="t('actions.copyPackage')"
     />
   </UFieldGroup>
 
@@ -165,20 +165,20 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
     v-else-if="props.name === 'kbd'"
     class="flex flex-wrap items-center gap-2"
   >
-    <span class="text-sm text-muted">{{ t('actions.open_search') }}</span>
+    <span class="text-sm text-muted">{{ t('actions.openSearch') }}</span>
     <UKbd>{{ t('actions.ctrl') }}</UKbd>
     <UKbd>{{ t('actions.k') }}</UKbd>
   </div>
 
   <UTooltip
     v-else-if="props.name === 'tooltip'"
-    :text="t('actions.open_component_docs')"
+    :text="t('actions.openComponentDocs')"
   >
     <UButton
       icon="i-lucide-arrow-up-right"
       color="neutral"
       variant="outline"
-      :label="t('actions.hover_for_hint')"
+      :label="t('actions.hoverForHint')"
     />
   </UTooltip>
 </template>

@@ -28,21 +28,21 @@ const tabs = computed(() => [
 ])
 
 const stepperItems = computed(() => [
-  { title: t('navigation.base'), description: t('navigation.set_spacing_type_and_color_roles') },
-  { title: t('navigation.identity'), description: t('navigation.choose_the_right_mark_and_voice') },
-  { title: t('navigation.interface'), description: t('navigation.apply_the_system_through_components') }
+  { title: t('navigation.base'), description: t('navigation.baseDescription') },
+  { title: t('navigation.identity'), description: t('navigation.identityDescription') },
+  { title: t('navigation.interface'), description: t('navigation.interfaceDescription') }
 ])
 
 const accordionItems = computed(() => [
   {
-    label: t('navigation.where_should_accent_color_appear'),
+    label: t('navigation.accentQuestion'),
     icon: 'i-lucide-sparkles',
-    content: t('navigation.use_accent_color_for_focus_active_states_and_precise_emphasis_avoid_making_it_the_only_hierarchy_tool')
+    content: t('navigation.accentAnswer')
   },
   {
-    label: t('navigation.what_should_stay_neutral'),
+    label: t('navigation.neutralQuestion'),
     icon: 'i-lucide-square',
-    content: t('navigation.panels_forms_tables_and_navigation_surfaces_should_use_semantic_neutral_surfaces_and_visible_borders')
+    content: t('navigation.neutralAnswer')
   }
 ])
 
@@ -51,9 +51,9 @@ const commandGroups = computed(() => [
     id: 'docs',
     label: t('navigation.docs'),
     items: [
-      { label: t('navigation.open_colors'), icon: 'i-lucide-palette' },
-      { label: t('navigation.open_logos'), icon: 'i-lucide-badge-check' },
-      { label: t('navigation.open_components'), icon: 'i-lucide-component' }
+      { label: t('navigation.openColors'), icon: 'i-lucide-palette' },
+      { label: t('navigation.openLogos'), icon: 'i-lucide-badge-check' },
+      { label: t('navigation.openComponents'), icon: 'i-lucide-component' }
     ]
   }
 ])
@@ -93,7 +93,7 @@ const treeItems = computed(() => [
       :to="props.context.paths.components"
       class="inline-flex items-center gap-2 text-primary hover:text-primary"
     >
-      {{ t('navigation.open_component_system') }}
+      {{ t('navigation.openComponentSystem') }}
       <UIcon name="i-lucide-arrow-right" class="size-4" />
     </ULink>
   </div>
@@ -103,7 +103,7 @@ const treeItems = computed(() => [
     :to="props.context.paths.components"
     class="inline-flex items-center gap-2 text-primary hover:text-primary"
   >
-    {{ t('navigation.open_component_system') }}
+    {{ t('navigation.openComponentSystem') }}
     <UIcon name="i-lucide-arrow-right" class="size-4" />
   </ULink>
 
@@ -159,21 +159,21 @@ const treeItems = computed(() => [
   <div v-else-if="props.name === 'navigation-structure-pattern'" class="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
     <div class="space-y-4">
       <p class="text-sm font-semibold text-highlighted">
-        {{ t('navigation.ordered_guidance') }}
+        {{ t('navigation.orderedGuidance') }}
       </p>
       <UStepper :items="stepperItems" orientation="vertical" class="max-w-md" />
     </div>
     <div class="space-y-5">
       <div class="space-y-3">
         <p class="text-sm font-semibold text-highlighted">
-          {{ t('navigation.optional_detail') }}
+          {{ t('navigation.optionalDetail') }}
         </p>
         <UAccordion :items="accordionItems" />
       </div>
       <div class="grid gap-5">
         <div class="space-y-3">
           <p class="text-sm font-semibold text-highlighted">
-            {{ t('navigation.list_position') }}
+            {{ t('navigation.listPosition') }}
           </p>
           <div class="overflow-x-auto pb-1">
             <UPagination :page="2" :total="30" :items-per-page="10" />
@@ -181,7 +181,7 @@ const treeItems = computed(() => [
         </div>
         <div class="space-y-3">
           <p class="text-sm font-semibold text-highlighted">
-            {{ t('navigation.nested_content') }}
+            {{ t('navigation.nestedContent') }}
           </p>
           <UTree :items="treeItems" class="max-w-sm" />
         </div>
@@ -196,7 +196,7 @@ const treeItems = computed(() => [
       class="max-h-72"
     />
     <p class="text-sm text-muted">
-      {{ t('navigation.command_palettes_are_useful_when_a_product_has_enough_destinations_or_commands_to_justify_fast_search') }}
+      {{ t('navigation.commandHelp') }}
     </p>
   </div>
 </template>

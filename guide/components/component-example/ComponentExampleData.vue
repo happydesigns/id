@@ -11,7 +11,7 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
 
 const tableData = computed(() => [
   { name: 'Button', role: t('data.action'), status: t('data.styled') },
-  { name: 'Input', role: t('data.data_entry'), status: t('data.styled') },
+  { name: 'Input', role: t('data.dataEntry'), status: t('data.styled') },
   { name: 'Alert', role: t('data.feedback'), status: t('data.styled') }
 ])
 
@@ -22,9 +22,9 @@ const tableColumns = computed(() => [
 ])
 
 const timelineItems = computed(() => [
-  { title: t('data.tokens'), description: t('data.set_semantic_roles'), icon: 'i-lucide-swatch-book' },
-  { title: t('data.components'), description: t('data.apply_shared_behavior'), icon: 'i-lucide-component' },
-  { title: t('data.review'), description: t('data.check_contrast_and_copy'), icon: 'i-lucide-circle-check' }
+  { title: t('data.tokens'), description: t('data.tokensDescription'), icon: 'i-lucide-swatch-book' },
+  { title: t('data.components'), description: t('data.componentsDescription'), icon: 'i-lucide-component' },
+  { title: t('data.review'), description: t('data.reviewDescription'), icon: 'i-lucide-circle-check' }
 ])
 
 const carouselItems = computed(() => [
@@ -56,7 +56,7 @@ const listboxItems = computed(() => [
     />
     <div class="flex flex-wrap items-center gap-2 text-sm text-muted">
       <UIcon name="i-lucide-circle-check" class="size-4 text-success" />
-      {{ t('data.tables_should_make_comparison_easier_before_color_or_badges_are_added') }}
+      {{ t('data.tableHelp') }}
     </div>
   </div>
 
@@ -66,17 +66,17 @@ const listboxItems = computed(() => [
     :ui="{ body: 'p-4' }"
   >
     <p class="font-semibold text-highlighted">
-      {{ t('data.reusable_pattern') }}
+      {{ t('data.reusablePattern') }}
     </p>
     <p class="mt-1 text-sm text-muted">
-      {{ t('data.cards_contain_one_object_decision_or_tool') }}
+      {{ t('data.cardDescription') }}
     </p>
   </UCard>
 
   <UPageCard
     v-else-if="props.name === 'page-card'"
-    :title="t('data.reusable_pattern')"
-    :description="t('data.use_page_cards_for_repeated_navigation_or_documentation_entries')"
+    :title="t('data.reusablePattern')"
+    :description="t('data.pageCardDescription')"
     icon="i-lucide-layout-grid"
     :to="props.context.paths.components"
   />
@@ -111,10 +111,10 @@ const listboxItems = computed(() => [
       <div class="flex items-start justify-between gap-4">
         <div>
           <p class="font-semibold text-highlighted">
-            {{ t('data.reusable_pattern') }}
+            {{ t('data.reusablePattern') }}
           </p>
           <p class="mt-1 text-sm text-muted">
-            {{ t('data.a_card_contains_one_object_decision_or_tool') }}
+            {{ t('data.objectCardDescription') }}
           </p>
         </div>
         <UAvatarGroup>
@@ -129,8 +129,8 @@ const listboxItems = computed(() => [
       </div>
     </UCard>
     <UPageCard
-      :title="t('data.component_family')"
-      :description="t('data.page_cards_work_for_linked_or_repeated_page_level_entries')"
+      :title="t('data.componentFamily')"
+      :description="t('data.familyCardDescription')"
       icon="i-lucide-layout-grid"
       :to="props.context.paths.components"
     />
@@ -153,7 +153,7 @@ const listboxItems = computed(() => [
   <div v-else-if="props.name === 'collapsible'" class="space-y-3">
     <UCollapsible>
       <UButton
-        :label="t('data.show_token_detail')"
+        :label="t('data.showTokenDetail')"
         color="neutral"
         variant="outline"
         trailing-icon="i-lucide-chevron-down"
@@ -198,7 +198,7 @@ const listboxItems = computed(() => [
           {{ item.label }}
         </p>
         <p class="mt-1 text-sm text-muted">
-          {{ t('data.overflow_remains_reachable_without_stretching_the_page') }}
+          {{ t('data.overflowHelp') }}
         </p>
       </UCard>
     </div>
@@ -207,14 +207,14 @@ const listboxItems = computed(() => [
   <div v-else-if="props.name === 'structure-sequence-pattern'" class="grid gap-7 md:grid-cols-2">
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
-        {{ t('data.optional_detail') }}
+        {{ t('data.optionalDetail') }}
       </p>
       <p class="text-sm text-muted">
-        {{ t('data.keep_supporting_notes_close_without_making_the_first_read_heavier') }}
+        {{ t('data.detailHelp') }}
       </p>
       <UCollapsible>
         <UButton
-          :label="t('data.show_token_detail')"
+          :label="t('data.showTokenDetail')"
           color="neutral"
           variant="outline"
           trailing-icon="i-lucide-chevron-down"
@@ -228,19 +228,19 @@ const listboxItems = computed(() => [
     </div>
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
-        {{ t('data.ordered_history') }}
+        {{ t('data.orderedHistory') }}
       </p>
       <p class="text-sm text-muted">
-        {{ t('data.use_timelines_when_sequence_explains_the_decision') }}
+        {{ t('data.timelineHelp') }}
       </p>
       <UTimeline :items="timelineItems" size="sm" />
     </div>
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
-        {{ t('data.comparable_previews') }}
+        {{ t('data.comparablePreviews') }}
       </p>
       <p class="text-sm text-muted">
-        {{ t('data.use_carousels_when_nearby_items_are_useful_to_compare') }}
+        {{ t('data.carouselHelp') }}
       </p>
       <UCarousel
         v-slot="{ item }"
@@ -256,10 +256,10 @@ const listboxItems = computed(() => [
     </div>
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
-        {{ t('data.overflow_reference') }}
+        {{ t('data.overflowReference') }}
       </p>
       <p class="text-sm text-muted">
-        {{ t('data.scroll_long_reference_lists_without_stretching_the_page') }}
+        {{ t('data.referenceHelp') }}
       </p>
       <UScrollArea class="h-32 rounded-sm border border-default bg-default">
         <div class="divide-y divide-default">
@@ -272,7 +272,7 @@ const listboxItems = computed(() => [
               {{ item.label }}
             </p>
             <p class="mt-0.5 text-sm text-muted">
-              {{ t('data.reference_content_stays_reachable') }}
+              {{ t('data.referenceContent') }}
             </p>
           </div>
         </div>
