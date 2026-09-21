@@ -969,7 +969,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
           />
           <span
             v-else
-            class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-inverted"
+            class="flex size-5 shrink-0 items-center justify-center text-primary"
           ><UIcon
             name="i-lucide-fingerprint"
             class="size-5"

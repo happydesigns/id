@@ -50,6 +50,7 @@ jobs:
       - run: pnpm pack:studio
       - run: pnpm check:native
       - run: pnpm exec nuxt generate tests/fixtures/guide
+      - run: pnpm docs:build
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:browser
       - name: Check release tag and write checksum

@@ -1,3 +1,4 @@
+import { createStudioDocument } from '../../src/studio'
 import { createNuxtUiAppConfig } from '../../src'
 import {
   sampleBrandTheme,
@@ -10,6 +11,10 @@ const nuxtUiAppConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
 
 export default defineAppConfig({
   idStudio: {
+    home: '/',
+    documentation: '/getting-started/introduction',
+    document: createStudioDocument({ name: 'nuxt-ui', colors: {} }, nuxtUiBrandTheme),
+    host: { name: 'happydesigns/id' },
     templates: { docs: { label: 'Docs', description: 'Docus navigation, search, prose and code examples.', thumbnail: docsThumbnail, owner: 'docus', route: '/getting-started/introduction', routePrefix: '/getting-started' } },
   },
   seo: {
@@ -17,7 +22,7 @@ export default defineAppConfig({
     description: 'Reusable identity contracts, Nuxt UI theme runtime, and brand-layer tooling for Nuxt projects.',
   },
   header: {
-    title: '@happydesigns/id',
+    title: 'happydesigns/id',
   },
   navigation: {
     sub: 'header',

@@ -14,6 +14,12 @@ export default defineConfig({
     env: { PORT: '3439' },
     reuseExistingServer: false,
     timeout: 60_000,
+  }, {
+    command: 'node tests/helpers/serve-static.mjs docs/.output/public',
+    url: 'http://127.0.0.1:3443',
+    env: { PORT: '3443' },
+    reuseExistingServer: false,
+    timeout: 60_000,
   }, ...['violet', 'amber', 'studio'].map((name, index) => ({
     command: 'node tests/helpers/serve-static.mjs .output/native-consumers/' + name,
     url: 'http://127.0.0.1:' + (3440 + index),

@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { createStudioDocument } from '../src/studio'
+import { sampleBrandTheme } from '../themes/sample-brand'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineNuxtConfig } from 'nuxt/config'
@@ -18,7 +21,12 @@ export default defineNuxtConfig({
   ],
   content: {
     _localDatabase: { type: 'sqlite', filename: devServer ? '.data/content/dev.sqlite' : '.data/content/contents.sqlite' },
-  }, buildDir: devServer ? '.nuxt-dev' : '.nuxt',
+  }, appConfig: { idStudio: { brands: {
+    [sampleBrandTheme.name]: createStudioDocument({ name: 'sample-brand', colors: {
+      sample: Object.fromEntries([...readFileSync(resolve(currentDir, '../themes/sample-brand/tokens.css'), 'utf8').matchAll(/--color-sample-(\d+):\s*([^;]+);/g)].map(match => [match[1]!, match[2]!.trim()])),
+    } }, sampleBrandTheme),
+  } } },
+  buildDir: devServer ? '.nuxt-dev' : '.nuxt',
   compatibilityDate: 'latest',
   llms: {
     domain: 'https://id.happydesigns.de',

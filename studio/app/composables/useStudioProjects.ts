@@ -1,7 +1,7 @@
 import { ref, type Ref } from 'vue'
 import { parseStudioSession, type StudioSession } from '../../editor'
 
-const projectPrefix = 'id-studio:project:2:'
+export const projectPrefix = 'id-studio:project:2:'
 
 export function useStudioProjects(notice: Ref<string>) {
   const projects = ref<StudioSession[]>([])
@@ -21,9 +21,11 @@ export function useStudioProjects(notice: Ref<string>) {
   }
   function saveProject(session: StudioSession) {
     localStorage.setItem(projectPrefix + session.id, JSON.stringify(session))
+    window.dispatchEvent(new Event('id-studio-projects-changed'))
   }
   function deleteProject(id: string) {
     localStorage.removeItem(projectPrefix + id)
+    window.dispatchEvent(new Event('id-studio-projects-changed'))
   }
   return { projects, listProjects, saveProject, deleteProject }
 }
