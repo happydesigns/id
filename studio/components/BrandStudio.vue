@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useStudioHistory } from '../composables/useStudioHistory'
 import { useStudioIcon } from "../playground-icons"
 
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -114,8 +115,7 @@ function frameLoaded(frame: HTMLIFrameElement | undefined, doc: StudioDocument, 
 
 watch(scene, () => { failedFrames.value = { original: false, draft: false }; loadedFrames.value = { original: false, draft: false } }, { flush: 'sync' })
 watch(compare, () => { loadedFrames.value.original = false })
-const history = ref<StudioDocument[]>([])
-const future = ref<StudioDocument[]>([])
+const { history, future, record, undo: undoDocument, redo: redoDocument, clear: clearHistory } = useStudioHistory(draft)
 const recovery = ref<StudioSession>()
 watch(recovery, session => {
   if (!session) { toast.remove('studio-recovery'); return }
@@ -358,9 +358,7 @@ function edit(change: (doc: StudioDocument) => void, field?: string) {
     }
     const valid = parseStudioDocument(next)
     if (!diffStudioDocuments(draft.value, valid).length) return
-    history.value.push(clone(draft.value))
-    if (history.value.length > 50) history.value.shift()
-    future.value = []
+    record()
     draft.value = valid
     error.value = ''
   } catch (cause) {
@@ -371,13 +369,11 @@ function edit(change: (doc: StudioDocument) => void, field?: string) {
 }
 function undo() {
   fieldErrors.value = {}
-  const previous = history.value.pop()
-  if (previous) { future.value.push(clone(draft.value)); draft.value = previous }
+  undoDocument()
 }
 function redo() {
   fieldErrors.value = {}
-  const next = future.value.pop()
-  if (next) { history.value.push(clone(draft.value)); draft.value = next }
+  redoDocument()
 }
 const resetOpen = ref(false)
 const randomScope = ref('all')
@@ -448,8 +444,7 @@ function replace(doc: StudioDocument, key?: string) {
   sourceConflict.value = false
   baseline.value = clone(doc)
   draft.value = clone(doc)
-  history.value = []
-  future.value = []
+  clearHistory()
   error.value = ''
   editing.value = !readOnly.value && (typeof route.query.editor === 'string' || route.query.browse === 'false')
   exported.value = undefined
@@ -662,7 +657,7 @@ function restore(session: StudioSession) {
   sourceConflict.value = false
   baseline.value = clone(session.baseline); draft.value = clone(session.draft)
   exported.value = session.exported ? clone(session.exported) : undefined
-  projectId.value = session.id; history.value = []; future.value = []; fieldErrors.value = {}
+  projectId.value = session.id; clearHistory(); fieldErrors.value = {}
   recovery.value = undefined; brandPickerOpen.value = false; editing.value = !readOnly.value && (typeof route.query.editor === 'string' || route.query.browse === 'false')
   persist()
   if (catalogKey.value === catalogPrefix + 'host') loadSource()
