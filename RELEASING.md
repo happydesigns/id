@@ -13,7 +13,7 @@ The native consumer check installs the actual ID tarball into a fresh authoring 
 - pnpm exec playwright install chromium
 - pnpm test:browser
 
-The native check retains its temporary directory and prints its location. Browser failure reports are in playwright-report and test-results. CI uploads those diagnostics on failure.
+The native check retains its temporary directory and prints its location. Browser failure reports are in `.output/tests/report` and `.output/tests/results`. CI uploads those diagnostics on failure.
 
 ## Versioned delivery
 

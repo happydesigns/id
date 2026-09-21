@@ -106,6 +106,8 @@ Prioritize tests for:
 
 If tests are not practical for a change, note the reason in the final summary.
 
+Browser reports and failure artifacts are generated under `.output/tests/`. The static fixture server lives in `tests/helpers/`; these files are test infrastructure, not package runtime.
+
 ## Commits
 
 Use Conventional Commits.
