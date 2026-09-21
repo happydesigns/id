@@ -25,8 +25,6 @@ The native check retains its temporary directory and prints its location. Browse
 
 ID has one versioned package; its private documentation and playground workspaces do not require Changesets. The ecosystem default is Changelogen; Changesets is an option when a repository releases multiple packages with independent or linked versions.
 
-The existing `v0.2.0` tag predates this workflow and is intentionally not moved or rewritten. Its original tag workflow may create a draft; migrating that existing release is a separate reviewed operation. Subsequent versions must use the Changelogen flow above.
-
 Until registry publication, consumers may install the reviewed release tarball as an exact file dependency with a committed lockfile. A checksum identifies the archive bytes; package.json identifies the API version. Do not silently replace an existing released archive.
 
 ## Integration compatibility
