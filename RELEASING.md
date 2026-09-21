@@ -37,6 +37,6 @@ Native Tabs demonstrations with labels only still need actual content slots when
 
 ## Support checks
 
-Release publication also requires the compatibility job: package types and local source operations on Node 24.0.0/Linux and Node 24/Windows. The production integration job remains on Node 24/Linux. These jobs test the supported range's baseline, not every dependency combination.
+Release publication also requires the compatibility job for package types and local source operations on Linux and Windows. CI reads the supported Node range from `package.json`; the explicit minimum-version case in `.github/workflows/verify.yml` must be reviewed when changing that range. These jobs test the baseline, not every dependency combination.
 
 Dependency updates arrive as reviewable Dependabot PRs; they are not merged automatically. Keep the Tiptap overrides coordinated. Remove the Guide hydration workaround only when the fixture passes without it on the supported dependency baseline, as described in tests/fixtures/guide/README.md.

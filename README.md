@@ -19,9 +19,9 @@ The supported path is Studio source → generated native brand → consuming Nux
 
 ## Compatibility
 
-ID currently supports Node 24, Nuxt 4.5.2 or newer within Nuxt 4, Nuxt UI 4.10 or newer within Nuxt UI 4, Vue 3.5.41 or newer within Vue 3, and Tailwind CSS 4.3.3 or newer within Tailwind 4. The optional guide is verified with Docus 5.12.3.
+Supported Node, Nuxt, Nuxt UI, Vue and Tailwind CSS ranges are declared in [`package.json`](package.json), under `engines`, `dependencies` and `peerDependencies`. The optional guide uses the Docus development dependency; [`pnpm-lock.yaml`](pnpm-lock.yaml) records the exact tested versions.
 
-CI checks the locked dependency set on Linux, plus package types and source operations on the minimum Node 24 release and Windows. Isolated package consumers resolve their own dependencies. Newer major versions are not implicitly supported.
+CI checks the locked dependency set on Linux, plus package types and source operations on the minimum supported Node release and Windows. Isolated package consumers resolve their own dependencies. Newer major versions are not implicitly supported.
 
 ## Install
 
