@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useStudioFrames } from '../composables/useStudioFrames'
+import { useStudioProjects } from '../composables/useStudioProjects'
+import { download, exportStudioProject } from '../export'
 import { useStudioHistory } from '../composables/useStudioHistory'
 import { useStudioIcon } from "../playground-icons"
 
@@ -17,7 +20,7 @@ import { paletteRamp } from '../palette'
 import { copyConfig, previewUi, studioShellCss } from '../preview'
 import StudioViewport from './StudioViewport.vue'
 import StudioViewportControls from './StudioViewportControls.vue'
-import { createBlankStudioDocument, createStudioDocument, createStudioArchive, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
+import { createBlankStudioDocument, createStudioDocument, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../src/studio'
 import { nuxtUiBrandTheme } from '../../themes/nuxt-ui'
 import { createStudioPalette, parseStudioSession, contrastRatio } from '../editor'
 import type { StudioSession } from '../editor'
@@ -100,28 +103,15 @@ onBeforeRouteLeave(() => {
   return new Promise<boolean>(resolve => { leaving.value = resolve })
 })
 const input = ref<HTMLInputElement>()
-const frameCache = ref<Record<string, HTMLIFrameElement | undefined>>({})
-const originalFrame = computed(() => frameCache.value[`original:${previewRuntime.value}`])
-const draftFrame = computed(() => frameCache.value[`draft:${previewRuntime.value}`])
-function cacheFrame(frame: unknown, key: string) { frameCache.value[key] = frame instanceof HTMLIFrameElement ? frame : undefined }
-const loadedFrames = ref({ original: false, draft: false })
-const failedFrames = ref({ original: false, draft: false })
-const previewAttempt = ref(0)
-function retryPreview() { failedFrames.value = { original: false, draft: false }; loadedFrames.value = { original: false, draft: false }; previewAttempt.value++ }
-function frameLoaded(frame: HTMLIFrameElement | undefined, doc: StudioDocument, key: 'original' | 'draft') {
-  if (!frame?.contentDocument) { failedFrames.value[key] = true; return }
-  send(frame, doc)
-}
-
-watch(scene, () => { failedFrames.value = { original: false, draft: false }; loadedFrames.value = { original: false, draft: false } }, { flush: 'sync' })
-watch(compare, () => { loadedFrames.value.original = false })
+const storageReady = ref(false)
+const { originalFrame, draftFrame, cacheFrame, loadedFrames, failedFrames, previewAttempt, retryPreview, frameLoaded } = useStudioFrames(previewRuntime, scene, compare, storageReady, send)
 const { history, future, record, undo: undoDocument, redo: redoDocument, clear: clearHistory } = useStudioHistory(draft)
 const recovery = ref<StudioSession>()
 watch(recovery, session => {
   if (!session) { toast.remove('studio-recovery'); return }
   toast.add({ id: 'studio-recovery', title: 'An older draft is available', description: session.draft.theme.label, duration: 0, actions: [{ label: 'Open draft', onClick: () => restore(session) }] })
 })
-const projects = ref<StudioSession[]>([])
+const { projects, listProjects, saveProject, deleteProject } = useStudioProjects(notice)
 const brandPickerOpen = ref(false)
 const templatePickerOpen = ref(false)
 const brandSearch = ref('')
@@ -156,7 +146,7 @@ function saveManagedProject() {
   if (!project) return
   try {
     if (manageAction.value === 'delete') {
-      localStorage.removeItem(projectPrefix + project.id)
+      deleteProject(project.id)
       if (localStorage.getItem(lastProjectKey) === project.id) localStorage.removeItem(lastProjectKey)
       if (recovery.value?.id === project.id) recovery.value = undefined
       if (projectId.value === project.id) {
@@ -170,7 +160,7 @@ function saveManagedProject() {
       const renamed = clone(project)
       renamed.draft.theme.label = name
       renamed.updatedAt = Date.now()
-      localStorage.setItem(projectPrefix + project.id, JSON.stringify(renamed))
+      saveProject(renamed)
       if (recovery.value?.id === project.id) recovery.value = renamed
       if (projectId.value === project.id) edit(doc => { doc.theme.label = name })
     }
@@ -180,16 +170,6 @@ function saveManagedProject() {
 }
 const exported = ref<StudioDocument>()
 const projectId = ref('')
-const storageReady = ref(false)
-watch([loadedFrames, storageReady, compare, previewAttempt], (_value, _previous, cleanup) => {
-  if (!storageReady.value || (loadedFrames.value.draft && (!compare.value || loadedFrames.value.original))) return
-  const timer = setTimeout(() => {
-    if (!loadedFrames.value.draft) failedFrames.value.draft = true
-    if (compare.value && !loadedFrames.value.original) failedFrames.value.original = true
-  }, 30000)
-  cleanup(() => clearTimeout(timer))
-}, { deep: true })
-
 const storedLocally = ref(false)
 const fieldErrors = ref<Record<string, string>>({})
 const previewOptionsOpen = ref(false)
@@ -336,7 +316,6 @@ const dirty = computed(() => changes.value.length > 0)
 const colors = computed(() => Object.keys(draft.value.brand.colors))
 const paletteOptions = computed(() => [...new Set([...colors.value.filter(name => typeof draft.value.brand.colors[name] === 'object'), ...studioBuiltinPalettes])])
 const storageKey = `id-studio:1:${seed.brand.packageName || seed.brand.name}`
-const projectPrefix = 'id-studio:project:2:'
 const lastProjectKey = `${storageKey}:active`
 const needsExport = computed(() => diffStudioDocuments(exported.value || baseline.value, draft.value).length > 0)
 const sourcePath = computed(() => draft.value.brand.name === seed.brand.name ? config.idStudio?.sourcePath || 'brand.studio.json' : 'brand.studio.json')
@@ -589,53 +568,17 @@ function ready(event: MessageEvent) {
   if (event.source === draftFrame.value?.contentWindow) send(draftFrame.value, draft.value)
 }
 function beforeUnload(event: BeforeUnloadEvent) { if (needsExport.value && !storedLocally.value) { event.preventDefault(); event.returnValue = '' } }
-function download(name: string, data: string | Uint8Array, mime = 'application/json') {
-  const payload = typeof data === 'string' ? data : new Uint8Array(data).buffer
-  const url = URL.createObjectURL(new Blob([payload], { type: mime }))
-  const link = Object.assign(window.document.createElement('a'), { href: url, download: name })
-  window.document.body.appendChild(link); link.click(); link.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
-}
 const includeGuide = ref(false)
 async function exportProject() {
   busy.value = true; error.value = ''
   try {
-    const packageAsset = config.idStudio?.packageAsset
-    if (packageAsset && (!/^\/(?!\/)[\w/.-]+\.tgz$/.test(packageAsset) || packageAsset.split('/').includes('..'))) throw new Error('Invalid host package asset.')
-    const files: Record<string, string | Uint8Array> = createStudioProject(draft.value, { bundledPackage: !!packageAsset, guide: includeGuide.value })
-    if (packageAsset) {
-      const response = await fetch(packageAsset, { credentials: 'omit', redirect: 'error' })
-      if (!response.ok) throw new Error('The editor package is unavailable. Ask the host to rebuild it before exporting.')
-      const bytes = new Uint8Array(await response.arrayBuffer())
-      if (bytes.length > 20_000_000 || bytes[0] !== 0x1f || bytes[1] !== 0x8b) throw new Error('The editor package is invalid or too large.')
-      files['vendor/id.tgz'] = bytes
-      files['playground/public/studio-packages/id.tgz'] = bytes
-    }
-    const assets = [...Object.values(draft.value.brand.assets?.logos ?? {}), ...(draft.value.brand.assets?.files ?? [])]
-    for (const asset of assets) {
-      if (!asset || !asset.src.startsWith('/') || files[`public${asset.src}`]) continue
-      const response = await fetch(asset.src, { credentials: 'omit', redirect: 'error' })
-      if (!response.ok || response.headers.get('content-type')?.includes('text/html')) throw new Error(`Asset unavailable: ${asset.src}. Restore this file before exporting a complete project.`)
-      const bytes = new Uint8Array(await response.arrayBuffer())
-      if (bytes.length > 5_000_000) throw new Error(`Asset too large: ${asset.src}`)
-      files[`public${asset.src}`] = bytes
-    }
-    download(`${draft.value.brand.name}.zip`, createStudioArchive(files), 'application/zip')
+    const archive = await exportStudioProject(draft.value, { packageAsset: config.idStudio?.packageAsset, guide: includeGuide.value })
+    download(`${draft.value.brand.name}.zip`, archive, 'application/zip')
     exported.value = clone(draft.value)
     persist()
     notice.value = 'Project downloaded. Apply it to your repository to publish the changes.'
   } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Export failed.' }
   finally { busy.value = false }
-}
-function listProjects() {
-  const saved: StudioSession[] = []
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
-    if (!key?.startsWith(projectPrefix)) continue
-    try { saved.push(parseStudioSession(JSON.parse(localStorage.getItem(key)!))) }
-    catch { notice.value = 'A saved project could not be read. Other projects are still available.' }
-  }
-  projects.value = saved.sort((a, b) => b.updatedAt - a.updatedAt)
 }
 function persist() {
   if (!storageReady.value || !projectId.value || readOnly.value) return
@@ -643,7 +586,7 @@ function persist() {
   storedLocally.value = false
   try {
     const session: StudioSession = { id: projectId.value, baseline: clone(baseline.value), draft: clone(draft.value), exported: exported.value ? clone(exported.value) : undefined, updatedAt: Date.now(), catalogKey: catalogKey.value }
-    localStorage.setItem(projectPrefix + projectId.value, JSON.stringify(session))
+    saveProject(session)
     localStorage.setItem(lastProjectKey, projectId.value)
     storedLocally.value = true
     listProjects()
@@ -735,25 +678,6 @@ onMounted(() => {
     const savedScope = localStorage.getItem(randomScopeKey)
     if (randomScopes.value.some(item => item.value === savedScope)) randomScope.value = savedScope!
   } catch { /* Keep the default when browser storage is unavailable. */ }
-  // A failed iframe has no live Vite client. Recover it when the host receives
-  // a successful update or reconnects after a dev-server restart.
-  if (import.meta.hot) {
-    const hot = import.meta.hot
-    let timer: ReturnType<typeof setTimeout> | undefined
-    const recover = () => {
-      clearTimeout(timer)
-      timer = setTimeout(() => {
-        if (failedFrames.value.draft || (compare.value && failedFrames.value.original)) retryPreview()
-      }, 250)
-    }
-    hot.on('vite:afterUpdate', recover)
-    hot.on('vite:ws:connect', recover)
-    onBeforeUnmount(() => {
-      clearTimeout(timer)
-      hot.off('vite:afterUpdate', recover)
-      hot.off('vite:ws:connect', recover)
-    })
-  }
   const root = window.document.documentElement
   const hostStyle = root.getAttribute('style')
   root.dataset.idStudioTheme = ''
