@@ -24,6 +24,8 @@ function run(command, args, cwd) {
 const author = join(workspace, 'author')
 write(author, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: { '@happydesigns/id': 'file:' + archive.replaceAll('\\', '/') } }))
 run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], author)
+const packed = JSON.parse(readFileSync(join(author, 'node_modules/@happydesigns/id/package.json'), 'utf8'))
+assert.ok(!packed.files.includes('templates/brand-layer/playground'), 'Only explicit starter source directories may be packed')
 write(author, 'generate.mjs', `
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'

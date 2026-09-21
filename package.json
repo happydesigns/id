@@ -89,7 +89,8 @@
     "README.md",
     "LICENSE",
     "scripts/prepare-studio-package.mjs",
-    "templates/brand-layer/playground"
+    "templates/brand-layer/playground/app",
+    "templates/brand-layer/playground/nuxt.config.ts"
   ],
   "publishConfig": {
     "access": "public"
