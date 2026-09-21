@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useStudioIcon, useStudioIcons  } from '../../playground-icons'
-import { usePlaygroundToast } from "../../playground-toast"
+import { useStudioIcon, useStudioIcons } from '../../playground-icons'
+import { usePlaygroundToast } from '../../playground-toast'
 import type { DropdownMenuItem } from '@nuxt/ui'
+
 const studioIcons = useStudioIcons()
 
 const appConfig = useAppConfig()
@@ -16,11 +17,11 @@ const webSearch = ref(true)
 const models = [
   { value: 'opus-5', label: 'Opus 5', description: 'Deep reasoning and hard problems' },
   { value: 'sonnet-5', label: 'Sonnet 5', description: 'Balanced speed and intelligence' },
-  { value: 'haiku-4-5', label: 'Haiku 4.5', description: 'Fastest for everyday tasks' }
+  { value: 'haiku-4-5', label: 'Haiku 4.5', description: 'Fastest for everyday tasks' },
 ]
 const legacyModels = [
   { value: 'opus-4-8', label: 'Opus 4.8' },
-  { value: 'sonnet-4-6', label: 'Sonnet 4.6' }
+  { value: 'sonnet-4-6', label: 'Sonnet 4.6' },
 ]
 const efforts = ['Low', 'Medium', 'High', 'Max']
 
@@ -37,24 +38,28 @@ const modelItems = computed<DropdownMenuItem[][]>(() => [
     checked: model.value === m.value,
     onUpdateChecked() {
       model.value = m.value
-    }
+    },
   })),
   [
     {
       label: 'Legacy models',
-      get icon() { return studioIcons.clock },
+      get icon() {
+        return studioIcons.clock
+      },
       children: legacyModels.map(m => ({
         label: m.label,
         type: 'checkbox',
         checked: model.value === m.value,
         onUpdateChecked() {
           model.value = m.value
-        }
-      }))
+        },
+      })),
     },
     {
       label: 'Effort',
-      get icon() { return studioIcons.zap },
+      get icon() {
+        return studioIcons.zap
+      },
       slot: 'effort',
       children: efforts.map(e => ({
         label: e,
@@ -62,41 +67,53 @@ const modelItems = computed<DropdownMenuItem[][]>(() => [
         checked: effort.value === e,
         onUpdateChecked() {
           effort.value = e
-        }
-      }))
-    }
-  ]
+        },
+      })),
+    },
+  ],
 ])
 
 const items = computed<DropdownMenuItem[][]>(() => [
   [
-    { label: 'Add files or photos', get icon() { return studioIcons.paperclip }, kbds: ['meta', 'U'] },
+    { label: 'Add files or photos', get icon() {
+      return studioIcons.paperclip
+    }, kbds: ['meta', 'U'] },
     {
       label: 'Add to project',
       icon: appConfig.ui.icons.folder,
       children: [
         { label: 'New project', icon: appConfig.ui.icons.plus },
-        { label: 'Nuxt UI', icon: appConfig.ui.icons.folder }
-      ]
-    }
+        { label: 'Nuxt UI', icon: appConfig.ui.icons.folder },
+      ],
+    },
   ],
   [
     {
       label: 'Skills',
-      get icon() { return resolveIcon('i-lucide-shapes') },
+      get icon() {
+        return resolveIcon('i-lucide-shapes')
+      },
       children: [
-        { label: 'Canvas design', get icon() { return studioIcons.palette } },
-        { label: 'Slides', get icon() { return resolveIcon('i-lucide-presentation') } },
-        { label: 'PDF', icon: appConfig.ui.icons.file }
-      ]
+        { label: 'Canvas design', get icon() {
+          return studioIcons.palette
+        } },
+        { label: 'Slides', get icon() {
+          return resolveIcon('i-lucide-presentation')
+        } },
+        { label: 'PDF', icon: appConfig.ui.icons.file },
+      ],
     },
     {
       label: 'Connectors',
-      get icon() { return resolveIcon('i-lucide-blocks') },
+      get icon() {
+        return resolveIcon('i-lucide-blocks')
+      },
       children: [
         [
           { label: 'Add connector', icon: appConfig.ui.icons.plus },
-          { label: 'Manage connectors', get icon() { return studioIcons.briefcase } }
+          { label: 'Manage connectors', get icon() {
+            return studioIcons.briefcase
+          } },
         ],
         [
           {
@@ -107,7 +124,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
             onSelect(e: Event) {
               e.preventDefault()
               awsMarketplace.value = !awsMarketplace.value
-            }
+            },
           },
           {
             label: 'Claude in Chrome',
@@ -117,34 +134,39 @@ const items = computed<DropdownMenuItem[][]>(() => [
             onSelect(e: Event) {
               e.preventDefault()
               claudeInChrome.value = !claudeInChrome.value
-            }
-          }
+            },
+          },
         ],
         [
-          { label: 'Tool access', icon: appConfig.ui.icons.search }
-        ]
-      ]
+          { label: 'Tool access', icon: appConfig.ui.icons.search },
+        ],
+      ],
     },
-    { label: 'Add plugins…', get icon() { return resolveIcon('i-lucide-plug') } }
+    { label: 'Add plugins…', get icon() {
+      return resolveIcon('i-lucide-plug')
+    } },
   ],
   [
     { label: 'Ask Vercel', icon: 'i-simple-icons-vercel' },
-    { label: 'Research', get icon() { return resolveIcon('i-lucide-activity') } },
+    { label: 'Research', get icon() {
+      return resolveIcon('i-lucide-activity')
+    } },
     {
       label: 'Web search',
-      get icon() { return studioIcons.globe },
+      get icon() {
+        return studioIcons.globe
+      },
       type: 'checkbox',
       checked: webSearch.value,
       onUpdateChecked(checked: boolean) {
         webSearch.value = checked
-      }
-    }
-  ]
+      },
+    },
+  ],
 ])
 
 function onSubmit() {
   if (!input.value.trim()) return
-
   toast.add({ title: 'Message sent', description: input.value })
   input.value = ''
 }
@@ -167,7 +189,12 @@ const resolveIcon = useStudioIcon()
     <template #footer>
       <div class="flex items-center justify-between gap-2 w-full">
         <div class="flex items-center gap-1">
-          <UDropdownMenu :items="items" :content="{ align: 'start', side: 'top' }" :ui="{ content: 'w-60' }" size="sm">
+          <UDropdownMenu
+            :items="items"
+            :content="{ align: 'start', side: 'top' }"
+            :ui="{ content: 'w-60' }"
+            size="sm"
+          >
             <UButton
               :icon="appConfig.ui.icons.plus"
               color="neutral"
@@ -178,11 +205,20 @@ const resolveIcon = useStudioIcon()
             />
 
             <template #switch-trailing="{ item }">
-              <USwitch :model-value="(item as DropdownMenuItem).checked" size="sm" tabindex="-1" />
+              <USwitch
+                :model-value="(item as DropdownMenuItem).checked"
+                size="sm"
+                tabindex="-1"
+              />
             </template>
           </UDropdownMenu>
 
-          <UDropdownMenu :items="modelItems" :content="{ align: 'start', side: 'top' }" :ui="{ content: 'w-72' }" size="sm">
+          <UDropdownMenu
+            :items="modelItems"
+            :content="{ align: 'start', side: 'top' }"
+            :ui="{ content: 'w-72' }"
+            size="sm"
+          >
             <UButton
               color="neutral"
               variant="ghost"
@@ -196,7 +232,10 @@ const resolveIcon = useStudioIcon()
 
             <template #effort-trailing="{ ui }">
               <span class="text-dimmed">{{ effort }}</span>
-              <UIcon :name="appConfig.ui.icons.chevronRight" :class="ui.itemTrailingIcon()" />
+              <UIcon
+                :name="appConfig.ui.icons.chevronRight"
+                :class="ui.itemTrailingIcon()"
+              />
             </template>
           </UDropdownMenu>
         </div>

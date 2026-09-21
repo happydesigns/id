@@ -8,14 +8,14 @@ const defaultTheme = defineBrandTheme({
       '--ui-bg': 'white',
       '--ui-text': '#334155',
       '--ui-text-highlighted': '#020617',
-      '--ui-border': '#E2E8F0'
+      '--ui-border': '#E2E8F0',
     },
     dark: {
       '--ui-bg': '#020617',
       '--ui-text': '#E2E8F0',
       '--ui-text-highlighted': 'white',
-      '--ui-border': '#1E293B'
-    }
+      '--ui-border': '#1E293B',
+    },
   },
   ui: {
     colors: {
@@ -25,9 +25,9 @@ const defaultTheme = defineBrandTheme({
       info: 'sky',
       warning: 'amber',
       error: 'red',
-      neutral: 'slate'
-    }
-  }
+      neutral: 'slate',
+    },
+  },
 })
 
 const nuxtUiConfig = createNuxtUiAppConfig(defaultTheme)
@@ -35,7 +35,7 @@ const nuxtUiConfig = createNuxtUiAppConfig(defaultTheme)
 export default defineAppConfig({
   id: {
     name: defaultTheme.name,
-    theme: defaultTheme
+    theme: defaultTheme,
   },
-  ui: nuxtUiConfig.ui
+  ui: nuxtUiConfig.ui,
 })

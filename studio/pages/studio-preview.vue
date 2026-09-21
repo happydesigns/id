@@ -69,22 +69,32 @@ function receive(event: MessageEvent) {
         const canvas = window.document.createElement('canvas')
         canvas.width = canvas.height = 1
         const context = canvas.getContext('2d')!
-        context.fillStyle = value; context.fillRect(0, 0, 1, 1)
+        context.fillStyle = value
+        context.fillRect(0, 0, 1, 1)
         const [r, g, b, alpha] = context.getImageData(0, 0, 1, 1).data
         return alpha === 255 ? `rgb(${r}, ${g}, ${b})` : ''
       }
       window.parent.postMessage({ type: 'id-studio-colors', foreground: srgb(styles.color), background: srgb(styles.backgroundColor) }, window.location.origin)
       window.parent.postMessage({ type: 'id-studio-rendered' }, window.location.origin)
     })))
-  } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Preview unavailable.'; window.parent.postMessage({ type: 'id-studio-preview-error' }, window.location.origin) }
+  }
+  catch (cause) {
+    error.value = cause instanceof Error ? cause.message : 'Preview unavailable.'
+    window.parent.postMessage({ type: 'id-studio-preview-error' }, window.location.origin)
+  }
 }
-function notifyPointer() { window.parent.postMessage({ type: 'id-studio-pointer' }, window.location.origin) }
+function notifyPointer() {
+  window.parent.postMessage({ type: 'id-studio-pointer' }, window.location.origin)
+}
 onMounted(() => {
   window.document.addEventListener('pointerdown', notifyPointer, true)
   window.addEventListener('message', receive)
   window.parent.postMessage({ type: 'id-studio-ready', frame: route.query.frame }, window.location.origin)
 })
-onBeforeUnmount(() => { window.removeEventListener('message', receive); window.document.removeEventListener('pointerdown', notifyPointer, true) })
+onBeforeUnmount(() => {
+  window.removeEventListener('message', receive)
+  window.document.removeEventListener('pointerdown', notifyPointer, true)
+})
 </script>
 
 <template>

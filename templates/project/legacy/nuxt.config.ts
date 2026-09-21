@@ -8,11 +8,11 @@ writeFileSync(stylesheet, [
   '@import "tailwindcss";',
   '@import "@nuxt/ui";',
   '@source "../../../brand.studio.json";',
-  createStudioCss(parseStudioDocument(source))
+  createStudioCss(parseStudioDocument(source)),
 ].join('\n'))
 
 export default defineNuxtConfig({
   extends: ['@happydesigns/id/nuxt'],
   css: [stylesheet],
-  compatibilityDate: '2026-08-01'
+  compatibilityDate: '2026-08-01',
 })

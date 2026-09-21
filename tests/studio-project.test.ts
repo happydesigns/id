@@ -49,8 +49,10 @@ describe('connected brand source', () => {
   })
   it('serializes simultaneous writes to the same source', async () => {
     const item = await source()
-    const left = structuredClone(item.document); left.theme.label = 'Left'
-    const right = structuredClone(item.document); right.theme.label = 'Right'
+    const left = structuredClone(item.document)
+    left.theme.label = 'Left'
+    const right = structuredClone(item.document)
+    right.theme.label = 'Right'
     const results = await Promise.allSettled([writeStudioSource(item.path, item.revision, left), writeStudioSource(item.path, item.revision, right)])
     expect(results.filter(result => result.status === 'fulfilled')).toHaveLength(1)
     const accepted = results.find(result => result.status === 'fulfilled')

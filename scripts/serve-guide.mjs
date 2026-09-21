@@ -8,12 +8,26 @@ const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/ja
 createServer((request, response) => {
   try {
     const path = resolve(root, '.' + decodeURIComponent(new URL(request.url, 'http://localhost').pathname))
-    if (path !== root && !path.startsWith(root + sep)) { response.writeHead(403).end(); return }
-    const file = [path, path + '.html', resolve(path, 'index.html')].find(candidate => {
-      try { return statSync(candidate).isFile() } catch { return false }
+    if (path !== root && !path.startsWith(root + sep)) {
+      response.writeHead(403).end()
+      return
+    }
+    const file = [path, path + '.html', resolve(path, 'index.html')].find((candidate) => {
+      try {
+        return statSync(candidate).isFile()
+      }
+      catch {
+        return false
+      }
     })
-    if (!file) { response.writeHead(404).end(); return }
+    if (!file) {
+      response.writeHead(404).end()
+      return
+    }
     response.setHeader('Content-Type', types[extname(file)] || 'application/octet-stream')
     response.end(readFileSync(file))
-  } catch { response.writeHead(400).end() }
+  }
+  catch {
+    response.writeHead(400).end()
+  }
 }).listen(Number(process.env.PORT || 3439), '127.0.0.1', () => console.log('Guide fixture ready'))

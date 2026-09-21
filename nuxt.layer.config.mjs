@@ -6,24 +6,24 @@ const currentDir = dirname(fileURLToPath(import.meta.url))
 
 export default defineNuxtConfig({
   $meta: {
-    name: '@happydesigns/id'
+    name: '@happydesigns/id',
   },
 
   modules: [
-    '@nuxt/ui'
+    '@nuxt/ui',
   ],
 
   components: [
     {
       path: resolve(currentDir, './app/components'),
       pathPrefix: false,
-      prefix: 'Id'
-    }
+      prefix: 'Id',
+    },
   ],
 
   css: [
-    resolve(currentDir, './app/assets/css/id.css')
+    resolve(currentDir, './app/assets/css/id.css'),
   ],
 
-  compatibilityDate: 'latest'
+  compatibilityDate: 'latest',
 })

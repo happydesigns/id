@@ -4,7 +4,9 @@ export function download(name: string, data: string | Uint8Array, mime = 'applic
   const payload = typeof data === 'string' ? data : new Uint8Array(data).buffer
   const url = URL.createObjectURL(new Blob([payload], { type: mime }))
   const link = Object.assign(window.document.createElement('a'), { href: url, download: name })
-  window.document.body.appendChild(link); link.click(); link.remove()
+  window.document.body.appendChild(link)
+  link.click()
+  link.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 

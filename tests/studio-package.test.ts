@@ -34,7 +34,8 @@ describe('reviewed Studio package provisioning', () => {
       const other = archive('@example/other')
       writeFileSync(source, other)
       expect(() => run(createHash('sha256').update(other).digest('hex'))).toThrow(/versioned @happydesigns\/id/)
-    } finally {
+    }
+    finally {
       rmSync(directory, { recursive: true, force: true })
     }
   })

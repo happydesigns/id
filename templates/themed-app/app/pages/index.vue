@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'ThemedAppHomePage'
+  name: 'ThemedAppHomePage',
 })
 
 const { currentTheme } = useBrandTheme()
@@ -32,7 +32,10 @@ const { currentTheme } = useBrandTheme()
             <h2 class="text-base font-semibold text-highlighted">
               Active theme
             </h2>
-            <UBadge color="primary" variant="subtle">
+            <UBadge
+              color="primary"
+              variant="subtle"
+            >
               {{ currentTheme?.label }}
             </UBadge>
           </div>

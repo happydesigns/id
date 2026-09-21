@@ -20,23 +20,23 @@ export const componentCoverageStatusMeta: Record<ComponentCoverageStatus, Compon
   planned: {
     label: 'Planned',
     description: 'The family is identified but not styled or documented.',
-    color: 'neutral'
+    color: 'neutral',
   },
   tokenized: {
     label: 'Tokenized',
     description: 'The family uses shared tokens and Nuxt UI defaults.',
-    color: 'info'
+    color: 'info',
   },
   documented: {
     label: 'Documented',
     description: 'The family has visible usage guidance.',
-    color: 'primary'
+    color: 'primary',
   },
   verified: {
     label: 'Verified',
     description: 'The family passed visual QA across light, dark, desktop, and mobile.',
-    color: 'success'
-  }
+    color: 'success',
+  },
 }
 
 export function normalizeComponentCoverage(items?: readonly BrandComponentCoverage[] | null): BrandComponentCoverage[] {
@@ -45,7 +45,7 @@ export function normalizeComponentCoverage(items?: readonly BrandComponentCovera
       ...item,
       family: item.family.trim(),
       components: item.components.map(component => component.trim()).filter(Boolean),
-      notes: item.notes?.trim()
+      notes: item.notes?.trim(),
     }))
     .filter(item => item.family && item.components.length > 0)
 }
@@ -53,17 +53,15 @@ export function normalizeComponentCoverage(items?: readonly BrandComponentCovera
 export function summarizeComponentCoverage(items?: readonly BrandComponentCoverage[] | null): ComponentCoverageSummary {
   const normalized = normalizeComponentCoverage(items)
   const byStatus = Object.fromEntries(
-    componentCoverageStatuses.map(status => [status, 0])
+    componentCoverageStatuses.map(status => [status, 0]),
   ) as Record<ComponentCoverageStatus, number>
-
   for (const item of normalized) {
     byStatus[item.status] += 1
   }
-
   return {
     families: normalized.length,
     components: normalized.reduce((total, item) => total + item.components.length, 0),
-    byStatus
+    byStatus,
   }
 }
 
@@ -81,6 +79,6 @@ export function resolveComponentCoverageStatus(status: ComponentCoverageStatus, 
   return {
     ...fallback,
     label: labels?.statuses?.[status]?.label ?? fallback.label,
-    description: labels?.statuses?.[status]?.description ?? fallback.description
+    description: labels?.statuses?.[status]?.description ?? fallback.description,
   }
 }

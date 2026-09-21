@@ -27,7 +27,10 @@ let settled = false
 
 function finish() {
   clearTimeout(timeout)
-  if (!settled) { settled = true; emit('settled') }
+  if (!settled) {
+    settled = true
+    emit('settled')
+  }
 }
 function send() {
   frame.value?.contentWindow?.postMessage({
@@ -37,27 +40,40 @@ function send() {
     page: props.template.pages[0]?.id || 'home',
     path: props.template.route,
     mode: props.mode,
-    state: 'default'
+    state: 'default',
   }, window.location.origin)
 }
 function receive(event: MessageEvent) {
   if (event.origin !== window.location.origin || event.source !== frame.value?.contentWindow) return
   if (event.data?.type === 'id-studio-ready') send()
-  if (event.data?.type === 'id-studio-rendered') { ready.value = true; finish() }
-  if (event.data?.type === 'id-studio-preview-error') { failed.value = true; finish() }
+  if (event.data?.type === 'id-studio-rendered') {
+    ready.value = true
+    finish()
+  }
+  if (event.data?.type === 'id-studio-preview-error') {
+    failed.value = true
+    finish()
+  }
   // Navigation, pointer events and mode changes never leave a thumbnail.
 }
 watch(() => [props.enabled, visible.value], () => {
   if (!props.enabled || !visible.value || started.value) return
   started.value = true
-  timeout = setTimeout(() => { failed.value = true; finish() }, 15000)
+  timeout = setTimeout(() => {
+    failed.value = true
+    finish()
+  }, 15000)
 })
 watch(() => [props.document, props.mode], send, { deep: true })
 onMounted(() => {
   window.addEventListener('message', receive)
-  observer = new IntersectionObserver(entries => { visible.value = entries.some(entry => entry.isIntersecting) })
+  observer = new IntersectionObserver((entries) => {
+    visible.value = entries.some(entry => entry.isIntersecting)
+  })
   observer.observe(container.value!)
-  resize = new ResizeObserver(entries => { width.value = entries[0]!.contentRect.width })
+  resize = new ResizeObserver((entries) => {
+    width.value = entries[0]!.contentRect.width
+  })
   resize.observe(container.value!)
 })
 onBeforeUnmount(() => {
@@ -69,7 +85,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <span ref="container" class="template-thumbnail" aria-hidden="true" inert :data-preview-state="failed ? 'failed' : ready ? 'ready' : 'loading'">
+  <span
+    ref="container"
+    class="template-thumbnail"
+    aria-hidden="true"
+    inert
+    :data-preview-state="failed ? 'failed' : ready ? 'ready' : 'loading'"
+  >
     <iframe
       v-if="started && !failed"
       ref="frame"
@@ -80,9 +102,23 @@ onBeforeUnmount(() => {
       @load="send"
       @error="failed = true; finish()"
     />
-    <img v-if="failed && template.thumbnail" :src="template.thumbnail" alt="" class="fallback">
-    <span v-else-if="failed" class="placeholder text-muted"><UIcon name="i-lucide-image-off" class="size-6" /></span>
-    <span v-else-if="!ready" class="placeholder"><USkeleton class="h-full w-full rounded-none" /></span>
+    <img
+      v-if="failed && template.thumbnail"
+      :src="template.thumbnail"
+      alt=""
+      class="fallback"
+    >
+    <span
+      v-else-if="failed"
+      class="placeholder text-muted"
+    ><UIcon
+      name="i-lucide-image-off"
+      class="size-6"
+    /></span>
+    <span
+      v-else-if="!ready"
+      class="placeholder"
+    ><USkeleton class="h-full w-full rounded-none" /></span>
   </span>
 </template>
 

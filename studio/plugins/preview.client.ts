@@ -33,7 +33,7 @@ export default defineNuxtPlugin({
     let pendingMessage: MessageEvent | undefined
     useHead({ htmlAttrs: { 'data-id-preview': status }, style: [{ key: 'id-studio-route-preview', textContent: style }], meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
     const post = (message: Record<string, unknown>) => window.parent.postMessage({ ...message, scene: template.id }, window.location.origin)
-    const stopNavigation = router.beforeEach(to => {
+    const stopNavigation = router.beforeEach((to) => {
       if (!withinStudioRoute(to.path, template.routePrefix!)) return false
       if (to.query.idPreview !== template.id) return { ...to, query: { ...to.query, idPreview: template.id, frame: initial.query.frame } }
     })
@@ -46,7 +46,7 @@ export default defineNuxtPlugin({
     })
     // Report user preference, not the resolved system appearance. Synchronous
     // observation lets parent updates be suppressed without a feedback loop.
-    const stopMode = watch(() => colorMode.preference, value => {
+    const stopMode = watch(() => colorMode.preference, (value) => {
       if (!applying && active && ['light', 'dark', 'system'].includes(value)) post({ type: 'id-studio-mode', mode: value })
     }, { flush: 'sync' })
     function applyMode(data: { preference?: string, mode?: string }) {
@@ -61,7 +61,10 @@ export default defineNuxtPlugin({
         return
       }
       if (event.source !== window.parent || event.origin !== window.location.origin || event.data?.type !== 'id-studio-preview' || event.data.scene !== template!.id) return
-      if (nuxtApp.isHydrating) { pendingMessage = event; return }
+      if (nuxtApp.isHydrating) {
+        pendingMessage = event
+        return
+      }
       try {
         const doc = parseStudioDocument(event.data.document)
         applying = true
@@ -70,7 +73,11 @@ export default defineNuxtPlugin({
         config.brand = { name: doc.theme.label ?? doc.brand.name, assets: doc.brand.assets }
         // Guide components must describe the same source as the rendered draft.
         if (config.idStudio) config.idStudio.document = doc
-        if (config.id) { config.id.theme = doc.theme; config.id.themes = []; config.id.assets = doc.brand.assets }
+        if (config.id) {
+          config.id.theme = doc.theme
+          config.id.themes = []
+          config.id.assets = doc.brand.assets
+        }
         style.value = studioPreviewCss(doc)
         applyMode(event.data)
         active = true
@@ -78,16 +85,30 @@ export default defineNuxtPlugin({
         await nextTick()
         status.value = 'ready'
         requestAnimationFrame(() => requestAnimationFrame(() => post({ type: 'id-studio-rendered' })))
-      } catch { post({ type: 'id-studio-preview-error', message: 'The documentation preview could not apply this brand.' }) }
-      finally { applying = false }
+      }
+      catch {
+        post({ type: 'id-studio-preview-error', message: 'The documentation preview could not apply this brand.' })
+      }
+      finally {
+        applying = false
+      }
     }
     const notifyPointer = () => post({ type: 'id-studio-pointer' })
     window.document.addEventListener('pointerdown', notifyPointer, true)
     window.addEventListener('message', receive)
     onNuxtReady(() => {
-      if (pendingMessage) { receive(pendingMessage); pendingMessage = undefined }
+      if (pendingMessage) {
+        receive(pendingMessage)
+        pendingMessage = undefined
+      }
       else post({ type: 'id-studio-ready' })
     })
-    if (import.meta.hot) import.meta.hot.dispose(() => { window.document.removeEventListener('pointerdown', notifyPointer, true); window.removeEventListener('message', receive); stopNavigation(); stopAfter(); stopMode() })
-  }
+    if (import.meta.hot) import.meta.hot.dispose(() => {
+      window.document.removeEventListener('pointerdown', notifyPointer, true)
+      window.removeEventListener('message', receive)
+      stopNavigation()
+      stopAfter()
+      stopMode()
+    })
+  },
 })

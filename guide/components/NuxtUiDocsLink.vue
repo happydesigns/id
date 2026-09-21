@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<{
   label?: string
 }>(), {
   links: undefined,
-  label: 'Docs'
+  label: 'Docs',
 })
 
 const links = computed(() => parseDocsLinks(props.links))
@@ -16,7 +16,10 @@ const getLabel = (link: DocsLink) => link.label || props.label
 </script>
 
 <template>
-  <div v-if="links.length" class="not-prose -mt-1 mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
+  <div
+    v-if="links.length"
+    class="not-prose -mt-1 mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs"
+  >
     <span class="font-mono uppercase tracking-[0.14em] text-dimmed">Nuxt UI reference</span>
     <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
       <ULink
@@ -28,9 +31,15 @@ const getLabel = (link: DocsLink) => link.label || props.label
         class="inline-flex items-center gap-1.5 font-medium text-muted hover:text-highlighted"
         :aria-label="`Open ${getLabel(link)} in Nuxt UI docs`"
       >
-        <UIcon name="i-simple-icons-nuxtdotjs" class="size-3.5 text-primary" />
+        <UIcon
+          name="i-simple-icons-nuxtdotjs"
+          class="size-3.5 text-primary"
+        />
         <span>{{ getLabel(link) }}</span>
-        <UIcon name="i-lucide-arrow-up-right" class="size-3" />
+        <UIcon
+          name="i-lucide-arrow-up-right"
+          class="size-3"
+        />
       </ULink>
     </div>
   </div>

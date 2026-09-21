@@ -7,7 +7,6 @@ const clone = (document: StudioDocument): StudioDocument => JSON.parse(JSON.stri
 export function useStudioHistory(draft: Ref<StudioDocument>) {
   const history = ref<StudioDocument[]>([])
   const future = ref<StudioDocument[]>([])
-
   function record() {
     history.value.push(clone(draft.value))
     if (history.value.length > 50) history.value.shift()

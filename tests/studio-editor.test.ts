@@ -32,6 +32,6 @@ describe('Studio authoring tools', () => {
     const files = createStudioProject(createBlankStudioDocument(), { bundledPackage: true })
     expect(JSON.parse(files['package.json']!).devDependencies['@happydesigns/id']).toBe('file:./vendor/id.tgz')
     expect(files['README.md']).toContain('bundled in vendor/id.tgz')
-    expect(files['playground/nuxt.config.ts']).toContain("packageAsset: '/studio-packages/id.tgz'")
+    expect(files['playground/nuxt.config.ts']).toContain('packageAsset: \'/studio-packages/id.tgz\'')
   })
 })

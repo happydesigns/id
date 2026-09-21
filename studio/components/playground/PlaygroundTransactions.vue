@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { useStudioIcon, useStudioIcons  } from '../../playground-icons'
+import { useStudioIcon, useStudioIcons } from '../../playground-icons'
 
 const studioIcons = useStudioIcons()
 
 const transactions = [
-  { name: 'Stripe Payout', category: 'Income', get icon() { return resolveIcon('i-lucide-arrow-down-left') }, amount: 2400.00 },
-  { name: 'Blue Bottle Coffee', category: 'Food & Drink', get icon() { return studioIcons.coffee }, amount: -8.50 },
-  { name: 'Whole Foods Market', category: 'Groceries', get icon() { return studioIcons.cart }, amount: -64.20 },
-  { name: 'Netflix', category: 'Entertainment', get icon() { return studioIcons.movie }, amount: -19.99 }
+  { name: 'Stripe Payout', category: 'Income', get icon() {
+    return resolveIcon('i-lucide-arrow-down-left')
+  }, amount: 2400.00 },
+  { name: 'Blue Bottle Coffee', category: 'Food & Drink', get icon() {
+    return studioIcons.coffee
+  }, amount: -8.50 },
+  { name: 'Whole Foods Market', category: 'Groceries', get icon() {
+    return studioIcons.cart
+  }, amount: -64.20 },
+  { name: 'Netflix', category: 'Entertainment', get icon() {
+    return studioIcons.movie
+  }, amount: -19.99 },
 ]
 
 function format(amount: number) {
@@ -31,9 +39,16 @@ const resolveIcon = useStudioIcon()
     <USeparator />
 
     <ul class="divide-y divide-default">
-      <li v-for="transaction in transactions" :key="transaction.name" class="flex items-center gap-3 px-4 py-2.5">
+      <li
+        v-for="transaction in transactions"
+        :key="transaction.name"
+        class="flex items-center gap-3 px-4 py-2.5"
+      >
         <div class="flex items-center justify-center size-8 rounded-full bg-elevated text-muted shrink-0">
-          <UIcon :name="transaction.icon" class="size-4" />
+          <UIcon
+            :name="transaction.icon"
+            class="size-4"
+          />
         </div>
         <div class="min-w-0 flex-1">
           <p class="text-sm font-medium text-highlighted truncate">
@@ -43,7 +58,10 @@ const resolveIcon = useStudioIcon()
             {{ transaction.category }}
           </p>
         </div>
-        <span class="text-sm font-medium" :class="transaction.amount < 0 ? 'text-highlighted' : 'text-success'">
+        <span
+          class="text-sm font-medium"
+          :class="transaction.amount < 0 ? 'text-highlighted' : 'text-success'"
+        >
           {{ format(transaction.amount) }}
         </span>
       </li>

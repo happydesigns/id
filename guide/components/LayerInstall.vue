@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import {
   createLayerInstallSnippets,
-  type LayerInstallPackageManager
+  type LayerInstallPackageManager,
 } from '../../src/layer-install'
 
 const props = withDefaults(defineProps<{
@@ -17,17 +17,17 @@ const props = withDefaults(defineProps<{
   packageManager: 'pnpm',
   eyebrow: 'Installation',
   title: 'Install the Nuxt layer.',
-  badge: undefined
+  badge: undefined,
 })
 
 const snippets = computed(() => createLayerInstallSnippets({
   packageName: props.packageName,
   layer: props.layer,
-  packageManager: props.packageManager
+  packageManager: props.packageManager,
 }))
 
 const prosePreUi = {
-  copy: 'hidden sm:inline-flex'
+  copy: 'hidden sm:inline-flex',
 }
 </script>
 

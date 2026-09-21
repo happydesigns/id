@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { resolveComponentExampleMessage, type ComponentExampleMessageKey, type ComponentExampleContext } from '../../../src/component-examples'
+
 const props = defineProps<{
   context: ComponentExampleContext
   name: string
@@ -11,11 +12,11 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
 const dropdownItems = computed(() => [
   [
     { label: t('overlays.copyToken'), icon: 'i-lucide-copy' },
-    { label: t('overlays.openDocs'), icon: 'i-lucide-arrow-up-right' }
+    { label: t('overlays.openDocs'), icon: 'i-lucide-arrow-up-right' },
   ],
   [
-    { label: t('overlays.archivePattern'), icon: 'i-lucide-archive' }
-  ]
+    { label: t('overlays.archivePattern'), icon: 'i-lucide-archive' },
+  ],
 ])
 </script>
 
@@ -25,7 +26,11 @@ const dropdownItems = computed(() => [
     :title="t('overlays.reviewPattern')"
     :description="t('overlays.modalDescription')"
   >
-    <UButton :label="t('overlays.openModal')" color="neutral" variant="outline" />
+    <UButton
+      :label="t('overlays.openModal')"
+      color="neutral"
+      variant="outline"
+    />
     <template #body>
       <p class="text-sm text-muted">
         {{ t('overlays.modalBody') }}
@@ -33,7 +38,11 @@ const dropdownItems = computed(() => [
     </template>
     <template #footer>
       <UButton :label="t('actions.save')" />
-      <UButton :label="t('actions.cancel')" color="neutral" variant="outline" />
+      <UButton
+        :label="t('actions.cancel')"
+        color="neutral"
+        variant="outline"
+      />
     </template>
   </UModal>
 
@@ -42,7 +51,11 @@ const dropdownItems = computed(() => [
     :title="t('overlays.patternNotes')"
     :description="t('overlays.slideoverDescription')"
   >
-    <UButton :label="t('overlays.openSlideover')" color="neutral" variant="outline" />
+    <UButton
+      :label="t('overlays.openSlideover')"
+      color="neutral"
+      variant="outline"
+    />
     <template #body>
       <p class="text-sm text-muted">
         {{ t('overlays.slideoverBody') }}
@@ -55,7 +68,11 @@ const dropdownItems = computed(() => [
     :title="t('overlays.mobileSettings')"
     :description="t('overlays.drawerDescription')"
   >
-    <UButton :label="t('overlays.openDrawer')" color="neutral" variant="outline" />
+    <UButton
+      :label="t('overlays.openDrawer')"
+      color="neutral"
+      variant="outline"
+    />
     <template #body>
       <p class="text-sm text-muted">
         {{ t('overlays.drawerBody') }}
@@ -63,9 +80,20 @@ const dropdownItems = computed(() => [
     </template>
   </UDrawer>
 
-  <div v-else-if="props.name === 'overlay-focused-pattern'" class="grid gap-3 sm:grid-cols-3">
-    <UModal :title="t('overlays.reviewPattern')" :description="t('overlays.modalDescription')">
-      <UButton :label="t('overlays.openModal')" color="neutral" variant="outline" block />
+  <div
+    v-else-if="props.name === 'overlay-focused-pattern'"
+    class="grid gap-3 sm:grid-cols-3"
+  >
+    <UModal
+      :title="t('overlays.reviewPattern')"
+      :description="t('overlays.modalDescription')"
+    >
+      <UButton
+        :label="t('overlays.openModal')"
+        color="neutral"
+        variant="outline"
+        block
+      />
       <template #body>
         <p class="text-sm text-muted">
           {{ t('overlays.modalBody') }}
@@ -73,19 +101,39 @@ const dropdownItems = computed(() => [
       </template>
       <template #footer>
         <UButton :label="t('actions.save')" />
-        <UButton :label="t('actions.cancel')" color="neutral" variant="outline" />
+        <UButton
+          :label="t('actions.cancel')"
+          color="neutral"
+          variant="outline"
+        />
       </template>
     </UModal>
-    <USlideover :title="t('overlays.patternNotes')" :description="t('overlays.slideoverDescription')">
-      <UButton :label="t('overlays.openSlideover')" color="neutral" variant="outline" block />
+    <USlideover
+      :title="t('overlays.patternNotes')"
+      :description="t('overlays.slideoverDescription')"
+    >
+      <UButton
+        :label="t('overlays.openSlideover')"
+        color="neutral"
+        variant="outline"
+        block
+      />
       <template #body>
         <p class="text-sm text-muted">
           {{ t('overlays.slideoverBody') }}
         </p>
       </template>
     </USlideover>
-    <UDrawer :title="t('overlays.mobileSettings')" :description="t('overlays.compactDrawerDescription')">
-      <UButton :label="t('overlays.openDrawer')" color="neutral" variant="outline" block />
+    <UDrawer
+      :title="t('overlays.mobileSettings')"
+      :description="t('overlays.compactDrawerDescription')"
+    >
+      <UButton
+        :label="t('overlays.openDrawer')"
+        color="neutral"
+        variant="outline"
+        block
+      />
       <template #body>
         <p class="text-sm text-muted">
           {{ t('overlays.drawerBody') }}
@@ -95,7 +143,11 @@ const dropdownItems = computed(() => [
   </div>
 
   <UPopover v-else-if="props.name === 'popover'">
-    <UButton :label="t('overlays.openPopover')" color="neutral" variant="outline" />
+    <UButton
+      :label="t('overlays.openPopover')"
+      color="neutral"
+      variant="outline"
+    />
     <template #content>
       <div class="w-56 p-4">
         <p class="font-semibold text-highlighted">
@@ -129,9 +181,16 @@ const dropdownItems = computed(() => [
     </div>
   </UContextMenu>
 
-  <div v-else-if="props.name === 'overlay-context-pattern'" class="flex flex-wrap items-center gap-3">
+  <div
+    v-else-if="props.name === 'overlay-context-pattern'"
+    class="flex flex-wrap items-center gap-3"
+  >
     <UPopover>
-      <UButton :label="t('overlays.openPopover')" color="neutral" variant="outline" />
+      <UButton
+        :label="t('overlays.openPopover')"
+        color="neutral"
+        variant="outline"
+      />
       <template #content>
         <div class="w-56 p-4">
           <p class="font-semibold text-highlighted">
@@ -153,7 +212,10 @@ const dropdownItems = computed(() => [
     </UTooltip>
   </div>
 
-  <div v-else-if="props.name === 'overlay-menu-pattern'" class="grid gap-4 sm:grid-cols-2">
+  <div
+    v-else-if="props.name === 'overlay-menu-pattern'"
+    class="grid gap-4 sm:grid-cols-2"
+  >
     <div class="space-y-3">
       <p class="text-sm font-semibold text-highlighted">
         {{ t('overlays.explicitMenu') }}

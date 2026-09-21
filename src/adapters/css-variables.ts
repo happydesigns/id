@@ -35,13 +35,12 @@ function addColorVariables(
   prefix: string,
   colorName: string,
   value: BrandPalette[string],
-  target = 'color'
+  target = 'color',
 ) {
   if (!isColorScale(value)) {
     variables[variableName(prefix, target, colorName)] = value
     return
   }
-
   for (const [shade, shadeValue] of Object.entries(value)) {
     if (shadeValue) {
       variables[variableName(prefix, target, colorName, shade)] = shadeValue
@@ -53,7 +52,6 @@ function renderCss(selector: string, variables: Record<string, string>) {
   const declarations = Object.entries(variables)
     .map(([name, value]) => `  ${name}: ${value};`)
     .join('\n')
-
   return declarations ? `${selector} {\n${declarations}\n}` : ''
 }
 
@@ -62,32 +60,29 @@ export const cssVariablesAdapter = defineBrandAdapter({
 
   transform<const TBrand extends BrandDefinition>(
     brand: TBrand,
-    options: CssVariablesAdapterOptions = {}
+    options: CssVariablesAdapterOptions = {},
   ): CssVariablesAdapterOutput {
     validateBrandDefinition(brand)
     const prefix = kebabCase(options.prefix ?? 'brand')
     const variables: Record<string, string> = {}
-
     for (const [name, value] of Object.entries(brand.colors)) {
       addColorVariables(variables, prefix, name, value)
     }
-
     if (options.includeRoles ?? true) {
       for (const [role, colorName] of Object.entries(brand.roles ?? {})) {
         const color = brand.colors[colorName]!
-
         if (isColorScale(color)) {
           for (const shade of Object.keys(color)) {
             variables[variableName(prefix, 'role', role, shade)]
               = `var(${variableName(prefix, 'color', colorName, shade)})`
           }
-        } else {
+        }
+        else {
           variables[variableName(prefix, 'role', role)]
             = `var(${variableName(prefix, 'color', colorName)})`
         }
       }
     }
-
     if ((options.includeTypography ?? true) && brand.typography) {
       for (const [role, stack] of Object.entries(brand.typography)) {
         if (stack) {
@@ -95,10 +90,9 @@ export const cssVariablesAdapter = defineBrandAdapter({
         }
       }
     }
-
     return {
       variables,
-      css: renderCss(options.selector ?? ':root', variables)
+      css: renderCss(options.selector ?? ':root', variables),
     }
-  }
+  },
 })

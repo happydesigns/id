@@ -10,14 +10,12 @@ const tscBin = join(rootDir, 'node_modules', 'typescript', 'bin', 'tsc')
 function run(command, args) {
   const result = spawnSync(command, args, {
     cwd: rootDir,
-    stdio: 'inherit'
+    stdio: 'inherit',
   })
-
   if (result.error) {
     console.error(result.error)
     process.exit(1)
   }
-
   if (result.status !== 0) {
     process.exit(result.status ?? 1)
   }
@@ -25,22 +23,17 @@ function run(command, args) {
 
 function copyRuntimeFiles() {
   cpSync(join(rootDir, 'app'), join(distDir, 'app'), {
-    recursive: true
+    recursive: true,
   })
-
   const themesDir = join(rootDir, 'themes')
-
   for (const themeDir of readdirSync(themesDir)) {
     const tokenSource = join(themesDir, themeDir, 'tokens.css')
-
     if (!existsSync(tokenSource)) {
       continue
     }
-
     const tokenTarget = join(distDir, 'themes', themeDir, 'tokens.css')
-
     mkdirSync(dirname(tokenTarget), {
-      recursive: true
+      recursive: true,
     })
     copyFileSync(tokenSource, tokenTarget)
   }
@@ -50,14 +43,13 @@ function listFiles(dir, files = []) {
   for (const entry of readdirSync(dir)) {
     const file = join(dir, entry)
     const stat = statSync(file)
-
     if (stat.isDirectory()) {
       listFiles(file, files)
-    } else {
+    }
+    else {
       files.push(file)
     }
   }
-
   return files
 }
 
@@ -65,21 +57,16 @@ function resolveSpecifier(fromFile, specifier) {
   if (!specifier.startsWith('./') && !specifier.startsWith('../')) {
     return specifier
   }
-
   if (extname(specifier)) {
     return specifier
   }
-
   const target = resolve(dirname(fromFile), specifier)
-
   if (existsSync(`${target}.js`)) {
     return `${specifier}.js`
   }
-
   if (existsSync(join(target, 'index.js'))) {
     return `${specifier}/index.js`
   }
-
   return specifier
 }
 
@@ -92,7 +79,6 @@ function rewriteImports(file) {
     .replace(/(import\s+['"])(\.{1,2}\/[^'"]+)(['"])/g, (_match, before, specifier, after) => {
       return `${before}${resolveSpecifier(file, specifier)}${after}`
     })
-
   if (rewritten !== source) {
     writeFileSync(file, rewritten)
   }
@@ -100,14 +86,14 @@ function rewriteImports(file) {
 
 rmSync(distDir, {
   force: true,
-  recursive: true
+  recursive: true,
 })
 
 const projectTemplates = {}
 for (const variant of ['native', 'guide', 'legacy']) {
   const directory = join(rootDir, 'templates/project', variant)
   projectTemplates[variant] = Object.fromEntries(listFiles(directory).sort().map(file => [
-    file.slice(directory.length + 1).replaceAll('\\', '/'), readFileSync(file, 'utf8').replaceAll('\r\n', '\n')
+    file.slice(directory.length + 1).replaceAll('\\', '/'), readFileSync(file, 'utf8').replaceAll('\r\n', '\n'),
   ]))
 }
 writeFileSync(join(rootDir, 'src/project-templates.generated.ts'),

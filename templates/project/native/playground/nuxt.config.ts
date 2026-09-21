@@ -9,22 +9,22 @@ const bundledPackage = packageJson.devDependencies['@happydesigns/id'].startsWit
 
 export default defineNuxtConfig({
   extends: ['..', '@happydesigns/id/studio'],
-  compatibilityDate: '2026-08-01',
   css: ['~/app.css'],
-  icon: { serverBundle: { collections: ['lucide', 'vscode-icons'] } },
-  runtimeConfig: {
-    idStudioSource: fileURLToPath(new URL('../brand.studio.json', import.meta.url))
-  },
-  hooks: {
-    'builder:watch': (_event, path) => {
-      if (path.endsWith('brand.studio.json')) generateBrand()
-    }
-  },
   appConfig: {
     idStudio: {
       document,
       sourcePath: 'brand.studio.json',
-      ...(bundledPackage ? { packageAsset: '/studio-packages/id.tgz' } : {})
-    }
-  }
+      ...(bundledPackage ? { packageAsset: '/studio-packages/id.tgz' } : {}),
+    },
+  },
+  runtimeConfig: {
+    idStudioSource: fileURLToPath(new URL('../brand.studio.json', import.meta.url)),
+  },
+  compatibilityDate: '2026-08-01',
+  hooks: {
+    'builder:watch': (_event, path) => {
+      if (path.endsWith('brand.studio.json')) generateBrand()
+    },
+  },
+  icon: { serverBundle: { collections: ['lucide', 'vscode-icons'] } },
 })

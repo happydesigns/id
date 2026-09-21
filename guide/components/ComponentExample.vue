@@ -5,7 +5,7 @@ import {
   getComponentExampleDefinition,
   componentExampleOwnSurfaceNames,
   type ComponentExampleContextInput,
-  type ComponentExampleFrame
+  type ComponentExampleFrame,
 } from '../../src/component-examples'
 import ComponentExampleActions from './component-example/ComponentExampleActions.vue'
 import ComponentExampleForms from './component-example/ComponentExampleForms.vue'
@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<{
   context?: ComponentExampleContextInput
 }>(), {
   frame: 'default',
-  context: undefined
+  context: undefined,
 })
 
 const ownSurfaceNames = new Set(componentExampleOwnSurfaceNames)
@@ -37,7 +37,7 @@ const exampleClass = computed(() => [
   props.frame === 'none' ? 'contents' : 'not-prose isolate my-5',
   props.frame === 'none' || ownSurfaceNames.has(props.name)
     ? 'overflow-visible'
-    : 'overflow-hidden rounded-sm border border-default bg-default p-4 sm:p-6'
+    : 'overflow-hidden rounded-sm border border-default bg-default p-4 sm:p-6',
 ])
 </script>
 

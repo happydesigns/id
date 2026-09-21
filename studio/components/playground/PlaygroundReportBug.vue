@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { usePlaygroundToast } from "../../playground-toast"
-import { useStudioIcons } from "../../playground-icons"
+import { usePlaygroundToast } from '../../playground-toast'
+import { useStudioIcons } from '../../playground-icons'
+
 const studioIcons = useStudioIcons()
 const toast = usePlaygroundToast()
 
 const severities = [
   { label: 'Low', value: 'low' },
   { label: 'Medium', value: 'medium' },
-  { label: 'High', value: 'high' }
+  { label: 'High', value: 'high' },
 ]
 
 const components = [
   { label: 'Dashboard', value: 'dashboard' },
   { label: 'API', value: 'api' },
-  { label: 'Billing', value: 'billing' }
+  { label: 'Billing', value: 'billing' },
 ]
 
 const title = ref('')
@@ -35,26 +36,51 @@ const steps = ref('')
       </div>
 
       <UFormField label="Title">
-        <UInput v-model="title" placeholder="Brief description of the issue" class="w-full" />
+        <UInput
+          v-model="title"
+          placeholder="Brief description of the issue"
+          class="w-full"
+        />
       </UFormField>
 
       <div class="grid grid-cols-2 gap-3">
         <UFormField label="Severity">
-          <USelect v-model="severity" :items="severities" class="w-full" />
+          <USelect
+            v-model="severity"
+            :items="severities"
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Component">
-          <USelect v-model="component" :items="components" class="w-full" />
+          <USelect
+            v-model="component"
+            :items="components"
+            class="w-full"
+          />
         </UFormField>
       </div>
 
       <UFormField label="Steps to reproduce">
-        <UTextarea v-model="steps" :rows="3" placeholder="1. Go to… 2. Click on… 3. See error" class="w-full" />
+        <UTextarea
+          v-model="steps"
+          :rows="3"
+          placeholder="1. Go to… 2. Click on… 3. See error"
+          class="w-full"
+        />
       </UFormField>
     </div>
 
     <div class="flex items-center justify-between border-t border-default p-3">
-      <UButton label="Attach file" :icon="studioIcons.paperclip" color="neutral" variant="ghost" />
-      <UButton label="Submit bug" @click="toast.add({ title: 'Bug reported' })" />
+      <UButton
+        label="Attach file"
+        :icon="studioIcons.paperclip"
+        color="neutral"
+        variant="ghost"
+      />
+      <UButton
+        label="Submit bug"
+        @click="toast.add({ title: 'Bug reported' })"
+      />
     </div>
   </div>
 </template>

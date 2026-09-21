@@ -1,7 +1,7 @@
 export {
   idBrandGuide,
   neutralBrandTheme,
-  nuxtUiBrandTheme
+  nuxtUiBrandTheme,
 } from './defaults'
 export {
   componentExampleFamilies,
@@ -11,7 +11,7 @@ export {
   createComponentExampleContext,
   defineComponentExampleContext,
   getComponentExampleDefinition,
-  isComponentExampleName
+  isComponentExampleName,
 } from './component-examples'
 export type {
   ComponentExampleContext,
@@ -19,5 +19,5 @@ export type {
   ComponentExampleDefinition,
   ComponentExampleFamily,
   ComponentExampleFrame,
-  ComponentExampleGroup
+  ComponentExampleGroup,
 } from './component-examples'

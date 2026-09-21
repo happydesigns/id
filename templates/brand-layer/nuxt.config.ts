@@ -8,24 +8,24 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui'],
 
   $meta: {
-    name: '@example/brand'
+    name: '@example/brand',
   },
 
   components: [
     {
       path: resolve(currentDir, './app/components'),
       pathPrefix: false,
-      prefix: 'Brand'
-    }
+      prefix: 'Brand',
+    },
   ],
 
   app: {
     head: {
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
-      ]
-    }
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+      ],
+    },
   },
 
-  compatibilityDate: 'latest'
+  compatibilityDate: 'latest',
 })

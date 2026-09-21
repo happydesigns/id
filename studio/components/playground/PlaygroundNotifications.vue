@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { usePlaygroundToast } from "../../playground-toast"
+import { usePlaygroundToast } from '../../playground-toast'
+
 const toast = usePlaygroundToast()
 
 const settings = ref({
   transactions: true,
   security: true,
-  marketing: false
+  marketing: false,
 })
 </script>
 
@@ -22,14 +23,29 @@ const settings = ref({
       </div>
 
       <div class="space-y-3">
-        <USwitch v-model="settings.transactions" label="Transaction alerts" description="Deposits, withdrawals and transfers." />
-        <USwitch v-model="settings.security" label="Security alerts" description="Login attempts and account changes." />
-        <USwitch v-model="settings.marketing" label="Marketing emails" description="Product news and occasional updates." />
+        <USwitch
+          v-model="settings.transactions"
+          label="Transaction alerts"
+          description="Deposits, withdrawals and transfers."
+        />
+        <USwitch
+          v-model="settings.security"
+          label="Security alerts"
+          description="Login attempts and account changes."
+        />
+        <USwitch
+          v-model="settings.marketing"
+          label="Marketing emails"
+          description="Product news and occasional updates."
+        />
       </div>
     </div>
 
     <div class="flex justify-end border-t border-default p-3">
-      <UButton label="Save preferences" @click="toast.add({ title: 'Preferences saved' })" />
+      <UButton
+        label="Save preferences"
+        @click="toast.add({ title: 'Preferences saved' })"
+      />
     </div>
   </div>
 </template>

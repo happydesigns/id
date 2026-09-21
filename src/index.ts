@@ -4,7 +4,7 @@ export {
   createBrandGuideAssets,
   createBrandLogoSet,
   defaultBrandAssetRoles,
-  selectBrandAsset
+  selectBrandAsset,
 } from './assets'
 export { defineBrandAdapter } from './adapter'
 export type { BrandAdapter } from './adapter'
@@ -15,23 +15,23 @@ export type { NuxtUiAdapterOptions } from './adapters/nuxt-ui'
 export type {
   BrandAssetEntry,
   BrandGuideAssetMappingOptions,
-  BrandAssetSelection
+  BrandAssetSelection,
 } from './assets'
 export {
   applyCssVariables,
   createThemeCssDeclarations,
-  createThemeCssVars
+  createThemeCssVars,
 } from './css'
 export {
   componentCoverageStatuses,
   componentCoverageStatusMeta,
   normalizeComponentCoverage,
-  summarizeComponentCoverage
+  summarizeComponentCoverage,
 } from './component-coverage'
 export type {
   ComponentCoverageStatus,
   ComponentCoverageStatusMeta,
-  ComponentCoverageSummary
+  ComponentCoverageSummary,
 } from './component-coverage'
 export {
   componentExampleFamilies,
@@ -41,7 +41,7 @@ export {
   createComponentExampleContext,
   defineComponentExampleContext,
   getComponentExampleDefinition,
-  isComponentExampleName
+  isComponentExampleName,
 } from './component-examples'
 export type {
   ComponentExampleContext,
@@ -49,31 +49,31 @@ export type {
   ComponentExampleDefinition,
   ComponentExampleFamily,
   ComponentExampleFrame,
-  ComponentExampleGroup
+  ComponentExampleGroup,
 } from './component-examples'
 export {
   idBrandGuide,
   neutralBrandTheme,
-  nuxtUiBrandTheme
+  nuxtUiBrandTheme,
 } from './defaults'
 export { parseDocsLinks } from './docs-links'
 export type { DocsLink } from './docs-links'
 export {
   createLayerInstallSnippets,
   layerInstallCommands,
-  layerInstallPackageManagers
+  layerInstallPackageManagers,
 } from './layer-install'
 export type {
   LayerInstallOptions,
   LayerInstallPackageManager,
-  LayerInstallSnippets
+  LayerInstallSnippets,
 } from './layer-install'
 export {
   createGuideDocsSections,
   createGuideSectionPath,
   defineGuideSections,
   findGuideSection,
-  normalizeGuideSections
+  normalizeGuideSections,
 } from './guide-sections'
 export type { GuideSectionPathOptions } from './guide-sections'
 export { createNuxtUiAppConfig } from './nuxt-ui'
@@ -83,7 +83,7 @@ export {
   brandThemeStatePrefix,
   brandThemeStyleElementId,
   createBrandThemeCookieName,
-  createBrandThemeStateKey
+  createBrandThemeStateKey,
 } from './runtime'
 export { brandAssetsSchema, brandDefinitionSchema, brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
 export { normalizeBrandThemes, resolveBrandThemeName, resolveBrandThemes } from './themes'
@@ -125,7 +125,7 @@ export type {
   NuxtUiAppConfig,
   NuxtUiColorRole,
   ThemeCssOptions,
-  ThemeMode
+  ThemeMode,
 } from './types'
 export {
   BrandValidationError,
@@ -136,7 +136,7 @@ export {
   validateBrandIdentity,
   validateBrandDefinition,
   validateBrandGuide,
-  validateBrandTheme
+  validateBrandTheme,
 } from './validation'
 export { createBrandReference } from './guide-reference'
 

@@ -41,5 +41,5 @@ export default {
   system: 'i-lucide-monitor',
   tip: 'i-lucide-lightbulb',
   upload: 'i-lucide-upload',
-  warning: 'i-lucide-triangle-alert'
+  warning: 'i-lucide-triangle-alert',
 }

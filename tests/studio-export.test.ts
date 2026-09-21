@@ -5,7 +5,7 @@ import { exportStudioProject } from '../studio/export'
 afterEach(() => vi.unstubAllGlobals())
 
 describe('project export', () => {
-  it.each([{}, { guide: true }, { legacyRuntime: true }, { legacyRuntime: true, guide: true }])('keeps brand data separate from scaffold code: %j', options => {
+  it.each([{}, { guide: true }, { legacyRuntime: true }, { legacyRuntime: true, guide: true }])('keeps brand data separate from scaffold code: %j', (options) => {
     const doc = createBlankStudioDocument()
     doc.theme.label = 'Brand {{packageName}} "sample"'
     doc.brand.packageName = '@sample/brand'
@@ -17,7 +17,6 @@ describe('project export', () => {
     const manifest = JSON.parse(files['package.json']!)
     expect(!!manifest.devDependencies?.docus).toBe(!!options.guide && !options.legacyRuntime)
   })
-
   it('does not fetch anything for a self-contained brand', async () => {
     const fetch = vi.fn()
     vi.stubGlobal('fetch', fetch)
@@ -25,14 +24,12 @@ describe('project export', () => {
     expect(archive[0]).toBe(0x50)
     expect(fetch).not.toHaveBeenCalled()
   })
-
   it('rejects external package paths before fetching', async () => {
     const fetch = vi.fn()
     vi.stubGlobal('fetch', fetch)
     await expect(exportStudioProject(createBlankStudioDocument(), { packageAsset: '//other.test/id.tgz' })).rejects.toThrow('Invalid host package')
     expect(fetch).not.toHaveBeenCalled()
   })
-
   it('fails a complete export when an asset URL returns an HTML fallback', async () => {
     const doc = createBlankStudioDocument()
     doc.brand.assets = { logos: { logo: { name: 'Logo', src: '/logo.svg', role: 'logo' } } }

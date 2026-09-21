@@ -1,22 +1,23 @@
 import type { ComponentExampleMessages } from './component-example-messages'
+
 export { componentExampleMessages, resolveComponentExampleMessage } from './component-example-messages'
 export type { ComponentExampleMessages, ComponentExampleMessageKey } from './component-example-messages'
 
 export type ComponentExampleFrame = 'default' | 'none'
 
-export type ComponentExampleFamily =
-  | 'actions'
-  | 'forms'
-  | 'feedback'
-  | 'data'
-  | 'navigation'
-  | 'overlays'
-  | 'page'
-  | 'system'
-  | 'dashboard'
-  | 'publishing'
-  | 'chat'
-  | 'editor'
+export type ComponentExampleFamily
+  = | 'actions'
+    | 'forms'
+    | 'feedback'
+    | 'data'
+    | 'navigation'
+    | 'overlays'
+    | 'page'
+    | 'system'
+    | 'dashboard'
+    | 'publishing'
+    | 'chat'
+    | 'editor'
 
 export type ComponentExampleDefinition = {
   name: string
@@ -100,20 +101,20 @@ const defaultAssetPreviewSurfaces: ComponentExampleAssetPreviewSurfaces = {
   light: {
     background: '#ffffff',
     color: '#111827',
-    border: 'rgba(17, 24, 39, 0.14)'
+    border: 'rgba(17, 24, 39, 0.14)',
   },
   dark: {
     background: '#111827',
     color: '#ffffff',
-    border: 'rgba(255, 255, 255, 0.16)'
-  }
+    border: 'rgba(255, 255, 255, 0.16)',
+  },
 }
 
 function defineGroup(
   family: ComponentExampleFamily,
   title: string,
   description: string,
-  names: readonly (string | readonly [name: string, title: string, ownsSurface?: boolean])[]
+  names: readonly (string | readonly [name: string, title: string, ownsSurface?: boolean])[],
 ): ComponentExampleGroup {
   return {
     family,
@@ -124,24 +125,23 @@ function defineGroup(
         return {
           name: entry,
           family,
-          title: titleFromName(entry)
+          title: titleFromName(entry),
         }
       }
-
       return {
         name: entry[0],
         family,
         title: entry[1],
-        ownsSurface: entry[2]
+        ownsSurface: entry[2],
       }
-    })
+    }),
   }
 }
 
 function titleFromName(name: string) {
   return name
     .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ')
 }
 
@@ -154,7 +154,7 @@ export const componentExampleGroups = [
     'chip',
     'field-group',
     'kbd',
-    'tooltip'
+    'tooltip',
   ]),
   defineGroup('forms', 'Forms', 'Input, selection, choice, bounded, and advanced form controls.', [
     ['form-pattern', 'Form pattern'],
@@ -183,7 +183,7 @@ export const componentExampleGroups = [
     'file-upload',
     'color-picker',
     'calendar',
-    'listbox'
+    'listbox',
   ]),
   defineGroup('feedback', 'Feedback', 'Inline feedback, progress, loading states, empty states, icons, and toasts.', [
     'alert',
@@ -193,7 +193,7 @@ export const componentExampleGroups = [
     'toast',
     'empty',
     'icon',
-    ['feedback-system-pattern', 'Feedback system']
+    ['feedback-system-pattern', 'Feedback system'],
   ]),
   defineGroup('data', 'Data and Structure', 'Tables, cards, identity objects, separators, timelines, and overflow.', [
     ['table', 'Table', true],
@@ -209,7 +209,7 @@ export const componentExampleGroups = [
     ['carousel', 'Carousel', true],
     ['timeline', 'Timeline', true],
     ['scroll-area', 'Scroll area', true],
-    ['structure-sequence-pattern', 'Structure and sequence']
+    ['structure-sequence-pattern', 'Structure and sequence'],
   ]),
   defineGroup('navigation', 'Navigation', 'Primary navigation, location, nested structure, and fast command surfaces.', [
     'navigation-menu',
@@ -224,7 +224,7 @@ export const componentExampleGroups = [
     'command-palette',
     'tree',
     ['navigation-structure-pattern', 'Structure navigation'],
-    ['navigation-fast-pattern', 'Fast navigation']
+    ['navigation-fast-pattern', 'Fast navigation'],
   ]),
   defineGroup('overlays', 'Overlays', 'Focused overlays, attached context, and menu surfaces.', [
     'modal',
@@ -235,7 +235,7 @@ export const componentExampleGroups = [
     'dropdown-menu',
     'context-menu',
     ['overlay-context-pattern', 'Context overlays'],
-    ['overlay-menu-pattern', 'Menu overlays']
+    ['overlay-menu-pattern', 'Menu overlays'],
   ]),
   defineGroup('page', 'Page and Docs', 'Page primitives, docs navigation, app shell, and content helpers.', [
     ['page-hero', 'Page hero', true],
@@ -263,7 +263,7 @@ export const componentExampleGroups = [
     ['page-opening-pattern', 'Page opening'],
     ['section-system-pattern', 'Section system'],
     ['page-support-pattern', 'Page support'],
-    ['page-shell-pattern', 'Page shell', true]
+    ['page-shell-pattern', 'Page shell', true],
   ]),
   defineGroup('system', 'System Helpers', 'Color mode, locale, auth, scoped themes, errors, and assets.', [
     'color-mode-button',
@@ -277,12 +277,12 @@ export const componentExampleGroups = [
     ['theme', 'Theme', true],
     ['system-appearance-pattern', 'System appearance'],
     ['system-assets-pattern', 'System assets'],
-    ['system-access-pattern', 'System access']
+    ['system-access-pattern', 'System access'],
   ]),
   defineGroup('dashboard', 'Dashboard', 'Dashboard group, sidebar, panel, toolbar, and scrollable work surfaces.', [
     ['dashboard-shell', 'Dashboard shell', true],
     ['dashboard-group', 'Dashboard group', true],
-    ['sidebar', 'Sidebar', true]
+    ['sidebar', 'Sidebar', true],
   ]),
   defineGroup('publishing', 'Publishing', 'Blog, changelog, pricing, marquee, and package explanation surfaces.', [
     ['publishing-editorial-pattern', 'Editorial publishing'],
@@ -294,7 +294,7 @@ export const componentExampleGroups = [
     ['pricing-plans', 'Pricing plans', true],
     ['pricing-plan', 'Pricing plan', true],
     ['pricing-table', 'Pricing table', true],
-    ['marquee', 'Marquee', true]
+    ['marquee', 'Marquee', true],
   ]),
   defineGroup('chat', 'Chat', 'Chat palette, messages, prompts, reasoning, shimmer, and tool state.', [
     ['chat-palette', 'Chat palette', true],
@@ -305,7 +305,7 @@ export const componentExampleGroups = [
     'chat-reasoning',
     'chat-shimmer',
     'chat-tool',
-    ['chat-activity-pattern', 'Chat activity']
+    ['chat-activity-pattern', 'Chat activity'],
   ]),
   defineGroup('editor', 'Editor', 'Editor surface and companion toolbar menus.', [
     ['editor', 'Editor', true],
@@ -313,22 +313,22 @@ export const componentExampleGroups = [
     'editor-drag-handle',
     'editor-emoji-menu',
     'editor-mention-menu',
-    'editor-suggestion-menu'
-  ])
+    'editor-suggestion-menu',
+  ]),
 ] as const satisfies readonly ComponentExampleGroup[]
 
 export const componentExampleFamilies = componentExampleGroups.map(group => group.family)
 
 export const componentExampleNames = componentExampleGroups.flatMap(group =>
-  group.examples.map(example => example.name)
+  group.examples.map(example => example.name),
 )
 
 export const componentExampleOwnSurfaceNames = componentExampleGroups.flatMap(group =>
-  group.examples.filter(example => example.ownsSurface).map(example => example.name)
+  group.examples.filter(example => example.ownsSurface).map(example => example.name),
 )
 
 const componentExampleDefinitionByName = new Map(
-  componentExampleGroups.flatMap(group => group.examples.map(example => [example.name, example] as const))
+  componentExampleGroups.flatMap(group => group.examples.map(example => [example.name, example] as const)),
 )
 
 export function getComponentExampleDefinition(name: string): ComponentExampleDefinition | undefined {
@@ -342,7 +342,6 @@ export function isComponentExampleName(name: string): boolean {
 export function createComponentExampleContext(input: ComponentExampleContextInput = {}): ComponentExampleContext {
   const brandName = input.brandName ?? 'brand'
   const packageName = input.packageName ?? '@example/brand'
-
   return {
     brandName,
     packageName,
@@ -350,24 +349,24 @@ export function createComponentExampleContext(input: ComponentExampleContextInpu
     accentColor: input.accentColor ?? '#3B82F6',
     logoAlt: input.logoAlt ?? `${brandName} symbol`,
     assets: {
-      ...input.assets
+      ...input.assets,
     },
     assetPreviewSurfaces: {
       light: {
         ...defaultAssetPreviewSurfaces.light,
-        ...input.assetPreviewSurfaces?.light
+        ...input.assetPreviewSurfaces?.light,
       },
       dark: {
         ...defaultAssetPreviewSurfaces.dark,
-        ...input.assetPreviewSurfaces?.dark
-      }
+        ...input.assetPreviewSurfaces?.dark,
+      },
     },
     paths: {
       docs: '/docs',
       components: '/docs/components',
       colors: '/docs/colors',
       typography: '/docs/typography',
-      ...input.paths
+      ...input.paths,
     },
     copy: {
       brandLabel: brandName,
@@ -382,8 +381,8 @@ export function createComponentExampleContext(input: ComponentExampleContextInpu
       projectDescription: 'Review component behavior before release.',
       releaseTitle: 'Component coverage expanded',
       releaseDescription: 'Dashboard, publishing, chat, and editor families now have brand guidance.',
-      ...input.copy
-    }
+      ...input.copy,
+    },
   }
 }
 

@@ -12,7 +12,7 @@ export function parseStudioSession(value: unknown): StudioSession {
 export function createStudioPalette(hex: string): Record<string, string> {
   if (!/^#[0-9a-f]{6}$/i.test(hex)) throw new Error('Choose a six-digit hex color.')
   const rgb = [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16))
-  const stops = [[50, .95], [100, .9], [200, .75], [300, .55], [400, .3], [500, 0], [600, -.15], [700, -.3], [800, -.45], [900, -.6], [950, -.8]]
+  const stops = [[50, 0.95], [100, 0.9], [200, 0.75], [300, 0.55], [400, 0.3], [500, 0], [600, -0.15], [700, -0.3], [800, -0.45], [900, -0.6], [950, -0.8]]
   return Object.fromEntries(stops.map(([stop, weight]) => [String(stop), '#' + rgb.map(channel => Math.round(weight! >= 0 ? channel + (255 - channel) * weight! : channel * (1 + weight!)).toString(16).padStart(2, '0')).join('')]))
 }
 
@@ -23,9 +23,12 @@ export function contrastRatio(foreground: string, background: string): number | 
     if (!match) return undefined
     const channels = match.slice(1).map(Number)
     if (channels.some(value => value < 0 || value > 255)) return undefined
-    const linear = channels.map(value => { const s = value / 255; return s <= .04045 ? s / 12.92 : ((s + .055) / 1.055) ** 2.4 })
-    return linear[0]! * .2126 + linear[1]! * .7152 + linear[2]! * .0722
+    const linear = channels.map((value) => {
+      const s = value / 255
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+    })
+    return linear[0]! * 0.2126 + linear[1]! * 0.7152 + linear[2]! * 0.0722
   }
   const a = luminance(foreground), b = luminance(background)
-  return a === undefined || b === undefined ? undefined : (Math.max(a, b) + .05) / (Math.min(a, b) + .05)
+  return a === undefined || b === undefined ? undefined : (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
 }

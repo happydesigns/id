@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+
 defineProps<{ grouped?: boolean }>()
 const model = defineModel<'light' | 'dark' | 'system'>({ required: true })
 const appConfig = useAppConfig()
@@ -26,7 +27,7 @@ function select(value: string | number) {
       label: 'sr-only',
       list: grouped ? 'bg-transparent p-0' : 'studio-control-group',
       indicator: ['rounded-[var(--studio-control-inner-radius)]', grouped ? 'bg-default inset-y-0' : 'bg-default inset-y-0.5'].join(' '),
-      trigger: 'rounded-[var(--studio-control-inner-radius)] in-[[data-slot=list]:not(:has([data-slot=indicator]))]:data-[state=active]:before:rounded-[var(--studio-control-inner-radius)] data-[state=active]:text-highlighted w-full in-[[data-slot=list]:not(:has([data-slot=indicator]))]:data-[state=active]:before:bg-default gap-0 p-1.5'
+      trigger: 'rounded-[var(--studio-control-inner-radius)] in-[[data-slot=list]:not(:has([data-slot=indicator]))]:data-[state=active]:before:rounded-[var(--studio-control-inner-radius)] data-[state=active]:text-highlighted w-full in-[[data-slot=list]:not(:has([data-slot=indicator]))]:data-[state=active]:before:bg-default gap-0 p-1.5',
     }"
     aria-label="Color mode"
     @update:model-value="select"

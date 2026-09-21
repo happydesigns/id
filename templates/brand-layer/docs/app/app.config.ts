@@ -9,22 +9,22 @@ export default defineAppConfig({
     name: brandTheme.name,
     theme: brandTheme,
     assets: brandRuntimeAssets,
-    guide: brandGuide
+    guide: brandGuide,
   },
   docus: {
     locale: 'en',
-    colorMode: ''
+    colorMode: '',
   },
   seo: {
     title: 'Example Brand',
-    description: 'Reference guide for the Example Brand layer.'
+    description: 'Reference guide for the Example Brand layer.',
   },
   header: {
-    title: 'Example Brand'
+    title: 'Example Brand',
   },
   socials: {},
   assistant: {
     floatingInput: false,
-    explainWithAi: false
-  }
+    explainWithAi: false,
+  },
 })

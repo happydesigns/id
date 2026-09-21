@@ -1,18 +1,18 @@
 import type { AppConfigInput } from 'nuxt/schema'
 
-export type BrandColorShade =
-  | 50
-  | 100
-  | 200
-  | 300
-  | 400
-  | 500
-  | 600
-  | 700
-  | 800
-  | 900
-  | 950
-  | (number & {})
+export type BrandColorShade
+  = | 50
+    | 100
+    | 200
+    | 300
+    | 400
+    | 500
+    | 600
+    | 700
+    | 800
+    | 900
+    | 950
+    | (number & {})
 
 export type BrandColorScale = Partial<Record<BrandColorShade, string>>
 
@@ -22,15 +22,15 @@ export type BrandColorName<TColors extends BrandPalette = BrandPalette> = Extrac
 
 export type BrandColorRoles<TColors extends BrandPalette = BrandPalette> = Record<string, BrandColorName<TColors>>
 
-export type NuxtUiColorRole =
-  | 'primary'
-  | 'secondary'
-  | 'success'
-  | 'info'
-  | 'warning'
-  | 'error'
-  | 'neutral'
-  | (string & {})
+export type NuxtUiColorRole
+  = | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'info'
+    | 'warning'
+    | 'error'
+    | 'neutral'
+    | (string & {})
 
 export type BrandSemanticColors = Partial<Record<NuxtUiColorRole, string>>
 
@@ -43,11 +43,11 @@ export type BrandCssVariables = {
   dark?: Record<string, string>
 }
 
-export type BrandTypographyRole =
-  | 'sans'
-  | 'mono'
-  | 'display'
-  | (string & {})
+export type BrandTypographyRole
+  = | 'sans'
+    | 'mono'
+    | 'display'
+    | (string & {})
 
 export type BrandTypography = Partial<Record<BrandTypographyRole, string>>
 
@@ -59,15 +59,15 @@ export type BrandAsset = {
   alt?: string
 }
 
-export type BrandLogoRole =
-  | 'logo'
-  | 'wordmark'
-  | 'wordmarkInverse'
-  | 'symbol'
-  | 'symbolInverse'
-  | 'mark'
-  | 'appIcon'
-  | (string & {})
+export type BrandLogoRole
+  = | 'logo'
+    | 'wordmark'
+    | 'wordmarkInverse'
+    | 'symbol'
+    | 'symbolInverse'
+    | 'mark'
+    | 'appIcon'
+    | (string & {})
 
 export type BrandLogoSet = {
   [role: string]: BrandAsset | undefined
@@ -104,7 +104,7 @@ export type BrandComponentCoverage = {
 
 export type BrandIdentity<
   TLogoAssetPaths extends Record<string, string> = Record<string, string>,
-  TColors extends BrandPalette = BrandPalette
+  TColors extends BrandPalette = BrandPalette,
 > = {
   name: string
   packageName?: string
@@ -116,7 +116,7 @@ export type BrandIdentity<
 export type BrandDefinition<
   TColors extends BrandPalette = BrandPalette,
   TRoles extends BrandColorRoles<TColors> = BrandColorRoles<TColors>,
-  TAssets extends BrandAssets = BrandAssets
+  TAssets extends BrandAssets = BrandAssets,
 > = {
   name: string
   packageName?: string

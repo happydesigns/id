@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'BrandLogo'
+  name: 'BrandLogo',
 })
 </script>
 

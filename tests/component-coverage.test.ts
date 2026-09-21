@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   normalizeComponentCoverage,
-  summarizeComponentCoverage
+  summarizeComponentCoverage,
 } from '../src'
 
 describe('component coverage helpers', () => {
@@ -11,35 +11,34 @@ describe('component coverage helpers', () => {
         family: ' Forms ',
         components: [' UInput ', ' ', 'USelect'],
         status: 'documented',
-        notes: ' Focus examples '
+        notes: ' Focus examples ',
       },
       {
         family: ' ',
         components: ['UButton'],
-        status: 'planned'
-      }
+        status: 'planned',
+      },
     ])).toEqual([
       {
         family: 'Forms',
         components: ['UInput', 'USelect'],
         status: 'documented',
-        notes: 'Focus examples'
-      }
+        notes: 'Focus examples',
+      },
     ])
   })
-
   it('summarizes family and component counts by status', () => {
     expect(summarizeComponentCoverage([
       {
         family: 'Actions',
         components: ['UButton', 'UBadge'],
-        status: 'verified'
+        status: 'verified',
       },
       {
         family: 'Overlays',
         components: ['UModal'],
-        status: 'planned'
-      }
+        status: 'planned',
+      },
     ])).toEqual({
       families: 2,
       components: 3,
@@ -47,8 +46,8 @@ describe('component coverage helpers', () => {
         planned: 1,
         tokenized: 0,
         documented: 0,
-        verified: 1
-      }
+        verified: 1,
+      },
     })
   })
 })

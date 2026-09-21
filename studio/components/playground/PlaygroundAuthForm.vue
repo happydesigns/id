@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { usePlaygroundToast } from "../../playground-toast"
-import { useStudioIcons } from "../../playground-icons"
+import { usePlaygroundToast } from '../../playground-toast'
+import { useStudioIcons } from '../../playground-icons'
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
+
 const studioIcons = useStudioIcons()
 
 const toast = usePlaygroundToast()
@@ -12,13 +13,13 @@ const fields: AuthFormField[] = [{
   type: 'email',
   label: 'Email',
   placeholder: 'Enter your email',
-  required: true
+  required: true,
 }, {
   name: 'password',
   label: 'Password',
   type: 'password',
   placeholder: 'Enter your password',
-  required: true
+  required: true,
 }]
 
 const providers = [{
@@ -26,18 +27,20 @@ const providers = [{
   icon: 'i-simple-icons-google',
   onClick: () => {
     toast.add({ title: 'Google', description: 'Login with Google' })
-  }
+  },
 }, {
   label: 'GitHub',
-  get icon() { return studioIcons.github },
+  get icon() {
+    return studioIcons.github
+  },
   onClick: () => {
     toast.add({ title: 'GitHub', description: 'Login with GitHub' })
-  }
+  },
 }]
 
 const schema = z.object({
   email: z.email('Invalid email'),
-  password: z.string('Password is required').min(8, 'Must be at least 8 characters')
+  password: z.string('Password is required').min(8, 'Must be at least 8 characters'),
 })
 
 type Schema = z.output<typeof schema>

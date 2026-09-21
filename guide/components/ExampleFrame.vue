@@ -4,14 +4,14 @@ import { computed } from 'vue'
 const props = withDefaults(defineProps<{
   variant?: 'frame' | 'plain'
 }>(), {
-  variant: 'frame'
+  variant: 'frame',
 })
 
 const frameClass = computed(() => [
   'not-prose isolate my-5',
   props.variant === 'plain'
     ? 'overflow-visible'
-    : 'overflow-hidden rounded-sm border border-default bg-default p-4 sm:p-6'
+    : 'overflow-hidden rounded-sm border border-default bg-default p-4 sm:p-6',
 ])
 </script>
 

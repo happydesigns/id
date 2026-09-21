@@ -19,22 +19,19 @@ function useThemeCookie(config: IdentityAppConfig) {
   return useCookie<string | undefined>(getThemeCookieKey(config), {
     maxAge: 60 * 60 * 24 * 365,
     path: '/',
-    sameSite: 'lax'
+    sameSite: 'lax',
   })
 }
 
 function readPersistedThemeName(config: IdentityAppConfig, themes: BrandTheme[]) {
   const themeCookie = useThemeCookie(config)
   const themeName = themeCookie.value
-
   if (!themeName) {
     return undefined
   }
-
   if (themes.some(theme => theme.name === themeName)) {
     return themeName
   }
-
   themeCookie.value = undefined
   return undefined
 }
@@ -68,64 +65,53 @@ function updateNuxtUiAppConfig(config: NuxtUiAppConfig) {
 export function useBrandTheme() {
   const appConfig = useAppConfig() as IdentityAppConfig
   const currentName = useState<string>(createBrandThemeStateKey(appConfig.id?.name), () => resolveInitialThemeName(appConfig))
-
   const themes = computed(() => getThemeList(appConfig))
   const currentTheme = computed(() => resolveTheme(themes.value, currentName.value))
   const selectedName = computed(() => currentTheme.value?.name ?? '')
-
   function setTheme(name: string, options: SetThemeOptions = {}) {
     const theme = themes.value.find(item => item.name === name)
-
     if (!theme) {
       throw new Error(`Unknown brand theme "${name}"`)
     }
-
     if (import.meta.client) {
       applyBrandThemeCore(theme, {
         mode: resolveDocumentMode(),
         target: document.documentElement,
-        updateAppConfig: updateNuxtUiAppConfig
+        updateAppConfig: updateNuxtUiAppConfig,
       })
-    } else {
+    }
+    else {
       updateNuxtUiAppConfig(createNuxtUiAppConfig(theme))
     }
-
     currentName.value = theme.name
-
     if (options.persist ?? true) {
       persistThemeName(appConfig, theme.name)
     }
-
     return theme
   }
-
   function applyTheme(theme: BrandTheme) {
     if (import.meta.client) {
       applyBrandThemeCore(theme, {
         mode: resolveDocumentMode(),
         target: document.documentElement,
-        updateAppConfig: updateNuxtUiAppConfig
+        updateAppConfig: updateNuxtUiAppConfig,
       })
-    } else {
+    }
+    else {
       updateNuxtUiAppConfig(createNuxtUiAppConfig(theme))
     }
-
     currentName.value = theme.name
     return theme
   }
-
   function restorePersistedTheme() {
     const themeName = readPersistedThemeName(appConfig, themes.value)
-
     if (!themeName || themeName === currentName.value) {
       return currentTheme.value
     }
-
     return setTheme(themeName, {
-      persist: false
+      persist: false,
     })
   }
-
   return {
     themes,
     currentName,
@@ -133,6 +119,6 @@ export function useBrandTheme() {
     currentTheme,
     setTheme,
     applyTheme,
-    restorePersistedTheme
+    restorePersistedTheme,
   }
 }

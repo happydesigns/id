@@ -15,5 +15,5 @@ export default defineNuxtModule({
     nuxt.options.runtimeConfig.idStudioWriterToken = token
     nuxt.options.runtimeConfig.public.idStudioWriterToken = token
     addServerHandler({ route: '/api/id-studio/source', handler: resolve('./server/source') })
-  }
+  },
 })

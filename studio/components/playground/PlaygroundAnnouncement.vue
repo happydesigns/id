@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { usePlaygroundToast } from "../../playground-toast"
-import { useStudioIcons } from "../../playground-icons"
+import { usePlaygroundToast } from '../../playground-toast'
+import { useStudioIcons } from '../../playground-icons'
+
 const studioIcons = useStudioIcons()
 const appConfig = useAppConfig()
 const toast = usePlaygroundToast()
@@ -10,7 +11,10 @@ const toast = usePlaygroundToast()
   <div>
     <div class="p-4 flex items-start gap-3">
       <div class="flex items-center justify-center size-9 rounded-lg bg-elevated text-primary shrink-0">
-        <UIcon :name="studioIcons.radar" class="size-5" />
+        <UIcon
+          :name="studioIcons.radar"
+          class="size-5"
+        />
       </div>
       <div>
         <p class="font-semibold text-highlighted">
@@ -23,7 +27,11 @@ const toast = usePlaygroundToast()
     </div>
 
     <div class="flex items-center justify-end gap-2 border-t border-default p-3">
-      <UButton label="Dismiss" color="neutral" variant="ghost" />
+      <UButton
+        label="Dismiss"
+        color="neutral"
+        variant="ghost"
+      />
       <UButton
         label="Learn more"
         color="neutral"

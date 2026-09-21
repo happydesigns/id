@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const usernames = [
   'benjamincanac', 'romhml', 'noook', 'atinux', 'HugoRCD',
-  'sandros94', 'danielroe', 'J-Michalek', 'genu', 'smarroufin'
+  'sandros94', 'danielroe', 'J-Michalek', 'genu', 'smarroufin',
 ]
 </script>
 
@@ -16,7 +16,10 @@ const usernames = [
           Built by the community.
         </p>
       </div>
-      <UBadge color="neutral" variant="subtle">
+      <UBadge
+        color="neutral"
+        variant="subtle"
+      >
         312
       </UBadge>
     </div>

@@ -4,9 +4,9 @@ const cssVariableMapSchema = z.record(z.string().min(1), z.string().min(1))
 
 const cssVariablesSchema = z.object({
   light: cssVariableMapSchema.optional(),
-  dark: cssVariableMapSchema.optional()
+  dark: cssVariableMapSchema.optional(),
 }).refine(value => Boolean(value.light || value.dark), {
-  message: 'At least one cssVariables mode is required'
+  message: 'At least one cssVariables mode is required',
 })
 
 const typographySchema = z.record(z.string().min(1), z.string().min(1))
@@ -16,14 +16,14 @@ const assetSchema = z.object({
   src: z.string().min(1),
   role: z.string().min(1),
   media: z.enum(['light', 'dark', 'any']).optional(),
-  alt: z.string().optional()
+  alt: z.string().optional(),
 })
 
 const logoSetSchema = z.record(z.string().min(1), assetSchema)
 
 export const brandAssetsSchema = z.object({
   logos: logoSetSchema.optional(),
-  files: z.array(assetSchema).optional()
+  files: z.array(assetSchema).optional(),
 })
 
 const colorScaleSchema = z.record(z.string().regex(/^\d+$/, 'Color scale keys must be numeric'), z.string().min(1))
@@ -38,54 +38,54 @@ const voiceSchema = z.object({
   donts: z.array(z.string().min(1)).optional(),
   examples: z.array(z.object({
     label: z.string().min(1),
-    text: z.string().min(1)
-  })).optional()
+    text: z.string().min(1),
+  })).optional(),
 })
 
 const componentCoverageSchema = z.object({
   family: z.string().min(1),
   components: z.array(z.string().min(1)).min(1),
   status: z.enum(['planned', 'tokenized', 'documented', 'verified']),
-  notes: z.string().optional()
+  notes: z.string().optional(),
 })
 
 const usageSchema = z.object({
   useFor: z.array(z.string().min(1)).optional(),
   avoid: z.array(z.string().min(1)).optional(),
-  runtimeLimits: z.array(z.string().min(1)).optional()
+  runtimeLimits: z.array(z.string().min(1)).optional(),
 })
 
 const docsSchema = z.object({
   sections: z.array(z.object({
     title: z.string().min(1),
     description: z.string().min(1),
-    to: z.string().min(1)
-  })).optional()
+    to: z.string().min(1),
+  })).optional(),
 })
 
 const brandMetadataSchema = z.object({
   name: z.string().min(1).regex(/^[a-z0-9][a-z0-9-]*$/, 'Brand identity names must be kebab-case'),
   packageName: z.string().min(1).optional(),
-  claim: z.string().min(1).optional()
+  claim: z.string().min(1).optional(),
 })
 
 export const brandIdentitySchema = brandMetadataSchema.extend({
   logoAssetPaths: z.record(z.string().min(1), z.string().min(1)).optional(),
-  colors: paletteSchema.optional()
+  colors: paletteSchema.optional(),
 }).passthrough()
 
 export const brandDefinitionSchema = brandMetadataSchema.extend({
   colors: paletteSchema,
   roles: z.record(z.string().min(1), z.string().min(1)).optional(),
   typography: typographySchema.optional(),
-  assets: brandAssetsSchema.optional()
+  assets: brandAssetsSchema.optional(),
 }).passthrough().superRefine((brand, context) => {
   for (const [role, colorName] of Object.entries(brand.roles ?? {})) {
     if (!(colorName in brand.colors)) {
       context.addIssue({
         code: 'custom',
         path: ['roles', role],
-        message: `Brand color "${colorName}" is not defined`
+        message: `Brand color "${colorName}" is not defined`,
       })
     }
   }
@@ -97,9 +97,9 @@ export const brandThemeSchema = z.object({
   description: z.string().optional(),
   cssVariables: cssVariablesSchema.optional(),
   typography: typographySchema.optional(),
-  ui: z.record(z.string().min(1), z.unknown()).optional()
+  ui: z.record(z.string().min(1), z.unknown()).optional(),
 }).refine(value => Boolean(value.cssVariables || value.typography || value.ui), {
-  message: 'A theme must define cssVariables, typography, or ui'
+  message: 'A theme must define cssVariables, typography, or ui',
 })
 
 export const brandGuideSchema = z.object({
@@ -118,7 +118,7 @@ export const brandGuideSchema = z.object({
   componentCoverage: z.array(componentCoverageSchema).optional(),
   usage: usageSchema.optional(),
   docs: docsSchema.optional(),
-  ui: z.record(z.string().min(1), z.unknown()).optional()
+  ui: z.record(z.string().min(1), z.unknown()).optional(),
 })
 
 export type BrandIdentitySchema = z.infer<typeof brandIdentitySchema>

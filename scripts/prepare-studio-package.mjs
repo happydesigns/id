@@ -7,9 +7,9 @@ import { parseArgs } from 'node:util'
 
 // Only copy an explicitly selected reviewed archive. Never search sibling repositories.
 const { values } = parseArgs({ options: {
-  source: { type: 'string' },
+  'source': { type: 'string' },
   'public-dir': { type: 'string' },
-  sha256: { type: 'string' }
+  'sha256': { type: 'string' },
 } })
 if (!values.source || !values['public-dir']) throw new Error('Usage: id-studio-package --source vendor/id.tgz --public-dir docs/public [--sha256 <expected hash>]')
 const bytes = await readFile(resolve(values.source))

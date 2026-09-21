@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { useStudioIcon } from "../playground-icons"
+import { useStudioIcon } from '../playground-icons'
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
 const props = defineProps<{ loading?: boolean, failed?: boolean }>()
 const showLoading = ref(false)
 watch(() => props.loading, (loading, _previous, cleanup) => {
   showLoading.value = false
   if (!loading) return
-  const timer = setTimeout(() => { showLoading.value = true }, 150)
+  const timer = setTimeout(() => {
+    showLoading.value = true
+  }, 150)
   cleanup(() => clearTimeout(timer))
 }, { immediate: true })
 defineEmits<{ retry: [] }>()
@@ -20,12 +23,17 @@ const clamp = (value: number) => Math.min(3840, Math.max(240, Math.round(value))
 function start(event: PointerEvent) {
   if (event.button !== 0) return
   const currentScale = scale.value
-  if (!width.value) { width.value = clamp(available.value.width); height.value = clamp(available.value.height) }
+  if (!width.value) {
+    width.value = clamp(available.value.width)
+    height.value = clamp(available.value.height)
+  }
   origin = { x: event.clientX, y: event.clientY, width: width.value, height: height.value, scale: currentScale || 1 }
   dragging.value = true
   zoom.value = currentScale
-  ;(event.currentTarget as HTMLElement).focus()
-  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+  ;
+  (event.currentTarget as HTMLElement).focus()
+  ;
+  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
   event.preventDefault()
 }
 function move(event: PointerEvent, axis: string) {
@@ -33,12 +41,25 @@ function move(event: PointerEvent, axis: string) {
   if (axis !== 'height') width.value = clamp(Math.min(available.value.width / origin.scale, origin.width + 2 * (event.clientX - origin.x) / origin.scale))
   if (axis !== 'width') height.value = clamp(Math.min(available.value.height / origin.scale, origin.height + (event.clientY - origin.y) / origin.scale))
 }
-function cancel() { if (dragging.value) { width.value = origin.width; height.value = origin.height; dragging.value = false } }
+function cancel() {
+  if (dragging.value) {
+    width.value = origin.width
+    height.value = origin.height
+    dragging.value = false
+  }
+}
 function keyboard(event: KeyboardEvent, axis: string) {
-  if (event.key === 'Escape') { event.preventDefault(); cancel(); return }
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    cancel()
+    return
+  }
   if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return
   event.preventDefault()
-  if (!width.value) { width.value = clamp(available.value.width); height.value = clamp(available.value.height) }
+  if (!width.value) {
+    width.value = clamp(available.value.width)
+    height.value = clamp(available.value.height)
+  }
   const step = event.shiftKey ? 10 : 1
   if (axis !== 'height' && event.key.startsWith('Arrow') && ['ArrowLeft', 'ArrowRight'].includes(event.key)) width.value = clamp(width.value + (event.key === 'ArrowRight' ? step : -step))
   if (axis !== 'width' && ['ArrowUp', 'ArrowDown'].includes(event.key)) height.value = clamp(height.value + (event.key === 'ArrowDown' ? step : -step))
@@ -60,21 +81,70 @@ const resolveIcon = useStudioIcon()
 </script>
 
 <template>
-  <div ref="surface" class="viewport-surface" :class="{ 'viewport-responsive': width }">
-    <div class="viewport-frame" :style="width ? { width: `${width * scale}px`, height: `${height * scale}px` } : { width: '100%', height: '100%' }">
+  <div
+    ref="surface"
+    class="viewport-surface"
+    :class="{ 'viewport-responsive': width }"
+  >
+    <div
+      class="viewport-frame"
+      :style="width ? { width: `${width * scale}px`, height: `${height * scale}px` } : { width: '100%', height: '100%' }"
+    >
       <div class="viewport-clip">
-      <slot :frame-style="frameStyle" />
-      <div v-if="failed" class="viewport-loading">
-        <div class="space-y-3 p-6 text-center">
-          <p role="alert" class="text-sm">Preview could not load.</p>
-          <UButton color="neutral" variant="outline" :icon="resolveIcon('i-lucide-refresh-cw')" @click="$emit('retry')">Retry preview</UButton>
+        <slot :frame-style="frameStyle" />
+        <div
+          v-if="failed"
+          class="viewport-loading"
+        >
+          <div class="space-y-3 p-6 text-center">
+            <p
+              role="alert"
+              class="text-sm"
+            >
+              Preview could not load.
+            </p>
+            <UButton
+              color="neutral"
+              variant="outline"
+              :icon="resolveIcon('i-lucide-refresh-cw')"
+              @click="$emit('retry')"
+            >
+              Retry preview
+            </UButton>
+          </div>
+        </div>
+        <div
+          v-else-if="showLoading"
+          class="viewport-loading"
+          role="status"
+        >
+          <UIcon
+            :name="resolveIcon('i-lucide-loader-circle')"
+            class="size-5 animate-spin"
+          /><span class="sr-only">Loading preview</span>
         </div>
       </div>
-      <div v-else-if="showLoading" class="viewport-loading" role="status"><UIcon :name="resolveIcon('i-lucide-loader-circle')" class="size-5 animate-spin" /><span class="sr-only">Loading preview</span></div>
-      </div>
-      <button v-for="axis in width ? ['width', 'height', 'both'] : []" :key="axis" type="button" :class="['viewport-handle', `handle-${axis}`]" :aria-label="`Resize viewport ${axis}`" :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`" @pointerdown="start" @pointermove="move($event, axis)" @pointerup="dragging = false" @pointercancel="cancel" @lostpointercapture="dragging = false" @keydown="keyboard($event, axis)"><span aria-hidden="true" /></button>
+      <button
+        v-for="axis in width ? ['width', 'height', 'both'] : []"
+        :key="axis"
+        type="button"
+        :class="['viewport-handle', `handle-${axis}`]"
+        :aria-label="`Resize viewport ${axis}`"
+        :title="axis === 'both' ? 'Drag to resize' : `Drag to resize ${axis}`"
+        @pointerdown="start"
+        @pointermove="move($event, axis)"
+        @pointerup="dragging = false"
+        @pointercancel="cancel"
+        @lostpointercapture="dragging = false"
+        @keydown="keyboard($event, axis)"
+      >
+        <span aria-hidden="true" />
+      </button>
     </div>
-    <span v-if="width && scale < 0.99" class="viewport-scale">{{ Math.round(scale * 100) }}%</span>
+    <span
+      v-if="width && scale < 0.99"
+      class="viewport-scale"
+    >{{ Math.round(scale * 100) }}%</span>
   </div>
 </template>
 

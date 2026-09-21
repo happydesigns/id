@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { usePlaygroundToast } from "../../playground-toast"
+import { usePlaygroundToast } from '../../playground-toast'
+
 const toast = usePlaygroundToast()
 
 const accounts = [
   { label: 'Main Checking •8402', value: 'checking' },
-  { label: 'High Yield Savings •1192', value: 'savings' }
+  { label: 'High Yield Savings •1192', value: 'savings' },
 ]
 
 const amount = ref(1200)
@@ -25,15 +26,27 @@ const to = ref('savings')
       </div>
 
       <UFormField label="Amount">
-        <UInputNumber v-model="amount" :format-options="{ style: 'currency', currency: 'USD' }" class="w-full" />
+        <UInputNumber
+          v-model="amount"
+          :format-options="{ style: 'currency', currency: 'USD' }"
+          class="w-full"
+        />
       </UFormField>
 
       <UFormField label="From">
-        <USelect v-model="from" :items="accounts" class="w-full" />
+        <USelect
+          v-model="from"
+          :items="accounts"
+          class="w-full"
+        />
       </UFormField>
 
       <UFormField label="To">
-        <USelect v-model="to" :items="accounts" class="w-full" />
+        <USelect
+          v-model="to"
+          :items="accounts"
+          class="w-full"
+        />
       </UFormField>
 
       <div class="space-y-1.5 text-sm">
@@ -49,7 +62,10 @@ const to = ref('savings')
     </div>
 
     <div class="flex justify-end border-t border-default p-3">
-      <UButton label="Confirm transfer" @click="toast.add({ title: 'Transfer confirmed' })" />
+      <UButton
+        label="Confirm transfer"
+        @click="toast.add({ title: 'Transfer confirmed' })"
+      />
     </div>
   </div>
 </template>

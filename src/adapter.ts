@@ -3,7 +3,7 @@ import type { BrandDefinition } from './types'
 export type BrandAdapter<
   TBrand extends BrandDefinition = BrandDefinition,
   TOptions = unknown,
-  TOutput = unknown
+  TOutput = unknown,
 > = {
   readonly name: string
   readonly transform: (brand: TBrand, options: TOptions) => TOutput
@@ -18,6 +18,5 @@ export function defineBrandAdapter<const TAdapter extends BrandAdapterShape>(ada
   if (!adapter.name.trim()) {
     throw new TypeError('Brand adapter names must not be empty')
   }
-
   return adapter
 }

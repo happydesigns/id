@@ -16,39 +16,38 @@ const authFields = [{
   name: 'email',
   type: 'email',
   label: 'Email',
-  placeholder: 'hello@example.com'
+  placeholder: 'hello@example.com',
 }, {
   name: 'password',
   type: 'password',
   label: 'Password',
-  placeholder: 'Password'
+  placeholder: 'Password',
 }]
 
 const scopedThemeProps = {
   button: {
     color: 'secondary' as const,
     variant: 'solid' as const,
-    size: 'sm' as const
+    size: 'sm' as const,
   },
   badge: {
     color: 'secondary' as const,
-    variant: 'subtle' as const
+    variant: 'subtle' as const,
   },
   alert: {
     color: 'secondary' as const,
-    variant: 'soft' as const
-  }
+    variant: 'soft' as const,
+  },
 }
 
 const previewSurfaceClass = 'flex min-h-28 items-center justify-center rounded-sm border p-5'
 
 function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSurfaces']) {
   const surface = props.context.assetPreviewSurfaces[mode]
-
   return {
     backgroundColor: surface.background,
     borderColor: surface.border,
-    color: surface.color
+    color: surface.color,
   }
 }
 </script>
@@ -92,7 +91,10 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
           :alt="`${props.context.copy.brandLabel} wordmark`"
           class="h-6 w-auto"
         >
-        <span v-else class="font-semibold text-highlighted">{{ props.context.copy.brandLabel }}</span>
+        <span
+          v-else
+          class="font-semibold text-highlighted"
+        >{{ props.context.copy.brandLabel }}</span>
       </div>
       <div
         :class="previewSurfaceClass"
@@ -104,7 +106,10 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
           :alt="`${props.context.copy.brandLabel} inverse wordmark`"
           class="h-6 w-auto"
         >
-        <span v-else class="font-semibold">{{ props.context.copy.brandLabel }}</span>
+        <span
+          v-else
+          class="font-semibold"
+        >{{ props.context.copy.brandLabel }}</span>
       </div>
     </div>
   </ClientOnly>
@@ -131,7 +136,10 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
     </template>
   </ClientOnly>
 
-  <div v-else-if="props.name === 'error'" class="overflow-hidden rounded-sm border border-default">
+  <div
+    v-else-if="props.name === 'error'"
+    class="overflow-hidden rounded-sm border border-default"
+  >
     <UError
       :error="{ statusCode: 404, message: 'This preview demonstrates a recoverable missing state.' }"
       :links="[{ label: 'Open components', to: props.context.paths.components, color: 'neutral', variant: 'outline' }]"
@@ -151,7 +159,10 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
       />
       <div class="flex flex-wrap items-center gap-2">
         <UBadge label="Scoped" />
-        <UButton label="Preview" icon="i-lucide-eye" />
+        <UButton
+          label="Preview"
+          icon="i-lucide-eye"
+        />
       </div>
     </div>
   </UTheme>
@@ -179,7 +190,10 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
           />
           <div class="flex flex-wrap items-center gap-2">
             <UBadge label="Scoped" />
-            <UButton label="Preview" icon="i-lucide-eye" />
+            <UButton
+              label="Preview"
+              icon="i-lucide-eye"
+            />
           </div>
         </div>
       </UTheme>
@@ -191,7 +205,10 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
     </template>
   </ClientOnly>
 
-  <div v-else-if="props.name === 'system-assets-pattern'" class="space-y-5">
+  <div
+    v-else-if="props.name === 'system-assets-pattern'"
+    class="space-y-5"
+  >
     <div class="grid gap-5 lg:grid-cols-2">
       <div class="space-y-3">
         <p class="font-semibold text-highlighted">
@@ -208,7 +225,10 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
               :alt="`${props.context.copy.brandLabel} wordmark on light surface`"
               class="h-6 w-auto"
             >
-            <span v-else class="font-semibold text-highlighted">{{ props.context.copy.brandLabel }}</span>
+            <span
+              v-else
+              class="font-semibold text-highlighted"
+            >{{ props.context.copy.brandLabel }}</span>
           </div>
           <div
             :class="previewSurfaceClass"
@@ -220,7 +240,10 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
               :alt="`${props.context.copy.brandLabel} inverse wordmark on dark surface`"
               class="h-6 w-auto"
             >
-            <span v-else class="font-semibold">{{ props.context.copy.brandLabel }}</span>
+            <span
+              v-else
+              class="font-semibold"
+            >{{ props.context.copy.brandLabel }}</span>
           </div>
         </div>
       </div>
@@ -269,13 +292,19 @@ function previewSurfaceStyle(mode: keyof ComponentExampleContext['assetPreviewSu
     </p>
   </div>
 
-  <div v-else-if="props.name === 'system-access-pattern'" class="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
+  <div
+    v-else-if="props.name === 'system-access-pattern'"
+    class="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]"
+  >
     <div class="space-y-4">
       <UFormField
         label="Language"
         help="Locale controls stay close to language-sensitive content."
       >
-        <ULocaleSelect v-model="locale" :locales="locales" />
+        <ULocaleSelect
+          v-model="locale"
+          :locales="locales"
+        />
       </UFormField>
       <div class="overflow-hidden rounded-sm border border-default">
         <UError

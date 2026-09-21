@@ -5,7 +5,7 @@ const nuxtUiConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
 export default defineAppConfig({
   id: {
     name: 'happydesigns-id',
-    theme: nuxtUiBrandTheme
+    theme: nuxtUiBrandTheme,
   },
-  ui: nuxtUiConfig.ui
+  ui: nuxtUiConfig.ui,
 })

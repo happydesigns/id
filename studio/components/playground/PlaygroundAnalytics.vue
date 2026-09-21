@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useStudioIcons } from "../../playground-icons"
+import { useStudioIcons } from '../../playground-icons'
+
 const studioIcons = useStudioIcons()
 const bars = [40, 65, 52, 80, 60, 95, 72]
 const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -16,7 +17,12 @@ const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
           418.2K
         </p>
       </div>
-      <UBadge color="success" variant="subtle" size="sm" :icon="studioIcons.trendingUp">
+      <UBadge
+        color="success"
+        variant="subtle"
+        size="sm"
+        :icon="studioIcons.trendingUp"
+      >
         +10%
       </UBadge>
     </div>
@@ -31,7 +37,11 @@ const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
         />
       </div>
       <div class="flex gap-1.5 mt-1.5">
-        <span v-for="(day, index) in days" :key="index" class="flex-1 text-center text-xs text-muted">
+        <span
+          v-for="(day, index) in days"
+          :key="index"
+          class="flex-1 text-center text-xs text-muted"
+        >
           {{ day }}
         </span>
       </div>

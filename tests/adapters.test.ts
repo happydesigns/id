@@ -5,7 +5,7 @@ import {
   cssVariablesAdapter,
   defineBrand,
   defineBrandAdapter,
-  nuxtUiAdapter
+  nuxtUiAdapter,
 } from '../src'
 
 const brand = defineBrand({
@@ -13,21 +13,21 @@ const brand = defineBrand({
   colors: {
     coral: {
       50: '#FFF2ED',
-      500: '#F28564'
+      500: '#F28564',
     },
     sand: {
       150: '#F1ECE6',
-      500: '#8F857A'
+      500: '#8F857A',
     },
-    graphite: '#242423'
+    graphite: '#242423',
   },
   roles: {
     signature: 'coral',
-    structure: 'sand'
+    structure: 'sand',
   },
   typography: {
     sans: 'Fixture Sans, sans-serif',
-    editorial: 'Fixture Serif, serif'
+    editorial: 'Fixture Serif, serif',
   },
   assets: {
     logos: {
@@ -35,10 +35,10 @@ const brand = defineBrand({
         name: 'Fixture signature',
         src: '/brand/signature.svg',
         role: 'signature',
-        media: 'any'
-      }
-    }
-  }
+        media: 'any',
+      },
+    },
+  },
 } as const)
 
 describe('brand definitions', () => {
@@ -48,46 +48,43 @@ describe('brand definitions', () => {
     expect(brand.typography.editorial).toBe('Fixture Serif, serif')
     expect(brand.assets.logos.signature.src).toBe('/brand/signature.svg')
   })
-
   it('rejects roles that reference undefined colors', () => {
     expect(() => defineBrand({
       name: 'invalid-brand',
       colors: {
-        coral: '#F28564'
+        coral: '#F28564',
       },
       roles: {
-        action: 'missing'
-      }
+        action: 'missing',
+      },
     } as never)).toThrow(BrandValidationError)
   })
-
   it('validates runtime assets without requiring a guide', () => {
     expect(() => defineBrand({
       name: 'invalid-assets',
       colors: {
-        coral: '#F28564'
+        coral: '#F28564',
       },
       assets: {
         logos: {
           signature: {
             name: 'Fixture signature',
             src: '',
-            role: 'signature'
-          }
-        }
-      }
+            role: 'signature',
+          },
+        },
+      },
     })).toThrow(BrandValidationError)
   })
-
   it('rejects empty custom typography stacks', () => {
     expect(() => defineBrand({
       name: 'invalid-typography',
       colors: {
-        coral: '#F28564'
+        coral: '#F28564',
       },
       typography: {
-        editorial: ''
-      }
+        editorial: '',
+      },
     })).toThrow(BrandValidationError)
   })
 })
@@ -99,76 +96,70 @@ describe('Nuxt UI adapter', () => {
       colors: {
         primary: brand.roles.signature,
         neutral: brand.roles.structure,
-        emphasis: 'graphite'
+        emphasis: 'graphite',
       },
       components: {
         button: {
           defaultVariants: {
-            variant: 'solid'
-          }
-        }
-      }
+            variant: 'solid',
+          },
+        },
+      },
     })
-
     expect(theme.ui).toMatchObject({
       colors: {
         primary: 'coral',
         neutral: 'sand',
-        emphasis: 'graphite'
+        emphasis: 'graphite',
       },
       button: {
         defaultVariants: {
-          variant: 'solid'
-        }
-      }
+          variant: 'solid',
+        },
+      },
     })
     expect(theme.typography).toEqual(brand.typography)
   })
-
   it('leaves omitted target roles at Nuxt UI defaults', () => {
     const theme = nuxtUiAdapter.transform(brand, {
       colors: {
-        primary: 'coral'
-      }
+        primary: 'coral',
+      },
     })
-
     expect(theme.ui?.colors).toEqual({ primary: 'coral' })
     expect(theme.ui?.colors).not.toHaveProperty('secondary')
   })
-
   it('rejects mappings to undefined brand colors', () => {
     expect(() => nuxtUiAdapter.transform(brand, {
       colors: {
-        primary: 'missing'
-      }
+        primary: 'missing',
+      },
     } as never)).toThrow(BrandValidationError)
   })
-
   it('only emits dark overrides when the brand integration provides them', () => {
     const lightOnly = nuxtUiAdapter.transform(brand, {
       colors: {
-        primary: 'coral'
+        primary: 'coral',
       },
       cssVariables: {
         light: {
-          '--ui-bg': '#FAF7F2'
-        }
-      }
+          '--ui-bg': '#FAF7F2',
+        },
+      },
     })
     const withDarkOverrides = nuxtUiAdapter.transform(brand, {
       colors: {
-        primary: 'coral'
+        primary: 'coral',
       },
       cssVariables: {
         light: {
-          '--ui-bg': '#FAF7F2'
+          '--ui-bg': '#FAF7F2',
         },
         dark: {
-          '--ui-bg': '#242423'
-        }
-      }
+          '--ui-bg': '#242423',
+        },
+      },
     })
-
     expect(createThemeCssVars(lightOnly)).not.toContain('.dark')
     expect(createThemeCssVars(withDarkOverrides)).toContain('.dark')
   })
@@ -178,16 +169,15 @@ describe('CSS variables adapter', () => {
   it('flattens the same neutral colors, roles, and typography', () => {
     const output = cssVariablesAdapter.transform(brand, {
       prefix: 'client',
-      selector: '[data-brand="client"]'
+      selector: '[data-brand="client"]',
     })
-
     expect(output.variables).toMatchObject({
       '--client-color-coral-500': '#F28564',
       '--client-color-sand-150': '#F1ECE6',
       '--client-color-graphite': '#242423',
       '--client-role-signature-500': 'var(--client-color-coral-500)',
       '--client-font-sans': 'Fixture Sans, sans-serif',
-      '--client-font-editorial': 'Fixture Serif, serif'
+      '--client-font-editorial': 'Fixture Serif, serif',
     })
     expect(output.css).toContain('[data-brand="client"] {')
     expect(output.css).toContain('--client-color-sand-150: #F1ECE6;')
@@ -201,14 +191,13 @@ describe('custom adapters', () => {
       transform(input: typeof brand, options: { accent: keyof typeof brand.colors }) {
         return {
           accent: options.accent,
-          value: input.colors[options.accent]
+          value: input.colors[options.accent],
         }
-      }
+      },
     })
-
     expect(customAdapter.transform(brand, { accent: 'graphite' })).toEqual({
       accent: 'graphite',
-      value: '#242423'
+      value: '#242423',
     })
   })
 })

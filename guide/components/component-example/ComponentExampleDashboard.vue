@@ -13,13 +13,13 @@ const sidebarCollapsed = ref(false)
 const statusItems = [
   { label: 'Draft', value: 'Draft' },
   { label: 'Ready for review', value: 'Ready for review' },
-  { label: 'Published', value: 'Published' }
+  { label: 'Published', value: 'Published' },
 ]
 
 const dashboardItems = [
   { label: 'Projects', icon: 'i-lucide-folder-kanban', active: true },
   { label: 'Components', icon: 'i-lucide-component' },
-  { label: 'Settings', icon: 'i-lucide-settings' }
+  { label: 'Settings', icon: 'i-lucide-settings' },
 ]
 
 const dashboardSearchGroups = [{
@@ -27,14 +27,14 @@ const dashboardSearchGroups = [{
   label: 'Dashboard',
   items: [
     { label: 'Open projects', icon: 'i-lucide-folder-kanban' },
-    { label: 'Review components', icon: 'i-lucide-component' }
-  ]
+    { label: 'Review components', icon: 'i-lucide-component' },
+  ],
 }]
 
 const navigationItems = [
   { label: 'Colors', icon: 'i-lucide-palette', to: props.context.paths.colors },
   { label: 'Typography', icon: 'i-lucide-type', to: props.context.paths.typography },
-  { label: 'Components', icon: 'i-lucide-component', to: props.context.paths.components, active: true }
+  { label: 'Components', icon: 'i-lucide-component', to: props.context.paths.components, active: true },
 ]
 </script>
 
@@ -128,7 +128,10 @@ const navigationItems = [
 
       <template #body>
         <div class="grid gap-3">
-          <UCard variant="outline" :ui="{ body: 'p-4' }">
+          <UCard
+            variant="outline"
+            :ui="{ body: 'p-4' }"
+          >
             <div class="space-y-1">
               <p class="font-semibold text-highlighted">
                 {{ props.context.copy.projectTitle }}
@@ -138,7 +141,10 @@ const navigationItems = [
               </p>
             </div>
           </UCard>
-          <UCard variant="outline" :ui="{ body: 'p-4' }">
+          <UCard
+            variant="outline"
+            :ui="{ body: 'p-4' }"
+          >
             <div class="space-y-1">
               <p class="font-semibold text-highlighted">
                 Brand guide

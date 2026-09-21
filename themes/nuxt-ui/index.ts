@@ -7,7 +7,7 @@ const nuxtUiColors = {
   info: 'sky',
   warning: 'amber',
   error: 'red',
-  neutral: 'slate'
+  neutral: 'slate',
 }
 
 const nuxtUiComponentDefaults = { colors: nuxtUiColors }
@@ -18,7 +18,7 @@ export const nuxtUiBrandTheme = defineBrandTheme({
   description: 'A default Nuxt UI baseline with standard semantic colors, radius, surfaces, and component defaults.',
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
-    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
   },
   cssVariables: {
     light: {
@@ -35,7 +35,7 @@ export const nuxtUiBrandTheme = defineBrandTheme({
       '--ui-border': 'var(--ui-color-neutral-200)',
       '--ui-border-muted': 'var(--ui-color-neutral-100)',
       '--ui-border-accented': 'var(--ui-color-neutral-300)',
-      '--ui-radius': '0.375rem'
+      '--ui-radius': '0.375rem',
     },
     dark: {
       '--ui-bg': 'var(--ui-color-neutral-950)',
@@ -51,10 +51,10 @@ export const nuxtUiBrandTheme = defineBrandTheme({
       '--ui-border': 'var(--ui-color-neutral-800)',
       '--ui-border-muted': 'var(--ui-color-neutral-900)',
       '--ui-border-accented': 'var(--ui-color-neutral-700)',
-      '--ui-radius': '0.375rem'
-    }
+      '--ui-radius': '0.375rem',
+    },
   },
-  ui: nuxtUiComponentDefaults
+  ui: nuxtUiComponentDefaults,
 })
 
 export const neutralBrandTheme = nuxtUiBrandTheme
@@ -73,33 +73,33 @@ export const idBrandGuide = defineBrandGuide({
     dos: [
       'Keep product behavior outside the brand layer.',
       'Map brand choices to Nuxt UI semantic roles first.',
-      'Use runtime switching only for values that are already shipped.'
+      'Use runtime switching only for values that are already shipped.',
     ],
     donts: [
       'Do not make arbitrary product components depend on a concrete brand.',
-      'Do not hide domain behavior inside identity configuration.'
-    ]
+      'Do not hide domain behavior inside identity configuration.',
+    ],
   },
   componentCoverage: [
     {
       family: 'Actions',
       components: ['UButton', 'UBadge', 'UDropdownMenu'],
-      status: 'verified'
+      status: 'verified',
     },
     {
       family: 'Forms',
       components: ['UInput', 'UTextarea', 'USelect', 'UCheckbox'],
-      status: 'verified'
+      status: 'verified',
     },
     {
       family: 'Surfaces',
       components: ['UCard', 'UAlert', 'UTable', 'UHeader'],
-      status: 'verified'
-    }
+      status: 'verified',
+    },
   ],
   usage: {
     useFor: ['Nuxt UI projects', 'brand layers', 'runtime-safe theme values'],
     avoid: ['authorization', 'domain behavior', 'server credentials'],
-    runtimeLimits: ['Runtime themes only affect shipped CSS variables and app config.']
-  }
+    runtimeLimits: ['Runtime themes only affect shipped CSS variables and app config.'],
+  },
 })

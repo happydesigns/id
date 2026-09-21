@@ -17,7 +17,7 @@ export type StudioDocument = {
 const documentSchema = z.object({
   version: z.literal(1),
   brand: brandDefinitionSchema,
-  theme: brandThemeSchema
+  theme: brandThemeSchema,
 }).passthrough()
 
 export const studioBuiltinPalettes = ['slate', 'gray', 'zinc', 'neutral', 'stone', 'mauve', 'olive', 'mist', 'taupe', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
@@ -65,7 +65,7 @@ export function parseStudioDocument(input: string | unknown): StudioDocument {
     ...Object.values(doc.brand.typography ?? {}),
     ...Object.values(doc.theme.typography ?? {}),
     ...Object.values(doc.theme.cssVariables?.light ?? {}),
-    ...Object.values(doc.theme.cssVariables?.dark ?? {})
+    ...Object.values(doc.theme.cssVariables?.dark ?? {}),
   ]
   for (const css of cssValues) {
     if (typeof css !== 'string' || /[;{}<>\\]|url\s*\(|expression\s*\(|@import/i.test(css)) {
@@ -96,7 +96,7 @@ export function createStudioDocument(brand: BrandDefinition, theme: BrandTheme):
 export function createBlankStudioDocument(): StudioDocument {
   return createStudioDocument({
     name: 'new-brand', packageName: '@example/brand', claim: 'Make it your own.',
-    colors: {}, typography: { sans: 'system-ui, sans-serif', mono: 'ui-monospace, monospace' }
+    colors: {}, typography: { sans: 'system-ui, sans-serif', mono: 'ui-monospace, monospace' },
   }, { name: 'new-brand', label: 'New brand', ui: { colors: { primary: 'green', neutral: 'slate' } } })
 }
 
@@ -110,7 +110,8 @@ export function diffStudioDocuments(before: StudioDocument, after: StudioDocumen
       const left = a as Record<string, unknown>
       const right = b as Record<string, unknown>
       for (const key of new Set([...Object.keys(left), ...Object.keys(right)])) visit(left[key], right[key], path ? `${path}.${key}` : key)
-    } else changes.push({ path, before: a, after: b })
+    }
+    else changes.push({ path, before: a, after: b })
   }
   visit(before, after, '')
   return changes
@@ -120,11 +121,10 @@ export function createStudioCss(doc: StudioDocument): string {
   parseStudioDocument(doc)
   return [
     cssVariablesAdapter.transform(doc.brand, { prefix: '', selector: '@theme static', includeRoles: false }).css,
-    createThemeCssVars({ ...doc.theme, typography: { ...doc.brand.typography, ...doc.theme.typography } })
+    createThemeCssVars({ ...doc.theme, typography: { ...doc.brand.typography, ...doc.theme.typography } }),
   ].filter(Boolean).join('\n\n')
 }
 
-/** Native runtime output. The editor is a development dependency only. */
 export function createStudioRuntimeFiles(input: StudioDocument, options: { styles?: 'entry' | 'fragment' } = {}): Record<string, string> {
   const doc = parseStudioDocument(input)
   const json = (value: unknown) => JSON.stringify(value, null, 2).replaceAll('<', '\\u003c')
@@ -133,7 +133,7 @@ export function createStudioRuntimeFiles(input: StudioDocument, options: { style
     'app/assets/css/brand.css': options.styles === 'fragment'
       ? `/* Generated from brand.studio.json. Import after Tailwind and Nuxt UI in the host CSS entry. */\n${createStudioCss(doc)}\n`
       : `/* Generated from brand.studio.json. */\n@import "tailwindcss";\n@import "@nuxt/ui";\n@source "../../app.config.ts";\n${createStudioCss(doc)}\n`,
-    'app/brand.assets.json': `${json({ name: doc.theme.label, logos: doc.brand.assets?.logos ?? {} })}\n`
+    'app/brand.assets.json': `${json({ name: doc.theme.label, logos: doc.brand.assets?.logos ?? {} })}\n`,
   }
 }
 
@@ -163,16 +163,16 @@ export function createStudioProject(input: StudioDocument, options: StudioProjec
     files['app/assets/css/brand.css'] = [
       '/* Regenerated from brand.studio.json when Nuxt starts. */',
       '@import "tailwindcss";', '@import "@nuxt/ui";',
-      '@source "../../../brand.studio.json";', createStudioCss(doc), ''
+      '@source "../../../brand.studio.json";', createStudioCss(doc), '',
     ].join('\n')
-  } else Object.assign(files, createStudioRuntimeFiles(doc, { styles: 'fragment' }))
-
+  }
+  else Object.assign(files, createStudioRuntimeFiles(doc, { styles: 'fragment' }))
   const text: Record<string, string> = {
     brandName: doc.theme.label,
     packageName: manifest.name,
     packageNote: options.bundledPackage
       ? 'The reviewed id development package is bundled in vendor/id.tgz.'
-      : 'Install the reviewed id package as the development dependency.'
+      : 'Install the reviewed id package as the development dependency.',
   }
   for (const path of Object.keys(files)) {
     if (path.endsWith('.md')) files[path] = files[path]!.replace(/\{\{(brandName|packageName|packageNote)\}\}/g, (_, key: string) => text[key]!)
@@ -228,7 +228,10 @@ export function createStudioArchive(files: Record<string, string | Uint8Array>):
   view.setUint32(16, offset, true)
   const result = new Uint8Array(offset + directorySize + end.length)
   let position = 0
-  for (const chunk of [...chunks, ...central, end]) { result.set(chunk, position); position += chunk.length }
+  for (const chunk of [...chunks, ...central, end]) {
+    result.set(chunk, position)
+    position += chunk.length
+  }
   return result
 }
 

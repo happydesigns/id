@@ -15,13 +15,16 @@ function showToastPreview() {
     title: 'Changes saved',
     description: 'The pattern is ready for review.',
     icon: 'i-lucide-circle-check',
-    color: 'success'
+    color: 'success',
   })
 }
 </script>
 
 <template>
-  <div v-if="props.name === 'alert'" class="grid gap-3">
+  <div
+    v-if="props.name === 'alert'"
+    class="grid gap-3"
+  >
     <UAlert
       color="success"
       variant="subtle"
@@ -52,19 +55,28 @@ function showToastPreview() {
     title="Brand layer updated"
   />
 
-  <div v-else-if="props.name === 'progress'" class="space-y-3">
+  <div
+    v-else-if="props.name === 'progress'"
+    class="space-y-3"
+  >
     <div class="flex items-center justify-between gap-3">
       <p class="font-semibold text-highlighted">
         Accessibility pass
       </p>
-      <UBadge color="neutral" variant="outline">
+      <UBadge
+        color="neutral"
+        variant="outline"
+      >
         {{ progress }}%
       </UBadge>
     </div>
     <UProgress v-model="progress" />
   </div>
 
-  <div v-else-if="props.name === 'skeleton'" class="space-y-3">
+  <div
+    v-else-if="props.name === 'skeleton'"
+    class="space-y-3"
+  >
     <USkeleton class="h-4 w-2/3" />
     <USkeleton class="h-4 w-5/6" />
     <USkeleton class="h-4 w-1/2" />
@@ -86,7 +98,10 @@ function showToastPreview() {
   >
     <template #header>
       <div class="flex flex-col items-center gap-2 text-center">
-        <UIcon name="i-lucide-folder-open" class="size-6 text-muted" />
+        <UIcon
+          name="i-lucide-folder-open"
+          class="size-6 text-muted"
+        />
         <h3 class="font-semibold text-highlighted">
           No patterns yet
         </h3>
@@ -97,15 +112,34 @@ function showToastPreview() {
     </template>
   </UEmpty>
 
-  <div v-else-if="props.name === 'icon'" class="flex flex-wrap items-center gap-4">
-    <UIcon name="i-lucide-palette" class="size-5 text-primary" />
-    <UIcon name="i-lucide-component" class="size-5 text-secondary" />
-    <UIcon name="i-lucide-circle-check" class="size-5 text-success" />
+  <div
+    v-else-if="props.name === 'icon'"
+    class="flex flex-wrap items-center gap-4"
+  >
+    <UIcon
+      name="i-lucide-palette"
+      class="size-5 text-primary"
+    />
+    <UIcon
+      name="i-lucide-component"
+      class="size-5 text-secondary"
+    />
+    <UIcon
+      name="i-lucide-circle-check"
+      class="size-5 text-success"
+    />
   </div>
 
-  <div v-else-if="props.name === 'feedback-system-pattern'" class="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
+  <div
+    v-else-if="props.name === 'feedback-system-pattern'"
+    class="grid gap-5 lg:grid-cols-[1fr_0.9fr]"
+  >
     <div class="space-y-3">
-      <UBanner color="secondary" icon="i-lucide-info" title="Brand layer updated" />
+      <UBanner
+        color="secondary"
+        icon="i-lucide-info"
+        title="Brand layer updated"
+      />
       <UAlert
         color="success"
         variant="subtle"
@@ -134,7 +168,10 @@ function showToastPreview() {
           <p class="font-semibold text-highlighted">
             Accessibility pass
           </p>
-          <UBadge color="neutral" variant="outline">
+          <UBadge
+            color="neutral"
+            variant="outline"
+          >
             {{ progress }}%
           </UBadge>
         </div>
@@ -150,7 +187,10 @@ function showToastPreview() {
       >
         <template #header>
           <div class="flex flex-col items-center gap-2 text-center">
-            <UIcon name="i-lucide-folder-open" class="size-6 text-muted" />
+            <UIcon
+              name="i-lucide-folder-open"
+              class="size-6 text-muted"
+            />
             <h3 class="font-semibold text-highlighted">
               No patterns yet
             </h3>

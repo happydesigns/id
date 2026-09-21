@@ -51,7 +51,7 @@ export const themeIcons = {
     system: 'i-bi-display',
     tip: 'i-bi-lightbulb',
     upload: 'i-bi-upload',
-    warning: 'i-bi-exclamation-triangle'
+    warning: 'i-bi-exclamation-triangle',
   },
   heroicons: {
     arrowDown: 'i-heroicons-arrow-down',
@@ -96,7 +96,7 @@ export const themeIcons = {
     system: 'i-heroicons-computer-desktop',
     tip: 'i-heroicons-light-bulb',
     upload: 'i-heroicons-arrow-up-tray',
-    warning: 'i-heroicons-exclamation-triangle'
+    warning: 'i-heroicons-exclamation-triangle',
   },
   iconoir: {
     arrowDown: 'i-iconoir-arrow-down',
@@ -143,7 +143,7 @@ export const themeIcons = {
     system: 'i-iconoir-computer',
     tip: 'i-iconoir-light-bulb',
     upload: 'i-iconoir-upload',
-    warning: 'i-iconoir-warning-triangle'
+    warning: 'i-iconoir-warning-triangle',
   },
   material: {
     arrowDown: 'i-material-symbols-arrow-downward-rounded',
@@ -190,7 +190,7 @@ export const themeIcons = {
     system: 'i-material-symbols-desktop-windows-outline-rounded',
     tip: 'i-material-symbols-lightbulb-outline-rounded',
     upload: 'i-material-symbols-upload-rounded',
-    warning: 'i-material-symbols-warning-outline-rounded'
+    warning: 'i-material-symbols-warning-outline-rounded',
   },
   phosphor: {
     arrowDown: 'i-ph-arrow-down',
@@ -235,7 +235,7 @@ export const themeIcons = {
     system: 'i-ph-monitor',
     tip: 'i-ph-lightbulb',
     upload: 'i-ph-upload',
-    warning: 'i-ph-warning'
+    warning: 'i-ph-warning',
   },
   remix: {
     arrowDown: 'i-ri-arrow-down-line',
@@ -280,7 +280,7 @@ export const themeIcons = {
     system: 'i-ri-computer-line',
     tip: 'i-ri-lightbulb-line',
     upload: 'i-ri-upload-2-line',
-    warning: 'i-ri-alert-line'
+    warning: 'i-ri-alert-line',
   },
   tabler: {
     arrowDown: 'i-tabler-arrow-down',
@@ -325,7 +325,7 @@ export const themeIcons = {
     system: 'i-tabler-device-desktop',
     tip: 'i-tabler-bulb',
     upload: 'i-tabler-upload',
-    warning: 'i-tabler-alert-triangle'
+    warning: 'i-tabler-alert-triangle',
   },
   // 8-bit pixel-art set. Pixelarticons is a functional
   // UI pack (unlike streamline-pixel, which has no arrows/chevrons), but it
@@ -378,8 +378,8 @@ export const themeIcons = {
     system: 'i-pixelarticons-monitor',
     tip: 'i-pixelarticons-lightbulb',
     upload: 'i-pixelarticons-upload',
-    warning: 'i-pixelarticons-warning-diamond'
-  }
+    warning: 'i-pixelarticons-warning-diamond',
+  },
 } satisfies Record<string, typeof lucide>
 
 export type ThemeIcons = keyof typeof themeIcons
@@ -517,7 +517,7 @@ export const studioIcons = {
   laptop: 'i-lucide-laptop',
   trees: 'i-lucide-trees',
   ferrisWheel: 'i-lucide-ferris-wheel',
-  waves: 'i-lucide-waves'
+  waves: 'i-lucide-waves',
 }
 
 export type StudioIcon = keyof typeof studioIcons
@@ -547,7 +547,7 @@ export const studioIconOverrides: Partial<Record<ThemeIcons, Partial<Record<Stud
     shapes: 'i-bi-triangle',
     curve: 'i-bi-graph-up',
     proportions: 'i-bi-aspect-ratio',
-    layers: 'i-bi-layers'
+    layers: 'i-bi-layers',
   },
   heroicons: {
     undo: 'i-heroicons-arrow-uturn-left',
@@ -567,7 +567,7 @@ export const studioIconOverrides: Partial<Record<ThemeIcons, Partial<Record<Stud
     shapes: 'i-heroicons-squares-2x2',
     curve: 'i-heroicons-chart-bar',
     proportions: 'i-heroicons-rectangle-group',
-    layers: 'i-heroicons-square-3-stack-3d'
+    layers: 'i-heroicons-square-3-stack-3d',
   },
   iconoir: {
     undo: 'i-iconoir-undo',
@@ -587,7 +587,7 @@ export const studioIconOverrides: Partial<Record<ThemeIcons, Partial<Record<Stud
     shapes: 'i-iconoir-triangle',
     curve: 'i-iconoir-graph-up',
     proportions: 'i-iconoir-frame',
-    layers: 'i-iconoir-multiple-pages'
+    layers: 'i-iconoir-multiple-pages',
   },
   material: {
     undo: 'i-material-symbols-undo',
@@ -607,7 +607,7 @@ export const studioIconOverrides: Partial<Record<ThemeIcons, Partial<Record<Stud
     shapes: 'i-material-symbols-shapes-outline',
     curve: 'i-material-symbols-timeline-rounded',
     proportions: 'i-material-symbols-aspect-ratio-outline-rounded',
-    layers: 'i-material-symbols-layers-outline-rounded'
+    layers: 'i-material-symbols-layers-outline-rounded',
   },
   phosphor: {
     undo: 'i-ph-arrow-arc-left',
@@ -627,7 +627,7 @@ export const studioIconOverrides: Partial<Record<ThemeIcons, Partial<Record<Stud
     shapes: 'i-ph-shapes',
     curve: 'i-ph-chart-line',
     proportions: 'i-ph-rectangle',
-    layers: 'i-ph-stack'
+    layers: 'i-ph-stack',
   },
   remix: {
     undo: 'i-ri-arrow-go-back-line',
@@ -647,7 +647,7 @@ export const studioIconOverrides: Partial<Record<ThemeIcons, Partial<Record<Stud
     shapes: 'i-ri-shape-line',
     curve: 'i-ri-line-chart-line',
     proportions: 'i-ri-aspect-ratio-line',
-    layers: 'i-ri-stack-line'
+    layers: 'i-ri-stack-line',
   },
   tabler: {
     undo: 'i-tabler-arrow-back-up',
@@ -667,7 +667,7 @@ export const studioIconOverrides: Partial<Record<ThemeIcons, Partial<Record<Stud
     shapes: 'i-tabler-shape',
     curve: 'i-tabler-chart-line',
     proportions: 'i-tabler-aspect-ratio',
-    layers: 'i-tabler-stack-2'
+    layers: 'i-tabler-stack-2',
   },
   // Pixel has no settings cog (sliders stands in), no pie chart (generic
   // chart), no up-down chevron (sort), and no rocket/panels/newspaper/
@@ -767,45 +767,45 @@ export const studioIconOverrides: Partial<Record<ThemeIcons, Partial<Record<Stud
     laptop: 'i-pixelarticons-laptop',
     trees: 'i-pixelarticons-tree-pine',
     ferrisWheel: 'i-pixelarticons-balloon',
-    waves: 'i-pixelarticons-waves'
-  }
+    waves: 'i-pixelarticons-waves',
+  },
 }
 
 /** The icon packs the studio offers, each with its own brand glyph. */
 export const ICON_PACKS = [{
   label: 'Lucide',
   icon: 'i-lucide-feather',
-  value: 'lucide'
+  value: 'lucide',
 }, {
   label: 'Bootstrap',
   icon: 'i-bi-bootstrap',
-  value: 'bootstrap'
+  value: 'bootstrap',
 }, {
   label: 'Heroicons',
   icon: 'i-simple-icons-tailwindcss',
-  value: 'heroicons'
+  value: 'heroicons',
 }, {
   label: 'Iconoir',
   icon: 'i-iconoir-iconoir',
-  value: 'iconoir'
+  value: 'iconoir',
 }, {
   label: 'Material Symbols',
   icon: 'i-simple-icons-materialdesign',
-  value: 'material'
+  value: 'material',
 }, {
   label: 'Phosphor',
   icon: 'i-ph-phosphor-logo',
-  value: 'phosphor'
+  value: 'phosphor',
 }, {
   label: 'Pixelart',
   icon: 'i-pixelarticons-pixelarticons',
-  value: 'pixelarticons'
+  value: 'pixelarticons',
 }, {
   label: 'Remix',
   icon: 'i-ri-remixicon-line',
-  value: 'remix'
+  value: 'remix',
 }, {
   label: 'Tabler',
   icon: 'i-tabler-brand-tabler',
-  value: 'tabler'
+  value: 'tabler',
 }]

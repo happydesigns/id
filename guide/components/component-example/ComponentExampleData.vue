@@ -12,25 +12,25 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
 const tableData = computed(() => [
   { name: 'Button', role: t('data.action'), status: t('data.styled') },
   { name: 'Input', role: t('data.dataEntry'), status: t('data.styled') },
-  { name: 'Alert', role: t('data.feedback'), status: t('data.styled') }
+  { name: 'Alert', role: t('data.feedback'), status: t('data.styled') },
 ])
 
 const tableColumns = computed(() => [
   { accessorKey: 'name', header: t('data.component') },
   { accessorKey: 'role', header: t('data.role') },
-  { accessorKey: 'status', header: t('forms.reviewStatus') }
+  { accessorKey: 'status', header: t('forms.reviewStatus') },
 ])
 
 const timelineItems = computed(() => [
   { title: t('data.tokens'), description: t('data.tokensDescription'), icon: 'i-lucide-swatch-book' },
   { title: t('data.components'), description: t('data.componentsDescription'), icon: 'i-lucide-component' },
-  { title: t('data.review'), description: t('data.reviewDescription'), icon: 'i-lucide-circle-check' }
+  { title: t('data.review'), description: t('data.reviewDescription'), icon: 'i-lucide-circle-check' },
 ])
 
 const carouselItems = computed(() => [
   { title: t('data.color'), icon: 'i-lucide-palette' },
   { title: t('data.type'), icon: 'i-lucide-type' },
-  { title: t('data.logo'), icon: 'i-lucide-badge-check' }
+  { title: t('data.logo'), icon: 'i-lucide-badge-check' },
 ])
 
 const listboxItems = computed(() => [
@@ -38,7 +38,7 @@ const listboxItems = computed(() => [
   { label: t('data.typography'), value: 'typography' },
   { label: t('data.logos'), value: 'logos' },
   { label: t('data.components'), value: 'components' },
-  { label: t('data.voice'), value: 'voice' }
+  { label: t('data.voice'), value: 'voice' },
 ])
 </script>
 
@@ -49,13 +49,19 @@ const listboxItems = computed(() => [
     :columns="tableColumns"
   />
 
-  <div v-else-if="props.name === 'data-comparison-pattern'" class="space-y-4">
+  <div
+    v-else-if="props.name === 'data-comparison-pattern'"
+    class="space-y-4"
+  >
     <UTable
       :data="tableData"
       :columns="tableColumns"
     />
     <div class="flex flex-wrap items-center gap-2 text-sm text-muted">
-      <UIcon name="i-lucide-circle-check" class="size-4 text-success" />
+      <UIcon
+        name="i-lucide-circle-check"
+        class="size-4 text-success"
+      />
       {{ t('data.tableHelp') }}
     </div>
   </div>
@@ -106,8 +112,14 @@ const listboxItems = computed(() => [
     :avatar="{ src: props.context.assets.symbol, text: props.context.assets.symbol ? undefined : props.context.copy.brandLabel.slice(0, 2).toUpperCase(), alt: props.context.logoAlt }"
   />
 
-  <div v-else-if="props.name === 'data-object-pattern'" class="grid gap-4 md:grid-cols-[1fr_1fr]">
-    <UCard variant="outline" :ui="{ body: 'p-4' }">
+  <div
+    v-else-if="props.name === 'data-object-pattern'"
+    class="grid gap-4 md:grid-cols-[1fr_1fr]"
+  >
+    <UCard
+      variant="outline"
+      :ui="{ body: 'p-4' }"
+    >
       <div class="flex items-start justify-between gap-4">
         <div>
           <p class="font-semibold text-highlighted">
@@ -143,14 +155,20 @@ const listboxItems = computed(() => [
     </div>
   </div>
 
-  <div v-else-if="props.name === 'separator'" class="space-y-4">
+  <div
+    v-else-if="props.name === 'separator'"
+    class="space-y-4"
+  >
     <USeparator :label="t('data.token')" />
     <div class="rounded-sm bg-muted px-4 py-3 font-mono text-sm text-toned">
       --ui-primary: primary
     </div>
   </div>
 
-  <div v-else-if="props.name === 'collapsible'" class="space-y-3">
+  <div
+    v-else-if="props.name === 'collapsible'"
+    class="space-y-3"
+  >
     <UCollapsible>
       <UButton
         :label="t('data.showTokenDetail')"
@@ -166,21 +184,33 @@ const listboxItems = computed(() => [
     </UCollapsible>
   </div>
 
-  <div v-else-if="props.name === 'carousel'" class="overflow-hidden rounded-sm bg-muted">
+  <div
+    v-else-if="props.name === 'carousel'"
+    class="overflow-hidden rounded-sm bg-muted"
+  >
     <UCarousel
       v-slot="{ item }"
       :items="carouselItems"
       :ui="{ item: 'basis-full' }"
     >
       <div class="flex h-28 items-center justify-center gap-3 px-4">
-        <UIcon :name="item.icon" class="size-5 text-primary" />
+        <UIcon
+          :name="item.icon"
+          class="size-5 text-primary"
+        />
         <span class="font-semibold text-highlighted">{{ item.title }}</span>
       </div>
     </UCarousel>
   </div>
 
-  <div v-else-if="props.name === 'timeline'" class="rounded-sm border border-default bg-default p-5">
-    <UTimeline :items="timelineItems" size="sm" />
+  <div
+    v-else-if="props.name === 'timeline'"
+    class="rounded-sm border border-default bg-default p-5"
+  >
+    <UTimeline
+      :items="timelineItems"
+      size="sm"
+    />
   </div>
 
   <UScrollArea
@@ -204,7 +234,10 @@ const listboxItems = computed(() => [
     </div>
   </UScrollArea>
 
-  <div v-else-if="props.name === 'structure-sequence-pattern'" class="grid gap-7 md:grid-cols-2">
+  <div
+    v-else-if="props.name === 'structure-sequence-pattern'"
+    class="grid gap-7 md:grid-cols-2"
+  >
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
         {{ t('data.optionalDetail') }}
@@ -233,7 +266,10 @@ const listboxItems = computed(() => [
       <p class="text-sm text-muted">
         {{ t('data.timelineHelp') }}
       </p>
-      <UTimeline :items="timelineItems" size="sm" />
+      <UTimeline
+        :items="timelineItems"
+        size="sm"
+      />
     </div>
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
@@ -249,7 +285,10 @@ const listboxItems = computed(() => [
         :ui="{ item: 'basis-full' }"
       >
         <div class="flex h-24 items-center justify-center gap-3 px-4">
-          <UIcon :name="item.icon" class="size-5 text-primary" />
+          <UIcon
+            :name="item.icon"
+            class="size-5 text-primary"
+          />
           <span class="font-semibold text-highlighted">{{ item.title }}</span>
         </div>
       </UCarousel>

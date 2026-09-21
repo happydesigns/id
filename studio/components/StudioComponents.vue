@@ -22,6 +22,7 @@ import PlaygroundAuthForm from './playground/PlaygroundAuthForm.vue'
 import PlaygroundPrompt from './playground/PlaygroundPrompt.vue'
 import PlaygroundCard from './playground/PlaygroundCard.vue'
 import { computed, onMounted, onBeforeUnmount, ref, useTemplateRef } from 'vue'
+
 defineProps<{ state: string }>()
 
 // Adapted from Nuxt UI. See playground/NOTICE.md for source and changes.
@@ -46,7 +47,7 @@ const tiles = [
   { name: 'tabs', component: PlaygroundTabs },
   { name: 'contributors', component: PlaygroundContributors },
   { name: 'auth-form', component: PlaygroundAuthForm },
-  { name: 'prompt', component: PlaygroundPrompt }
+  { name: 'prompt', component: PlaygroundPrompt },
 ]
 
 // Measure the actual preview container, including its padding.
@@ -57,7 +58,9 @@ onMounted(() => {
   const element = scrollArea.value?.$el as HTMLElement | undefined
   if (!element) return
   width.value = element.getBoundingClientRect().width
-  observer = new ResizeObserver(() => { width.value = element.getBoundingClientRect().width })
+  observer = new ResizeObserver(() => {
+    width.value = element.getBoundingClientRect().width
+  })
   observer.observe(element, { box: 'border-box' })
 })
 onBeforeUnmount(() => observer?.disconnect())
@@ -84,13 +87,16 @@ const visibleTiles = tiles
       paddingStart: padding,
       paddingEnd: padding,
       overscan: 0,
-      getItemKey: (index: number) => visibleTiles[index]!.name
+      getItemKey: (index: number) => visibleTiles[index]!.name,
     }"
     :class="['component-gallery h-dvh', compact ? 'px-4' : 'px-6']"
   >
     <template #default="{ item }">
       <PlaygroundCard :data-example="item.name">
-        <component :is="item.component" :state="state" />
+        <component
+          :is="item.component"
+          :state="state"
+        />
       </PlaygroundCard>
     </template>
   </UScrollArea>

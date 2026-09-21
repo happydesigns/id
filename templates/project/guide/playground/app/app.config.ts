@@ -1,3 +1,3 @@
 export default defineAppConfig({
-    github: false
+  github: false,
 })

@@ -9,17 +9,6 @@ const bundledPackage = packageJson.devDependencies['@happydesigns/id'].startsWit
 
 export default defineNuxtConfig({
   extends: ['..', '@happydesigns/id/studio', '@happydesigns/id/guide', 'docus'],
-  compatibilityDate: '2026-08-01',
-  image: { provider: 'none' },
-  icon: { serverBundle: { collections: ['lucide', 'vscode-icons'] } },
-  runtimeConfig: {
-    idStudioSource: fileURLToPath(new URL('../brand.studio.json', import.meta.url))
-  },
-  hooks: {
-    'builder:watch': (_event, path) => {
-      if (path.endsWith('brand.studio.json')) generateBrand()
-    }
-  },
   appConfig: {
     idStudio: {
       document,
@@ -31,17 +20,28 @@ export default defineNuxtConfig({
           label: 'Docs',
           owner: 'docus',
           route: '/docs/introduction',
-          routePrefix: '/docs'
-        }
-      }
+          routePrefix: '/docs',
+        },
+      },
     },
     header: {
       title: document.theme.label,
       logo: {
         light: document.brand.assets?.logos?.wordmark?.src,
-        dark: document.brand.assets?.logos?.wordmarkInverse?.src
-      }
+        dark: document.brand.assets?.logos?.wordmarkInverse?.src,
+      },
     },
-    github: false
-  }
+    github: false,
+  },
+  runtimeConfig: {
+    idStudioSource: fileURLToPath(new URL('../brand.studio.json', import.meta.url)),
+  },
+  compatibilityDate: '2026-08-01',
+  hooks: {
+    'builder:watch': (_event, path) => {
+      if (path.endsWith('brand.studio.json')) generateBrand()
+    },
+  },
+  icon: { serverBundle: { collections: ['lucide', 'vscode-icons'] } },
+  image: { provider: 'none' },
 })

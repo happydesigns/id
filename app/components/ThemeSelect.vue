@@ -5,20 +5,20 @@ import { useBrandTheme } from '../composables/useBrandTheme'
 const props = withDefaults(defineProps<{
   appearance?: 'default' | 'header'
 }>(), {
-  appearance: 'default'
+  appearance: 'default',
 })
 
 const brandTheme = useBrandTheme()
 
 const items = computed(() => brandTheme.themes.value.map(theme => ({
   label: theme.label,
-  value: theme.name
+  value: theme.name,
 })))
 
 const selectUi = computed(() => props.appearance === 'header'
   ? {
       base: 'h-8 rounded-md px-2.5 text-sm font-medium hover:bg-elevated focus-visible:outline-2 focus-visible:outline-primary/30',
-      trailingIcon: 'size-4 text-muted'
+      trailingIcon: 'size-4 text-muted',
     }
   : undefined)
 
@@ -26,7 +26,7 @@ const selectedTheme = computed<string>({
   get: () => brandTheme.selectedName.value,
   set: (value) => {
     brandTheme.setTheme(value)
-  }
+  },
 })
 </script>
 

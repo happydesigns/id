@@ -12,7 +12,10 @@ export function generateBrand() {
     const target = resolve(root, path)
     mkdirSync(dirname(target), { recursive: true })
     let previous = ''
-    try { previous = readFileSync(target, 'utf8') } catch { /* First generation. */ }
+    try {
+      previous = readFileSync(target, 'utf8')
+    }
+    catch { /* First generation. */ }
     if (previous !== content) writeFileSync(target, content, 'utf8')
   }
 }

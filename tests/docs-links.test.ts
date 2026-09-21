@@ -6,36 +6,34 @@ describe('docs links', () => {
     expect(parseDocsLinks('UButton|https://ui.nuxt.com/docs/components/button; UTooltip|https://ui.nuxt.com/docs/components/tooltip')).toEqual([
       {
         label: 'UButton',
-        to: 'https://ui.nuxt.com/docs/components/button'
+        to: 'https://ui.nuxt.com/docs/components/button',
       },
       {
         label: 'UTooltip',
-        to: 'https://ui.nuxt.com/docs/components/tooltip'
-      }
+        to: 'https://ui.nuxt.com/docs/components/tooltip',
+      },
     ])
   })
-
   it('keeps url-only entries and filters empty targets', () => {
     expect(parseDocsLinks('https://ui.nuxt.com/docs/components/button; Empty| ; UCard|https://ui.nuxt.com/docs/components/card')).toEqual([
       {
-        to: 'https://ui.nuxt.com/docs/components/button'
+        to: 'https://ui.nuxt.com/docs/components/button',
       },
       {
         label: 'UCard',
-        to: 'https://ui.nuxt.com/docs/components/card'
-      }
+        to: 'https://ui.nuxt.com/docs/components/card',
+      },
     ])
   })
-
   it('normalizes typed docs links for component usage', () => {
     expect(parseDocsLinks([
       { label: ' UBadge ', to: ' https://ui.nuxt.com/docs/components/badge ' },
-      { label: 'Empty', to: ' ' }
+      { label: 'Empty', to: ' ' },
     ])).toEqual([
       {
         label: 'UBadge',
-        to: 'https://ui.nuxt.com/docs/components/badge'
-      }
+        to: 'https://ui.nuxt.com/docs/components/badge',
+      },
     ])
   })
 })

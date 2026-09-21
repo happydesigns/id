@@ -4,7 +4,7 @@ const shortcuts = [
   { label: 'Quick actions', keys: ['meta', 'J'] },
   { label: 'New file', keys: ['meta', 'N'] },
   { label: 'Save', keys: ['meta', 'S'] },
-  { label: 'Toggle sidebar', keys: ['meta', 'B'] }
+  { label: 'Toggle sidebar', keys: ['meta', 'B'] },
 ]
 </script>
 
@@ -22,10 +22,18 @@ const shortcuts = [
     <USeparator />
 
     <ul class="divide-y divide-default">
-      <li v-for="shortcut in shortcuts" :key="shortcut.label" class="flex items-center justify-between px-4 py-2.5">
+      <li
+        v-for="shortcut in shortcuts"
+        :key="shortcut.label"
+        class="flex items-center justify-between px-4 py-2.5"
+      >
         <span class="text-sm text-default">{{ shortcut.label }}</span>
         <div class="flex gap-1">
-          <UKbd v-for="key in shortcut.keys" :key="key" :value="key" />
+          <UKbd
+            v-for="key in shortcut.keys"
+            :key="key"
+            :value="key"
+          />
         </div>
       </li>
     </ul>

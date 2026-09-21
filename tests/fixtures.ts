@@ -7,7 +7,7 @@ const editorialColors = {
   info: 'cyan',
   warning: 'amber',
   error: 'rose',
-  neutral: 'stone'
+  neutral: 'stone',
 }
 
 const studioColors = {
@@ -17,7 +17,7 @@ const studioColors = {
   info: 'cyan',
   warning: 'amber',
   error: 'red',
-  neutral: 'zinc'
+  neutral: 'zinc',
 }
 
 export const editorialBrandTheme = defineBrandTheme({
@@ -26,7 +26,7 @@ export const editorialBrandTheme = defineBrandTheme({
   description: 'A crisp editorial fixture with warm paper surfaces, serif typography, tighter radius, and quieter controls.',
   typography: {
     sans: 'ui-serif, Georgia, Cambria, Times New Roman, Times, serif',
-    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
   },
   cssVariables: {
     light: {
@@ -43,7 +43,7 @@ export const editorialBrandTheme = defineBrandTheme({
       '--ui-border': '#D8C5B0',
       '--ui-border-muted': '#E8DACB',
       '--ui-border-accented': '#C7A98A',
-      '--ui-radius': '0.25rem'
+      '--ui-radius': '0.25rem',
     },
     dark: {
       '--ui-bg': '#211B16',
@@ -59,33 +59,33 @@ export const editorialBrandTheme = defineBrandTheme({
       '--ui-border': '#4A3F35',
       '--ui-border-muted': '#352D25',
       '--ui-border-accented': '#6A5849',
-      '--ui-radius': '0.25rem'
-    }
+      '--ui-radius': '0.25rem',
+    },
   },
   ui: {
     colors: editorialColors,
     button: {
       slots: {
-        base: 'rounded-sm font-semibold tracking-wide'
+        base: 'rounded-sm font-semibold tracking-wide',
       },
       defaultVariants: {
         color: 'primary',
         variant: 'solid',
-        size: 'md'
-      }
+        size: 'md',
+      },
     },
     card: {
       slots: {
         root: 'rounded-sm shadow-none',
         header: 'px-5 py-4',
         body: 'px-5 py-5',
-        footer: 'px-5 py-4'
+        footer: 'px-5 py-4',
       },
       defaultVariants: {
-        variant: 'subtle'
-      }
-    }
-  }
+        variant: 'subtle',
+      },
+    },
+  },
 })
 
 export const studioBrandTheme = defineBrandTheme({
@@ -94,7 +94,7 @@ export const studioBrandTheme = defineBrandTheme({
   description: 'A polished studio fixture with cool glassy surfaces, rounded controls, and a high-contrast teal system.',
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
-    mono: 'JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+    mono: 'JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
   },
   cssVariables: {
     light: {
@@ -111,7 +111,7 @@ export const studioBrandTheme = defineBrandTheme({
       '--ui-border': '#C6DED8',
       '--ui-border-muted': '#DDEAE7',
       '--ui-border-accented': '#8CC8BC',
-      '--ui-radius': '0.75rem'
+      '--ui-radius': '0.75rem',
     },
     dark: {
       '--ui-bg': '#071412',
@@ -127,37 +127,37 @@ export const studioBrandTheme = defineBrandTheme({
       '--ui-border': '#28655B',
       '--ui-border-muted': '#173A34',
       '--ui-border-accented': '#38A692',
-      '--ui-radius': '0.75rem'
-    }
+      '--ui-radius': '0.75rem',
+    },
   },
   ui: {
     colors: studioColors,
     button: {
       slots: {
-        base: 'rounded-xl font-semibold shadow-sm shadow-primary/10'
+        base: 'rounded-xl font-semibold shadow-sm shadow-primary/10',
       },
       defaultVariants: {
         color: 'primary',
         variant: 'solid',
-        size: 'md'
-      }
+        size: 'md',
+      },
     },
     card: {
       slots: {
         root: 'rounded-xl bg-default/80 shadow-lg shadow-primary/5 ring ring-default backdrop-blur',
         header: 'px-5 py-4',
         body: 'px-5 py-5',
-        footer: 'px-5 py-4'
+        footer: 'px-5 py-4',
       },
       defaultVariants: {
-        variant: 'outline'
-      }
-    }
-  }
+        variant: 'outline',
+      },
+    },
+  },
 })
 
 export const testBrandThemes = [
   nuxtUiBrandTheme,
   editorialBrandTheme,
-  studioBrandTheme
+  studioBrandTheme,
 ]

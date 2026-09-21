@@ -13,7 +13,7 @@ export function useStudioIcon() {
     'i-lucide-git-compare-arrows': 'comparison', 'i-lucide-folder-sync': 'folderPlus',
     'i-lucide-tablet-smartphone': 'proportions', 'i-lucide-rotate-cw': 'reset',
     'i-lucide-maximize': 'proportions', 'i-lucide-smartphone': 'proportions',
-    'i-lucide-tablet': 'tablet', 'i-lucide-trash-2': 'trash'
+    'i-lucide-tablet': 'tablet', 'i-lucide-trash-2': 'trash',
   }
   return (name: string) => {
     const native = Object.entries(themeIcons.lucide).find(([, value]) => value === name)?.[0]
@@ -31,6 +31,6 @@ export function useStudioIcons() {
       const pack = Object.keys(themeIcons).find(name => themeIcons[name as ThemeIcons].search === config.ui.icons.search) as ThemeIcons | undefined
       const audited = auditedIconOverrides as Partial<Record<ThemeIcons, Partial<typeof studioIcons>>>
       return (pack && (audited[pack]?.[key] || studioIconOverrides[pack]?.[key])) || target[key]
-    }
+    },
   })
 }

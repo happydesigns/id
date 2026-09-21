@@ -53,19 +53,31 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
           </UBadge>
         </template>
       </UButton>
-      <UBadge color="primary" variant="subtle">
+      <UBadge
+        color="primary"
+        variant="subtle"
+      >
         {{ t('actions.active') }}
       </UBadge>
-      <UBadge color="secondary" variant="outline">
+      <UBadge
+        color="secondary"
+        variant="outline"
+      >
         {{ t('actions.editorial') }}
       </UBadge>
-      <UBadge color="success" variant="subtle">
+      <UBadge
+        color="success"
+        variant="subtle"
+      >
         {{ t('actions.ready') }}
       </UBadge>
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <span class="text-sm text-muted">{{ t('actions.assigned') }}</span>
-      <UChip inset color="success">
+      <UChip
+        inset
+        color="success"
+      >
         <UAvatar
           :src="props.context.assets.symbol"
           :alt="props.context.logoAlt"
@@ -104,16 +116,28 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
     v-else-if="props.name === 'badge'"
     class="flex flex-wrap items-center gap-2"
   >
-    <UBadge color="primary" variant="subtle">
+    <UBadge
+      color="primary"
+      variant="subtle"
+    >
       {{ t('actions.active') }}
     </UBadge>
-    <UBadge color="secondary" variant="outline">
+    <UBadge
+      color="secondary"
+      variant="outline"
+    >
       {{ t('actions.editorial') }}
     </UBadge>
-    <UBadge color="success" variant="subtle">
+    <UBadge
+      color="success"
+      variant="subtle"
+    >
       {{ t('actions.ready') }}
     </UBadge>
-    <UBadge color="warning" variant="subtle">
+    <UBadge
+      color="warning"
+      variant="subtle"
+    >
       {{ t('actions.checkContrast') }}
     </UBadge>
   </div>
@@ -136,7 +160,10 @@ const t = (key: ComponentExampleMessageKey) => resolveComponentExampleMessage(pr
         square
       />
     </UChip>
-    <UChip inset color="success">
+    <UChip
+      inset
+      color="success"
+    >
       <UAvatar
         :src="props.context.assets.symbol"
         :alt="props.context.logoAlt"

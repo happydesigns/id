@@ -2,9 +2,9 @@ import { fileURLToPath } from 'node:url'
 import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
-  $meta: { name: '@happydesigns/id-studio' },
+
   modules: [fileURLToPath(new URL('./module.ts', import.meta.url))],
-  plugins: [fileURLToPath(new URL('./plugins/preview.client.ts', import.meta.url))],
+  plugins: [fileURLToPath(new URL('./plugins/preview.client.ts', import.meta.url))], $meta: { name: '@happydesigns/id-studio' },
   components: [{ path: fileURLToPath(new URL('./components', import.meta.url)), pathPrefix: false, prefix: 'Id' }],
   hooks: {
     'pages:extend'(pages) {
@@ -17,6 +17,6 @@ export default defineNuxtConfig({
         if (discovered) discovered.path = path
         else if (!pages.some(page => page.path === path)) pages.push({ name: `id-${name}`, path, file })
       }
-    }
-  }
+    },
+  },
 })

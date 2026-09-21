@@ -9,5 +9,12 @@ const available = computed(() => router.getRoutes().some(route => route.path ===
 </script>
 
 <template>
-  <UButton v-if="available" to="/studio?browse=true" :label="label" icon="i-lucide-palette" color="neutral" variant="ghost" />
+  <UButton
+    v-if="available"
+    to="/studio?browse=true"
+    :label="label"
+    icon="i-lucide-palette"
+    color="neutral"
+    variant="ghost"
+  />
 </template>

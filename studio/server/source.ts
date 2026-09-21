@@ -3,7 +3,7 @@ import { useRuntimeConfig } from '#imports'
 import { basename } from 'node:path'
 import { readStudioSource, StudioSourceConflict, writeStudioSource } from '../source'
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
   const url = getRequestURL(event)
   const origin = getHeader(event, 'origin')
@@ -18,7 +18,8 @@ export default defineEventHandler(async event => {
     const body = await readBody(event)
     if (typeof body?.revision !== 'string') throw createError({ statusCode: 400, statusMessage: 'Source revision required.' })
     return { ...await writeStudioSource(path, body.revision, body.document), source: basename(path) }
-  } catch (error) {
+  }
+  catch (error) {
     if (error instanceof StudioSourceConflict) throw createError({ statusCode: 409, statusMessage: error.message })
     if (error && typeof error === 'object' && 'statusCode' in error) throw error
     throw createError({ statusCode: 422, statusMessage: 'The brand source could not be read or written. Check its JSON and file permissions.' })

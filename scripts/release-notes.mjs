@@ -16,7 +16,6 @@ export function releaseNotes(changelog, version, highlights = '') {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const version = process.argv[2] || JSON.parse(readFileSync('package.json', 'utf8')).version
-  // Validate before deriving the optional highlights path.
   const body = releaseNotes(readFileSync('CHANGELOG.md', 'utf8'), version)
   const highlightsPath = resolve('release-notes', `${version}.md`)
   const highlights = existsSync(highlightsPath) ? readFileSync(highlightsPath, 'utf8').trim() : ''

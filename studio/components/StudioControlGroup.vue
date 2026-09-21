@@ -3,7 +3,13 @@ defineProps<{ label: string }>()
 </script>
 
 <template>
-  <div class="studio-control-group" role="group" :aria-label="label"><slot /></div>
+  <div
+    class="studio-control-group"
+    role="group"
+    :aria-label="label"
+  >
+    <slot />
+  </div>
 </template>
 
 <style>

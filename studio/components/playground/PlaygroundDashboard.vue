@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { usePlaygroundToast } from "../../playground-toast"
-import { useStudioIcons } from "../../playground-icons"
+import { usePlaygroundToast } from '../../playground-toast'
+import { useStudioIcons } from '../../playground-icons'
 import type { DropdownMenuItem } from '@nuxt/ui'
+
 const studioIcons = useStudioIcons()
 
 const toast = usePlaygroundToast()
@@ -10,12 +11,16 @@ const appConfig = useAppConfig()
 const items: DropdownMenuItem[][] = [
   [
     { label: 'View report', icon: appConfig.ui.icons.eye, onSelect: () => toast.add({ title: 'View report' }) },
-    { label: 'Export as CSV', get icon() { return studioIcons.download }, onSelect: () => toast.add({ title: 'Exporting…' }) },
-    { label: 'Refresh', icon: appConfig.ui.icons.reload, onSelect: () => toast.add({ title: 'Refreshed' }) }
+    { label: 'Export as CSV', get icon() {
+      return studioIcons.download
+    }, onSelect: () => toast.add({ title: 'Exporting…' }) },
+    { label: 'Refresh', icon: appConfig.ui.icons.reload, onSelect: () => toast.add({ title: 'Refreshed' }) },
   ],
   [
-    { label: 'Delete', get icon() { return studioIcons.trash }, color: 'error', onSelect: () => toast.add({ title: 'Deleted', color: 'error' }) }
-  ]
+    { label: 'Delete', get icon() {
+      return studioIcons.trash
+    }, color: 'error', onSelect: () => toast.add({ title: 'Deleted', color: 'error' }) },
+  ],
 ]
 
 const progress = ref(75)
@@ -34,11 +39,19 @@ const progress = ref(75)
       </div>
 
       <div class="flex items-center gap-2">
-        <UBadge color="success" variant="subtle" size="sm" :icon="studioIcons.trendingUp">
+        <UBadge
+          color="success"
+          variant="subtle"
+          size="sm"
+          :icon="studioIcons.trendingUp"
+        >
           +12.5%
         </UBadge>
 
-        <UDropdownMenu :items="items" :ui="{ content: 'w-44' }">
+        <UDropdownMenu
+          :items="items"
+          :ui="{ content: 'w-44' }"
+        >
           <UButton
             :icon="appConfig.ui.icons.ellipsis"
             color="neutral"
@@ -56,16 +69,31 @@ const progress = ref(75)
         <span class="text-muted">Monthly goal</span>
         <span class="font-medium text-highlighted">{{ progress }}%</span>
       </div>
-      <UProgress v-model="progress" size="sm" />
+      <UProgress
+        v-model="progress"
+        size="sm"
+      />
     </div>
 
     <USeparator />
 
     <div class="flex items-center justify-between">
       <UAvatarGroup size="xs">
-        <UAvatar src="https://github.com/benjamincanac.png" alt="Benjamin Canac" loading="lazy" />
-        <UAvatar src="https://github.com/romhml.png" alt="Romain Hamel" loading="lazy" />
-        <UAvatar src="https://github.com/noook.png" alt="Neil Richter" loading="lazy" />
+        <UAvatar
+          src="https://github.com/benjamincanac.png"
+          alt="Benjamin Canac"
+          loading="lazy"
+        />
+        <UAvatar
+          src="https://github.com/romhml.png"
+          alt="Romain Hamel"
+          loading="lazy"
+        />
+        <UAvatar
+          src="https://github.com/noook.png"
+          alt="Neil Richter"
+          loading="lazy"
+        />
       </UAvatarGroup>
       <span class="text-xs text-muted">+8 active now</span>
     </div>

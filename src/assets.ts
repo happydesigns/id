@@ -26,33 +26,33 @@ function defaultFallbackRoles(media?: BrandAsset['media']) {
 
 export function createBrandAsset(
   entry: BrandGuideAssetEntry,
-  options: BrandGuideAssetMappingOptions = {}
+  options: BrandGuideAssetMappingOptions = {},
 ): BrandAsset {
   return {
     name: entry.name,
     src: entry.path,
     role: entry.role,
     media: entry.media,
-    alt: entry.alt ?? options.alt?.(entry) ?? entry.name
+    alt: entry.alt ?? options.alt?.(entry) ?? entry.name,
   }
 }
 
 export function createBrandLogoSet(
   entries: readonly BrandGuideAssetEntry[],
-  options: BrandGuideAssetMappingOptions = {}
+  options: BrandGuideAssetMappingOptions = {},
 ): BrandLogoSet {
   return Object.fromEntries(
-    entries.map(entry => [entry.role, createBrandAsset(entry, options)])
+    entries.map(entry => [entry.role, createBrandAsset(entry, options)]),
   ) as BrandLogoSet
 }
 
 export function createBrandGuideAssets(
   entries: readonly BrandGuideAssetEntry[],
-  options: BrandGuideAssetMappingOptions = {}
+  options: BrandGuideAssetMappingOptions = {},
 ): BrandAssets {
   return {
     logos: createBrandLogoSet(entries, options),
-    files: entries.map(entry => createBrandAsset(entry, options))
+    files: entries.map(entry => createBrandAsset(entry, options)),
   }
 }
 
@@ -67,18 +67,15 @@ function matchesRole(entry: BrandAssetEntry, role: string) {
 function selectFromEntries(entries: BrandAssetEntry[], selection: BrandAssetSelection = {}) {
   const requestedRole = selection.role ?? selection.variant
   const fallbackRoles = selection.fallbackRoles ?? defaultFallbackRoles(selection.media)
-
   if (requestedRole) {
     return entries.find(entry => matchesRole(entry, requestedRole))?.asset
   }
-
   for (const role of fallbackRoles) {
     const asset = entries.find(entry => matchesRole(entry, role))?.asset
     if (asset) {
       return asset
     }
   }
-
   return entries[0]?.asset
 }
 
@@ -90,12 +87,10 @@ export function collectBrandAssets(source?: BrandAssets | { assets?: BrandAssets
     .map(([role, asset]) => asset ? { role, asset } : undefined)
     .filter((entry): entry is BrandAssetEntry => Boolean(entry))
   const files = (assets?.files ?? []).map(asset => ({ role: asset.role, asset }))
-
   return [...logos, ...files]
 }
 
 export function selectBrandAsset(entries: BrandAssetEntry[], selection: BrandAssetSelection = {}) {
   const mediaEntries = entries.filter(entry => matchesMedia(entry.asset, selection.media))
-
   return selectFromEntries(mediaEntries, selection) ?? selectFromEntries(entries, selection)
 }

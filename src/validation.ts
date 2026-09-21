@@ -17,45 +17,37 @@ function formatIssues(issues: { path: PropertyKey[], message: string }[]) {
 
 export function validateBrandTheme(theme: unknown): BrandTheme {
   const result = brandThemeSchema.safeParse(theme)
-
   if (!result.success) {
     const issues = formatIssues(result.error.issues)
     throw new BrandValidationError('Invalid brand theme', issues)
   }
-
   return result.data as BrandTheme
 }
 
 export function validateBrandIdentity(identity: unknown): BrandIdentity {
   const result = brandIdentitySchema.safeParse(identity)
-
   if (!result.success) {
     const issues = formatIssues(result.error.issues)
     throw new BrandValidationError('Invalid brand identity', issues)
   }
-
   return result.data as BrandIdentity
 }
 
 export function validateBrandDefinition(brand: unknown): BrandDefinition {
   const result = brandDefinitionSchema.safeParse(brand)
-
   if (!result.success) {
     const issues = formatIssues(result.error.issues)
     throw new BrandValidationError('Invalid brand definition', issues)
   }
-
   return result.data as BrandDefinition
 }
 
 export function validateBrandGuide(guide: unknown): BrandGuide {
   const result = brandGuideSchema.safeParse(guide)
-
   if (!result.success) {
     const issues = formatIssues(result.error.issues)
     throw new BrandValidationError('Invalid brand guide', issues)
   }
-
   return result.data as BrandGuide
 }
 

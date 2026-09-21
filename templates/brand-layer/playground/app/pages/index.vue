@@ -2,4 +2,7 @@
 defineOptions({ name: 'BrandStudioEntry' })
 await navigateTo('/studio')
 </script>
-<template><div /></template>
+
+<template>
+  <div />
+</template>

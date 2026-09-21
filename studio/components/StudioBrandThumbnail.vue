@@ -18,11 +18,27 @@ const colors = computed(() => {
 </script>
 
 <template>
-  <span aria-hidden="true" class="brand-thumbnail" :style="{ background: colors.light, color: colors.dark }">
-    <span class="brand-thumbnail-surface" :style="{ background: colors.dark }">
-      <span class="brand-thumbnail-line" :style="{ background: colors.light }" />
-      <span class="brand-thumbnail-line brand-thumbnail-short" :style="{ background: colors.muted }" />
-      <span class="brand-thumbnail-button" :style="{ background: colors.primary }" />
+  <span
+    aria-hidden="true"
+    class="brand-thumbnail"
+    :style="{ background: colors.light, color: colors.dark }"
+  >
+    <span
+      class="brand-thumbnail-surface"
+      :style="{ background: colors.dark }"
+    >
+      <span
+        class="brand-thumbnail-line"
+        :style="{ background: colors.light }"
+      />
+      <span
+        class="brand-thumbnail-line brand-thumbnail-short"
+        :style="{ background: colors.muted }"
+      />
+      <span
+        class="brand-thumbnail-button"
+        :style="{ background: colors.primary }"
+      />
     </span>
     <span class="brand-thumbnail-colors"><span :style="{ background: colors.primary }" /><span :style="{ background: colors.muted }" /><span :style="{ background: colors.dark }" /></span>
   </span>

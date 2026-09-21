@@ -6,7 +6,7 @@ import {
   componentExampleOwnSurfaceNames,
   createComponentExampleContext,
   getComponentExampleDefinition,
-  isComponentExampleName
+  isComponentExampleName,
 } from '../src/component-examples'
 
 describe('component examples', () => {
@@ -15,59 +15,53 @@ describe('component examples', () => {
     expect(componentExampleFamilies).toContain('actions')
     expect(componentExampleFamilies).toContain('forms')
     expect(componentExampleFamilies).toContain('dashboard')
-
     const uniqueNames = new Set(componentExampleNames)
-
     expect(uniqueNames.size).toBe(componentExampleNames.length)
   })
-
   it('resolves example definitions by name', () => {
     expect(isComponentExampleName('button')).toBe(true)
     expect(isComponentExampleName('dashboard-shell')).toBe(true)
     expect(isComponentExampleName('missing-example')).toBe(false)
-
     expect(getComponentExampleDefinition('button')).toMatchObject({
       name: 'button',
-      family: 'actions'
+      family: 'actions',
     })
   })
-
   it('tracks examples that own their own visible surface', () => {
     expect(componentExampleOwnSurfaceNames).toContain('content-system')
     expect(componentExampleOwnSurfaceNames).toContain('dashboard-shell')
     expect(componentExampleOwnSurfaceNames).not.toContain('button')
   })
-
   it('merges brand-owned context with neutral defaults', () => {
     expect(createComponentExampleContext({
       brandName: 'sample',
       packageName: '@sample/brand',
       accentColor: '#F28564',
       assets: {
-        symbol: '/logos/sample.svg'
+        symbol: '/logos/sample.svg',
       },
       paths: {
-        docs: '/guide'
+        docs: '/guide',
       },
       copy: {
-        heroTitle: 'Sample guide'
-      }
+        heroTitle: 'Sample guide',
+      },
     })).toMatchObject({
       brandName: 'sample',
       packageName: '@sample/brand',
       accentColor: '#F28564',
       logoAlt: 'sample symbol',
       assets: {
-        symbol: '/logos/sample.svg'
+        symbol: '/logos/sample.svg',
       },
       paths: {
         docs: '/guide',
-        components: '/docs/components'
+        components: '/docs/components',
       },
       copy: {
         brandLabel: 'sample',
-        heroTitle: 'Sample guide'
-      }
+        heroTitle: 'Sample guide',
+      },
     })
   })
 })

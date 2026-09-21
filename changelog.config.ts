@@ -4,6 +4,6 @@ export default {
   templates: {
     commitMessage: 'chore(release): v{{newVersion}}',
     tagMessage: 'v{{newVersion}}',
-    tagBody: 'v{{newVersion}}'
-  }
+    tagBody: 'v{{newVersion}}',
+  },
 }

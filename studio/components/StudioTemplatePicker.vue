@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useStudioIcon } from "../playground-icons"
+import { useStudioIcon } from '../playground-icons'
 
 import { computed, ref, watch } from 'vue'
 import type { StudioTemplate } from '../templates'
@@ -11,24 +11,85 @@ const model = defineModel<string>({ required: true })
 const open = defineModel<boolean>('open', { default: false })
 const items = computed(() => props.templates)
 const selected = computed(() => items.value.find(item => item.id === model.value))
-function select(id: string) { model.value = id; open.value = false }
+function select(id: string) {
+  model.value = id
+  open.value = false
+}
 const activeCount = ref(2)
-watch(open, () => { activeCount.value = 2 })
+watch(open, () => {
+  activeCount.value = 2
+})
 
 const resolveIcon = useStudioIcon()
 </script>
 
 <template>
-  <div class="template-switcher studio-scene-pill" role="group" aria-label="Preview type">
-    <UButton color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-monitor')" aria-label="Components" :aria-pressed="model === 'components'" class="components-trigger studio-scene-trigger" @click="select('components')"><span class="components-label">Components</span></UButton>
-    <UPopover v-model:open="open" :content="{ align: 'center', sideOffset: 8 }">
-      <UButton color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-panels-top-left')" :trailing-icon="resolveIcon('i-lucide-chevron-down')" aria-label="Templates" :aria-pressed="model !== 'components'" class="templates-trigger studio-scene-trigger" :ui="{ trailingIcon: 'ms-auto shrink-0' }"><span class="truncate">{{ selected?.label || 'Templates' }}</span></UButton>
+  <div
+    class="template-switcher studio-scene-pill"
+    role="group"
+    aria-label="Preview type"
+  >
+    <UButton
+      color="neutral"
+      variant="ghost"
+      :icon="resolveIcon('i-lucide-monitor')"
+      aria-label="Components"
+      :aria-pressed="model === 'components'"
+      class="components-trigger studio-scene-trigger"
+      @click="select('components')"
+    >
+      <span class="components-label">Components</span>
+    </UButton>
+    <UPopover
+      v-model:open="open"
+      :content="{ align: 'center', sideOffset: 8 }"
+    >
+      <UButton
+        color="neutral"
+        variant="ghost"
+        :icon="resolveIcon('i-lucide-panels-top-left')"
+        :trailing-icon="resolveIcon('i-lucide-chevron-down')"
+        aria-label="Templates"
+        :aria-pressed="model !== 'components'"
+        class="templates-trigger studio-scene-trigger"
+        :ui="{ trailingIcon: 'ms-auto shrink-0' }"
+      >
+        <span class="truncate">{{ selected?.label || 'Templates' }}</span>
+      </UButton>
       <template #content>
-        <div class="template-gallery" :class="{ 'template-gallery-wide': items.length > 2 }" role="group" aria-label="Choose a template">
-          <UButton v-for="(item, index) in items" :key="item.id" color="neutral" variant="ghost" :aria-label="item.label" :aria-pressed="model === item.id" class="template-choice" @click="select(item.id)">
-            <StudioTemplateThumbnail v-if="open" :template="item" :document="document" :mode="mode" :enabled="index < activeCount" @settled="activeCount++" />
-            <span class="flex w-full items-center justify-between gap-2"><span class="font-medium text-highlighted">{{ item.label }}</span><UIcon v-if="model === item.id" :name="resolveIcon('i-lucide-check')" class="size-4 shrink-0" /></span>
-            <span v-if="item.description" class="template-description">{{ item.description }}</span>
+        <div
+          class="template-gallery"
+          :class="{ 'template-gallery-wide': items.length > 2 }"
+          role="group"
+          aria-label="Choose a template"
+        >
+          <UButton
+            v-for="(item, index) in items"
+            :key="item.id"
+            color="neutral"
+            variant="ghost"
+            :aria-label="item.label"
+            :aria-pressed="model === item.id"
+            class="template-choice"
+            @click="select(item.id)"
+          >
+            <StudioTemplateThumbnail
+              v-if="open"
+              :template="item"
+              :document="document"
+              :mode="mode"
+              :enabled="index < activeCount"
+              @settled="activeCount++"
+            />
+            <span class="flex w-full items-center justify-between gap-2"><span class="font-medium text-highlighted">{{ item.label }}</span><UIcon
+              v-if="model === item.id"
+              :name="resolveIcon('i-lucide-check')"
+              class="size-4 shrink-0"
+            /></span>
+            <span
+              v-if="item.description"
+              class="template-description"
+            >{{ item.description }}</span>
           </UButton>
         </div>
       </template>

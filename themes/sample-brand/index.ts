@@ -7,65 +7,65 @@ const sampleBrandColors = {
   info: 'sky',
   warning: 'amber',
   error: 'rose',
-  neutral: 'slate'
+  neutral: 'slate',
 }
 
 const sampleBrandUiDefaults = {
   colors: sampleBrandColors,
   button: {
     slots: {
-      base: 'rounded-md font-medium'
+      base: 'rounded-md font-medium',
     },
     defaultVariants: {
       color: 'primary',
       variant: 'solid',
-      size: 'md'
-    }
+      size: 'md',
+    },
   },
   badge: {
     slots: {
-      base: 'rounded-md font-medium ring-1 ring-inset'
+      base: 'rounded-md font-medium ring-1 ring-inset',
     },
     defaultVariants: {
       color: 'neutral',
       variant: 'subtle',
-      size: 'sm'
-    }
+      size: 'sm',
+    },
   },
   card: {
     slots: {
       root: 'rounded-md bg-default shadow-none transition-colors',
       header: 'border-b border-default',
-      footer: 'border-t border-default'
+      footer: 'border-t border-default',
     },
     defaultVariants: {
-      variant: 'outline'
-    }
+      variant: 'outline',
+    },
   },
   input: {
     slots: {
-      base: 'rounded-md bg-default text-highlighted ring-default focus-visible:ring-primary'
+      base: 'rounded-md bg-default text-highlighted ring-default focus-visible:ring-primary',
     },
     defaultVariants: {
       color: 'primary',
       variant: 'outline',
-      size: 'md'
-    }
+      size: 'md',
+    },
   },
   alert: {
     slots: {
-      root: 'rounded-md border shadow-none'
+      root: 'rounded-md border shadow-none',
     },
     defaultVariants: {
-      variant: 'subtle'
-    }
+      variant: 'subtle',
+    },
   },
   table: {
     slots: {
       th: 'font-semibold text-muted',
-      td: 'text-default'
-    }
-  }
+      td: 'text-default',
+    },
+  },
 }
 
 export const sampleBrandTheme = defineBrandTheme({
@@ -74,7 +74,7 @@ export const sampleBrandTheme = defineBrandTheme({
   description: 'Neutral reference theme for id documentation examples.',
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
-    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
   },
   cssVariables: {
     light: {
@@ -97,7 +97,7 @@ export const sampleBrandTheme = defineBrandTheme({
       '--ui-warning': '#D97706',
       '--ui-error': '#E11D48',
       '--ui-radius': '0.375rem',
-      '--sample-surface-accent': '#EEF2FF'
+      '--sample-surface-accent': '#EEF2FF',
     },
     dark: {
       '--ui-bg': '#0F172A',
@@ -119,10 +119,10 @@ export const sampleBrandTheme = defineBrandTheme({
       '--ui-warning': '#FBBF24',
       '--ui-error': '#FB7185',
       '--ui-radius': '0.375rem',
-      '--sample-surface-accent': '#1E293B'
-    }
+      '--sample-surface-accent': '#1E293B',
+    },
   },
-  ui: sampleBrandUiDefaults
+  ui: sampleBrandUiDefaults,
 })
 
 export const sampleBrandGuide = defineBrandGuide({
@@ -136,6 +136,6 @@ export const sampleBrandGuide = defineBrandGuide({
   ui: sampleBrandTheme.ui,
   usage: {
     useFor: ['runtime theme previews', 'contract demonstrations', 'starter comparisons'],
-    avoid: ['brand doctrine', 'product behavior', 'authorization', 'runtime credentials']
-  }
+    avoid: ['brand doctrine', 'product behavior', 'authorization', 'runtime credentials'],
+  },
 })

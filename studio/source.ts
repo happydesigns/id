@@ -30,10 +30,18 @@ export async function writeStudioSource(path: string, revision: string, input: u
       if ((await readStudioSource(path)).revision !== revision) throw new StudioSourceConflict('The source changed while saving. Your draft has not replaced it.')
       await rename(temporary, path)
       return { ...await readStudioSource(path), changed: true }
-    } finally {
-      await unlink(temporary).catch((error: NodeJS.ErrnoException) => { if (error.code !== 'ENOENT') throw error })
+    }
+    finally {
+      await unlink(temporary).catch((error: NodeJS.ErrnoException) => {
+        if (error.code !== 'ENOENT') throw error
+      })
     }
   })
   writes.set(key, result)
-  try { return await result } finally { if (writes.get(key) === result) writes.delete(key) }
+  try {
+    return await result
+  }
+  finally {
+    if (writes.get(key) === result) writes.delete(key)
+  }
 }

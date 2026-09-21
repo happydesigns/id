@@ -8,13 +8,13 @@ export default defineAppConfig({
   id: {
     name: 'happydesigns-id-playground',
     theme: nuxtUiBrandTheme,
-    guide: idBrandGuide
+    guide: idBrandGuide,
   },
   idStudio: {
-    document: createStudioDocument({ name: 'nuxt-ui', colors: {} }, nuxtUiBrandTheme)
+    document: createStudioDocument({ name: 'nuxt-ui', colors: {} }, nuxtUiBrandTheme),
   },
   header: {
-    title: '@happydesigns/id'
+    title: '@happydesigns/id',
   },
-  ui: nuxtUiConfig.ui
+  ui: nuxtUiConfig.ui,
 })

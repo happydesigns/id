@@ -18,7 +18,8 @@ export function previewUi(host: Config, seed: Config, draft: Config): Config {
       if (object(result[key]) && object(owned[key])) {
         result[key] = without(result[key], owned[key])
         if (!Object.keys(result[key] as Config).length) Reflect.deleteProperty(result, key)
-      } else if (JSON.stringify(result[key]) === JSON.stringify(owned[key])) Reflect.deleteProperty(result, key)
+      }
+      else if (JSON.stringify(result[key]) === JSON.stringify(owned[key])) Reflect.deleteProperty(result, key)
     }
     return result
   }
@@ -45,9 +46,9 @@ export function studioShellCss(doc: StudioDocument): string {
       cssVariables: {
         ...variables,
         light: { ...variables?.light, '--ui-radius': `clamp(0rem, ${light}, 0.25rem)` },
-        dark: { ...variables?.dark, '--ui-radius': `clamp(0rem, ${dark}, 0.25rem)` }
-      }
-    }
+        dark: { ...variables?.dark, '--ui-radius': `clamp(0rem, ${dark}, 0.25rem)` },
+      },
+    },
   })
 }
 
@@ -55,7 +56,7 @@ export function studioPreviewCss(doc: StudioDocument): string {
   return [previewDefaults,
     cssVariablesAdapter.transform(doc.brand, { prefix: '', includeRoles: false, selector: ':root:root' }).css,
     createThemeCssVars({ ...doc.theme, typography: { ...doc.brand.typography, ...doc.theme.typography } }, { lightSelector: ':root:root', darkSelector: ':root:root.dark' }),
-    'html { color-scheme: light; overscroll-behavior: contain; } html.dark { color-scheme: dark; } body { background: var(--ui-bg); color: var(--ui-text); }'
+    'html { color-scheme: light; overscroll-behavior: contain; } html.dark { color-scheme: dark; } body { background: var(--ui-bg); color: var(--ui-text); }',
   ].join('\n')
 }
 

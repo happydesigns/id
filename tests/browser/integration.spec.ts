@@ -46,19 +46,20 @@ for (const route of ['/', '/smoke', '/hydration']) test('Docus host preserves fo
   if (route === '/hydration') {
     await expect(page.getByTestId('hydration-probe')).toHaveAttribute('data-ready', 'true')
     await page.getByRole('button', { name: 'Change value', exact: true }).click()
-  } else {
+  }
+  else {
     await expect(page.getByTestId('guide-integration')).toHaveAttribute('data-ready', 'true')
     await page.getByTestId('locale').click()
     await expect(page.locator('[data-example="select"]').getByRole('combobox')).toHaveAttribute('aria-label', 'Status')
   }
   const missing = await page.locator('label[for]').evaluateAll(labels =>
-    labels.filter(label => !document.getElementById(label.getAttribute('for')!)).map(label => label.textContent)
+    labels.filter(label => !document.getElementById(label.getAttribute('for')!)).map(label => label.textContent),
   )
   expect(missing).toEqual([])
   const selectedTabs = page.getByRole('tab', { selected: true })
   expect(await selectedTabs.count()).toBeGreaterThan(0)
   expect(await selectedTabs.evaluateAll(tabs => tabs.filter(tab =>
-    !document.getElementById(tab.getAttribute('aria-controls')!)
+    !document.getElementById(tab.getAttribute('aria-controls')!),
   ).map(tab => tab.textContent))).toEqual([])
   if (route === '/hydration') {
     await page.getByText('Project', { exact: true }).click()
@@ -72,7 +73,9 @@ for (const colorScheme of ['light', 'dark'] as const) {
   for (const width of [320, 834, 1440]) {
     test(`guide layout and hydration: ${colorScheme} ${width}`, async ({ page }) => {
       const errors: string[] = []
-      page.on('console', message => { if (/hydration|mismatch/i.test(message.text())) errors.push(message.text()) })
+      page.on('console', (message) => {
+        if (/hydration|mismatch/i.test(message.text())) errors.push(message.text())
+      })
       page.on('pageerror', error => errors.push(error.message))
       await page.emulateMedia({ colorScheme })
       await page.setViewportSize({ width, height: 1000 })

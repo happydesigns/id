@@ -46,7 +46,8 @@ it('creates version, changelog, commit and tag together in an isolated repositor
     expect(git('status', '--porcelain')).toBe('')
     expect(releaseNotes(readFileSync(join(cwd, 'CHANGELOG.md'), 'utf8'), '0.0.1')).toContain('Verify release fixture')
     expect(git('remote')).toBe('')
-  } finally {
+  }
+  finally {
     rmSync(cwd, { recursive: true, force: true })
   }
 }, 30000)

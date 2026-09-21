@@ -3,6 +3,7 @@ import { useStudioIcon } from '../../playground-icons'
 
 const resolveIcon = useStudioIcon()
 </script>
+
 <template>
   <UEmpty
     :icon="resolveIcon('i-lucide-landmark')"

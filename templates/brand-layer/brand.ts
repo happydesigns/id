@@ -17,13 +17,13 @@ export const brandIdentity = defineBrand({
       700: '#1d4ed8',
       800: '#1e40af',
       900: '#1e3a8a',
-      950: '#172554'
+      950: '#172554',
     },
-    slate: '#64748B'
+    slate: '#64748B',
   },
   typography: {
     sans: 'Inter, ui-sans-serif, system-ui, sans-serif',
-    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
   },
   assets: {
     logos: {
@@ -32,22 +32,22 @@ export const brandIdentity = defineBrand({
         src: '/favicon.svg',
         role: 'logo',
         media: 'any',
-        alt: 'Example Brand'
+        alt: 'Example Brand',
       },
       appIcon: {
         name: 'Example Brand app icon',
         src: '/favicon.svg',
         role: 'appIcon',
         media: 'any',
-        alt: 'Example Brand app icon'
-      }
-    }
-  }
+        alt: 'Example Brand app icon',
+      },
+    },
+  },
 })
 
 const brandColors = {
   primary: 'brand',
-  neutral: 'slate'
+  neutral: 'slate',
 } as const
 
 export const brandTheme = nuxtUiAdapter.transform(brandIdentity, {
@@ -61,7 +61,7 @@ export const brandTheme = nuxtUiAdapter.transform(brandIdentity, {
       '--ui-text': '#334155',
       '--ui-text-highlighted': '#020617',
       '--ui-border': '#E2E8F0',
-      '--ui-radius': '0.375rem'
+      '--ui-radius': '0.375rem',
     },
     dark: {
       '--ui-bg': '#020617',
@@ -69,9 +69,9 @@ export const brandTheme = nuxtUiAdapter.transform(brandIdentity, {
       '--ui-bg-elevated': '#0F172A',
       '--ui-text': '#E2E8F0',
       '--ui-text-highlighted': 'white',
-      '--ui-border': '#1E293B'
-    }
-  }
+      '--ui-border': '#1E293B',
+    },
+  },
 })
 
 export const brandRuntimeAssets = brandIdentity.assets
@@ -88,6 +88,6 @@ export const brandGuide = defineBrandGuide({
   typography: brandTheme.typography,
   usage: {
     useFor: ['Nuxt UI apps', 'Docus docs', 'brand-specific presentation'],
-    avoid: ['domain behavior', 'authorization', 'runtime credentials']
-  }
+    avoid: ['domain behavior', 'authorization', 'runtime credentials'],
+  },
 })

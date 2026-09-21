@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
   variant: undefined,
   media: 'auto',
   alt: undefined,
-  label: undefined
+  label: undefined,
 })
 
 const brandAssets = useBrandAssets()
@@ -25,14 +25,14 @@ const logo = computed(() => {
   return brandAssets.resolveAsset({
     role: props.role,
     variant: props.variant,
-    media: props.media === 'auto' ? 'light' : props.media
+    media: props.media === 'auto' ? 'light' : props.media,
   })
 })
 
 const darkLogo = computed(() => brandAssets.resolveAsset({
   role: props.role,
   variant: props.variant,
-  media: 'dark'
+  media: 'dark',
 }))
 
 const brandLabel = computed(() => {

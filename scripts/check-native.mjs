@@ -66,7 +66,7 @@ for (const name of ['violet', 'amber']) {
   run('npm', ['pack', '--ignore-scripts'], brand)
   const consumer = join(workspace, 'consumer-' + name)
   write(consumer, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: {
-    '@id-test/brand': 'file:../' + name + '/id-test-brand-0.0.0.tgz', nuxt: manifest.devDependencies.nuxt
+    '@id-test/brand': 'file:../' + name + '/id-test-brand-0.0.0.tgz', 'nuxt': manifest.devDependencies.nuxt,
   } }))
   write(consumer, 'nuxt.config.ts', `export default defineNuxtConfig({ extends: ['@id-test/brand'], css: ['~/assets/css/main.css'], compatibilityDate: '2026-08-01', ui: { fonts: false }, colorMode: { preference: 'light' } })`)
   write(consumer, 'app/assets/css/main.css', '@import "tailwindcss";\n@import "@nuxt/ui";\n@import "@id-test/brand/styles.css";\n')
@@ -81,7 +81,7 @@ for (const name of ['violet', 'amber']) {
   if (name === 'violet') {
     // Validate the actual exported Studio host without Docus, not just its manifest.
     run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], brand)
-    write(brand, 'playground/nuxt.config.ts', readFileSync(join(brand, 'playground/nuxt.config.ts'), 'utf8').replace("compatibilityDate:", "ui: { fonts: false }, compatibilityDate:"))
+    write(brand, 'playground/nuxt.config.ts', readFileSync(join(brand, 'playground/nuxt.config.ts'), 'utf8').replace('compatibilityDate:', 'ui: { fonts: false }, compatibilityDate:'))
     run(process.execPath, ['node_modules/nuxt/bin/nuxt.mjs', 'generate', 'playground'], brand)
     cpSync(join(brand, 'playground/.output/public'), resolve('.output/native-consumers/studio'), { recursive: true })
   }

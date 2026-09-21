@@ -8,20 +8,19 @@ export default defineNuxtModule<ModuleOptions>({
     name: '@happydesigns/id',
     configKey: 'id',
     compatibility: {
-      nuxt: '>=4.0.0'
-    }
+      nuxt: '>=4.0.0',
+    },
   },
   moduleDependencies: {
     '@nuxt/ui': {
-      version: '^4.0.0'
-    }
+      version: '^4.0.0',
+    },
   },
   defaults: {},
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
     const { componentPrefix = 'Id', ...runtimeOptions } = options
     const existing = (nuxt.options.appConfig.id ?? {}) as BrandGuideAppConfig
-
     nuxt.options.appConfig.id = {
       ...runtimeOptions,
       ...existing,
@@ -30,19 +29,16 @@ export default defineNuxtModule<ModuleOptions>({
       defaultTheme: existing.defaultTheme ?? runtimeOptions.defaultTheme,
       themes: existing.themes ?? runtimeOptions.themes,
       assets: existing.assets ?? runtimeOptions.assets,
-      guide: existing.guide ?? runtimeOptions.guide
+      guide: existing.guide ?? runtimeOptions.guide,
     }
-
     nuxt.options.css.push(resolver.resolve('./app/assets/css/id.css'))
-
     addPlugin(resolver.resolve('./app/plugins/brand-theme'))
     addImportsDir(resolver.resolve('./app/composables'))
     addComponentsDir({
       path: resolver.resolve('./app/components'),
       pathPrefix: false,
-      prefix: componentPrefix
+      prefix: componentPrefix,
     })
-
     addTypeTemplate({
       filename: 'types/id-app-config.d.ts',
       getContents: () => [
@@ -58,8 +54,8 @@ export default defineNuxtModule<ModuleOptions>({
         '  }',
         '}',
         '',
-        'export {}'
-      ].join('\n')
+        'export {}',
+      ].join('\n'),
     })
-  }
+  },
 })

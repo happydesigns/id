@@ -16,33 +16,33 @@ const editorContent = ref({
     {
       type: 'heading',
       attrs: { level: 2 },
-      content: [{ type: 'text', text: 'Component note' }]
+      content: [{ type: 'text', text: 'Component note' }],
     },
     {
       type: 'paragraph',
-      content: [{ type: 'text', text: 'Use visible structure before adding brand expression.' }]
-    }
-  ]
+      content: [{ type: 'text', text: 'Use visible structure before adding brand expression.' }],
+    },
+  ],
 })
 
 const chatMessages = [
   {
     id: 'user-1',
     role: 'user' as const,
-    parts: [{ type: 'text' as const, text: 'Can this interface stay useful before it feels branded?' }]
+    parts: [{ type: 'text' as const, text: 'Can this interface stay useful before it feels branded?' }],
   },
   {
     id: 'assistant-1',
     role: 'assistant' as const,
-    parts: [{ type: 'text' as const, text: 'Yes. Start with clear structure, then add recognition through restrained details.' }]
-  }
+    parts: [{ type: 'text' as const, text: 'Yes. Start with clear structure, then add recognition through restrained details.' }],
+  },
 ]
 
 const assistantChatMessage = computed(() => chatMessages[1])
 
 const editorMentions = [
   { label: 'Brand owner', avatar: { text: 'BO' } },
-  { label: 'Design review', avatar: { icon: 'i-lucide-palette' } }
+  { label: 'Design review', avatar: { icon: 'i-lucide-palette' } },
 ]
 </script>
 
@@ -127,7 +127,10 @@ const editorMentions = [
     icon="i-lucide-contrast"
   />
 
-  <div v-else-if="props.name === 'chat-activity-pattern'" class="grid gap-5 lg:grid-cols-[1fr_0.95fr]">
+  <div
+    v-else-if="props.name === 'chat-activity-pattern'"
+    class="grid gap-5 lg:grid-cols-[1fr_0.95fr]"
+  >
     <div class="space-y-3">
       <p class="font-semibold text-highlighted">
         Reasoning stays secondary

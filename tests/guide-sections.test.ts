@@ -4,7 +4,7 @@ import {
   createGuideSectionPath,
   defineGuideSections,
   findGuideSection,
-  normalizeGuideSections
+  normalizeGuideSections,
 } from '../src'
 
 describe('guide section helpers', () => {
@@ -16,20 +16,19 @@ describe('guide section helpers', () => {
       summary: ' Palette and semantic roles. ',
       description: 'Color decisions for a brand guide.',
       icon: ' i-lucide-palette ',
-      anchors: [' Palette ', ' ', 'Semantic roles']
+      anchors: [' Palette ', ' ', 'Semantic roles'],
     },
     {
       slug: 'overview',
       title: 'Overview',
-      description: 'Start here.'
+      description: 'Start here.',
     },
     {
       slug: '',
       title: 'Empty',
-      description: 'Invalid.'
-    }
+      description: 'Invalid.',
+    },
   ])
-
   it('normalizes section metadata without owning brand content', () => {
     expect(normalizeGuideSections(sections)).toEqual([
       {
@@ -40,7 +39,7 @@ describe('guide section helpers', () => {
         description: 'Color decisions for a brand guide.',
         icon: 'i-lucide-palette',
         to: undefined,
-        anchors: ['Palette', 'Semantic roles']
+        anchors: ['Palette', 'Semantic roles'],
       },
       {
         slug: 'overview',
@@ -50,44 +49,40 @@ describe('guide section helpers', () => {
         eyebrow: undefined,
         icon: undefined,
         to: undefined,
-        anchors: undefined
-      }
+        anchors: undefined,
+      },
     ])
   })
-
   it('creates Docus navigation sections from richer guide metadata', () => {
     expect(createGuideDocsSections(sections)).toEqual([
       {
         title: 'Colors',
         description: 'Palette and semantic roles.',
-        to: '/docs/colors'
+        to: '/docs/colors',
       },
       {
         title: 'Overview',
         description: 'Start here.',
-        to: '/docs'
-      }
+        to: '/docs',
+      },
     ])
   })
-
   it('supports custom base paths, index slugs, and explicit paths', () => {
     expect(createGuideSectionPath({
       slug: 'introduction',
       title: 'Introduction',
-      description: 'Start here.'
+      description: 'Start here.',
     }, {
       basePath: 'brand',
-      indexSlug: 'introduction'
+      indexSlug: 'introduction',
     })).toBe('/brand')
-
     expect(createGuideSectionPath({
       slug: 'voice',
       title: 'Voice',
       description: 'Writing guidance.',
-      to: '/docs/writing'
+      to: '/docs/writing',
     })).toBe('/docs/writing')
   })
-
   it('finds sections by normalized slug', () => {
     expect(findGuideSection(sections, ' colors ')?.title).toBe('Colors')
     expect(findGuideSection(sections, 'missing')).toBeUndefined()

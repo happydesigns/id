@@ -4,16 +4,16 @@ import { defineNuxtConfig } from 'nuxt/config'
 const devServer = process.argv.includes('dev')
 
 export default defineNuxtConfig({
-  buildDir: devServer ? '.nuxt-dev' : '.nuxt',
+
   extends: ['..', '../studio'],
-  icon: { serverBundle: { collections: ['lucide', 'vscode-icons'] }, clientBundle: { scan: true } },
   devtools: {
-    enabled: false
+    enabled: false,
   },
   app: {
     head: {
-      title: 'happydesigns id playground'
-    }
-  },
-  compatibilityDate: 'latest'
+      title: 'happydesigns id playground',
+    },
+  }, buildDir: devServer ? '.nuxt-dev' : '.nuxt',
+  compatibilityDate: 'latest',
+  icon: { serverBundle: { collections: ['lucide', 'vscode-icons'] }, clientBundle: { scan: true } },
 })

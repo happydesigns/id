@@ -1,5 +1,5 @@
 export {
   idBrandGuide,
   neutralBrandTheme,
-  nuxtUiBrandTheme
+  nuxtUiBrandTheme,
 } from '../themes/nuxt-ui'

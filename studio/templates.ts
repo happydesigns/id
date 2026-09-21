@@ -12,7 +12,7 @@ export interface StudioTemplate {
 }
 export function studioTemplates(input?: unknown): StudioTemplate[] {
   const result: StudioTemplate[] = [
-    { id: 'landing', label: 'Landing', description: 'Hero, features and pricing for a product website.', pages: [{ id: 'home', label: 'Home' }] }
+    { id: 'landing', label: 'Landing', description: 'Hero, features and pricing for a product website.', pages: [{ id: 'home', label: 'Home' }] },
   ]
   if (!input || typeof input !== 'object' || Array.isArray(input)) return result
   for (const [id, value] of Object.entries(input)) {

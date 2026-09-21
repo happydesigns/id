@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { usePlaygroundToast } from "../../playground-toast"
+import { usePlaygroundToast } from '../../playground-toast'
+
 const appConfig = useAppConfig()
 const toast = usePlaygroundToast()
 
 const roles = [
   { label: 'Editor', value: 'editor' },
-  { label: 'Viewer', value: 'viewer' }
+  { label: 'Viewer', value: 'viewer' },
 ]
 
 const members = ref([
   { email: 'alex@example.com', role: 'editor' },
-  { email: 'sam@example.com', role: 'viewer' }
+  { email: 'sam@example.com', role: 'viewer' },
 ])
 
 const link = 'https://app.nuxt.com/invite/x8f2k'
@@ -29,15 +30,34 @@ const link = 'https://app.nuxt.com/invite/x8f2k'
       </div>
 
       <div class="space-y-2">
-        <div v-for="(member, index) in members" :key="index" class="flex items-center gap-2">
-          <UInput v-model="member.email" type="email" :aria-label="`Team member ${index + 1} email`" class="flex-1" />
-          <USelect v-model="member.role" :items="roles" :aria-label="`Team member ${index + 1} role`" class="w-28" />
+        <div
+          v-for="(member, index) in members"
+          :key="index"
+          class="flex items-center gap-2"
+        >
+          <UInput
+            v-model="member.email"
+            type="email"
+            :aria-label="`Team member ${index + 1} email`"
+            class="flex-1"
+          />
+          <USelect
+            v-model="member.role"
+            :items="roles"
+            :aria-label="`Team member ${index + 1} role`"
+            class="w-28"
+          />
         </div>
       </div>
 
       <USeparator label="Or share a link" />
 
-      <UInput :model-value="link" aria-label="Team invitation link" readonly class="w-full">
+      <UInput
+        :model-value="link"
+        aria-label="Team invitation link"
+        readonly
+        class="w-full"
+      >
         <template #trailing>
           <UButton
             :icon="appConfig.ui.icons.copy"
@@ -52,7 +72,10 @@ const link = 'https://app.nuxt.com/invite/x8f2k'
     </div>
 
     <div class="flex justify-end border-t border-default p-3">
-      <UButton label="Send invites" @click="toast.add({ title: 'Invites sent' })" />
+      <UButton
+        label="Send invites"
+        @click="toast.add({ title: 'Invites sent' })"
+      />
     </div>
   </div>
 </template>
