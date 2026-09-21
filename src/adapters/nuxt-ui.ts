@@ -1,12 +1,12 @@
-import { defineBrandAdapter } from '../adapter'
+import { defineBrandAdapter } from '../adapter.js'
 import type {
   BrandColorName,
   BrandCssVariables,
   BrandDefinition,
   BrandTheme,
   NuxtUiColorRole,
-} from '../types'
-import { BrandValidationError, defineBrandTheme, validateBrandDefinition } from '../validation'
+} from '../types.js'
+import { BrandValidationError, defineBrandTheme, validateBrandDefinition } from '../validation.js'
 
 export type NuxtUiAdapterOptions<TBrand extends BrandDefinition> = {
   name?: string

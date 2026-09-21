@@ -2,7 +2,7 @@ export {
   idBrandGuide,
   neutralBrandTheme,
   nuxtUiBrandTheme,
-} from './defaults'
+} from './defaults.js'
 export {
   componentExampleFamilies,
   componentExampleGroups,
@@ -12,7 +12,7 @@ export {
   defineComponentExampleContext,
   getComponentExampleDefinition,
   isComponentExampleName,
-} from './component-examples'
+} from './component-examples.js'
 export type {
   ComponentExampleContext,
   ComponentExampleContextInput,
@@ -20,4 +20,4 @@ export type {
   ComponentExampleFamily,
   ComponentExampleFrame,
   ComponentExampleGroup,
-} from './component-examples'
+} from './component-examples.js'

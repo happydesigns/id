@@ -1,4 +1,4 @@
-import { defineBrandGuide, defineBrandTheme } from '../../src'
+import { defineBrandGuide, defineBrandTheme } from '../../src/index.js'
 
 const sampleBrandColors = {
   primary: 'sample',

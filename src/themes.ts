@@ -1,4 +1,4 @@
-import type { BrandRuntimeOnlyConfig, BrandTheme } from './types'
+import type { BrandRuntimeOnlyConfig, BrandTheme } from './types.js'
 
 export function normalizeBrandThemes(themes: readonly BrandTheme[] = []): BrandTheme[] {
   const themesByName = new Map<string, BrandTheme>()

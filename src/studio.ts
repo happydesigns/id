@@ -1,10 +1,10 @@
 import { projectTemplates } from './project-templates.generated.js'
 import { z } from 'zod'
-import { brandDefinitionSchema, brandThemeSchema } from './schema'
-import { cssVariablesAdapter } from './adapters/css-variables'
-import { createThemeCssVars } from './css'
-import type { BrandDefinition, BrandTheme } from './types'
-import { validateBrandDefinition, validateBrandTheme } from './validation'
+import { brandDefinitionSchema, brandThemeSchema } from './schema.js'
+import { cssVariablesAdapter } from './adapters/css-variables.js'
+import { createThemeCssVars } from './css.js'
+import type { BrandDefinition, BrandTheme } from './types.js'
+import { validateBrandDefinition, validateBrandTheme } from './validation.js'
 
 /** The editable source. Unknown JSON fields survive an unchanged round trip. */
 export type StudioDocument = {
@@ -235,4 +235,4 @@ export function createStudioArchive(files: Record<string, string | Uint8Array>):
   return result
 }
 
-export type { StudioHostConfig } from './studio-host'
+export type { StudioHostConfig } from './studio-host.js'

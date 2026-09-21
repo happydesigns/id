@@ -1,4 +1,4 @@
-import type { StudioDocument } from './studio'
+import type { StudioDocument } from './studio.js'
 
 /** Trusted host configuration, separate from portable brand JSON. */
 export interface StudioHostConfig {

@@ -1,7 +1,7 @@
-import { applyCssVariables } from './css'
-import { createNuxtUiAppConfig } from './nuxt-ui'
-import type { ApplyBrandThemeOptions, BrandTheme } from './types'
-import { validateBrandTheme } from './validation'
+import { applyCssVariables } from './css.js'
+import { createNuxtUiAppConfig } from './nuxt-ui.js'
+import type { ApplyBrandThemeOptions, BrandTheme } from './types.js'
+import { validateBrandTheme } from './validation.js'
 
 export const brandThemeCookiePrefix = 'id-theme'
 export const brandThemeStatePrefix = 'id-theme-state'

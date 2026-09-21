@@ -1,4 +1,4 @@
-import { defineBrandGuide, defineBrandTheme } from '../../src/validation'
+import { defineBrandGuide, defineBrandTheme } from '../../src/validation.js'
 
 const nuxtUiColors = {
   primary: 'green',

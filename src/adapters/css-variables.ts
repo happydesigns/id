@@ -1,6 +1,6 @@
-import { defineBrandAdapter } from '../adapter'
-import type { BrandColorScale, BrandDefinition, BrandPalette } from '../types'
-import { validateBrandDefinition } from '../validation'
+import { defineBrandAdapter } from '../adapter.js'
+import type { BrandColorScale, BrandDefinition, BrandPalette } from '../types.js'
+import { validateBrandDefinition } from '../validation.js'
 
 export type CssVariablesAdapterOptions = {
   prefix?: string

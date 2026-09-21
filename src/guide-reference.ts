@@ -1,4 +1,4 @@
-import type { StudioDocument } from './studio'
+import type { StudioDocument } from './studio.js'
 
 const record = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
 const strings = (value: unknown) => Object.entries(record(value)).filter((entry): entry is [string, string] => typeof entry[1] === 'string')

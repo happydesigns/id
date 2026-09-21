@@ -1,4 +1,4 @@
-import type { BrandDefinition } from './types'
+import type { BrandDefinition } from './types.js'
 
 export type BrandAdapter<
   TBrand extends BrandDefinition = BrandDefinition,

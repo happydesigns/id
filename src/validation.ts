@@ -1,5 +1,5 @@
-import { brandDefinitionSchema, brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema'
-import type { BrandDefinition, BrandGuide, BrandIdentity, BrandTheme } from './types'
+import { brandDefinitionSchema, brandGuideSchema, brandIdentitySchema, brandThemeSchema } from './schema.js'
+import type { BrandDefinition, BrandGuide, BrandIdentity, BrandTheme } from './types.js'
 
 export class BrandValidationError extends Error {
   constructor(message: string, readonly issues: string[]) {

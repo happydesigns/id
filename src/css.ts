@@ -1,4 +1,4 @@
-import type { BrandCssVariables, BrandTheme, BrandThemeStyleTarget, ThemeCssOptions, ThemeMode } from './types'
+import type { BrandCssVariables, BrandTheme, BrandThemeStyleTarget, ThemeCssOptions, ThemeMode } from './types.js'
 
 const DEFAULT_LIGHT_SELECTOR = ':root'
 const DEFAULT_DARK_SELECTOR = '.dark'

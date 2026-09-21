@@ -2,4 +2,4 @@ export {
   idBrandGuide,
   neutralBrandTheme,
   nuxtUiBrandTheme,
-} from '../themes/nuxt-ui'
+} from '../themes/nuxt-ui/index.js'

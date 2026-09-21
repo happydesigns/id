@@ -1,4 +1,4 @@
-import type { BrandComponentCoverage } from './types'
+import type { BrandComponentCoverage } from './types.js'
 
 export const componentCoverageStatuses = ['planned', 'tokenized', 'documented', 'verified'] as const
 

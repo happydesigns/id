@@ -2,7 +2,7 @@ import type {
   BrandGuideDocsSection,
   BrandGuideSection,
   BrandGuideSectionInput,
-} from './types'
+} from './types.js'
 
 export type GuideSectionPathOptions = {
   basePath?: string

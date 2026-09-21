@@ -1,4 +1,4 @@
-import type { BrandAsset, BrandAssets, BrandGuideAssetEntry, BrandLogoSet } from './types'
+import type { BrandAsset, BrandAssets, BrandGuideAssetEntry, BrandLogoSet } from './types.js'
 
 export type BrandAssetEntry = {
   role: string

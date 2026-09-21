@@ -1,5 +1,5 @@
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
-import { dirname, extname, join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
@@ -53,37 +53,6 @@ function listFiles(dir, files = []) {
   return files
 }
 
-function resolveSpecifier(fromFile, specifier) {
-  if (!specifier.startsWith('./') && !specifier.startsWith('../')) {
-    return specifier
-  }
-  if (extname(specifier)) {
-    return specifier
-  }
-  const target = resolve(dirname(fromFile), specifier)
-  if (existsSync(`${target}.js`)) {
-    return `${specifier}.js`
-  }
-  if (existsSync(join(target, 'index.js'))) {
-    return `${specifier}/index.js`
-  }
-  return specifier
-}
-
-function rewriteImports(file) {
-  const source = readFileSync(file, 'utf8')
-  const rewritten = source
-    .replace(/(from\s+['"])(\.{1,2}\/[^'"]+)(['"])/g, (_match, before, specifier, after) => {
-      return `${before}${resolveSpecifier(file, specifier)}${after}`
-    })
-    .replace(/(import\s+['"])(\.{1,2}\/[^'"]+)(['"])/g, (_match, before, specifier, after) => {
-      return `${before}${resolveSpecifier(file, specifier)}${after}`
-    })
-  if (rewritten !== source) {
-    writeFileSync(file, rewritten)
-  }
-}
-
 rmSync(distDir, {
   force: true,
   recursive: true,
@@ -103,12 +72,6 @@ writeFileSync(join(rootDir, 'src/project-templates.generated.ts'),
 
 run(process.execPath, [tscBin, '-p', 'tsconfig.package.json'])
 copyRuntimeFiles()
-
-for (const file of listFiles(distDir)) {
-  if (file.endsWith('.js') || file.endsWith('.d.ts')) {
-    rewriteImports(file)
-  }
-}
 
 // This example consumes the public generator; its runtime is not hand-maintained.
 const { createStudioDocument, createStudioRuntimeFiles } = await import('../dist/src/studio.js')

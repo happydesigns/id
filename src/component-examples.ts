@@ -1,7 +1,7 @@
-import type { ComponentExampleMessages } from './component-example-messages'
+import type { ComponentExampleMessages } from './component-example-messages.js'
 
-export { componentExampleMessages, resolveComponentExampleMessage } from './component-example-messages'
-export type { ComponentExampleMessages, ComponentExampleMessageKey } from './component-example-messages'
+export { componentExampleMessages, resolveComponentExampleMessage } from './component-example-messages.js'
+export type { ComponentExampleMessages, ComponentExampleMessageKey } from './component-example-messages.js'
 
 export type ComponentExampleFrame = 'default' | 'none'
 

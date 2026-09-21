@@ -1,5 +1,5 @@
 import { addComponentsDir, addImportsDir, addPlugin, addTypeTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
-import type { BrandGuideAppConfig, BrandModuleOptions } from './src'
+import type { BrandGuideAppConfig, BrandModuleOptions } from './src/index.js'
 
 export type ModuleOptions = BrandModuleOptions
 
