@@ -85,6 +85,12 @@ Prefer well-maintained packages that fit Nuxt, TypeScript, and package publishin
 
 If a dependency is added, justify it through implementation and update the lockfile.
 
+## Code style
+
+Nuxt ESLint checks code and formatting, including the file-based project templates. Run `pnpm lint:fix` to format and `pnpm lint` to verify. Generated output is excluded.
+
+Comments explain non-obvious constraints, compatibility decisions and safety boundaries. Avoid narrating the next statement. Keep public API contracts and upstream-workaround explanations.
+
 ## Testing
 
 Add or update tests when changing logic.

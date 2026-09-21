@@ -5,11 +5,14 @@ export default withNuxt({
   ignores: [
     '.tmp/**',
     'src/project-templates.generated.ts',
-    'templates/project/**',
+    'templates/brand-layer/app/app.config.ts',
     'node_modules/**',
     'docs/.nuxt/**',
     'docs/.nuxt-dev/**',
     'playground/.nuxt-dev/**',
-    'playground/.nuxt/**'
-  ]
+    'playground/.nuxt/**',
+  ],
+}, {
+  files: ['templates/project/**/app/pages/**/*.vue'],
+  rules: { 'vue/multi-word-component-names': 'off' },
 })

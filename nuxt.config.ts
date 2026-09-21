@@ -6,8 +6,8 @@ export default defineNuxtConfig({
 
   modules: [
     ...(layerConfig.modules ?? []),
-    '@nuxt/eslint'
+    ['@nuxt/eslint', { config: { stylistic: true } }],
   ],
 
-  compatibilityDate: 'latest'
+  compatibilityDate: 'latest',
 })
