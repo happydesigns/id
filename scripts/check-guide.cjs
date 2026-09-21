@@ -32,7 +32,7 @@ const assert = require('node:assert/strict')
       }
     }
     assert.deepEqual(errors, [], 'Hydration or runtime errors')
-    assert.deepEqual(ssrIssues, [], 'Known Docus/MDC SSR label-ID mismatch: keep targeted ClientOnly until resolved')
+    assert.deepEqual(ssrIssues, [], 'Docus form labels must remain associated after hydration')
     console.log('Guide integration passed: 17 MDC examples; 4 widths; light/dark; Select translation; keyboard Tabs; no hydration errors.')
   } finally { await browser.close() }
 })().catch(error => { console.error(error); process.exitCode = 1 })

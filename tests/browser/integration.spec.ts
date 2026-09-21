@@ -39,13 +39,29 @@ test('Studio starts and opens its native brand menu in both modes', async ({ pag
   expect(errors).toEqual([])
 })
 
-for (const route of ['/', '/smoke']) test('known Docus host label-ID mismatch: ' + route, async ({ page }) => {
+for (const route of ['/', '/smoke', '/hydration']) test('Docus host preserves form and tab associations: ' + route, async ({ page }) => {
   await page.goto(route)
   // An actual interaction ensures hydration completed before examining associations.
-  await page.getByTestId('locale').click()
+  if (route === '/hydration') {
+    await expect(page.getByTestId('hydration-probe')).toHaveAttribute('data-ready', 'true')
+    await page.getByRole('button', { name: 'Change value', exact: true }).click()
+  } else {
+    await page.getByTestId('locale').click()
+    await expect(page.locator('[data-example="select"]').getByRole('combobox')).toHaveAttribute('aria-label', 'Status')
+  }
   const missing = await page.locator('label[for]').evaluateAll(labels =>
     labels.filter(label => !document.getElementById(label.getAttribute('for')!)).map(label => label.textContent)
   )
-  test.fail(true, 'GUIDE-001: documented in tests/fixtures/guide/README.md; an unexpected pass requires removing the workaround.')
   expect(missing).toEqual([])
+  const selectedTabs = page.getByRole('tab', { selected: true })
+  expect(await selectedTabs.count()).toBeGreaterThan(0)
+  expect(await selectedTabs.evaluateAll(tabs => tabs.filter(tab =>
+    !document.getElementById(tab.getAttribute('aria-controls')!)
+  ).map(tab => tab.textContent))).toEqual([])
+  if (route === '/hydration') {
+    await page.getByText('Project', { exact: true }).click()
+    await expect(page.getByRole('textbox', { name: 'Project', exact: true })).toBeFocused()
+    await page.getByRole('tab', { name: 'Details', exact: true }).click()
+    await expect(page.getByRole('tabpanel')).toHaveText('Details content')
+  }
 })

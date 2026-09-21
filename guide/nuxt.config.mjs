@@ -9,6 +9,13 @@ export default defineNuxtConfig({
     name: '@happydesigns/id-guide'
   },
 
+  // Vue uses hook registration to delimit useId() ranges, even on the client.
+  // Removing it (Nuxt production default) shifts IDs after Nuxt Icon siblings.
+  modules: [(_options, nuxt) => {
+    const client = nuxt.options.optimization.treeShake.composables.client
+    if (client.vue) client.vue = client.vue.filter(name => name !== 'onServerPrefetch')
+  }],
+
   components: [
     {
       path: resolve(currentDir, './components'),
