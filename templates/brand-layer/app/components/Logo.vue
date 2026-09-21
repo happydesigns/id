@@ -11,7 +11,7 @@ defineOptions({
       alt=""
       aria-hidden="true"
       class="size-5 shrink-0"
-    />
+    >
     <span class="truncate">
       Example Brand
     </span>
