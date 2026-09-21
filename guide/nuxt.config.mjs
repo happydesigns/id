@@ -17,7 +17,7 @@ export default defineNuxtConfig({
 
   components: [
     {
-      path: resolve(currentDir, './components'),
+      path: resolve(currentDir, './app/components'),
       pathPrefix: false,
       prefix: 'Id',
     },
@@ -28,7 +28,7 @@ export default defineNuxtConfig({
       // MDC needs the reference globally; other guide components stay auto-imported.
       const reference = components.find(component =>
         component.pascalName === 'IdBrandReference'
-        && resolve(component.filePath) === resolve(currentDir, './components/BrandReference.vue'),
+        && resolve(component.filePath) === resolve(currentDir, './app/components/BrandReference.vue'),
       )
       if (reference) reference.global = true
     },

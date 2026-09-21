@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { describe, expect, it } from 'vitest'
 import { createBlankStudioDocument } from '../src/studio'
-import { useStudioHistory } from '../studio/composables/useStudioHistory'
+import { useStudioHistory } from '../studio/app/composables/useStudioHistory'
 
 describe('Studio document history', () => {
   it('isolates snapshots, restores undo/redo and drops redo after a new edit', () => {

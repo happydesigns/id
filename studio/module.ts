@@ -6,7 +6,7 @@ export default defineNuxtModule({
   meta: { name: '@happydesigns/id-studio-project' },
   setup(_options, nuxt) {
     const { resolve } = createResolver(import.meta.url)
-    addRouteMiddleware({ name: 'id-studio-thumbnail-mode', path: resolve('./middleware/thumbnail-mode'), global: true })
+    addRouteMiddleware({ name: 'id-studio-thumbnail-mode', path: resolve('./app/middleware/thumbnail-mode'), global: true })
     nuxt.options.nitro.publicAssets ||= []
     nuxt.options.nitro.publicAssets.push({ dir: resolve('./public') })
     const source = nuxt.options.runtimeConfig.idStudioSource

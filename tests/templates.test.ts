@@ -94,7 +94,7 @@ describe('starter templates', () => {
       expect(statSync(join(rootDir, 'app', 'components', component)).isFile()).toBe(true)
     }
     for (const component of ['BrandSwatch.vue', 'ComponentCoverageTable.vue', 'ComponentExample.vue', 'ExampleFrame.vue', 'LayerInstall.vue', 'NuxtUiDocsLink.vue']) {
-      expect(statSync(join(rootDir, 'guide', 'components', component)).isFile()).toBe(true)
+      expect(statSync(join(rootDir, 'guide', 'app', 'components', component)).isFile()).toBe(true)
       expect(existsSync(join(rootDir, 'app', 'components', component))).toBe(false)
     }
   })

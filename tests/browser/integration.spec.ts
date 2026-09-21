@@ -28,6 +28,7 @@ test('Studio starts and opens its native brand menu in both modes', async ({ pag
   for (const mode of ['light', 'dark']) {
     await page.goto('/studio?browse=true&mode=' + mode)
     await expect(page.getByRole('main', { name: 'Brand Studio', exact: true })).toHaveAttribute('data-mode', mode)
+    await expect(page.frameLocator('iframe[title="Draft brand preview"]').locator('input[type="email"]').first()).toBeVisible()
     await page.getByRole('button', { name: 'Brand picker', exact: true }).click()
     await expect(page.getByRole('menu', { name: 'Brand picker', exact: true })).toBeVisible()
     await page.keyboard.press('Escape')
