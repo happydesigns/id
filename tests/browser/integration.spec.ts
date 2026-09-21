@@ -67,3 +67,19 @@ for (const route of ['/', '/smoke', '/hydration']) test('Docus host preserves fo
     await expect(page.getByRole('tabpanel')).toHaveText('Details content')
   }
 })
+
+for (const colorScheme of ['light', 'dark'] as const) {
+  for (const width of [320, 834, 1440]) {
+    test(`guide layout and hydration: ${colorScheme} ${width}`, async ({ page }) => {
+      const errors: string[] = []
+      page.on('console', message => { if (/hydration|mismatch/i.test(message.text())) errors.push(message.text()) })
+      page.on('pageerror', error => errors.push(error.message))
+      await page.emulateMedia({ colorScheme })
+      await page.setViewportSize({ width, height: 1000 })
+      await page.goto('/smoke')
+      await expect(page.getByTestId('guide-integration')).toHaveAttribute('data-ready', 'true')
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+      expect(errors).toEqual([])
+    })
+  }
+}
