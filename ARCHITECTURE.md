@@ -98,3 +98,11 @@ Studio now generates native runtime CSS, app config and assets through `createSt
 The generated native projects pin Nuxt 4.5.2, Nuxt UI 4.10.0, Tailwind CSS 4.3.3 and Docus 5.12.3. The workspace lockfile is the tested dependency graph; declared compatible ranges are not evidence that every newer combination has passed visual or hydration checks. Guide/Studio integration is tested independently from a native packed-brand consumer. Customer upgrades need their own consuming-app checks. Keep the package together; native runtime output does not require physically splitting the authoring package.
 
 The workspace pins Tiptap's editor family together at 3.30.1 after a mixed core/extension graph failed production bundling. This is an authoring test-workspace constraint, not a new dependency of native brand consumers. The Docus/MDC fixture records the remaining SSR ID limitation; keep targeted consumer workarounds until that check passes.
+
+## Evolution policy
+
+New branding features target the native generation path. The existing identity runtime remains supported for current consumers with correctness and security fixes; it is not a second place to independently develop the editor. Handwritten starters are examples, while Studio-generated projects keep brand.studio.json as their editable source and generated runtime files as derived output.
+
+Guide components accept ordinary typed props and slots. Markdown parser trees and renderer lifecycle details must not enter the public brand/document contracts. A future Comark migration belongs to the Guide/Docus integration boundary and must pass the same production hydration, slots, code rendering and accessibility checks. Do not prebuild a generic renderer framework or assume a new parser fixes existing hydration defects.
+
+Studio history is isolated in useStudioHistory. Validation and user-visible errors stay in the editor, and history owns bounded snapshots, undo/redo and project reset. Further extraction should follow tested behavior boundaries rather than file-size targets.

@@ -14,11 +14,11 @@ Nuxt UI is the supported component and theme system. Neutral named data and the 
 - Prefer real Nuxt UI examples in documentation and playground surfaces.
 - Keep `id` runtime components globally prefixed. The default prefix is `Id`; apps can choose another prefix through the module when needed.
 
-## Brand Guide First
+## Shared Brand Source
 
-A brand layer should be generated from a clear brand guide, not from scattered styling fixes.
+A brand layer is generated from one reviewed brand source. Applications use semantic roles instead of scattered brand-specific styling. A guide can explain and demonstrate the same source; a manually authored guide is not required to consume the brand.
 
-The brand guide should describe:
+The source and optional guide can describe:
 
 - identity metadata
 - logo and asset roles

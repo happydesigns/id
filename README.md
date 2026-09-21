@@ -4,6 +4,12 @@ Brand authoring, previews and reusable brand layers for Nuxt UI. Nuxt UI is the 
 
 `@happydesigns/id` defines how a brand is described, validated, documented, and applied to Nuxt UI projects. It is the reusable identity mechanism between Nuxt UI apps and concrete brand layers such as `@happydesigns/brand`.
 
+## Product contract
+
+Applications depend on Nuxt UI components, semantic roles and stable brand asset roles. A brand supplies their appearance. Change the shared brand source and regenerate its native layer to update compatible applications without rewriting their features. Applications must adopt the new brand version and rebuild or redeploy; ID is not a remote theme distribution service.
+
+The supported path is Studio source → generated native brand → consuming Nuxt applications. Studio and the guide are optional authoring tools. ID does not guarantee artistic quality or automatically theme hardcoded application colors, custom third-party widgets or unavailable fonts.
+
 ## What it provides
 
 - A visual Studio for brand projects, with shared component scenarios and real Docus route previews.
