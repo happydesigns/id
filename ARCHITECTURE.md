@@ -19,7 +19,8 @@ This file defines the technical structure for `@happydesigns/id`: Nuxt UI brand-
 | --- | --- | --- |
 | `src/` | Neutral brand definitions, adapter contracts, brand-guide types, validation, CSS generation, app-config helpers, brand-theme utilities. | Vue component state, routing, assets, app-specific copy. |
 | `app/` | Consumer-safe Nuxt layer runtime, composables, plugin, neutral CSS defaults, and runtime identity helpers. | Guide-only examples, concrete customer assets, domain behavior, server APIs. |
-| `guide/` | Optional brand-guide components such as example frames, coverage tables, install surfaces, and docs links. | Runtime requirements, brand doctrine, customer copy, or product behavior. |
+| `guide/app/` | Optional brand-guide components such as example frames, coverage tables, install surfaces, and docs links. | Runtime requirements, brand doctrine, customer copy, or product behavior. |
+| `studio/app/` | Optional Studio pages, components, composables and preview plugin, using Nuxt directory conventions. | Separate package versions or a second application runtime. |
 | `module.ts` | Optional Nuxt module integration, module options, runtime registration. | Brand-specific visual decisions. |
 | `nuxt.layer.config.mjs` | Public runtime layer export for consumers extending `@happydesigns/id/nuxt`. | Guide-only components and repository tooling such as lint modules. |
 | `guide/nuxt.config.mjs` | Optional guide add-on for documentation applications extending `@happydesigns/id/guide`. | Theme selection, concrete guide content, or production app behavior. |
@@ -91,7 +92,7 @@ Original and draft render in separate same-origin frames. Messages require the p
 
 `brand.studio.json` is the editable source. Unknown JSON fields and custom component configuration survive a round trip. The importer accepts data only and rejects executable objects, prototype properties, remote assets and CSS injection. Exported projects regenerate CSS and scan their source for custom classes. Custom components, external fonts and app-specific utilities are not inferred from a token document.
 
-Studio now generates native runtime CSS, app config and assets through `createStudioRuntimeFiles`. The exported playground contains Studio as a development dependency. Docus, guide components and documentation routes are generated only with the explicit `guide: true` option. Existing runtime consumers and `{ legacyRuntime: true }` exports remain supported. `studio/module.ts` registers the fixed-source writer only during local development; `studio/source.ts` validates and replaces the source after a revision check. Hosts own regeneration of derived artifacts. `studio/plugins/preview.client.ts` applies drafts after hydration to real, bounded host routes and preserves consumer UI overrides.
+Studio now generates native runtime CSS, app config and assets through `createStudioRuntimeFiles`. The exported playground contains Studio as a development dependency. Docus, guide components and documentation routes are generated only with the explicit `guide: true` option. Existing runtime consumers and `{ legacyRuntime: true }` exports remain supported. `studio/module.ts` registers the fixed-source writer only during local development; `studio/source.ts` validates and replaces the source after a revision check. Hosts own regeneration of derived artifacts. `studio/app/plugins/preview.client.ts` applies drafts after hydration to real, bounded host routes and preserves consumer UI overrides.
 
 ## Validated framework baseline
 
@@ -116,3 +117,14 @@ File-based scaffolds under templates/project own project boilerplate. Package bu
 The Studio component coordinates user actions. `useStudioHistory` owns undo/redo, `useStudioProjects` owns browser project storage, `useStudioFrames` owns iframe identity/loading/recovery, and `studio/export.ts` owns downloading complete projects and assets. Confirmation and user-visible error handling remain at the UI boundary.
 
 `.nuxt`, `.output`, `dist`, caches, logs and browser reports are ignored local artifacts. They are not architecture layers. `scripts/check-native.mjs` validates packed generated brands and a standalone Studio; Playwright owns production browser checks. There is no separate manual guide runner.
+
+## Remaining verification work
+
+The earlier brand-system research is reflected in the native brand exports, source-derived brand references and the two-brand consumer checks. Remaining improvements, in priority order:
+
+- Extend generator regression coverage across complete light/dark outputs and component defaults. Prefer focused assertions; use snapshots where reviewing the whole artifact adds value.
+- Add a small visual regression matrix for representative component states. Existing browser checks verify behavior and layout, not screenshot equivalence.
+- Derive field-level contract documentation from the schemas if maintaining the API reference starts to drift. Brand-value references already derive from the authoring source.
+- Evaluate targeted checks for hardcoded brand colors in reusable examples, with explicit exceptions for palette displays and intentional demonstrations.
+
+DTCG or Style Dictionary integration remains demand-driven, for a concrete design-tool interchange use case. It is not a runtime requirement or a prerequisite for the current product.
