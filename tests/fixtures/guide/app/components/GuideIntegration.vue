@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { ComponentExampleMessages } from '../../../../../src/component-examples'
+const ready = ref(false)
+onMounted(() => { ready.value = true })
 const german = ref(true)
 const messages = computed<ComponentExampleMessages>(() => german.value ? {
   'forms.projectName': 'Projektname',
@@ -14,7 +16,7 @@ const names = ['action-hierarchy-pattern', 'badge', 'tooltip', 'form-pattern', '
 </script>
 
 <template>
-  <div>
+  <div data-testid="guide-integration" :data-ready="ready">
     <UButton data-testid="locale" label="Change language" @click="german = !german" />
     <UColorModeButton data-testid="mode" />
     <IdStudioLink />

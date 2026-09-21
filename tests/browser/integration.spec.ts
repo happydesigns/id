@@ -5,6 +5,7 @@ test('guide controls: translated Select and keyboard coverage', async ({ page })
   page.on('pageerror', error => errors.push(error.message))
   await page.setViewportSize({ width: 390, height: 1000 })
   await page.goto('/smoke')
+  await expect(page.getByTestId('guide-integration')).toHaveAttribute('data-ready', 'true')
   const select = page.locator('[data-example="select"]').getByRole('combobox')
   await select.click()
   await page.getByRole('option', { name: 'Bereit zur Prüfung', exact: true }).click()
@@ -46,6 +47,7 @@ for (const route of ['/', '/smoke', '/hydration']) test('Docus host preserves fo
     await expect(page.getByTestId('hydration-probe')).toHaveAttribute('data-ready', 'true')
     await page.getByRole('button', { name: 'Change value', exact: true }).click()
   } else {
+    await expect(page.getByTestId('guide-integration')).toHaveAttribute('data-ready', 'true')
     await page.getByTestId('locale').click()
     await expect(page.locator('[data-example="select"]').getByRole('combobox')).toHaveAttribute('aria-label', 'Status')
   }
