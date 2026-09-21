@@ -20,7 +20,7 @@ import { paletteRamp } from '../../palette'
 import { copyConfig, previewUi, studioShellCss } from '../../preview'
 import StudioViewport from './StudioViewport.vue'
 import StudioViewportControls from './StudioViewportControls.vue'
-import { createBlankStudioDocument, createStudioDocument, createStudioProject, diffStudioDocuments, parseStudioDocument, studioRoles, studioBuiltinPalettes } from '../../../src/studio'
+import { createBlankStudioDocument, createStudioDocument, createStudioProject, diffStudioDocuments, parseStudioDocument, studioDocumentMaxBytes, studioRoles, studioBuiltinPalettes } from '../../../src/studio'
 import { nuxtUiBrandTheme } from '../../../themes/nuxt-ui'
 import { createStudioPalette, parseStudioSession, contrastRatio } from '../../editor'
 import type { StudioSession } from '../../editor'
@@ -636,12 +636,12 @@ async function openDocument(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
   try {
-    if (file.size > 8_000_000) throw new Error('Choose a brand document smaller than 8 MB.')
+    if (file.size > studioDocumentMaxBytes) throw new Error('Choose a brand document smaller than 8 MB.')
     const doc = parseStudioDocument(await file.text())
     guard(() => replace(doc))
   }
   catch {
-    error.value = file.size > 8_000_000 ? 'Choose a brand document smaller than 8 MB.' : 'This file is not a valid brand document. Choose a Studio source JSON file.'
+    error.value = file.size > studioDocumentMaxBytes ? 'Choose a brand document smaller than 8 MB.' : 'This file is not a valid brand document. Choose a Studio source JSON file.'
   }
   finally {
     if (input.value) input.value.value = ''

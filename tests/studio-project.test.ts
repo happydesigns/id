@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { createBlankStudioDocument, createStudioProject, createStudioRuntimeFiles } from '../src/studio'
+import { createBlankStudioDocument, parseStudioDocument, createStudioProject, createStudioRuntimeFiles } from '../src/studio'
 import { readStudioSource, writeStudioSource } from '../studio/source'
 import { previewUi } from '../studio/preview'
 import { studioTemplates, withinStudioRoute } from '../studio/templates'
@@ -24,6 +24,11 @@ async function source() {
 }
 
 describe('connected brand source', () => {
+  it('rejects oversized UTF-8 documents even when their string length is smaller', () => {
+    const doc = createBlankStudioDocument()
+    doc.notes = 'ä'.repeat(4_000_001)
+    expect(() => parseStudioDocument(JSON.stringify(doc))).toThrow('8 MB')
+  })
   it('preserves exact bytes when nothing changed', async () => {
     const item = await source()
     const before = await readFile(item.path)

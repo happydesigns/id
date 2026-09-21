@@ -1,3 +1,4 @@
+import { studioDocumentMaxBytes } from '../../src/studio'
 import { createError, defineEventHandler, getHeader, getMethod, getRequestURL, readBody } from 'h3'
 import type { H3Event } from 'h3'
 import { basename } from 'node:path'
@@ -17,7 +18,7 @@ export function createStudioSourceHandler(getConfig: (event: H3Event) => SourceC
       if (getMethod(event) === 'GET') return { ...await readStudioSource(path), source: basename(path) }
       if (getMethod(event) !== 'POST') throw createError({ statusCode: 405, statusMessage: 'Method not allowed.' })
       const length = Number(getHeader(event, 'content-length'))
-      if (!getHeader(event, 'content-type')?.startsWith('application/json') || !Number.isSafeInteger(length) || length <= 0 || length > 8_000_000) throw createError({ statusCode: 400, statusMessage: 'A brand JSON document smaller than 8 MB with a Content-Length is required.' })
+      if (!getHeader(event, 'content-type')?.startsWith('application/json') || !Number.isSafeInteger(length) || length <= 0 || length > studioDocumentMaxBytes) throw createError({ statusCode: 400, statusMessage: 'A brand JSON document smaller than 8 MB with a Content-Length is required.' })
       const body = await readBody(event)
       if (typeof body?.revision !== 'string') throw createError({ statusCode: 400, statusMessage: 'Source revision required.' })
       return { ...await writeStudioSource(path, body.revision, body.document), source: basename(path) }
