@@ -9,7 +9,7 @@ The native consumer check installs the actual ID tarball into a fresh authoring 
 - pnpm verify
 - pnpm pack:studio
 - pnpm check:native
-- pnpm exec nuxt build tests/fixtures/guide
+- pnpm exec nuxt generate tests/fixtures/guide
 - pnpm exec playwright install chromium
 - pnpm test:browser
 
@@ -26,6 +26,6 @@ Until registry publication, consumers may install the reviewed release tarball a
 
 ## Integration limitations
 
-GUIDE-001 is the Docus/MDC server/client ID mismatch documented in tests/fixtures/guide/README.md. Its browser assertion is marked as an expected failure, not ignored: if it starts passing, CI reports an unexpected pass and requires reviewing/removing the expectation and consumer workarounds. New unrelated failures are not exempted.
+GUIDE-001 is the Docus-host server/client ID mismatch documented in tests/fixtures/guide/README.md. Its label-association assertions for both direct Vue and MDC routes are marked as expected failures, not ignored: if it starts passing, CI reports an unexpected pass and requires reviewing/removing the expectation and consumer workarounds. New unrelated failures are not exempted.
 
 The release gate checks a direct Vue guide page separately from the MDC rendering path. Native Tabs demonstrations currently expose labels without complete example content; hosts that need tab panels supply native content slots. Neither limitation is a reason to duplicate Nuxt UI components or replace the Docus shell.

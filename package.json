@@ -108,7 +108,9 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "verify": "pnpm lint && pnpm test && pnpm typecheck",
-    "pack:studio": "pnpm build:package && pnpm --config.ignore-scripts=true pack --out .output/studio-package/id.tgz"
+    "pack:studio": "pnpm build:package && pnpm --config.ignore-scripts=true pack --out .output/studio-package/id.tgz",
+    "check:native": "node scripts/check-native.mjs",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@nuxt/kit": "^4.5.2",
@@ -125,12 +127,14 @@
     "@iconify-json/simple-icons": "^1.2.93",
     "@iconify-json/vscode-icons": "1.2.61",
     "@nuxt/eslint": "^1.17.0",
+    "@playwright/test": "1.63.0",
     "@vue/compiler-sfc": "^3.5.41",
     "docus": "^5.12.3",
     "eslint": "^10.8.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
+    "vue": "3.5.41",
     "vue-tsc": "^3.3.10",
     "zod-to-json-schema": "^3.25.2"
   },
