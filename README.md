@@ -17,6 +17,12 @@ The supported path is Studio source → generated native brand → consuming Nux
 - Optional capability previews and Docus guide components.
 - Compatible identity-runtime helpers for existing applications.
 
+## Compatibility
+
+ID currently supports Node 24, Nuxt 4.5.2 or newer within Nuxt 4, Nuxt UI 4.10 or newer within Nuxt UI 4, Vue 3.5.41 or newer within Vue 3, and Tailwind CSS 4.3.3 or newer within Tailwind 4. The optional guide is verified with Docus 5.12.3.
+
+CI checks the locked dependency set on Linux, plus package types and source operations on the minimum Node 24 release and Windows. Isolated package consumers resolve their own dependencies. Newer major versions are not implicitly supported.
+
 ## Install
 
 For a new brand, use Studio and download **New project**. The project contains a standard Nuxt UI layer and a Studio playground. Select **Include Docus guide** only when the project also needs documentation. Consumers extend the generated brand; `id` is only an authoring dependency.

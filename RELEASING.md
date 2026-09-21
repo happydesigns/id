@@ -34,3 +34,9 @@ Until registry publication, consumers may install the reviewed release tarball a
 GUIDE-001 is resolved by preserving Vue's onServerPrefetch registration in the Guide production client. See tests/fixtures/guide/README.md for the minimal reproduction and reason. The form-label and tab-panel assertions are now required success tests. Do not restore expected failures to accommodate a dependency update.
 
 Native Tabs demonstrations with labels only still need actual content slots when a host wants meaningful tab-panel content. This is independent of hydration.
+
+## Support checks
+
+Release publication also requires the compatibility job: package types and local source operations on Node 24.0.0/Linux and Node 24/Windows. The production integration job remains on Node 24/Linux. These jobs test the supported range's baseline, not every dependency combination.
+
+Dependency updates arrive as reviewable Dependabot PRs; they are not merged automatically. Keep the Tiptap overrides coordinated. Remove the Guide hydration workaround only when the fixture passes without it on the supported dependency baseline, as described in tests/fixtures/guide/README.md.
