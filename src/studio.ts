@@ -155,6 +155,7 @@ export function createStudioProject(input: StudioDocument, options: StudioProjec
     Object.assign(manifest.devDependencies, JSON.parse(dependencies!).devDependencies)
     // Docus supplies the host app; the minimal Studio host supplies its own UApp.
     delete files['playground/app/app.vue']
+    delete files['playground/app/pages/index.vue']
   }
   manifest.name = doc.brand.packageName || doc.brand.name
   const dependencies = legacy ? manifest.dependencies : manifest.devDependencies

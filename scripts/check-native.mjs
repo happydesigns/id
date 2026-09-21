@@ -24,11 +24,12 @@ function run(command, args, cwd) {
 const author = join(workspace, 'author')
 write(author, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: { '@happydesigns/id': 'file:' + archive.replaceAll('\\', '/') } }))
 run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], author)
-for (const directory of ['app', 'guide', 'studio', 'src', 'themes', 'dist', 'templates']) {
+for (const directory of ['app', 'guide', 'studio', 'src', 'themes', 'dist']) {
   for (const file of readdirSync(join(author, 'node_modules/@happydesigns/id', directory), { recursive: true })) {
     assert.ok(!String(file).split(/[\\/]/).some(part => ['.nuxt', '.output', '.tmp', '.agents', 'node_modules'].includes(part)), 'Generated file in package: ' + file)
   }
 }
+assert.ok(!existsSync(join(author, 'node_modules/@happydesigns/id/templates')), 'Workspace examples must not ship')
 const manifest = JSON.parse(readFileSync(join(author, 'node_modules/@happydesigns/id/package.json'), 'utf8'))
 for (const group of ['dependencies', 'devDependencies', 'peerDependencies']) {
   for (const version of Object.values(manifest[group] ?? {})) {
@@ -47,16 +48,16 @@ write(author, 'generate.mjs', `
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { createBlankStudioDocument, createStudioProject } from '@happydesigns/id/studio/core'
-for (const name of ['violet', 'amber']) {
+for (const name of ['violet', 'amber', 'guide']) {
   const doc = createBlankStudioDocument()
   doc.brand.name = name
   doc.brand.packageName = '@id-test/brand'
   doc.theme.label = name
-  doc.theme.ui.colors.primary = name
+  doc.theme.ui.colors.primary = name === 'guide' ? 'violet' : name
   doc.brand.typography.sans = name === 'violet' ? 'Georgia, serif' : 'Arial, sans-serif'
   doc.theme.cssVariables = { light: { '--ui-primary': name === 'violet' ? '#7c3aed' : '#b45309' }, dark: { '--ui-primary': name === 'violet' ? '#c4b5fd' : '#fcd34d' } }
   doc.brand.assets = { logos: Object.fromEntries(['wordmark', 'wordmarkInverse'].map(role => [role, { name: role, role, src: '/' + name + '-' + role + '.svg', alt: name }])) }
-  const files = createStudioProject(doc)
+  const files = createStudioProject(doc, { guide: name === 'guide' })
   for (const asset of Object.values(doc.brand.assets.logos)) files['public' + asset.src] = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="24"><text x="0" y="18">' + name + '</text></svg>'
   for (const [path, value] of Object.entries(files)) {
     const target = resolve('../' + name, path)
@@ -105,3 +106,14 @@ for (const name of ['violet', 'amber']) {
 assert.equal(readFileSync(join(workspace, 'consumer-violet/app/app.vue'), 'utf8'), readFileSync(join(workspace, 'consumer-amber/app/app.vue'), 'utf8'))
 console.log('PASS: identical application generated with two packed native brands without ID or Docus; exported Studio generated without Docus.')
 console.log('Fixture retained for diagnosis:', workspace)
+
+const guide = join(workspace, 'guide')
+const guideManifest = JSON.parse(readFileSync(join(guide, 'package.json'), 'utf8'))
+guideManifest.devDependencies['@happydesigns/id'] = 'file:' + archive.replaceAll('\\', '/')
+write(guide, 'package.json', JSON.stringify(guideManifest))
+write(guide, 'playground/nuxt.config.ts', readFileSync(join(guide, 'playground/nuxt.config.ts'), 'utf8').replace('compatibilityDate:', 'ui: { fonts: false }, compatibilityDate:'))
+run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], guide)
+run(process.execPath, ['node_modules/nuxt/bin/nuxt.mjs', 'generate', 'playground'], guide)
+assert.match(readFileSync(join(guide, 'playground/.output/public/docs/introduction.html'), 'utf8'), /Use your brand/, 'Exported introduction missing')
+assert.match(readFileSync(join(guide, 'playground/.output/public/docs/brand-reference.html'), 'utf8'), /Brand reference/, 'Exported reference missing')
+console.log('PASS: exported Docus project installed and generated from the packed package.')
