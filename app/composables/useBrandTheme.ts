@@ -1,10 +1,14 @@
-import { updateAppConfig, useAppConfig, useCookie, useState } from '#imports'
+import { useAppConfig, useCookie, useState } from '#imports'
 import { computed } from 'vue'
+import { copyConfig, replaceThemeUi } from '../../src/ui-config'
 import { applyBrandTheme as applyBrandThemeCore, createBrandThemeCookieName, createBrandThemeStateKey, createNuxtUiAppConfig, resolveBrandThemeName, resolveBrandThemes } from '../../src'
 import type { BrandRuntimeOnlyConfig, BrandTheme, NuxtUiAppConfig } from '../../src'
 
+const hostConfigs = new WeakMap<object, { ui: Record<string, unknown>, seed: Record<string, unknown> }>()
+
 type IdentityAppConfig = {
   id?: BrandRuntimeOnlyConfig
+  ui?: Record<string, unknown>
 }
 
 function getThemeList(config: IdentityAppConfig) {
@@ -58,14 +62,16 @@ type SetThemeOptions = {
   persist?: boolean
 }
 
-function updateNuxtUiAppConfig(config: NuxtUiAppConfig) {
-  updateAppConfig(config as Parameters<typeof updateAppConfig>[0])
-}
-
 export function useBrandTheme() {
   const appConfig = useAppConfig() as IdentityAppConfig
   const currentName = useState<string>(createBrandThemeStateKey(appConfig.id?.name), () => resolveInitialThemeName(appConfig))
-  const themes = computed(() => getThemeList(appConfig))
+  const localThemes = useState<BrandTheme[]>(createBrandThemeStateKey(appConfig.id?.name) + ':local', () => [])
+  const themes = computed(() => [...getThemeList(appConfig).filter(theme => !localThemes.value.some(local => local.name === theme.name)), ...localThemes.value])
+  if (!hostConfigs.has(appConfig)) hostConfigs.set(appConfig, { ui: copyConfig(appConfig.ui ?? {}), seed: copyConfig(appConfig.id?.theme?.ui ?? {}) })
+  function updateNuxtUiAppConfig(config: NuxtUiAppConfig) {
+    const host = hostConfigs.get(appConfig)!
+    appConfig.ui = replaceThemeUi(host.ui, host.seed, config.ui ?? {})
+  }
   const currentTheme = computed(() => resolveTheme(themes.value, currentName.value))
   const selectedName = computed(() => currentTheme.value?.name ?? '')
   function setTheme(name: string, options: SetThemeOptions = {}) {
@@ -114,6 +120,7 @@ export function useBrandTheme() {
   }
   return {
     themes,
+    localThemes,
     currentName,
     selectedName,
     currentTheme,

@@ -45,6 +45,8 @@ const baseline = ref(clone(seed))
 const draft = ref(clone(seed))
 const shellConfig = useAppConfig()
 const hostUi = copyConfig(shellConfig.ui)
+const hostRuntime = useNuxtApp().$brandTheme as { currentTheme?: { value?: { ui?: Record<string, unknown> } } } | undefined
+const hostSeedUi = copyConfig(hostRuntime?.currentTheme?.value?.ui ?? seed.theme.ui ?? {})
 const shellTheme = ref('')
 useHead({ style: [{ key: 'id-studio-shell-theme', textContent: shellTheme }] })
 const templates = studioTemplates(config.idStudio?.templates)
@@ -859,7 +861,7 @@ onMounted(() => {
   root.dataset.idStudioTheme = ''
   root.removeAttribute('style')
   watch(draft, (doc) => {
-    shellConfig.ui = previewUi(hostUi, seed.theme.ui ?? {}, doc.theme.ui ?? {}) as typeof shellConfig.ui
+    shellConfig.ui = previewUi(hostUi, hostSeedUi, doc.theme.ui ?? {}) as typeof shellConfig.ui
     shellTheme.value = studioShellCss(doc)
   }, { immediate: true, deep: true })
   onBeforeUnmount(() => {
