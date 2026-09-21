@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { cpSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -24,8 +24,9 @@ function run(command, args, cwd) {
 const author = join(workspace, 'author')
 write(author, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: { '@happydesigns/id': 'file:' + archive.replaceAll('\\', '/') } }))
 run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], author)
-const packed = JSON.parse(readFileSync(join(author, 'node_modules/@happydesigns/id/package.json'), 'utf8'))
-assert.ok(!packed.files.includes('templates/brand-layer/playground'), 'Only explicit starter source directories may be packed')
+for (const file of readdirSync(join(author, 'node_modules/@happydesigns/id/templates'), { recursive: true })) {
+  assert.ok(!String(file).split(/[\\/]/).some(part => ['.nuxt', '.output', 'node_modules'].includes(part)), 'Generated file in package: ' + file)
+}
 write(author, 'generate.mjs', `
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
