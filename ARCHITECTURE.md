@@ -21,8 +21,8 @@ This file defines the technical structure for `@happydesigns/id`: Nuxt UI brand-
 | `app/` | Consumer-safe Nuxt layer runtime, composables, plugin, neutral CSS defaults, and runtime identity helpers. | Guide-only examples, concrete customer assets, domain behavior, server APIs. |
 | `guide/` | Optional brand-guide components such as example frames, coverage tables, install surfaces, and docs links. | Runtime requirements, brand doctrine, customer copy, or product behavior. |
 | `module.ts` | Optional Nuxt module integration, module options, runtime registration. | Brand-specific visual decisions. |
-| `nuxt.layer.config.ts` | Public runtime layer export for consumers extending `@happydesigns/id/nuxt`. | Guide-only components and repository tooling such as lint modules. |
-| `guide/nuxt.config.ts` | Optional guide add-on for documentation applications extending `@happydesigns/id/guide`. | Theme selection, concrete guide content, or production app behavior. |
+| `nuxt.layer.config.mjs` | Public runtime layer export for consumers extending `@happydesigns/id/nuxt`. | Guide-only components and repository tooling such as lint modules. |
+| `guide/nuxt.config.mjs` | Optional guide add-on for documentation applications extending `@happydesigns/id/guide`. | Theme selection, concrete guide content, or production app behavior. |
 | `nuxt.config.ts` | Development config for this repository, importing the public layer and adding local tooling. | Public layer behavior. |
 | `themes/` | Shipped reference themes such as the Nuxt UI baseline and a neutral sample brand demonstration theme. | Canonical brand doctrine, product-specific behavior, or private customer configuration. |
 | `templates/` | Starter projects for brand layers and themed apps. | Generated project state or private credentials. |
@@ -79,15 +79,15 @@ Docs and playground may import from the package to demonstrate real usage.
 ## Source of Truth
 
 - TypeScript source owns exact runtime behavior and public API shapes.
-- Root docs own durable architecture, contribution, security, design, and API rules.
+- Root docs own durable architecture, contribution, security and design rules. The public API reference lives in docs/content/4.reference/1.api.md; API.md points to it.
 - Docus docs own product usage guidance.
-- Templates own recommended starting files, not every possible project shape.
+- Templates are integration and compatibility examples. Studio project generation owns the recommended new-project shape.
 
 ## Optional authoring surface
 
 `studio/` owns the optional Nuxt UI Brand Studio layer and the shared visual scenes. `src/studio.ts` owns its versioned JSON document, boundary validation, source-preserving diff, CSS and project exports. Studio is opt-in and is not imported by the normal runtime or module. The supported design system is Nuxt UI; the existing adapter exports remain compatible utilities.
 
-Original and draft render in separate same-origin frames. Messages require the parent origin and window identity. The editor never changes its own app config while editing. Local draft storage is scoped to the host brand. Browser-local project recovery preserves drafts during switches; when storage fails, replacing unsaved work requires a user choice. Export requires no server storage or repository credentials.
+Original and draft render in separate same-origin frames. Messages require the parent origin and window identity. The editor temporarily previews draft UI defaults in the shell and restores the host configuration when leaving Studio. Local draft storage is scoped to the host brand. Browser-local project recovery preserves drafts during switches; when storage fails, replacing unsaved work requires a user choice. Export requires no server storage or repository credentials.
 
 `brand.studio.json` is the editable source. Unknown JSON fields and custom component configuration survive a round trip. The importer accepts data only and rejects executable objects, prototype properties, remote assets and CSS injection. Exported projects regenerate CSS and scan their source for custom classes. Custom components, external fonts and app-specific utilities are not inferred from a token document.
 
@@ -101,8 +101,18 @@ The workspace pins Tiptap's editor family together at 3.30.1 after a mixed core/
 
 ## Evolution policy
 
-New branding features target the native generation path. The existing identity runtime remains supported for current consumers with correctness and security fixes; it is not a second place to independently develop the editor. Handwritten starters are examples, while Studio-generated projects keep brand.studio.json as their editable source and generated runtime files as derived output.
+New branding features target the native generation path. The existing identity runtime remains supported for current consumers with correctness and security fixes; it is not a second place to independently develop the editor. The brand-layer example derives its runtime and Studio document from brand.ts through the public generator during package build. Studio-generated projects keep brand.studio.json as their editable source. Both paths use createStudioRuntimeFiles; generated runtime files are never edited separately.
 
 Guide components accept ordinary typed props and slots. Markdown parser trees and renderer lifecycle details must not enter the public brand/document contracts. A future Comark migration belongs to the Guide/Docus integration boundary and must pass the same production hydration, slots, code rendering and accessibility checks. Do not prebuild a generic renderer framework or assume a new parser fixes existing hydration defects.
 
 Studio history is isolated in useStudioHistory. Validation and user-visible errors stay in the editor, and history owns bounded snapshots, undo/redo and project reset. Further extraction should follow tested behavior boundaries rather than file-size targets.
+
+## Build and editor ownership
+
+Published `.mjs` layer entries own their configuration. Local `.ts` entries re-export them so Nuxt discovery and package consumption cannot drift. The package builder compiles portable TypeScript and copies runtime files; source and built runtime copies serve the layer and module entry points respectively.
+
+File-based scaffolds under templates/project own project boilerplate. Package build bundles these files for portable browser/Node use; native generation adds brand runtime data and either a minimal Studio host or the optional Docus overlay. Legacy output has a separate compatibility scaffold under templates/project/legacy. Do not construct new native output by modifying a legacy project.
+
+The Studio component coordinates user actions. `useStudioHistory` owns undo/redo, `useStudioProjects` owns browser project storage, `useStudioFrames` owns iframe identity/loading/recovery, and `studio/export.ts` owns downloading complete projects and assets. Confirmation and user-visible error handling remain at the UI boundary.
+
+`.nuxt`, `.output`, `dist`, caches, logs and browser reports are ignored local artifacts. They are not architecture layers. `scripts/check-native.mjs` validates packed generated brands and a standalone Studio; Playwright owns production browser checks. There is no separate manual guide runner.

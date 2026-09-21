@@ -12,21 +12,10 @@ The supported path is Studio source → generated native brand → consuming Nux
 
 ## What it provides
 
-- A visual Studio for brand projects, with shared component scenarios, Landing and optional capability templates.
-- Native Nuxt UI exports: CSS, app config and assets; consumers do not need the editor runtime.
-- Reviewed local source updates in development, plus portable JSON and project downloads.
-- A neutral typed brand definition plus a small public adapter contract.
-- An official Nuxt UI adapter and a generic CSS-variable reference adapter.
-- Separate brand-guide and primary brand-theme contracts.
-- A neutral Nuxt UI baseline through `nuxtUiBrandTheme` and `idBrandGuide`.
-- Explicit theme exports for `@happydesigns/id/themes/nuxt-ui` and the neutral `@happydesigns/id/themes/sample-brand` reference theme.
-- Validation helpers for brand metadata, palettes, semantic roles, logos, voice, component coverage, and usage limits.
-- CSS variable generation for light and dark themes.
-- Nuxt UI app-config helpers for `ui.colors` and component defaults.
-- A consumer-safe Nuxt layer and module for applying identity runtime behavior.
-- An optional guide layer for docs links, example frames, reusable Nuxt UI component examples, install snippets, swatches, and component coverage.
-- Starters for brand layers and themed apps.
-- Docus documentation for brand-guide authors and Nuxt developers.
+- Studio for editing, comparing and exporting brands.
+- Native Nuxt UI layers generated from a validated brand source.
+- Optional capability previews and Docus guide components.
+- Compatible identity-runtime helpers for existing applications.
 
 ## Install
 
@@ -86,31 +75,6 @@ export default defineNuxtConfig({
 
 `@happydesigns/id/guide` is an add-on to an existing identity runtime or brand layer. It does not select a brand or configure a theme by itself.
 
-## Branding model
-
-`id` supports a brand-layer-first model:
-
-- A neutral brand definition stores named colors, optional free roles, freely named typography roles, and structured runtime assets once. `sans`, `mono`, and `display` are useful typography conventions, not a closed vocabulary.
-- Nuxt UI mappings turn those values into component defaults and theme variables. Existing adapter helpers remain compatible utilities; additional design-system runtimes and editors are outside the supported product.
-- Build-time brand layers for full app transformation: assets, layouts, app shell, custom components, CSS, metadata, docs styling, and Nuxt UI defaults.
-- For existing identity-runtime integrations, a primary `id.theme` in `app.config.ts` for public token data, Nuxt UI mappings, validation, previews, and generated CSS variables.
-- A reusable brand source file such as `brand.ts` for package-owned identity data, with theme and guide exports wired into Nuxt through `app.config.ts`.
-- Optional runtime theme lists for fast switching: CSS variables, semantic color mappings, typography variables, and Nuxt UI app-config defaults.
-
-The included baseline intentionally stays close to standard Nuxt UI. Brand repositories build on top of it instead of starting from unrelated demo themes. The sample brand theme demonstrates the reusable contracts without carrying doctrine from a real brand; `@happydesigns/brand` owns the final public happydesigns guide, assets, logo doctrine, palette meaning, and voice.
-
-Runtime themes are intentionally lightweight. They do not load arbitrary remote Vue components, uncompiled Tailwind classes, domain behavior, credentials, APIs, or server runtime changes.
-
-Nuxt UI keeps its normal color-mode behavior. A brand may provide targeted dark CSS-variable overrides, but `id` does not require, generate, or force a separate dark theme.
-
-Normal apps use the runtime-only `BrandRuntimeOnlyConfig`. Guide applications add `BrandGuideConfig` through `BrandGuideAppConfig`; the existing `BrandRuntimeConfig` name remains a compatibility alias for that combined shape.
-
-## Development
-
-## Brand Studio
-
-Extend `@happydesigns/id/studio` in a guide or playground to add `/studio`. Create a brand, open a versioned JSON source, compare original and draft on shared Components, Landing and Docs scenes, then export the source or a starter archive. The runtime layer never includes Studio. See `docs/content/3.guides/6.brand-studio.md` for source, asset and export contracts.
-
 ## Development commands
 
 ```bash
@@ -138,47 +102,13 @@ pnpm docs:build
 
 `id` owns reusable identity contracts and application mechanics. It does not own a specific brand expression, product domain behavior, authorization, storage, API contracts, runtime credentials, or customer-specific copy.
 
-### Capability-owned Studio templates
+## Reference
 
-The Studio supports an optional host catalog in `appConfig.idStudio.templates`.
-Capabilities keep their name and runtime ownership; **Templates** is the Studio's
-presentation of complete example applications. Landing is included. Docs uses the host’s real Docus routes, registered with `route` and `routePrefix`; it has no duplicated page implementation.
+- [Studio and template integration](docs/content/3.guides/6.brand-studio.md)
+- [Public API](docs/content/4.reference/1.api.md)
+- [Architecture and repository layout](ARCHITECTURE.md)
+- [Contribution and verification](CONTRIBUTING.md)
+- [Security boundaries](SECURITY.md)
+- [Release workflow](RELEASING.md)
 
-A capability may publish an opt-in Nuxt layer that registers an async global
-component, its fixtures and this catalog entry:
-
-```ts
-export default defineAppConfig({
-  idStudio: {
-    templates: {
-      course: {
-        label: 'Course',
-        description: 'A complete learning scenario.',
-        owner: '@happydesigns/course-nuxt',
-        component: 'CourseAcademyPreview',
-        pages: [{ id: 'home', label: 'Home' }, { id: 'lesson', label: 'Lesson' }]
-      }
-    }
-  }
-})
-```
-
-The component receives `document` (the validated brand), `mode` and `page`, and
-emits `navigate(pageId)` for an internal page change. The host validates IDs against
-its catalog and synchronizes page selection between isolated original/draft frames.
-The component must use semantic theme tokens, keep demo data and progress local,
-and expose no real service mutations. Register it globally with Nuxt's async
-component registration so its implementation loads only when selected.
-
-Catalog configuration is trusted application code, never executable data from an
-imported brand document. Templates are previews: selecting one does not install a
-capability into the exported brand project. Add a capability explicitly when building
-that application. The Studio has no dependency on Course or another capability.
-The capability playground should consume the exact same component and fixtures;
-maintain one scenario, not separate Studio and playground implementations.
-
-Studio exports native Nuxt UI layers whose consumers do not need the id runtime. Extend the layer for app config/components and import its public `styles.css` fragment after Tailwind and Nuxt UI in the application's CSS entry. New native layers do not auto-register CSS. Docus hosts import the fragment through `app/app.css`; Docus owns the framework entry. Legacy runtime exports retain their existing contract and require an explicit migration. The handwritten brand-layer starter uses the same native runtime boundary. A local authoring host may opt into one fixed JSON source through private `runtimeConfig.idStudioSource`; only the development server offers reviewed, revision-checked Apply. See [Brand Studio](docs/content/3.guides/6.brand-studio.md) for route previews, generation and export compatibility.
-
-## Optional documentation
-
-Studio is the default authoring surface. Docus is an explicit host extension, not a requirement for Studio, templates or generated brand consumers. Existing guides keep using the separate `@happydesigns/id/guide` layer alongside `docus`. The project generator accepts `{ guide: true }` for that opt-in; its default output contains no Docus dependency or documentation routes.
+Studio's default export is a native brand with a minimal Studio playground. Docus is an explicit extension (`guide: true`). Existing identity-runtime projects remain supported (`legacyRuntime: true`). The examples under `templates/` cover compatibility and integration; use Studio's New project export for a new brand.
