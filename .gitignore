@@ -40,3 +40,4 @@ test-results
 
 # Starter assets bundled for browser and Node exports
 src/project-templates.generated.ts
+module-meta.generated.ts

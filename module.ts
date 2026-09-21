@@ -1,8 +1,6 @@
-import { createRequire } from 'node:module'
 import { addComponentsDir, addImportsDir, addPlugin, addTypeTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
 import type { BrandGuideAppConfig, BrandModuleOptions } from './src/index.js'
-
-const { dependencies } = createRequire(import.meta.url)('@happydesigns/id/package.json')
+import { dependencies } from './module-meta.generated.js'
 
 export type ModuleOptions = BrandModuleOptions
 

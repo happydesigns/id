@@ -30,6 +30,11 @@ for (const directory of ['app', 'guide', 'studio', 'src', 'themes', 'dist', 'tem
   }
 }
 const manifest = JSON.parse(readFileSync(join(author, 'node_modules/@happydesigns/id/package.json'), 'utf8'))
+for (const group of ['dependencies', 'devDependencies', 'peerDependencies']) {
+  for (const version of Object.values(manifest[group] ?? {})) {
+    assert.ok(!/^(catalog|workspace):/.test(version), 'Unresolved dependency in packed manifest: ' + version)
+  }
+}
 for (const entry of Object.values(manifest.exports)) {
   for (const target of typeof entry === 'string' ? [entry] : Object.values(entry)) {
     assert.ok(existsSync(join(author, 'node_modules/@happydesigns/id', target)), 'Missing package export: ' + target)

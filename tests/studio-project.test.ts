@@ -78,7 +78,7 @@ describe('native runtime and real previews', () => {
       const installed = JSON.parse(await readFile(new URL('../node_modules/' + name + '/package.json', import.meta.url), 'utf8'))
       expect(dependencies[name]).toBe(installed.version)
     }
-    expect(Object.values(dependencies).some(version => String(version).startsWith('workspace:'))).toBe(false)
+    expect(Object.values(dependencies).some(version => /^(workspace|catalog):/.test(String(version)))).toBe(false)
   })
 
   it('keeps older generated projects compatible until explicitly migrated', () => {

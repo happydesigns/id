@@ -28,7 +28,7 @@ Use the right source for the information being changed.
 - Root guides own durable architecture, design, API, security, and contribution rules.
 - Docus docs own product usage guidance.
 - Templates own recommended starting shapes.
-- `package.json` owns supported dependency ranges and the ID version; the lockfile owns the tested resolutions. Link to these instead of copying version lists into documentation.
+- `package.json` owns dependency contracts and the ID version; the pnpm catalog owns shared version ranges, and the lockfile owns the tested resolutions. Link to these instead of copying version lists into documentation.
 
 When implementation changes how `id` is understood, update the documentation. When docs describe behavior that no longer exists, update them with the code change.
 

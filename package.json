@@ -120,32 +120,33 @@
     "release:notes": "node scripts/release-notes.mjs"
   },
   "dependencies": {
-    "@nuxt/kit": "^4.5.2",
-    "@nuxt/schema": "^4.5.2",
-    "@nuxt/ui": "^4.10.0",
-    "nuxt": "^4.5.2",
+    "@nuxt/kit": "catalog:",
+    "@nuxt/schema": "catalog:",
+    "@nuxt/ui": "catalog:",
+    "nuxt": "catalog:",
     "zod": "^4.4.3",
     "h3": "^1.15.11"
   },
   "peerDependencies": {
-    "tailwindcss": "^4.3.3",
+    "tailwindcss": "catalog:",
     "vue": "^3.5.41"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.123",
+    "@iconify-json/lucide": "catalog:",
     "@iconify-json/simple-icons": "^1.2.93",
-    "@iconify-json/vscode-icons": "1.2.61",
+    "@iconify-json/vscode-icons": "catalog:",
     "@nuxt/eslint": "^1.17.0",
     "@playwright/test": "1.63.0",
     "@vue/compiler-sfc": "^3.5.41",
     "changelogen": "^0.6.2",
-    "docus": "^5.12.3",
+    "docus": "catalog:",
     "eslint": "^10.8.1",
-    "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
     "vitest": "^4.1.10",
     "vue": "3.5.41",
-    "vue-tsc": "^3.3.10"
+    "vue-tsc": "catalog:",
+    "yaml": "^2.9.0"
   },
   "bin": {
     "id-studio-package": "./scripts/prepare-studio-package.mjs"

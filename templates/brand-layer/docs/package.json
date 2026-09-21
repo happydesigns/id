@@ -7,7 +7,7 @@
     "build": "nuxt build"
   },
   "devDependencies": {
-    "docus": "5.12.3",
-    "@happydesigns/id": "^0.2.0"
+    "docus": "catalog:",
+    "@happydesigns/id": "workspace:*"
   }
 }

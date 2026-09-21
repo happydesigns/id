@@ -19,14 +19,14 @@
     "verify": "pnpm typecheck && pnpm build"
   },
   "dependencies": {
-    "@nuxt/ui": "^4.10.0",
-    "nuxt": "^4.5.2",
-    "tailwindcss": "^4.3.3"
+    "@nuxt/ui": "catalog:",
+    "nuxt": "catalog:",
+    "tailwindcss": "catalog:"
   },
   "devDependencies": {
-    "typescript": "^6.0.3",
-    "vue-tsc": "^3.3.10",
-    "@happydesigns/id": "^0.2.0"
+    "typescript": "catalog:",
+    "vue-tsc": "catalog:",
+    "@happydesigns/id": "workspace:*"
   },
   "files": [
     "app",

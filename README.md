@@ -19,7 +19,7 @@ The supported path is Studio source → generated native brand → consuming Nux
 
 ## Compatibility
 
-Supported Node, Nuxt, Nuxt UI, Vue and Tailwind CSS ranges are declared in [`package.json`](package.json), under `engines`, `dependencies` and `peerDependencies`. The optional guide uses the Docus development dependency; [`pnpm-lock.yaml`](pnpm-lock.yaml) records the exact tested versions.
+The Node requirement and dependency contracts are declared in [`package.json`](package.json). Shared dependency ranges are maintained in the catalog in [`pnpm-workspace.yaml`](pnpm-workspace.yaml). The optional guide uses the Docus development dependency; [`pnpm-lock.yaml`](pnpm-lock.yaml) records the exact tested versions.
 
 CI checks the locked dependency set on Linux, plus package types and source operations on the minimum supported Node release and Windows. Isolated package consumers resolve their own dependencies. Newer major versions are not implicitly supported.
 

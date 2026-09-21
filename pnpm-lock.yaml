@@ -4,6 +4,39 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@iconify-json/lucide':
+      specifier: ^1.2.123
+      version: 1.2.123
+    '@iconify-json/vscode-icons':
+      specifier: 1.2.61
+      version: 1.2.61
+    '@nuxt/kit':
+      specifier: ^4.5.2
+      version: 4.5.2
+    '@nuxt/schema':
+      specifier: ^4.5.2
+      version: 4.5.2
+    '@nuxt/ui':
+      specifier: ^4.10.0
+      version: 4.10.0
+    docus:
+      specifier: ^5.12.3
+      version: 5.12.3
+    nuxt:
+      specifier: ^4.5.2
+      version: 4.5.2
+    tailwindcss:
+      specifier: ^4.3.3
+      version: 4.3.3
+    typescript:
+      specifier: ^6.0.3
+      version: 6.0.3
+    vue-tsc:
+      specifier: ^3.3.10
+      version: 3.3.10
+
 overrides:
   '@happydesigns/id': workspace:*
   '@tiptap/core': 3.30.1
@@ -49,32 +82,32 @@ importers:
   .:
     dependencies:
       '@nuxt/kit':
-        specifier: ^4.5.2
+        specifier: 'catalog:'
         version: 4.5.2(magic-string@1.2.0)(magicast@0.5.4)(oxc-parser@0.135.0)(rolldown@1.2.4)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.4)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
       '@nuxt/schema':
-        specifier: ^4.5.2
+        specifier: 'catalog:'
         version: 4.5.2
       '@nuxt/ui':
-        specifier: ^4.10.0
+        specifier: 'catalog:'
         version: 4.10.0(1b557a81cc0348b5474d0e26631c84a6)
       h3:
         specifier: ^1.15.11
         version: 1.15.11
       nuxt:
-        specifier: ^4.5.2
+        specifier: 'catalog:'
         version: 4.5.2(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@oxc-project/types@0.144.0)(@parcel/watcher@2.5.6)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.41)(better-sqlite3@12.11.1)(cac@7.0.0)(db0@0.3.4(better-sqlite3@12.11.1))(esbuild@0.28.2)(eslint@10.8.1(jiti@2.7.0))(ioredis@5.11.1)(lightningcss@1.33.0)(magicast@0.5.4)(optionator@0.9.4)(oxc-parser@0.135.0)(rolldown@1.2.4)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.4)(rollup@4.62.4))(rollup@4.62.4)(srvx@0.11.22)(terser@5.50.0)(typescript@6.0.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))(vue-tsc@3.3.10(typescript@6.0.3))(yaml@2.9.0)
       zod:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
       '@iconify-json/lucide':
-        specifier: ^1.2.123
+        specifier: 'catalog:'
         version: 1.2.123
       '@iconify-json/simple-icons':
         specifier: ^1.2.93
         version: 1.2.93
       '@iconify-json/vscode-icons':
-        specifier: 1.2.61
+        specifier: 'catalog:'
         version: 1.2.61
       '@nuxt/eslint':
         specifier: ^1.17.0
@@ -89,16 +122,16 @@ importers:
         specifier: ^0.6.2
         version: 0.6.2(magicast@0.5.4)
       docus:
-        specifier: ^5.12.3
+        specifier: 'catalog:'
         version: 5.12.3(e84baa0f79f8425f942a77fe61cb0215)
       eslint:
         specifier: ^10.8.1
         version: 10.8.1(jiti@2.7.0)
       tailwindcss:
-        specifier: ^4.3.3
+        specifier: 'catalog:'
         version: 4.3.3
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vitest:
         specifier: ^4.1.10
@@ -107,8 +140,11 @@ importers:
         specifier: 3.5.41
         version: 3.5.41(typescript@6.0.3)
       vue-tsc:
-        specifier: ^3.3.10
+        specifier: 'catalog:'
         version: 3.3.10(typescript@6.0.3)
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
   docs:
     dependencies:
@@ -125,23 +161,23 @@ importers:
   templates/brand-layer:
     dependencies:
       '@nuxt/ui':
-        specifier: ^4.10.0
+        specifier: 'catalog:'
         version: 4.10.0(cd204ab80bde504807f9fd1cccf6a53c)
       nuxt:
-        specifier: ^4.5.2
+        specifier: 'catalog:'
         version: 4.5.2(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@oxc-project/types@0.144.0)(@parcel/watcher@2.5.6)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.41)(better-sqlite3@12.11.1)(cac@7.0.0)(db0@0.3.4(better-sqlite3@12.11.1))(esbuild@0.28.2)(eslint@10.8.1(jiti@2.7.0))(ioredis@5.11.1)(lightningcss@1.33.0)(magicast@0.5.4)(optionator@0.9.4)(oxc-parser@0.141.0)(rolldown@1.2.4)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.4)(rollup@4.62.4))(rollup@4.62.4)(srvx@0.11.22)(terser@5.50.0)(typescript@6.0.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))(vue-tsc@3.3.10(typescript@6.0.3))(yaml@2.9.0)
       tailwindcss:
-        specifier: ^4.3.3
+        specifier: 'catalog:'
         version: 4.3.3
     devDependencies:
       '@happydesigns/id':
         specifier: workspace:*
         version: link:../..
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vue-tsc:
-        specifier: ^3.3.10
+        specifier: 'catalog:'
         version: 3.3.10(typescript@6.0.3)
 
   templates/themed-app:
@@ -150,20 +186,20 @@ importers:
         specifier: workspace:*
         version: link:../..
       '@nuxt/ui':
-        specifier: ^4.10.0
+        specifier: 'catalog:'
         version: 4.10.0(cd204ab80bde504807f9fd1cccf6a53c)
       nuxt:
-        specifier: ^4.5.2
+        specifier: 'catalog:'
         version: 4.5.2(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@oxc-project/types@0.144.0)(@parcel/watcher@2.5.6)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.41)(better-sqlite3@12.11.1)(cac@7.0.0)(db0@0.3.4(better-sqlite3@12.11.1))(esbuild@0.28.2)(eslint@10.8.1(jiti@2.7.0))(ioredis@5.11.1)(lightningcss@1.33.0)(magicast@0.5.4)(optionator@0.9.4)(oxc-parser@0.141.0)(rolldown@1.2.4)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.4)(rollup@4.62.4))(rollup@4.62.4)(srvx@0.11.22)(terser@5.50.0)(typescript@6.0.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))(vue-tsc@3.3.10(typescript@6.0.3))(yaml@2.9.0)
       tailwindcss:
-        specifier: ^4.3.3
+        specifier: 'catalog:'
         version: 4.3.3
     devDependencies:
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vue-tsc:
-        specifier: ^3.3.10
+        specifier: 'catalog:'
         version: 3.3.10(typescript@6.0.3)
 
 packages:
@@ -1020,9 +1056,6 @@ packages:
 
   '@iconify-json/vscode-icons@1.2.61':
     resolution: {integrity: sha512-UIXY/NurvgMQxOA2EpgKVPW3z6vVHG0ww6aODtttxhXVU4vTLuwRR2WqHoNlmpYK6cAWUlXO9Ey7zgrG1OcIhg==}
-
-  '@iconify-json/vscode-icons@1.2.73':
-    resolution: {integrity: sha512-qoJ5ZYQbes3Wi3+5A65c0vBKG8iCNXcpEIObgJ8e8fltLIG3U/zgA3Ft3+tUCupEl/kO9vIPht85n1kjJVyDMw==}
 
   '@iconify/collections@1.0.725':
     resolution: {integrity: sha512-qUpq0dw5Og2rNGN8fSBRNOnO3ocj6l3uZZQLmzOjJM8fiQ+Exq4u0AyEk5dlAPOiBlXaSdX4NanpeXr8Ycqqiw==}
@@ -8738,10 +8771,6 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/vscode-icons@1.2.73':
-    dependencies:
-      '@iconify/types': 2.0.0
-
   '@iconify/collections@1.0.725':
     dependencies:
       '@iconify/types': 2.0.0
@@ -12995,7 +13024,7 @@ snapshots:
       '@comark/vue': 0.4.0(shiki@4.4.3)(vue@3.5.41(typescript@6.0.3))
       '@iconify-json/lucide': 1.2.123
       '@iconify-json/simple-icons': 1.2.93
-      '@iconify-json/vscode-icons': 1.2.73
+      '@iconify-json/vscode-icons': 1.2.61
       '@nuxt/content': 3.15.2(@oxc-project/types@0.144.0)(@valibot/to-json-schema@1.7.1(valibot@1.4.1(typescript@6.0.3)))(better-sqlite3@12.11.1)(esbuild@0.28.2)(magic-string@1.2.0)(magicast@0.5.4)(oxc-parser@0.135.0)(rolldown@1.2.4)(rollup@4.62.4)(valibot@1.4.1(typescript@6.0.3))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))
       '@nuxt/image': 2.1.0(@types/node@26.2.0)(magic-string@1.2.0)(magicast@0.5.4)(oxc-parser@0.135.0)(rolldown@1.2.4)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.4)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))(unstorage@1.17.5(db0@0.3.4(better-sqlite3@12.11.1))(ioredis@5.11.1))
       '@nuxt/kit': 4.5.2(magic-string@1.2.0)(magicast@0.5.4)(oxc-parser@0.135.0)(rolldown@1.2.4)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.4)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))

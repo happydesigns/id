@@ -8,9 +8,9 @@
   },
   "dependencies": {
     "@happydesigns/id": "workspace:^",
-    "@nuxt/ui": "workspace:*",
-    "nuxt": "workspace:*",
-    "tailwindcss": "workspace:*",
-    "@iconify-json/lucide": "workspace:*"
+    "@nuxt/ui": "catalog:",
+    "nuxt": "catalog:",
+    "tailwindcss": "catalog:",
+    "@iconify-json/lucide": "catalog:"
   }
 }

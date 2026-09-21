@@ -12,13 +12,13 @@
     "verify": "pnpm typecheck"
   },
   "dependencies": {
-    "@happydesigns/id": "^0.1.0",
-    "@nuxt/ui": "^4.10.0",
-    "nuxt": "^4.5.2",
-    "tailwindcss": "^4.3.3"
+    "@happydesigns/id": "workspace:*",
+    "@nuxt/ui": "catalog:",
+    "nuxt": "catalog:",
+    "tailwindcss": "catalog:"
   },
   "devDependencies": {
-    "typescript": "^6.0.3",
-    "vue-tsc": "^3.3.10"
+    "typescript": "catalog:",
+    "vue-tsc": "catalog:"
   }
 }
