@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { cpSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -24,9 +24,20 @@ function run(command, args, cwd) {
 const author = join(workspace, 'author')
 write(author, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: { '@happydesigns/id': 'file:' + archive.replaceAll('\\', '/') } }))
 run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], author)
-for (const file of readdirSync(join(author, 'node_modules/@happydesigns/id/templates'), { recursive: true })) {
-  assert.ok(!String(file).split(/[\\/]/).some(part => ['.nuxt', '.output', 'node_modules'].includes(part)), 'Generated file in package: ' + file)
+for (const directory of ['app', 'guide', 'studio', 'src', 'themes', 'dist', 'templates']) {
+  for (const file of readdirSync(join(author, 'node_modules/@happydesigns/id', directory), { recursive: true })) {
+    assert.ok(!String(file).split(/[\\/]/).some(part => ['.nuxt', '.output', '.tmp', '.agents', 'node_modules'].includes(part)), 'Generated file in package: ' + file)
+  }
 }
+const manifest = JSON.parse(readFileSync(join(author, 'node_modules/@happydesigns/id/package.json'), 'utf8'))
+for (const entry of Object.values(manifest.exports)) {
+  for (const target of typeof entry === 'string' ? [entry] : Object.values(entry)) {
+    assert.ok(existsSync(join(author, 'node_modules/@happydesigns/id', target)), 'Missing package export: ' + target)
+  }
+}
+const entrypoints = Object.entries(manifest.exports).filter(([, entry]) => typeof entry !== 'string' || !entry.endsWith('.css')).map(([key]) => '@happydesigns/id' + (key === '.' ? '' : key.slice(1)))
+write(author, 'imports.mjs', 'for (const entry of ' + JSON.stringify(entrypoints) + ') await import(entry)')
+run(process.execPath, ['imports.mjs'], author)
 write(author, 'generate.mjs', `
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'

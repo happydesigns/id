@@ -3,17 +3,26 @@ import type { BrandGuideAppConfig, BrandModuleOptions } from './src/index.js'
 
 export type ModuleOptions = BrandModuleOptions
 
+declare module '@nuxt/schema' {
+  interface NuxtConfig {
+    id?: ModuleOptions
+  }
+  interface NuxtOptions {
+    id?: ModuleOptions
+  }
+}
+
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: '@happydesigns/id',
     configKey: 'id',
     compatibility: {
-      nuxt: '>=4.0.0',
+      nuxt: '^4.5.2',
     },
   },
   moduleDependencies: {
     '@nuxt/ui': {
-      version: '^4.0.0',
+      version: '^4.10.0',
     },
   },
   defaults: {},
