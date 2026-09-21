@@ -38,8 +38,8 @@ describe('source-derived brand reference', () => {
     expect(b.palettes.map(palette => palette.name)).toEqual(['ink'])
   })
 
-  it('includes a source-driven guide in exported projects without adding it to runtime dependencies', () => {
-    const project = createStudioProject(createBlankStudioDocument())
+  it('optionally includes a source-driven guide in exported projects without adding it to runtime dependencies', () => {
+    const project = createStudioProject(createBlankStudioDocument(), { guide: true })
     expect(project['playground/nuxt.config.ts']).toContain('@happydesigns/id/guide')
     expect(project['playground/content/docs/2.brand-reference.md']).toContain('::id-brand-reference')
     expect(JSON.parse(project['package.json']!).dependencies).not.toHaveProperty('@happydesigns/id')

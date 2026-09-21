@@ -596,12 +596,13 @@ function download(name: string, data: string | Uint8Array, mime = 'application/j
   window.document.body.appendChild(link); link.click(); link.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
+const includeGuide = ref(false)
 async function exportProject() {
   busy.value = true; error.value = ''
   try {
     const packageAsset = config.idStudio?.packageAsset
     if (packageAsset && (!/^\/(?!\/)[\w/.-]+\.tgz$/.test(packageAsset) || packageAsset.split('/').includes('..'))) throw new Error('Invalid host package asset.')
-    const files: Record<string, string | Uint8Array> = createStudioProject(draft.value, { bundledPackage: !!packageAsset })
+    const files: Record<string, string | Uint8Array> = createStudioProject(draft.value, { bundledPackage: !!packageAsset, guide: includeGuide.value })
     if (packageAsset) {
       const response = await fetch(packageAsset, { credentials: 'omit', redirect: 'error' })
       if (!response.ok) throw new Error('The editor package is unavailable. Ask the host to rebuild it before exporting.')
@@ -848,7 +849,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
         <StudioTemplatePicker v-model="scene" v-model:open="templatePickerOpen" :templates="templates" :document="draft" :mode="mode" />
       </div>
       <div class="studio-review flex items-center gap-2">
-        <UTooltip text="Documentation"><UButton :to="config.idStudio?.documentation || config.idStudio?.home || '/'" target="_blank" color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-book-open')" aria-label="Documentation (opens in a new tab)"><span class="studio-docs-label">Docs</span></UButton></UTooltip>
+        <UTooltip v-if="config.idStudio?.documentation || config.idStudio?.home" text="Documentation"><UButton :to="config.idStudio?.documentation || config.idStudio?.home || '/'" target="_blank" color="neutral" variant="ghost" :icon="resolveIcon('i-lucide-book-open')" aria-label="Documentation (opens in a new tab)"><span class="studio-docs-label">Docs</span></UButton></UTooltip>
         <UButton color="neutral" variant="outline" @click="askAiOpen = true">Ask AI</UButton>
         <UButton color="neutral" variant="solid" @click="exportTab = 'download'; exportOpen = true">Export</UButton>
       </div>
@@ -1030,7 +1031,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
         <template #content="{ item }">
         <div v-if="item.value === 'download'" class="grid gap-4 py-3 sm:grid-cols-2">
           <UCard><h3 class="font-semibold">Brand file</h3><p class="mt-2 mb-4 text-sm text-muted">Reopen and continue editing in Studio, or share your brand with another author.</p><UButton color="neutral" variant="outline" :icon="resolveIcon('i-lucide-download')" @click="exportSource">Download JSON</UButton></UCard>
-          <UCard><h3 class="font-semibold">Nuxt project</h3><p class="mt-2 mb-4 text-sm text-muted">A reusable Nuxt UI brand layer with a Studio playground.</p><UButton color="neutral" variant="outline" :icon="resolveIcon('i-lucide-download')" :loading="busy" @click="exportProject">Download ZIP</UButton><p class="mt-4 text-xs text-muted">Add custom fonts and capabilities in the generated project. Custom Vue components are not included.</p></UCard>
+          <UCard><h3 class="font-semibold">Nuxt project</h3><p class="mt-2 mb-4 text-sm text-muted">A reusable Nuxt UI brand layer with a Studio playground.</p><UCheckbox v-model="includeGuide" label="Include Docus guide" class="mb-4" /><UButton color="neutral" variant="outline" :icon="resolveIcon('i-lucide-download')" :loading="busy" @click="exportProject">Download ZIP</UButton><p class="mt-4 text-xs text-muted">Add custom fonts and capabilities in the generated project. Custom Vue components are not included.</p></UCard>
         </div>
         <div v-else-if="item.value === 'changes'" class="mb-4 divide-y divide-default">
           <p v-if="!changes.length" class="text-sm text-muted">No changes to apply.</p>

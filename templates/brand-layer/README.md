@@ -14,4 +14,6 @@ export default defineNuxtConfig({ extends: ['@example/brand'] })
 
 `docs/` is the separate Docus consumer. Docus owns its framework CSS entry; `docs/app/app.css` imports only the brand fragment. `brand.ts` contains guide/authoring data and is not imported by the published runtime. Keep runtime app config and CSS aligned when editing this handwritten starter. For single-source generation use Studio's New project export instead.
 
-Install the reviewed ID package as a development dependency. Run `pnpm dev` for Docus and `pnpm verify` for typecheck/build. Studio is optional: extend `@happydesigns/id/studio` in docs only and provide `appConfig.idStudio`. Use Docus AppHeaderCTA/AppFooterLeft slots to link to `/studio`; retain any individual homepage. No custom header/footer replacement is required.
+Install the reviewed ID package as a development dependency. Run `pnpm dev` for the minimal Studio playground and `pnpm verify` for typecheck/build. Add configured templates through `appConfig.idStudio.templates`.
+
+The `docs/` directory is an optional extension. Install its dependencies with `pnpm --dir docs install`, then run `pnpm --dir docs dev` when you want the Docus guide. It does not participate in the default Studio build. Existing guide hosts can also extend `@happydesigns/id/studio` and provide their brand document.

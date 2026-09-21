@@ -61,6 +61,9 @@ describe('starter templates', () => {
   })
 
   it('keeps the brand-layer template shaped like an external brand repo', () => {
+    expectTemplateFile('brand-layer', 'playground/nuxt.config.ts')
+    expect(readTemplateFile('brand-layer', 'playground/nuxt.config.ts')).not.toContain('docus')
+    expect(JSON.parse(readTemplateFile('brand-layer', 'package.json')).devDependencies).not.toHaveProperty('docus')
     expectTemplateFile('brand-layer', 'brand.ts')
     expectTemplateFile('brand-layer', 'app/app.config.ts')
     expectTemplateFile('brand-layer', 'nuxt.config.ts')

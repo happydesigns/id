@@ -10,11 +10,11 @@
     "./styles.css": "./app/assets/css/brand.css"
   },
   "scripts": {
-    "dev": "nuxt dev docs",
-    "build": "nuxt build docs",
+    "dev": "nuxt dev playground",
+    "build": "nuxt build playground",
     "build:layer": "nuxt build",
-    "preview": "nuxt preview docs",
-    "prepare": "nuxt prepare docs",
+    "preview": "nuxt preview playground",
+    "prepare": "nuxt prepare playground",
     "typecheck": "nuxt typecheck",
     "verify": "pnpm typecheck && pnpm build"
   },
@@ -24,10 +24,9 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "docus": "^5.12.3",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.3.10",
-    "@happydesigns/id": "^0.1.0"
+    "@happydesigns/id": "^0.2.0"
   },
   "files": [
     "app",

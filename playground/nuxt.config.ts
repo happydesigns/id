@@ -5,10 +5,7 @@ const devServer = process.argv.includes('dev')
 
 export default defineNuxtConfig({
   buildDir: devServer ? '.nuxt-dev' : '.nuxt',
-  content: {
-    _localDatabase: { type: 'sqlite', filename: devServer ? '.data/content/dev.sqlite' : '.data/content/contents.sqlite' }
-  },
-  extends: ['..', '../guide', '../studio', 'docus'],
+  extends: ['..', '../studio'],
   icon: { serverBundle: { collections: ['lucide', 'vscode-icons'] }, clientBundle: { scan: true } },
   devtools: {
     enabled: false
