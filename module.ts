@@ -1,5 +1,8 @@
+import { createRequire } from 'node:module'
 import { addComponentsDir, addImportsDir, addPlugin, addTypeTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
 import type { BrandGuideAppConfig, BrandModuleOptions } from './src/index.js'
+
+const { dependencies } = createRequire(import.meta.url)('@happydesigns/id/package.json')
 
 export type ModuleOptions = BrandModuleOptions
 
@@ -17,12 +20,12 @@ export default defineNuxtModule<ModuleOptions>({
     name: '@happydesigns/id',
     configKey: 'id',
     compatibility: {
-      nuxt: '^4.5.2',
+      nuxt: dependencies.nuxt,
     },
   },
   moduleDependencies: {
     '@nuxt/ui': {
-      version: '^4.10.0',
+      version: dependencies['@nuxt/ui'],
     },
   },
   defaults: {},

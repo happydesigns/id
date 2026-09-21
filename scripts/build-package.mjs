@@ -58,6 +58,7 @@ rmSync(distDir, {
   recursive: true,
 })
 
+const packageManifest = JSON.parse(readFileSync(join(rootDir, 'package.json'), 'utf8'))
 const projectTemplates = {}
 for (const variant of ['native', 'guide', 'legacy']) {
   const directory = join(rootDir, 'templates/project', variant)
@@ -65,6 +66,28 @@ for (const variant of ['native', 'guide', 'legacy']) {
     file.slice(directory.length + 1).replaceAll('\\', '/'), readFileSync(file, 'utf8').replaceAll('\r\n', '\n'),
   ]))
 }
+// Resolve workspace references before bundling so browser exports stay self-contained.
+for (const files of Object.values(projectTemplates)) {
+  const manifest = JSON.parse(files['package.json'])
+  for (const group of ['dependencies', 'devDependencies']) {
+    for (const [name, version] of Object.entries(manifest[group] ?? {})) {
+      if (version === 'workspace:^' && name === packageManifest.name) {
+        manifest[group][name] = '^' + packageManifest.version
+      }
+      else if (version === 'workspace:*') {
+        if (!packageManifest.dependencies?.[name] && !packageManifest.devDependencies?.[name] && !packageManifest.peerDependencies?.[name]) {
+          throw new Error('Template dependency is not declared in the root package: ' + name)
+        }
+        manifest[group][name] = JSON.parse(readFileSync(join(rootDir, 'node_modules', name, 'package.json'), 'utf8')).version
+      }
+      else if (version.startsWith('workspace:')) {
+        throw new Error('Unsupported template dependency reference: ' + name + '@' + version)
+      }
+    }
+  }
+  files['package.json'] = JSON.stringify(manifest, null, 2) + '\n'
+}
+
 writeFileSync(join(rootDir, 'src/project-templates.generated.ts'),
   '// Generated from templates/project by build:package. Do not edit.\n'
   + 'export const projectTemplates: Record<"native" | "guide" | "legacy", Record<string, string>> = '

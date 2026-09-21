@@ -68,6 +68,19 @@ describe('connected brand source', () => {
 })
 
 describe('native runtime and real previews', () => {
+  it.each([{}, { guide: true }, { legacyRuntime: true }])('exports release and installed dependency versions for %j', async (options) => {
+    const root = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
+    const files = createStudioProject(createBlankStudioDocument(), options)
+    const manifest = JSON.parse(files['package.json']!)
+    const dependencies = { ...manifest.dependencies, ...manifest.devDependencies }
+    expect(dependencies[root.name]).toBe('^' + root.version)
+    for (const name of ['nuxt', '@nuxt/ui', 'tailwindcss', '@iconify-json/lucide', ...(options.guide ? ['docus'] : [])]) {
+      const installed = JSON.parse(await readFile(new URL('../node_modules/' + name + '/package.json', import.meta.url), 'utf8'))
+      expect(dependencies[name]).toBe(installed.version)
+    }
+    expect(Object.values(dependencies).some(version => String(version).startsWith('workspace:'))).toBe(false)
+  })
+
   it('keeps older generated projects compatible until explicitly migrated', () => {
     const document = createBlankStudioDocument()
     expect(createStudioRuntimeFiles(document)['app/assets/css/brand.css']).toContain('@import "tailwindcss"')

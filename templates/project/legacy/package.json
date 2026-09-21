@@ -7,10 +7,10 @@
     "build": "nuxt build playground"
   },
   "dependencies": {
-    "@happydesigns/id": "^0.2.0",
-    "@nuxt/ui": "4.10.0",
-    "nuxt": "4.5.2",
-    "tailwindcss": "4.3.3",
-    "@iconify-json/lucide": "^1.2.123"
+    "@happydesigns/id": "workspace:^",
+    "@nuxt/ui": "workspace:*",
+    "nuxt": "workspace:*",
+    "tailwindcss": "workspace:*",
+    "@iconify-json/lucide": "workspace:*"
   }
 }

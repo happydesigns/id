@@ -56,7 +56,8 @@
       "types": "./dist/themes/sample-brand/index.d.ts",
       "import": "./dist/themes/sample-brand/index.js"
     },
-    "./themes/sample-brand/tokens.css": "./dist/themes/sample-brand/tokens.css"
+    "./themes/sample-brand/tokens.css": "./dist/themes/sample-brand/tokens.css",
+    "./package.json": "./package.json"
   },
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",

@@ -36,7 +36,7 @@ for (const entry of Object.values(manifest.exports)) {
   }
 }
 const entrypoints = Object.entries(manifest.exports).filter(([, entry]) => typeof entry !== 'string' || !entry.endsWith('.css')).map(([key]) => '@happydesigns/id' + (key === '.' ? '' : key.slice(1)))
-write(author, 'imports.mjs', 'for (const entry of ' + JSON.stringify(entrypoints) + ') await import(entry)')
+write(author, 'imports.mjs', 'for (const entry of ' + JSON.stringify(entrypoints) + ') await import(entry, entry.endsWith("/package.json") ? { with: { type: "json" } } : {})')
 run(process.execPath, ['imports.mjs'], author)
 write(author, 'generate.mjs', `
 import { mkdirSync, writeFileSync } from 'node:fs'

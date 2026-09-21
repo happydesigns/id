@@ -21,13 +21,13 @@
     "build": "nuxt build playground"
   },
   "dependencies": {
-    "@nuxt/ui": "4.10.0",
-    "tailwindcss": "4.3.3"
+    "@nuxt/ui": "workspace:*",
+    "tailwindcss": "workspace:*"
   },
   "devDependencies": {
-    "@happydesigns/id": "^0.2.0",
-    "nuxt": "4.5.2",
-    "@iconify-json/lucide": "^1.2.123",
-    "@iconify-json/vscode-icons": "^1.2.61"
+    "@happydesigns/id": "workspace:^",
+    "nuxt": "workspace:*",
+    "@iconify-json/lucide": "workspace:*",
+    "@iconify-json/vscode-icons": "workspace:*"
   }
 }
