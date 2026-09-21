@@ -10,64 +10,7 @@ const nuxtUiColors = {
   neutral: 'slate'
 }
 
-const nuxtUiComponentDefaults = {
-  colors: nuxtUiColors,
-  button: {
-    slots: {
-      base: 'rounded-md font-medium'
-    },
-    defaultVariants: {
-      color: 'primary',
-      variant: 'solid',
-      size: 'md'
-    }
-  },
-  card: {
-    slots: {
-      root: 'rounded-lg shadow-none',
-      header: 'p-4 sm:px-6',
-      body: 'p-4 sm:p-6',
-      footer: 'p-4 sm:px-6'
-    },
-    defaultVariants: {
-      variant: 'outline'
-    }
-  },
-  input: {
-    slots: {
-      base: 'rounded-md'
-    },
-    defaultVariants: {
-      color: 'primary',
-      variant: 'outline',
-      size: 'md'
-    }
-  },
-  badge: {
-    slots: {
-      base: 'rounded-md font-medium'
-    },
-    defaultVariants: {
-      color: 'primary',
-      variant: 'subtle',
-      size: 'md'
-    }
-  },
-  alert: {
-    slots: {
-      root: 'rounded-lg'
-    },
-    defaultVariants: {
-      variant: 'subtle'
-    }
-  },
-  table: {
-    slots: {
-      th: 'font-semibold text-muted',
-      td: 'text-default'
-    }
-  }
-}
+const nuxtUiComponentDefaults = { colors: nuxtUiColors }
 
 export const nuxtUiBrandTheme = defineBrandTheme({
   name: 'nuxt-ui',
@@ -80,34 +23,34 @@ export const nuxtUiBrandTheme = defineBrandTheme({
   cssVariables: {
     light: {
       '--ui-bg': 'white',
-      '--ui-bg-muted': '#F8FAFC',
-      '--ui-bg-elevated': '#F1F5F9',
-      '--ui-bg-accented': '#E2E8F0',
-      '--ui-bg-inverted': '#020617',
-      '--ui-text': '#334155',
-      '--ui-text-highlighted': '#020617',
-      '--ui-text-muted': '#64748B',
-      '--ui-text-dimmed': '#94A3B8',
+      '--ui-bg-muted': 'var(--ui-color-neutral-50)',
+      '--ui-bg-elevated': 'var(--ui-color-neutral-100)',
+      '--ui-bg-accented': 'var(--ui-color-neutral-200)',
+      '--ui-bg-inverted': 'var(--ui-color-neutral-950)',
+      '--ui-text': 'var(--ui-color-neutral-700)',
+      '--ui-text-highlighted': 'var(--ui-color-neutral-950)',
+      '--ui-text-muted': 'var(--ui-color-neutral-500)',
+      '--ui-text-dimmed': 'var(--ui-color-neutral-400)',
       '--ui-text-inverted': 'white',
-      '--ui-border': '#E2E8F0',
-      '--ui-border-muted': '#F1F5F9',
-      '--ui-border-accented': '#CBD5E1',
+      '--ui-border': 'var(--ui-color-neutral-200)',
+      '--ui-border-muted': 'var(--ui-color-neutral-100)',
+      '--ui-border-accented': 'var(--ui-color-neutral-300)',
       '--ui-radius': '0.375rem'
     },
     dark: {
-      '--ui-bg': '#020617',
-      '--ui-bg-muted': '#0F172A',
-      '--ui-bg-elevated': '#111827',
-      '--ui-bg-accented': '#1E293B',
+      '--ui-bg': 'var(--ui-color-neutral-950)',
+      '--ui-bg-muted': 'var(--ui-color-neutral-900)',
+      '--ui-bg-elevated': 'var(--ui-color-neutral-800)',
+      '--ui-bg-accented': 'var(--ui-color-neutral-800)',
       '--ui-bg-inverted': 'white',
-      '--ui-text': '#E2E8F0',
+      '--ui-text': 'var(--ui-color-neutral-200)',
       '--ui-text-highlighted': 'white',
-      '--ui-text-muted': '#94A3B8',
-      '--ui-text-dimmed': '#64748B',
-      '--ui-text-inverted': '#020617',
-      '--ui-border': '#1E293B',
-      '--ui-border-muted': '#0F172A',
-      '--ui-border-accented': '#334155',
+      '--ui-text-muted': 'var(--ui-color-neutral-400)',
+      '--ui-text-dimmed': 'var(--ui-color-neutral-500)',
+      '--ui-text-inverted': 'var(--ui-color-neutral-950)',
+      '--ui-border': 'var(--ui-color-neutral-800)',
+      '--ui-border-muted': 'var(--ui-color-neutral-900)',
+      '--ui-border-accented': 'var(--ui-color-neutral-700)',
       '--ui-radius': '0.375rem'
     }
   },

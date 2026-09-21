@@ -395,7 +395,7 @@ function randomize() {
     if (['colors', 'all'].includes(randomScope.value)) {
       doc.theme.ui ??= {}
       doc.theme.ui.colors ??= {}
-      for (const [role, options] of Object.entries({ primary: ['blue', 'violet', 'rose', 'teal', 'orange', 'emerald', 'indigo'], neutral: ['slate', 'gray', 'zinc', 'neutral', 'stone'] })) {
+      for (const [role, options] of Object.entries({ primary: ['blue', 'violet', 'rose', 'teal', 'orange', 'emerald', 'indigo'], neutral: ['slate', 'gray', 'zinc', 'neutral', 'stone', 'mauve', 'olive', 'mist', 'taupe'] })) {
         doc.theme.ui.colors[role] = pick(options, doc.theme.ui.colors[role])
       }
     }

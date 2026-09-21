@@ -368,8 +368,10 @@ describe('brand theme lists', () => {
       expect(theme.cssVariables?.light?.['--ui-bg']).toBeTruthy()
       expect(theme.cssVariables?.dark?.['--ui-bg']).toBeTruthy()
       expect(theme.ui?.colors).toBeTruthy()
-      expect(theme.ui?.button).toBeTruthy()
-      expect(theme.ui?.card).toBeTruthy()
+      if (theme.name !== nuxtUiBrandTheme.name) {
+        expect(theme.ui?.button).toBeTruthy()
+        expect(theme.ui?.card).toBeTruthy()
+      }
     }
   })
 
@@ -503,8 +505,8 @@ describe('runtime theme application', () => {
 
     expect(style.get('--ui-bg')).toBe('white')
     expect(neutralBrandTheme).toBe(nuxtUiBrandTheme)
-    expect(style.get('--ui-text-highlighted')).toBe('#020617')
-    expect(style.get('--ui-text-muted')).toBe('#64748B')
+    expect(style.get('--ui-text-highlighted')).toBe('var(--ui-color-neutral-950)')
+    expect(style.get('--ui-text-muted')).toBe('var(--ui-color-neutral-500)')
   })
 
   it('removes stale inline css variables when switching back to the Nuxt UI theme', () => {
