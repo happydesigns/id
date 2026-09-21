@@ -3,7 +3,7 @@ import { readFileSync, statSync } from 'node:fs'
 import { resolve, extname, sep } from 'node:path'
 
 // Test-only server for Nuxt's prerendered output; no application fallback on missing assets.
-const root = resolve('tests/fixtures/guide/.output/public')
+const root = resolve(process.argv[2] || 'tests/fixtures/guide/.output/public')
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.wasm': 'application/wasm' }
 createServer((request, response) => {
   try {

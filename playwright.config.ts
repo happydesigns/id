@@ -7,11 +7,17 @@ export default defineConfig({
   workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: { baseURL: 'http://127.0.0.1:3439', trace: 'retain-on-failure' },
-  webServer: {
+  webServer: [{
     command: 'node scripts/serve-guide.mjs',
     url: 'http://127.0.0.1:3439',
     env: { PORT: '3439' },
     reuseExistingServer: false,
     timeout: 60_000
-  }
+  }, ...['violet', 'amber', 'studio'].map((name, index) => ({
+    command: 'node scripts/serve-guide.mjs .output/native-consumers/' + name,
+    url: 'http://127.0.0.1:' + (3440 + index),
+    env: { PORT: String(3440 + index) },
+    reuseExistingServer: false,
+    timeout: 60_000
+  }))]
 })
