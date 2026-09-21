@@ -78,9 +78,6 @@ importers:
 
   templates/brand-layer:
     dependencies:
-      '@happydesigns/id':
-        specifier: workspace:*
-        version: link:../..
       '@nuxt/ui':
         specifier: ^4.10.0
         version: 4.10.0(a62cb20d3d2275a69aacddc8aab090c8)
@@ -91,6 +88,9 @@ importers:
         specifier: ^4.3.3
         version: 4.3.3
     devDependencies:
+      '@happydesigns/id':
+        specifier: workspace:*
+        version: link:../..
       docus:
         specifier: ^5.12.3
         version: 5.12.3(110574ca2d75bdf0b5cb704e65d4fb01)
