@@ -29,6 +29,7 @@ function startTimeout() {
 function fail() {
   stopTimeout()
   failed.value = true
+  ready.value = false
 }
 
 function send() {

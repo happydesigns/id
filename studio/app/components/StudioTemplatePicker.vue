@@ -6,7 +6,7 @@ import type { StudioTemplate } from '../../templates'
 import type { StudioDocument } from '../../../src/studio'
 import StudioTemplateThumbnail from './StudioTemplateThumbnail.vue'
 
-const props = defineProps<{ templates: StudioTemplate[], document: StudioDocument, mode: 'light' | 'dark' }>()
+const props = withDefaults(defineProps<{ templates: StudioTemplate[], document: StudioDocument, mode: 'light' | 'dark', liveThumbnails?: boolean }>(), { liveThumbnails: true })
 const model = defineModel<string>({ required: true })
 const open = defineModel<boolean>('open', { default: false })
 const items = computed(() => props.templates)
@@ -74,13 +74,20 @@ const resolveIcon = useStudioIcon()
             @click="select(item.id)"
           >
             <StudioTemplateThumbnail
-              v-if="open"
+              v-if="open && liveThumbnails"
               :template="item"
               :document="document"
               :mode="mode"
               :enabled="index < activeCount"
               @settled="activeCount++"
             />
+            <img
+              v-else-if="item.thumbnail"
+              :src="item.thumbnail"
+              alt=""
+              loading="lazy"
+              class="aspect-[16/10] w-full rounded object-cover object-top"
+            >
             <span class="flex w-full items-center justify-between gap-2"><span class="font-medium text-highlighted">{{ item.label }}</span><UIcon
               v-if="model === item.id"
               :name="resolveIcon('i-lucide-check')"
