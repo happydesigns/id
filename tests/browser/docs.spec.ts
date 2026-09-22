@@ -72,5 +72,6 @@ for (const width of [390, 1440]) test('landing shows working code tabs and fits 
   await expect(page.getByRole('tabpanel').first()).toContainText('@import')
   await expect.poll(() => page.getByRole('tabpanel').first().locator('code .line span').evaluateAll(elements => new Set(elements.map(element => getComputedStyle(element).color)).size)).toBeGreaterThan(1)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.evaluate(() => window.scrollTo(0, 0))
   await page.screenshot({ path: `.output/tests/landing-${width}.png`, fullPage: true })
 })
