@@ -14,7 +14,7 @@ Track the agreed six steps here. A release is a baseline, not completion of this
 | 2. Independent native output | Preserve user code and prove deterministic generation and standalone consumption. | Complete. Owned output is separate from user code; regeneration tests and two packed brand consumers verified, including standalone Studio and optional Guide builds. |
 | 3. Replaceable editor | Separate theme controls from project lifecycle and demonstrate an alternative editor. | Complete. Controlled theme editor and alternative-editor browser proof. |
 | 4. Independent app preview | Connect separately running apps through an explicit development integration. | Complete. Explicit development module and browser proof across two origins, with draft/original comparison and bounded app navigation. |
-| 5. Full workflow proof | Two different apps with two brands, from draft through native builds. | Planned. Current consumer check uses identical app source. |
+| 5. Full workflow proof | Two different apps with two brands, from draft through native builds. | Complete. Browser-edited exports build in a catalog and a dashboard with two brands; native appearance and app behavior match their light/dark previews. |
 | 6. Reduction and upstream proposal | Remove proven redundancy and prepare a minimal contribution backed by the workflow. | Planned after the proof. |
 
 The v0.2.1 release is the baseline for this work. Keep one versioned package; split packages only when independent usage justifies it.
@@ -41,6 +41,12 @@ The internal editor slot permits a host to supply different theme controls throu
 ### Generated file ownership
 
 New native projects scaffold the editable `app/app.config.ts` once. It imports `app/brand.config.ts`, which is regenerated alongside `app/assets/css/brand.css`. These two files belong to the source document; everything else belongs to the project author. Regeneration validates before writing, checks existing output for read errors, skips identical content and never deletes files. It is not a multi-file filesystem transaction. Full project export is scaffolding for a new directory, not an in-place updater. Existing generator defaults retain their entry-file behavior; the new scaffold explicitly requests configuration and CSS fragments.
+
+### Workflow proof
+
+The catalog fixture exercises filtering, cart state and navigation; the dashboard exercises Nuxt UI form validation and saved state. Browser authoring imports a brand document, changes its primary palette through the editor, previews both apps in light/dark mode and downloads the resulting JSON. The native consumer check uses those exact exports from the packed ID package, builds four independent apps and checks that neither ID nor Docus appears in their dependency graph. App source and app-specific configuration stay unchanged between brands. Browser checks compare native typography, primary color, button radius and size against the preview measurements and repeat the application interactions.
+
+This is a bounded integration proof, not a visual certification of arbitrary applications. Fonts and classes must already be available; applications still own their features and adopt brand updates through normal builds. See CONTRIBUTING.md for the ordered authoring, package and browser checks.
 
 ## Principles
 

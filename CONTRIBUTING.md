@@ -109,6 +109,23 @@ If tests are not practical for a change, note the reason in the final summary.
 
 Browser reports and failure artifacts are generated under `.output/tests/`. The static fixture server lives in `tests/helpers/`; these files are test infrastructure, not package runtime.
 
+### Native branding workflow
+
+The browser authoring pass must precede the isolated native builds. It edits and exports two brands, exercises both application previews and records their appearance. The consumer check generates and packs those exact documents, builds the catalog and dashboard with each brand, and rejects ID/Docus runtime dependencies. The final browser pass compares the built applications with their previews and exercises app behavior again.
+
+After `pnpm prepare` and installing Playwright Chromium, run:
+
+```sh
+pnpm pack:studio
+pnpm exec nuxt generate tests/fixtures/guide
+pnpm docs:build
+pnpm test:authoring
+pnpm check:native
+pnpm test:browser
+```
+
+Keep the stages in this order; do not reuse old exports after changing the fixtures. Generated documents and measurements live in `.output/workflow/`. App source is copied unchanged into each native consumer; only its brand dependency and CSS import differ from development. These small fixtures prove the integration contract, not every customer application's visual quality.
+
 ## Commits
 
 Use Conventional Commits.
