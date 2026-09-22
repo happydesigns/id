@@ -1,6 +1,6 @@
 import { defineNuxtPlugin, onNuxtReady, useAppConfig, useColorMode, useHead, useRouter, useRuntimeConfig } from '#imports'
 import { nextTick, ref, watch } from 'vue'
-import { parseStudioDocument } from '../../../src/studio'
+import { parseStudioDocument } from '../../../src/studio-document'
 import { createPreviewBrand, type PreviewAppConfig } from '../../preview'
 import { studioTemplates, withinStudioRoute } from '../../templates'
 

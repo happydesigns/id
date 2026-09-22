@@ -1,5 +1,5 @@
-import { parseStudioDocument } from '../src/studio'
-import type { StudioDocument } from '../src/studio'
+import { parseStudioDocument } from '../src/studio-document'
+import type { StudioDocument } from '../src/studio-document'
 
 export type StudioSession = { id: string, baseline: StudioDocument, draft: StudioDocument, exported?: StudioDocument, updatedAt: number, catalogKey?: string }
 export function parseStudioSession(value: unknown): StudioSession {
