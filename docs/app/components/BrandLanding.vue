@@ -21,11 +21,11 @@ const steps = [
       orientation="horizontal"
       :ui="{ container: 'py-16 sm:py-24 lg:py-28 gap-12 lg:gap-16', title: 'text-5xl sm:text-6xl lg:text-7xl tracking-tight', description: 'text-lg sm:text-xl max-w-xl' }"
       headline="Identity for Nuxt UI"
-      description="Build the application once. Give it an identity that travels with it — from your first button to your next product."
+      description="Develop your app ecosystem without tying application code to a visual identity. Define your brand in a reusable Nuxt layer, apply it across your apps, and evolve it in one place."
     >
       <template #title>
-        One app.<br>
-        <span class="text-primary">Every identity.</span>
+        Build your apps.<br>
+        <span class="text-primary">Brand them together.</span>
       </template>
       <template #links>
         <UButton
