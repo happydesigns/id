@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import type { DeepReadonly } from 'vue'
+import { ref, type DeepReadonly } from 'vue'
 import type { StudioDocument } from '../../../../../src/studio'
 import BrandStudio from '../../../../../studio/app/components/BrandStudio.vue'
 
 defineOptions({ name: 'AlternativeEditorPage' })
 definePageMeta({ layout: false })
-function recolor(document: DeepReadonly<StudioDocument>, change: (document: StudioDocument, field?: string) => void, primary: string) {
+const accepted = ref<boolean>()
+function recolor(document: DeepReadonly<StudioDocument>, change: (document: StudioDocument, field?: string) => boolean, primary: string) {
   const next: StudioDocument = JSON.parse(JSON.stringify(document))
   next.theme.ui ??= {}
   next.theme.ui.colors ??= {}
   next.theme.ui.colors.primary = primary
-  change(next, 'primary')
+  accepted.value = change(next, 'primary')
 }
 </script>
 
@@ -21,6 +22,12 @@ function recolor(document: DeepReadonly<StudioDocument>, change: (document: Stud
         data-testid="alternative-editor"
         class="space-y-3"
       >
+        <p
+          v-if="accepted !== undefined"
+          role="status"
+        >
+          {{ accepted ? 'Accepted' : 'Rejected' }}
+        </p>
         <p>Primary: {{ document.theme.ui?.colors?.primary }}</p>
         <UButton @click="recolor(document, change, 'violet')">
           Use violet

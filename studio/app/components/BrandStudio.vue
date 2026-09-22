@@ -355,6 +355,12 @@ const lastProjectKey = `${storageKey}:active`
 const needsExport = computed(() => diffStudioDocuments(exported.value || baseline.value, draft.value).length > 0)
 const sourcePath = computed(() => draft.value.brand.name === seed.brand.name ? config.idStudio?.sourcePath || 'brand.studio.json' : 'brand.studio.json')
 const output = computed(() => exportTab.value === 'changes' ? JSON.stringify(changes.value, null, 2) : codeFormat.value === 'css' ? createStudioProject(draft.value)['app/assets/css/brand.css'] : JSON.stringify(draft.value, null, 2))
+function setEditorBusy(value: boolean) {
+  editorBusy.value = value
+}
+function notifyEditor(message: string) {
+  notice.value = message
+}
 function reportError(message: string, field?: string) {
   if (field) {
     if (message) fieldErrors.value[field] = message
@@ -373,11 +379,11 @@ function edit(change: (doc: StudioDocument) => void, field?: string) {
     reportError(cause instanceof Error ? cause.message : 'This value could not be applied.', field)
   }
 }
-function applyDraft(document: StudioDocument, field?: string) {
-  if (readOnly.value) return
+function applyDraft(document: StudioDocument, field?: string): boolean {
+  if (readOnly.value) return false
   if (field) Reflect.deleteProperty(fieldErrors.value, field)
   try {
-    const next = clone(document)
+    const next = parseStudioDocument(document)
     if (next.theme.label !== draft.value.theme.label) {
       const name = next.theme.label.trim()
       if (!name || name.length > 80) throw new Error('Enter a name of 1–80 characters.')
@@ -385,15 +391,16 @@ function applyDraft(document: StudioDocument, field?: string) {
       if (labels.some(label => label.trim().toLocaleLowerCase() === name.toLocaleLowerCase())) throw new Error('A brand with this name already exists.')
       next.theme.label = name
     }
-    const valid = parseStudioDocument(next)
-    if (!diffStudioDocuments(draft.value, valid).length) return
+    if (!diffStudioDocuments(draft.value, next).length) return true
     record()
-    draft.value = valid
+    draft.value = next
     error.value = ''
+    return true
   }
   catch (cause) {
     const message = cause instanceof Error ? cause.message : 'This value could not be applied.'
     reportError(message, field)
+    return false
   }
 }
 function undo() {
@@ -1377,6 +1384,8 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
                 :body-contrast="bodyContrast"
                 :change="applyDraft"
                 :invalid="reportError"
+                :set-busy="setEditorBusy"
+                :notify="notifyEditor"
               >
                 <StudioThemeEditor
                   :document="draft"
@@ -1385,10 +1394,10 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
                   :mode="mode"
                   :errors="fieldErrors"
                   :body-contrast="bodyContrast"
-                  @change="applyDraft"
+                  :change="applyDraft"
                   @invalid="reportError"
-                  @notice="notice = $event"
-                  @busy="editorBusy = $event"
+                  @notice="notifyEditor"
+                  @busy="setEditorBusy"
                 />
               </slot>
             </div>
@@ -1780,8 +1789,7 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; backgro
 .studio-inspector-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; padding: 8px 12px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--ui-border); }
 .studio-fields { flex: 0 1 auto; min-height: 0; padding: 12px; overflow-y: auto; overscroll-behavior: contain; }.studio-form-section { display: flex; flex-direction: column; gap: 12px; padding-bottom: 0; }
 .studio-fields :deep(button[data-slot="trigger"]) { font-weight: 500; }
-.studio-help { font-size: 12px; line-height: 1.6; color: var(--ui-text-muted); }
-.studio-code { font-size: 11px; overflow: auto; max-height: 280px; margin-top: 12px; }.studio-notice { flex: none; max-height: 100px; overflow: auto; display: flex; gap: 12px; align-items: center; padding: 8px 12px; font-size: 13px; }
+.studio-notice { flex: none; max-height: 100px; overflow: auto; display: flex; gap: 12px; align-items: center; padding: 8px 12px; font-size: 13px; }
 .studio-export-code { width: max-content; min-width: 100%; padding: 20px; border-radius: calc(var(--ui-radius) * 2); background: var(--ui-bg-muted); font-size: 12px; }
 .studio-pinned .studio-inspector { position: relative; inset: auto; transform: none; width: 100%; box-shadow: none; }
 .studio-history { display: flex; align-items: center; gap: 0; }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import type { DeepReadonly } from 'vue'
 import type { StudioDocument } from '../../../src/studio'
 import { studioBuiltinPalettes, studioRoles } from '../../../src/studio'
@@ -16,9 +16,9 @@ const props = defineProps<{
   mode: 'light' | 'dark'
   errors: Readonly<Record<string, string>>
   bodyContrast?: number
+  change: (document: StudioDocument, field?: string) => boolean
 }>()
 const emit = defineEmits<{
-  change: [document: StudioDocument, field?: string]
   invalid: [message: string, field?: string]
   notice: [message: string]
   busy: [value: boolean]
@@ -32,10 +32,11 @@ function edit(change: (document: StudioDocument) => void, field?: string) {
   try {
     const next: StudioDocument = JSON.parse(JSON.stringify(props.document))
     change(next)
-    emit('change', next, field)
+    return props.change(next, field)
   }
   catch (cause) {
     emit('invalid', cause instanceof Error ? cause.message : 'This value could not be applied.', field)
+    return false
   }
 }
 function value(event: Event) {
@@ -129,11 +130,11 @@ function defaultVariant(component: string, next: string) {
 function componentVariant(component: string) {
   return ((draft.value.theme.ui?.[component] as Record<string, unknown> | undefined)?.defaultVariants as Record<string, string> | undefined)?.variant || ''
 }
-async function addPalette() {
+function addPalette() {
   const name = newColorName.value.trim()
   if (paletteAction.value !== 'delete' && paletteNameError.value) return
   if (paletteAction.value === 'delete' && paletteUses(paletteTarget.value).length && !replacementPalette.value) return
-  edit((doc) => {
+  const accepted = edit((doc) => {
     if (paletteAction.value === 'create') doc.brand.colors[name] = createStudioPalette(newColor.value)
     else {
       const previous = paletteTarget.value
@@ -155,8 +156,7 @@ async function addPalette() {
       if (previous !== next) Reflect.deleteProperty(doc.brand.colors, previous)
     }
   }, 'new-palette')
-  await nextTick()
-  if (fieldErrors.value['new-palette']) return
+  if (!accepted) return
   paletteOpen.value = false
   paletteExpanded.value = paletteAction.value === 'delete' ? undefined : name
   emit('notice', paletteAction.value === 'create' ? 'Palette created. Select it under Primary or Neutral to use it.' : paletteAction.value === 'rename' ? 'Palette renamed.' : 'Palette deleted.')
