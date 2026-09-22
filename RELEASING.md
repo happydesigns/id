@@ -1,40 +1,14 @@
-# Release and compatibility checks
+# Releasing
 
-The Verify workflow runs for pull requests, main, version tags and manual dispatch. It installs the committed pnpm lockfile, runs lint/unit/type checks, packs ID, builds an isolated native consumer and runs production browser checks. Passing runs retain the package and SHA-256 checksum as a versioned artifact.
+ID uses Changelogen for its single versioned package. Conventional Commits determine the version: during v0, compatible changes increment patch and breaking changes increment minor. Review actual compatibility, not just commit labels.
 
-The native consumer check installs the actual ID tarball into a fresh authoring project outside this workspace, generates and packs two brands, then builds identical application source against each brand archive. Browser checks verify primary colors, fonts, mode-specific assets and behavior. The exported minimal Studio host is also built and exercised without Docus. The optional Docus export is independently installed and generated, including its guide routes. That application must contain neither ID nor Docus. This checks the published package boundary rather than sibling checkout imports. Fresh consumer dependencies resolve independently of the workspace lockfile, deliberately detecting compatibility failures; the retained temporary fixture includes its lockfile for diagnosis.
+## Release overview
 
-## Commands
+1. Complete the [verification pipeline](docs/content/5.development/2.verification.md).
+2. Run `pnpm release:preview` to review proposed entries and version without changing files.
+3. From a clean worktree, run `pnpm release`. It verifies the package and creates the version, generated `CHANGELOG.md`, release commit and annotated tag together. It does not push or publish.
+4. Review the result. An authorized tag push triggers CI verification and GitHub release publication with the exact built archive, checksum and changelog entries. Registry publication requires separate authorization.
 
-- pnpm verify
-- pnpm pack:studio
-- pnpm check:native
-- pnpm exec nuxt generate tests/fixtures/guide
-- pnpm docs:build
-- pnpm exec playwright install chromium
-- pnpm test:browser
+Do not manually rewrite released tags or replace released archive bytes. Keep release history in `CHANGELOG.md`, not parallel notes.
 
-The native check retains its temporary directory and prints its location. Browser failure reports are in `.output/tests/report` and `.output/tests/results`. CI uploads those diagnostics on failure.
-
-## Versioned delivery
-
-1. Use Conventional Commits. Run `pnpm release:preview` to inspect the generated entries without changing files, versions, tags or remote releases. Review public API compatibility and the proposed version.
-2. From a clean worktree run `pnpm release` and let Changelogen infer the version from Conventional Commits. While the package is on v0, compatible changes including `feat` increment the patch version; breaking changes marked with `!` or a `BREAKING CHANGE:` footer increment the minor version. Review the actual API and dependency changes before release; commit labels do not prove compatibility. Use an explicit version override only for a reviewed exception. Changelogen generates the version, CHANGELOG.md, `chore(release): vVERSION` commit and annotated tag together. Do not hand-edit the version or manually tag a later test commit. Preparation does not push, publish to GitHub or publish to npm.
-3. Review the generated commit and tag, then push the branch and its tag through the approved repository process (`git push --follow-tags` when authorized). Tag CI repeats all checks, verifies version and release-commit agreement, and automatically publishes a GitHub release containing the exact CI-built archive, checksum and that version's generated changelog. Prerelease tags produce prereleases. There is no separate GitHub-generated changelog and no manual draft-publishing step.
-4. Registry publication remains a separate explicitly authorized step. This workflow needs no npm credentials and never deploys. A retry fails if a release already exists; do not overwrite its assets or move its tag.
-
-ID has one versioned package; its private documentation and playground workspaces do not require Changesets. The ecosystem default is Changelogen; Changesets is an option when a repository releases multiple packages with independent or linked versions.
-
-Until registry publication, consumers may install the reviewed release tarball as an exact file dependency with a committed lockfile. A checksum identifies the archive bytes; package.json identifies the API version. Do not silently replace an existing released archive.
-
-## Integration compatibility
-
-GUIDE-001 is resolved by preserving Vue's onServerPrefetch registration in the Guide production client. See tests/fixtures/guide/README.md for the minimal reproduction and reason. The form-label and tab-panel assertions are now required success tests. Do not restore expected failures to accommodate a dependency update.
-
-Native Tabs demonstrations with labels only still need actual content slots when a host wants meaningful tab-panel content. This is independent of hydration.
-
-## Support checks
-
-Release publication also requires the compatibility job for package types and local source operations on Linux and Windows. CI reads the supported Node range from `package.json`; the explicit minimum-version case in `.github/workflows/verify.yml` must be reviewed when changing that range. These jobs test the baseline, not every dependency combination.
-
-Dependency updates arrive as reviewable Dependabot PRs; they are not merged automatically. Keep the Tiptap overrides coordinated. Remove the Guide hydration workaround only when the fixture passes without it on the supported dependency baseline, as described in tests/fixtures/guide/README.md.
+The [release guide](docs/content/5.development/3.releasing.md) owns detailed delivery, prerelease and retry rules. The [verification guide](docs/content/5.development/2.verification.md) owns command order, compatibility jobs and framework constraints.

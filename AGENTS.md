@@ -16,6 +16,6 @@ Check these root-level guides when they are present and relevant:
 - `API.md`: public TypeScript API, Nuxt layer, module, and app-config contracts
 - `SECURITY.md`: public data rules, identity boundaries, and runtime theme safety
 
-Use the source that owns the information. Source files own implementation facts. Docus docs own product usage guidance. Root guides own durable contribution, architecture, design, API, and security rules.
+Use the source that owns the information. Source files own implementation facts. Root guides provide topic overviews and essential policies. Docus docs own detailed product usage, architecture, verification, releases and roadmap status. Follow the links in each overview before changing its subject.
 
-Temporary planning can live in issues, pull requests, task tools, or agreed workspace notes. Durable product, architecture, design, security, API, or contribution rules should move into documentation or code.
+Temporary planning can live in issues, pull requests, task tools, or agreed workspace notes. Durable detail belongs in the relevant docs/content page or code. Update existing canonical explanations instead of appending task reports or duplicating them in root guides.

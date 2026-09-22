@@ -1,48 +1,15 @@
 # Security
 
-`@happydesigns/id` handles public identity data. It must not become a channel for secrets or runtime authority.
+ID handles public presentation data, never runtime authority. Brand sources, app config, CSS, logos and other public assets are visible to clients. Do not include credentials, private endpoints or sensitive customer data.
 
-## Public Data Rule
+Branding must not control authorization, tenant isolation, billing, audit, storage policy, APIs, MCP, webhooks, jobs or deployment credentials. Only load trusted themes; configuration must not carry executable code or remote components. Keep dependencies necessary and behavior inspectable.
 
-Brand guides, theme packs, app config, CSS variables, logos, and public assets are visible to clients. Do not place secrets, credentials, private tokens, internal endpoints, or sensitive customer data in identity configuration.
+## Development integrations
 
-## Boundary Rule
+The optional source writer targets a host-configured JSON file and exists only in development. Preview connections require explicit origins and bounded routes. Neither mechanism is remote-user authentication. Validation, revision checks and transport limits are part of these boundaries, not optional UI checks.
 
-Identity layers may change presentation. They must not change:
-
-- authorization
-- tenant isolation
-- billing or financial rules
-- audit behavior
-- storage policy
-- API behavior
-- MCP behavior
-- webhook behavior
-- job execution
-- deployment credentials
-
-## Runtime Themes
-
-Only load trusted theme packs. Runtime theme data should be treated as public presentation data, not executable code.
-
-Runtime themes should not carry raw HTML, scripts, remote component code, credentials, or user-specific secrets.
-
-## Dependencies
-
-Avoid adding dependencies unless they are needed for the current implementation. Keep validation and runtime behavior deterministic and inspectable.
-
-## Local Studio writer
-
-The optional Studio module registers `/api/id-studio/source` only in Nuxt development and only when the host provides an absolute `.json` path in private `runtimeConfig.idStudioSource`. Browser input cannot choose a filesystem path. Requests require a loopback host, a matching Origin when supplied, and a per-server nonce in a custom header. The nonce is available to the local application; this is a same-origin development boundary, not remote-user authentication.
-
-The writer accepts validated public brand JSON, preserves unknown safe fields, checks the current source hash and performs a same-directory atomic replacement. It rejects a stale revision and serializes writes within the process. It cannot lock unrelated external editors across the final filesystem replacement. It does not evaluate TypeScript, update arbitrary CSS, commit files or deploy. Production builds do not register the endpoint.
-
-Route previews accept only configured subtrees. Separately running apps opt into the development-only `@happydesigns/id/preview` module with an exact Studio origin; Studio explicitly configures the app origin. Both sides check window identity, exact origin and the connection session. No wildcard message targets or source-writing endpoints are added by this module. This is a trusted development connection, not user authentication. Draft styling is applied after hydration and cannot replace the editor shell's configuration.
-
-## Size and storage limits
-
-The pure document parser and local generator have no byte limit. Browser file import and the local Studio HTTP writer use `studioDocumentMaxBytes` as an 8 MB transfer guard before parsing; the writer also checks serialized output. Browser persistence is subject to the browser storage quota and reports failures without silently discarding the draft. Keep large images and fonts as separate public files. The transfer limit is not a branding schema constraint.
+The [security reference](docs/content/4.reference/4.security.md) documents the exact writer, message, storage and size constraints. [Application boundaries](docs/content/2.concepts/3.boundaries.md) explains the separation between branding and domain behavior.
 
 ## Reporting a vulnerability
 
-Use [GitHub private vulnerability reporting](https://github.com/happydesigns/id/security/advisories/new). If that channel is unavailable, open an issue asking for a private contact without publishing exploit details or sensitive data. Include the affected version and a minimal reproduction privately.
+Use [GitHub private vulnerability reporting](https://github.com/happydesigns/id/security/advisories/new). If unavailable, open an issue asking for a private contact without publishing exploit details or sensitive data. Include the affected version and a minimal reproduction privately.
