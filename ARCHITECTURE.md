@@ -11,7 +11,7 @@ Track the agreed six steps here. A release is a baseline, not completion of this
 | Step | Outcome | Status |
 | --- | --- | --- |
 | 1. Responsibilities | Identify required authoring, optional extensions and compatibility code. | Complete. Ownership is defined below. |
-| 2. Independent native output | Preserve user code and prove deterministic generation and standalone consumption. | Existing two-brand consumer coverage; complete source-ownership audit pending. |
+| 2. Independent native output | Preserve user code and prove deterministic generation and standalone consumption. | Complete. Owned output is separate from user code; regeneration tests and two packed brand consumers verified, including standalone Studio and optional Guide builds. |
 | 3. Replaceable editor | Separate theme controls from project lifecycle and demonstrate an alternative editor. | Complete. Controlled theme editor and alternative-editor browser proof. |
 | 4. Independent app preview | Connect separately running apps through an explicit development integration. | Planned. Current bridge is same-origin only. |
 | 5. Full workflow proof | Two different apps with two brands, from draft through native builds. | Planned. Current consumer check uses identical app source. |
@@ -37,6 +37,10 @@ The v0.2.1 release is the baseline for this work. Keep one versioned package; sp
 BrandStudio owns the project and the editor panel. Brand metadata and asset controls remain there. StudioThemeEditor receives the current document, baseline, category, mode, field errors and optional measured contrast. It clones the input and emits a proposed document; only the host validates, records history and updates the authoritative draft. The existing version-1 document remains unchanged, including fields unknown to the controls.
 
 The internal editor slot permits a host to supply different theme controls through the same change and error handlers. It is an extraction boundary, not a promised upstream API or a new portable theme schema. Preview, persistence and export observe the accepted draft and do not depend on the concrete editor. Palette dialogs and their transient state belong to the default editor; their open state informs panel dismissal. `tests/browser/editor.spec.ts` exercises a replacement editor through validation, draft/original previews, undo/redo, persistence and JSON export in both color modes, preserving unknown document fields. It also checks default palette editing and focus restoration at mobile and desktop widths.
+
+### Generated file ownership
+
+New native projects scaffold the editable `app/app.config.ts` once. It imports `app/brand.config.ts`, which is regenerated alongside `app/assets/css/brand.css` and `app/brand.assets.json`. These three files belong to the source document; everything else belongs to the project author. Regeneration validates before writing, checks existing output for read errors, skips identical content and never deletes files. It is not a multi-file filesystem transaction. Full project export is scaffolding for a new directory, not an in-place updater. Existing generator defaults retain their entry-file behavior; the new scaffold explicitly requests configuration and CSS fragments.
 
 ## Principles
 

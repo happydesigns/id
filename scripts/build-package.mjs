@@ -114,7 +114,7 @@ const { brandIdentity, brandTheme } = await import('../templates/brand-layer/bra
 const document = createStudioDocument(brandIdentity, brandTheme)
 const templateDir = join(rootDir, 'templates/brand-layer')
 writeFileSync(join(templateDir, 'brand.studio.json'), JSON.stringify(document, null, 2) + '\n')
-for (const [path, contents] of Object.entries(createStudioRuntimeFiles(document, { styles: 'fragment' }))) {
+for (const [path, contents] of Object.entries(createStudioRuntimeFiles(document, { styles: 'fragment', config: 'fragment' }))) {
   const target = join(templateDir, path)
   mkdirSync(dirname(target), { recursive: true })
   writeFileSync(target, contents)

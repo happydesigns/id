@@ -5,7 +5,7 @@ export default withNuxt({
   ignores: [
     '.tmp/**',
     'src/project-templates.generated.ts',
-    'templates/brand-layer/app/app.config.ts',
+    'templates/brand-layer/app/brand.config.ts',
     'node_modules/**',
     'docs/.nuxt/**',
     'docs/.nuxt-dev/**',
