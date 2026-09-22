@@ -15,7 +15,7 @@ Track the agreed six steps here. A release is a baseline, not completion of this
 | 3. Replaceable editor | Separate theme controls from project lifecycle and demonstrate an alternative editor. | Complete. Controlled theme editor and alternative-editor browser proof. |
 | 4. Independent app preview | Connect separately running apps through an explicit development integration. | Complete. Explicit development module and browser proof across two origins, with draft/original comparison and bounded app navigation. |
 | 5. Full workflow proof | Two different apps with two brands, from draft through native builds. | Complete. Browser-edited exports build in a catalog and a dashboard with two brands; native appearance and app behavior match their light/dark previews. |
-| 6. Reduction and upstream proposal | Remove proven redundancy and prepare a minimal contribution backed by the workflow. | Planned after the proof. |
+| 6. Reduction and upstream proposal | Remove proven redundancy and prepare a minimal contribution backed by the workflow. | Reduction pass implemented; current-state review precedes any upstream proposal. |
 
 The v0.2.1 release is the baseline for this work. Keep one versioned package; split packages only when independent usage justifies it.
 
@@ -163,6 +163,18 @@ File-based scaffolds under templates/project own project boilerplate. Package bu
 The Studio component coordinates user actions. `useStudioHistory` owns undo/redo, `useStudioProjects` owns browser project storage, `useStudioFrames` owns iframe identity/loading/recovery, and `studio/export.ts` owns downloading complete projects and assets. Confirmation and user-visible error handling remain at the UI boundary.
 
 `.nuxt`, `.output`, `dist`, caches, logs and browser reports are ignored local artifacts. They are not architecture layers. `scripts/check-native.mjs` validates packed generated brands and a standalone Studio; Playwright owns production browser checks. There is no separate manual guide runner.
+
+## Current-state review after the workflow proof
+
+The native path has a demonstrated boundary: the authoring host owns documents, generated brands use native Nuxt configuration, and applications keep their own behavior. The editor is replaceable; built-in and app previews share draft application, and preview/export share CSS rendering. These are verified integration boundaries, not evidence of a complete upstream editor API.
+
+The remaining maintenance cost is concentrated in three places:
+
+- Studio's project coordinator still combines substantial UI and lifecycle orchestration. Extract only independently useful responsibilities supported by tests; a smaller file alone is not a simpler architecture.
+- Preview resets, icon presets and the component gallery retain Nuxt UI-derived definitions. Reset CSS prevents a host brand from leaking into another draft. The installed Nuxt UI package does not expose the complete reset/icon data as a ready-to-use public contract; replacing it with parsing of private build files would exchange visible duplication for fragile coupling.
+- The published identity runtime, reference themes and legacy project export remain compatibility surfaces. They should not be expanded alongside native branding, but removing them requires an explicit breaking-change decision and migration.
+
+Before proposing an upstream contribution, review these remaining responsibilities against concrete public Nuxt UI extension points and agree the compatibility horizon. Keep the proven app-preview and native-generation workflow as the acceptance test. No upstream proposal is part of this reduction pass.
 
 ## Remaining verification work
 
