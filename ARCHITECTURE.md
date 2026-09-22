@@ -1,6 +1,42 @@
 # Architecture
 
-This file defines the technical structure for `@happydesigns/id`: Nuxt UI brand-guide contracts, runtime theming, Nuxt integration, starters, and documentation.
+This file defines the technical structure for `@happydesigns/id`: optional brand authoring and verification, native Nuxt layer generation, and the existing compatibility integrations.
+
+## Native branding roadmap
+
+The target workflow is: edit a brand, verify it in applications, generate a native Nuxt layer, then update each consuming application deliberately. Nuxt UI owns components and styling mechanisms; Nuxt owns layer composition. ID provides optional authoring and verification. Its editor should be replaceable by an upstream implementation without changing project storage or generated brands.
+
+Track the agreed six steps here. A release is a baseline, not completion of this roadmap.
+
+| Step | Outcome | Status |
+| --- | --- | --- |
+| 1. Responsibilities | Identify required authoring, optional extensions and compatibility code. | Complete. Ownership is defined below. |
+| 2. Independent native output | Preserve user code and prove deterministic generation and standalone consumption. | Existing two-brand consumer coverage; complete source-ownership audit pending. |
+| 3. Replaceable editor | Separate theme controls from project lifecycle and demonstrate an alternative editor. | Complete. Controlled theme editor and alternative-editor browser proof. |
+| 4. Independent app preview | Connect separately running apps through an explicit development integration. | Planned. Current bridge is same-origin only. |
+| 5. Full workflow proof | Two different apps with two brands, from draft through native builds. | Planned. Current consumer check uses identical app source. |
+| 6. Reduction and upstream proposal | Remove proven redundancy and prepare a minimal contribution backed by the workflow. | Planned after the proof. |
+
+The v0.2.1 release is the baseline for this work. Keep one versioned package; split packages only when independent usage justifies it.
+
+### Ownership
+
+| Responsibility | Owner |
+| --- | --- |
+| Components, semantic styling and native theme configuration | Nuxt UI; ID controls use those existing mechanisms. |
+| Theme editing controls | Optional, replaceable Studio editor. Receives state and proposes changes; owns only transient control state. |
+| Brand metadata and assets, validation, history, storage, source writes and export | Studio project host. Owns the complete document and accepts or rejects proposed edits. |
+| Native output generation | Pure generation functions, shared by export and regeneration. No editor or Guide dependency. |
+| App rendering, routes, content and functional states | The consuming app. The preview bridge only applies a temporary draft. |
+| Technical references and editorial documentation | Optional Guide/Docus integration. No renderer types in the brand contract. |
+| Existing identity runtime, adapter utilities and runtime theme selection | Compatibility surface. Maintain correctness; new workflow features target native output. |
+| Built-in galleries, icon presets and copied preview defaults | Current editor support. Reassess in step 6 rather than expanding a parallel design system. |
+
+### Editor boundary
+
+BrandStudio owns the project and the editor panel. Brand metadata and asset controls remain there. StudioThemeEditor receives the current document, baseline, category, mode, field errors and optional measured contrast. It clones the input and emits a proposed document; only the host validates, records history and updates the authoritative draft. The existing version-1 document remains unchanged, including fields unknown to the controls.
+
+The internal editor slot permits a host to supply different theme controls through the same change and error handlers. It is an extraction boundary, not a promised upstream API or a new portable theme schema. Preview, persistence and export observe the accepted draft and do not depend on the concrete editor. Palette dialogs and their transient state belong to the default editor; their open state informs panel dismissal. `tests/browser/editor.spec.ts` exercises a replacement editor through validation, draft/original previews, undo/redo, persistence and JSON export in both color modes, preserving unknown document fields. It also checks default palette editing and focus restoration at mobile and desktop widths.
 
 ## Principles
 

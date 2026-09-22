@@ -2,7 +2,7 @@
 
 Brand authoring, previews and reusable brand layers for Nuxt UI. Nuxt UI is the supported design system.
 
-`@happydesigns/id` defines how a brand is described, validated, documented, and applied to Nuxt UI projects. It is the reusable identity mechanism between Nuxt UI apps and concrete brand layers such as `@happydesigns/brand`.
+`@happydesigns/id` is an optional authoring and verification tool for reusable native Nuxt UI brand layers. Applications use Nuxt UI and their brand layer; Studio helps edit the brand and check its appearance without becoming an application runtime requirement.
 
 ## Product contract
 
