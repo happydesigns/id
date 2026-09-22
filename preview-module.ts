@@ -2,6 +2,8 @@ import { addPlugin, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { studioOrigin, isStudioRoute } from './studio/templates.js'
 
 export interface PreviewOptions {
+  /** Include the bridge in a dedicated, explicitly opted-in preview deployment. */
+  previewBuild?: boolean
   studioOrigin?: string
   id?: string
   routePrefix?: string
@@ -12,9 +14,9 @@ export interface PreviewOptions {
 
 export default defineNuxtModule<PreviewOptions>({
   meta: { name: '@happydesigns/id-preview' },
-  defaults: { studioOrigin: '', id: '', routePrefix: '/' },
+  defaults: { studioOrigin: '', id: '', routePrefix: '/', previewBuild: false },
   setup(options, nuxt) {
-    if (!nuxt.options.dev) return
+    if (!nuxt.options.dev && options.previewBuild !== true) return
     const origin = studioOrigin(options.studioOrigin)
     if (!origin) throw new Error('Studio preview requires an exact HTTP(S) studioOrigin.')
     if (!/^[a-z][a-z0-9-]{0,63}$/.test(options.id || '')) throw new Error('Studio preview requires a template id.')

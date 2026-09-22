@@ -42,3 +42,12 @@ it('binds frame messages to their configured origin, window and session', () => 
   expect(acceptsStudioFrame({ ...event, source: {} } as MessageEvent, frame)).toBe(false)
   expect(acceptsStudioFrame({ ...event, data: { session: 'old' } } as MessageEvent, frame)).toBe(false)
 })
+
+it('requires an explicit preview-build opt-in and still validates the origin', () => {
+  addPlugin.mockClear()
+  const production = { options: { dev: false, runtimeConfig: { public: {} } } }
+  setup({ previewBuild: true, studioOrigin: 'https://brand.example.com', id: 'shop', routePrefix: '/shop' }, production)
+  expect(addPlugin).toHaveBeenCalledTimes(1)
+  expect(production.options.runtimeConfig.public).toHaveProperty('idStudioPreview.studioOrigin', 'https://brand.example.com')
+  expect(() => setup({ previewBuild: true, studioOrigin: '*', id: 'shop' }, production)).toThrow()
+})
