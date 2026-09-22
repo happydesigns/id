@@ -24,27 +24,32 @@ describe('release notes', () => {
   })
 })
 
-it('creates version, changelog, commit and tag together in an isolated repository', () => {
+it.each([
+  ['fix: verify release fixture', '0.2.1'],
+  ['feat: verify release fixture', '0.2.1'],
+  ['feat!: verify release fixture', '0.3.0'],
+  ['refactor: verify release fixture\n\nBREAKING CHANGE: replace the public contract', '0.3.0'],
+])('infers the v0 release from %s and creates its version, changelog, commit and tag', (message, version) => {
   const cwd = mkdtempSync(join(tmpdir(), 'id-release-test-'))
   const git = (...args: string[]) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim()
   try {
     git('init')
     git('config', 'user.name', 'Release test')
     git('config', 'user.email', 'release@example.invalid')
-    writeFileSync(join(cwd, 'package.json'), JSON.stringify({ name: 'release-test', version: '0.0.0', private: true }))
+    writeFileSync(join(cwd, 'package.json'), JSON.stringify({ name: 'release-test', version: '0.2.0', private: true }))
     copyFileSync(resolve('changelog.config.ts'), join(cwd, 'changelog.config.ts'))
     git('add', '.')
     git('commit', '-m', 'chore: initial fixture')
-    git('tag', 'v0.0.0')
+    git('tag', 'v0.2.0')
     writeFileSync(join(cwd, 'feature.txt'), 'fixture only')
     git('add', '.')
-    git('commit', '-m', 'fix: verify release fixture')
-    execFileSync(process.execPath, [resolve('node_modules/changelogen/dist/cli.mjs'), '--release', '--patch', '--no-github', '--clean'], { cwd, stdio: 'pipe' })
-    expect(JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')).version).toBe('0.0.1')
-    expect(git('log', '-1', '--format=%s')).toBe('chore(release): v0.0.1')
-    expect(git('rev-parse', 'v0.0.1^{}')).toBe(git('rev-parse', 'HEAD'))
+    git('commit', '-m', message)
+    execFileSync(process.execPath, [resolve('node_modules/changelogen/dist/cli.mjs'), '--release', '--no-github', '--clean'], { cwd, stdio: 'pipe' })
+    expect(JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')).version).toBe(version)
+    expect(git('log', '-1', '--format=%s')).toBe('chore(release): v' + version)
+    expect(git('rev-parse', 'v' + version + '^{}')).toBe(git('rev-parse', 'HEAD'))
     expect(git('status', '--porcelain')).toBe('')
-    expect(releaseNotes(readFileSync(join(cwd, 'CHANGELOG.md'), 'utf8'), '0.0.1')).toContain('Verify release fixture')
+    expect(releaseNotes(readFileSync(join(cwd, 'CHANGELOG.md'), 'utf8'), version)).toContain('Verify release fixture')
     expect(git('remote')).toBe('')
   }
   finally {

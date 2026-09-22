@@ -121,6 +121,8 @@ Examples:
 - `docs: add brand-layer guide`
 - `test: add theme css generation cases`
 
+Mark incompatible public API, source-format or dependency-requirement changes with `!` and explain the migration in a `BREAKING CHANGE:` footer. Changelogen derives releases from these commits: on v0, compatible changes increment patch and breaking changes increment minor.
+
 Avoid vague commit messages such as `update`, `fix stuff`, `changes`, or `wip`.
 
 ## AI Assistant Guidelines
