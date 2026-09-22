@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            node: '24.0.0'
+            node: '22.19.0'
           - os: windows-latest
     steps:
       - uses: actions/checkout@v4

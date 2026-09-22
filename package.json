@@ -108,7 +108,7 @@
     "h3": "^1.15.11"
   },
   "peerDependencies": {
-    "tailwindcss": "catalog:",
+    "tailwindcss": "^4.0.0",
     "vue": "^3.5.41"
   },
   "devDependencies": {
@@ -132,6 +132,6 @@
     "id-studio-package": "./scripts/prepare-studio-package.mjs"
   },
   "engines": {
-    "node": "^24.0.0"
+    "node": "^22.19.0 || ^24.11.0 || >=26.0.0"
   }
 }
