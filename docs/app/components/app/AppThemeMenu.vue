@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { docsPresetDocuments, presetIcons } from '../../../presets'
+import { docsPresetDocuments, docsPresetAvatar } from '../../../presets'
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { builtinPaletteNames, neutralPalettes, resolvePalette } from '../../../../src/palettes'
 import { studioFontPresets, studioRadiusPresets } from '../../../../studio/editor'
@@ -82,18 +82,12 @@ function createTheme() {
   }
   catch (error) { createError.value = error instanceof Error ? error.message : 'Could not save theme.' }
 }
-function presetAvatar(theme: typeof current.value) {
-  const document = theme ? docsPresetDocuments[theme.name] : undefined
-  const palette = resolvePalette(theme?.ui?.colors?.primary || 'green', document?.brand.colors || {})
-  const color = theme?.cssVariables?.light?.['--ui-primary'] === 'black' ? 'var(--ui-text-highlighted)' : typeof palette === 'object' ? palette[500] : palette
-  return { icon: presetIcons[theme?.name.replace('nuxt-ui-', '') || ''] || 'i-lucide-palette', style: { color, backgroundColor: color ? 'color-mix(in oklab, ' + color + ' 15%, transparent)' : undefined } }
-}
 const items = computed<DropdownMenuItem[][]>(() => [[{
   label: name.value,
-  avatar: presetAvatar(current.value),
+  avatar: docsPresetAvatar(current.value),
   children: [...brand.themes.value.map(theme => ({
     label: theme.label,
-    avatar: presetAvatar(theme),
+    avatar: docsPresetAvatar(theme),
     type: 'checkbox',
     checked: theme.name === brand.selectedName.value,
     onSelect(event: Event) {
@@ -135,7 +129,7 @@ function setMode(value: string | number) {
   >
     <UTooltip :text="name + ' appearance'">
       <UButton
-        :icon="presetAvatar(current).icon"
+        :icon="docsPresetAvatar(current).icon"
         color="neutral"
         variant="ghost"
         :aria-label="'Appearance: ' + name"

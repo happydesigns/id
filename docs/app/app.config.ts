@@ -1,8 +1,5 @@
 import { createStudioDocument } from '../../src/studio'
 import { createNuxtUiAppConfig } from '../../src'
-import {
-  sampleBrandTheme,
-} from '../../themes/sample-brand'
 import { idBrandGuide, nuxtUiBrandTheme } from '../../themes/nuxt-ui'
 
 import { docsPresetDocuments } from '../presets'
@@ -47,7 +44,6 @@ export default defineAppConfig({
     theme: nuxtUiBrandTheme,
     defaultTheme: nuxtUiBrandTheme.name,
     themes: [
-      sampleBrandTheme,
       ...Object.values(docsPresetDocuments).map(document => document.theme),
     ],
     guide: idBrandGuide,
