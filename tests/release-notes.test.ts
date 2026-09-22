@@ -7,9 +7,8 @@ import { releaseNotes } from '../scripts/release-notes.mjs'
 
 describe('release notes', () => {
   const changelog = '# Changelog\n\n## v0.3.0\n\n### Features\n\n- New export ([abc](https://example.com))\n\n## v0.2.0\n\n- Old export\n'
-  it('uses only the selected generated entry, with optional human highlights', () => {
-    const notes = releaseNotes(changelog, '0.3.0', '## Highlights\n\nA simpler export.')
-    expect(notes).toContain('A simpler export.')
+  it('uses only the selected generated changelog entry', () => {
+    const notes = releaseNotes(changelog, '0.3.0')
     expect(notes).toContain('New export')
     expect(notes).not.toContain('Old export')
   })
