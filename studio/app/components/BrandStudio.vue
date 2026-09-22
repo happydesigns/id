@@ -22,7 +22,7 @@ import { createBlankStudioDocument, createStudioDocument, createStudioProject, d
 import { nuxtUiBrandTheme } from '../../../themes/nuxt-ui'
 import { parseStudioSession, contrastRatio } from '../../editor'
 import type { StudioSession } from '../../editor'
-import { studioTemplates, withinStudioRoute } from '../../templates'
+import { studioTemplates, withinStudioRoute, studioFrameUrl, acceptsStudioFrame } from '../../templates'
 import type { StudioDocument } from '../../../src/studio'
 import type { StudioHostConfig } from '../../../src/studio-host'
 
@@ -58,9 +58,10 @@ watch(previewRuntime, (runtime) => {
   // Reordering live iframe elements reloads their documents in browsers.
   if (!cachedRuntimes.value.includes(runtime)) cachedRuntimes.value = [...cachedRuntimes.value, runtime].slice(-3)
 }, { flush: 'sync' })
+const previewSession = import.meta.client ? crypto.randomUUID() : ''
 function frameSrc(frame: string, runtime: string) {
   const template = templates.find(item => item.id === runtime)
-  return template?.route ? `${template.route}?idPreview=${runtime}&frame=${frame}` : `/studio/preview?frame=${frame}`
+  return studioFrameUrl(template, frame, window.location.origin, previewSession)
 }
 const templatePage = ref(selectedTemplate.value?.pages.find(page => page.id === route.query.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home')
 watch(scene, () => {
@@ -609,16 +610,15 @@ async function addLogo(file: File | null | undefined) {
   reader.readAsDataURL(file)
 }
 function send(frame: HTMLIFrameElement | undefined, doc: StudioDocument) {
-  if (!frame?.contentDocument) return
-  frame.contentWindow?.postMessage({ type: 'id-studio-preview', document: clone(doc), scene: scene.value, page: templatePage.value, path: previewPath.value, mode: mode.value, preference: preference.value, state: state.value }, window.location.origin)
+  if (!frame?.contentWindow) return
+  frame.contentWindow?.postMessage({ type: 'id-studio-preview', session: new URL(frame.src).searchParams.get('idSession'), document: clone(doc), scene: scene.value, page: templatePage.value, path: previewPath.value, mode: mode.value, preference: preference.value, state: state.value }, new URL(frame.src).origin)
 }
 function refresh() {
   send(originalFrame.value, baseline.value)
   send(draftFrame.value, draft.value)
 }
 function ready(event: MessageEvent) {
-  if (event.origin !== window.location.origin) return
-  if (event.source !== originalFrame.value?.contentWindow && event.source !== draftFrame.value?.contentWindow) return
+  if (!acceptsStudioFrame(event, originalFrame.value) && !acceptsStudioFrame(event, draftFrame.value)) return
   if (event.data?.type === 'id-studio-pointer') {
     brandPickerOpen.value = false
     templatePickerOpen.value = false
@@ -824,10 +824,9 @@ watch([mode, preference], ([value, selected]) => {
   // Same-origin documents change CSS mode in one task, before the next paint.
   for (const frame of [originalFrame.value, draftFrame.value]) {
     const root = frame?.contentDocument?.documentElement
-    if (!root) continue
-    root.classList.toggle('dark', value === 'dark')
-    root.classList.toggle('light', value === 'light')
-    frame?.contentWindow?.postMessage({ type: 'id-studio-color-mode', mode: value, preference: selected }, window.location.origin)
+    root?.classList.toggle('dark', value === 'dark')
+    root?.classList.toggle('light', value === 'light')
+    if (frame) frame.contentWindow?.postMessage({ type: 'id-studio-color-mode', session: new URL(frame.src).searchParams.get('idSession'), mode: value, preference: selected }, new URL(frame.src).origin)
   }
 }, { flush: 'sync' })
 onBeforeUnmount(() => {

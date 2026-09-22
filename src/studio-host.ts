@@ -16,6 +16,8 @@ export interface StudioHostConfig {
     description?: string
     owner?: string
     thumbnail?: string
+    /** Explicit development app origin; the app must allow this Studio origin. */
+    origin?: string
     route?: string
     routePrefix?: string
     component?: string

@@ -20,7 +20,7 @@ export function useStudioFrames(
     previewAttempt.value++
   }
   function frameLoaded(frame: HTMLIFrameElement | undefined, doc: StudioDocument, key: 'original' | 'draft') {
-    if (!frame?.contentDocument) {
+    if (!frame?.contentWindow) {
       failedFrames.value[key] = true
       return
     }

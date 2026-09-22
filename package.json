@@ -21,6 +21,10 @@
       "types": "./dist/module.d.ts",
       "import": "./dist/module.js"
     },
+    "./preview": {
+      "types": "./dist/preview-module.d.ts",
+      "import": "./dist/preview-module.js"
+    },
     "./nuxt": "./nuxt.layer.config.mjs",
     "./guide": "./guide/nuxt.config.mjs",
     "./studio": "./studio/nuxt.config.mjs",

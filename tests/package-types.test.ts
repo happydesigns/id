@@ -8,6 +8,10 @@ describe('published module types', () => {
     const source = `import { defineNuxtConfig } from 'nuxt/config'
 import id from '@happydesigns/id/module'
 import type { ModuleOptions } from '@happydesigns/id/module'
+import preview from '@happydesigns/id/preview'
+import type { PreviewOptions } from '@happydesigns/id/preview'
+const previewOptions: PreviewOptions = { studioOrigin: 'http://localhost:3000', id: 'app' }
+defineNuxtConfig({ modules: [[preview, previewOptions]] })
 const options: ModuleOptions = { name: 'brand', componentPrefix: 'Brand' }
 export default defineNuxtConfig({ modules: [id], id: options })
 // @ts-expect-error Module options must retain their types.

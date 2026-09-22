@@ -5,6 +5,7 @@ export interface StudioTemplate {
   description: string
   thumbnail?: string
   component?: string
+  origin?: string
   route?: string
   routePrefix?: string
   owner?: string
@@ -20,8 +21,10 @@ export function studioTemplates(input?: unknown): StudioTemplate[] {
     const item = value as Record<string, unknown>
     const thumbnail = typeof item.thumbnail === 'string' && item.thumbnail.startsWith('/') && !item.thumbnail.startsWith('//') && !item.thumbnail.includes('..') ? item.thumbnail : undefined
     if (typeof item.label !== 'string' || !item.label.trim()) continue
+    const origin = item.origin === undefined ? undefined : studioOrigin(item.origin)
+    if (item.origin !== undefined && !origin) continue
     if (isStudioRoute(item.route) && isStudioRoute(item.routePrefix) && withinStudioRoute(item.route, item.routePrefix)) {
-      result.push({ id, label: item.label, description: typeof item.description === 'string' ? item.description : '', thumbnail, route: item.route, routePrefix: item.routePrefix, owner: typeof item.owner === 'string' ? item.owner : undefined, pages: [{ id: 'home', label: 'Home' }] })
+      result.push({ id, label: item.label, description: typeof item.description === 'string' ? item.description : '', thumbnail, origin, route: item.route, routePrefix: item.routePrefix, owner: typeof item.owner === 'string' ? item.owner : undefined, pages: [{ id: 'home', label: 'Home' }] })
       continue
     }
     if (typeof item.label !== 'string' || !item.label.trim() || typeof item.component !== 'string' || !/^[A-Z][A-Za-z0-9]+$/.test(item.component)) continue
@@ -33,9 +36,36 @@ export function studioTemplates(input?: unknown): StudioTemplate[] {
 }
 
 export function isStudioRoute(value: unknown): value is string {
-  return typeof value === 'string' && /^\/[a-zA-Z0-9_/-]+$/.test(value) && !value.includes('//') && !value.split('/').some(part => ['studio', 'api', '_nuxt', '..'].includes(part))
+  return typeof value === 'string' && /^\/[a-zA-Z0-9_/-]*$/.test(value) && !value.includes('//') && !value.split('/').some(part => ['studio', 'api', '_nuxt', '..'].includes(part))
 }
 
 export function withinStudioRoute(path: unknown, prefix: string): path is string {
-  return isStudioRoute(path) && (path === prefix || path.startsWith(`${prefix}/`))
+  const base = prefix.replace(/\/$/, '')
+  return isStudioRoute(path) && (base === '' || path === base || path.startsWith(`${base}/`))
+}
+
+export function studioOrigin(value: unknown): string | undefined {
+  if (typeof value !== 'string') return
+  try {
+    const url = new URL(value)
+    if (['http:', 'https:'].includes(url.protocol) && !url.username && !url.password && url.pathname === '/' && !url.search && !url.hash) return url.origin
+  }
+  catch { /* Invalid host configuration. */ }
+}
+
+export function studioFrameUrl(template: StudioTemplate | undefined, frame: string, hostOrigin: string, session: string): string {
+  const url = new URL(template?.route || '/studio/preview', template?.origin || hostOrigin)
+  url.searchParams.set('frame', frame)
+  if (template?.route) url.searchParams.set('idPreview', template.id)
+  if (template?.origin) {
+    url.searchParams.set('idStudioOrigin', hostOrigin)
+    url.searchParams.set('idSession', session)
+  }
+  return url.href
+}
+
+export function acceptsStudioFrame(event: MessageEvent, frame: HTMLIFrameElement | undefined): boolean {
+  if (!frame || event.source !== frame.contentWindow) return false
+  const url = new URL(frame.src)
+  return event.origin === url.origin && (!url.searchParams.has('idSession') || event.data?.session === url.searchParams.get('idSession'))
 }

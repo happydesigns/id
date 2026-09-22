@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { StudioDocument } from '../../../src/studio'
-import type { StudioTemplate } from '../../templates'
+import { studioFrameUrl, acceptsStudioFrame, type StudioTemplate } from '../../templates'
 
 const props = defineProps<{
   template: StudioTemplate
@@ -17,9 +17,8 @@ const width = ref(216)
 const started = ref(false)
 const ready = ref(false)
 const failed = ref(false)
-const src = computed(() => props.template.route
-  ? `${props.template.route}?idPreview=${props.template.id}&frame=thumbnail&previewMode=${props.mode}`
-  : `/studio/preview?frame=thumbnail&previewMode=${props.mode}`)
+const session = import.meta.client ? crypto.randomUUID() : ''
+const src = computed(() => import.meta.client ? studioFrameUrl(props.template, 'thumbnail', window.location.origin, session) + '&previewMode=' + props.mode : '')
 let observer: IntersectionObserver | undefined
 let resize: ResizeObserver | undefined
 let timeout: ReturnType<typeof setTimeout> | undefined
@@ -35,16 +34,17 @@ function finish() {
 function send() {
   frame.value?.contentWindow?.postMessage({
     type: 'id-studio-preview',
+    session,
     document: JSON.parse(JSON.stringify(props.document)),
     scene: props.template.id,
     page: props.template.pages[0]?.id || 'home',
     path: props.template.route,
     mode: props.mode,
     state: 'default',
-  }, window.location.origin)
+  }, props.template.origin || window.location.origin)
 }
 function receive(event: MessageEvent) {
-  if (event.origin !== window.location.origin || event.source !== frame.value?.contentWindow) return
+  if (!acceptsStudioFrame(event, frame.value)) return
   if (event.data?.type === 'id-studio-ready') send()
   if (event.data?.type === 'id-studio-rendered') {
     ready.value = true

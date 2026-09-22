@@ -22,7 +22,8 @@
   "include": [
     "src/**/*.ts",
     "themes/**/*.ts",
-    "module.ts"
+    "module.ts",
+    "preview-module.ts"
   ],
   "exclude": [
     "dist",
