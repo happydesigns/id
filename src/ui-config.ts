@@ -6,7 +6,7 @@ export function copyConfig<T>(value: T): T {
   return value
 }
 /** Remove only seed-owned declarations; retain explicit consumer overrides. */
-export function replaceThemeUi(host: Config, seed: Config, draft: Config): Config {
+export function replaceThemeUi(host: Config, seed: Config, draft: Config, appUi: Config = {}): Config {
   function without(base: Config, owned: Config): Config {
     const result = copyConfig(base)
     for (const key of Object.keys(owned)) {
@@ -26,5 +26,5 @@ export function replaceThemeUi(host: Config, seed: Config, draft: Config): Confi
   const result = merge(merge({ colors: { primary: 'green', secondary: 'blue', success: 'green', info: 'blue', warning: 'yellow', error: 'red', neutral: 'slate' } }, draft), without(host, seed))
   // An explicit icon choice must also replace Nuxt's host-provided defaults.
   if (object(draft.icons)) result.icons = merge(object(result.icons) ? result.icons : {}, draft.icons)
-  return result
+  return merge(result, appUi)
 }

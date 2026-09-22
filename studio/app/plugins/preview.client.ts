@@ -13,13 +13,13 @@ export default defineNuxtPlugin({
     const thumbnail = initial.query.frame === 'thumbnail'
     if (window.parent === window || typeof initial.query.idPreview !== 'string') return
     const config = useAppConfig() as unknown as PreviewAppConfig
-    const remote = useRuntimeConfig().public.idStudioPreview as { studioOrigin: string, id: string, routePrefix: string, brandUi?: Record<string, unknown> } | undefined
+    const remote = useRuntimeConfig().public.idStudioPreview as { studioOrigin: string, id: string, routePrefix: string, brandUi?: Record<string, unknown>, appUi?: Record<string, unknown> } | undefined
     const session = typeof initial.query.idSession === 'string' ? initial.query.idSession : ''
     const external = !!remote && initial.query.idStudioOrigin === remote.studioOrigin && initial.query.idPreview === remote.id && /^[a-f0-9-]{36}$/.test(session) && withinStudioRoute(initial.path, remote.routePrefix)
     const parentOrigin = external ? remote!.studioOrigin : window.location.origin
     const template = external ? { id: remote!.id, routePrefix: remote!.routePrefix } : studioTemplates(config.idStudio?.templates).find(item => item.id === initial.query.idPreview && item.routePrefix && withinStudioRoute(initial.path, item.routePrefix))
     if (!template?.routePrefix) return
-    const applyBrand = createPreviewBrand(config, remote?.brandUi)
+    const applyBrand = createPreviewBrand(config, remote?.brandUi, remote?.appUi)
     const style = ref('')
     const status = ref('loading')
     const colorMode = useColorMode()

@@ -48,12 +48,13 @@ export interface PreviewAppConfig {
 }
 
 /** Capture the host once so repeated drafts never become their own baseline. */
-export function createPreviewBrand(config: PreviewAppConfig, brandUi?: Config) {
+export function createPreviewBrand(config: PreviewAppConfig, brandUi?: Config, appUi: Config = {}) {
   const hostUi = copyConfig(config.ui ?? {})
   const seedUi = copyConfig(brandUi ?? config.idStudio?.document?.theme.ui ?? config.id?.theme.ui ?? {})
+  const overrides = copyConfig(appUi)
   const header = config.header ? copyConfig(config.header) : undefined
   return (doc: StudioDocument) => {
-    config.ui = replaceThemeUi(hostUi, seedUi, doc.theme.ui ?? {})
+    config.ui = replaceThemeUi(hostUi, seedUi, doc.theme.ui ?? {}, overrides)
     config.brand = { name: doc.theme.label ?? doc.brand.name, assets: doc.brand.assets }
     if (header) config.header = docusBrandHeader(doc, header)
     if (config.idStudio) config.idStudio.document = doc

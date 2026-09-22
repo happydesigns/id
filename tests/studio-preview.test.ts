@@ -35,3 +35,19 @@ it('does not install optional Guide or identity configuration in a native app', 
   expect(config).not.toHaveProperty('id')
   expect(config).not.toHaveProperty('idStudio')
 })
+
+it('preserves explicit app overrides even when they equal the original brand', () => {
+  const seed = { button: { defaultVariants: { variant: 'outline', size: 'md' } }, icons: { close: 'i-lucide-x' } }
+  const appUi = { button: { defaultVariants: { variant: 'outline' } }, icons: { close: 'i-lucide-x' } }
+  const config: PreviewAppConfig = { ui: structuredClone(seed) }
+  const apply = createPreviewBrand(config, seed, appUi)
+  const draft = createBlankStudioDocument()
+  draft.theme.ui = { button: { defaultVariants: { variant: 'solid', size: 'lg' } }, icons: { close: 'i-lucide-check' } }
+  apply(draft)
+  expect(config.ui.button).toEqual({ defaultVariants: { variant: 'outline', size: 'lg' } })
+  expect(config.ui.icons).toEqual({ close: 'i-lucide-x' })
+  apply(createBlankStudioDocument())
+  expect(config.ui.button).toEqual({ defaultVariants: { variant: 'outline' } })
+  expect(appUi.button.defaultVariants.variant).toBe('outline')
+  expect(seed.button.defaultVariants.size).toBe('md')
+})

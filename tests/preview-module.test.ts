@@ -7,7 +7,7 @@ const { default: module } = await import('../preview-module')
 const setup = (module as unknown as { setup: (options: unknown, nuxt: unknown) => void }).setup
 
 it('registers only the preview plugin in development and nothing in production', () => {
-  const options = { studioOrigin: 'http://localhost:3000', id: 'shop', routePrefix: '/shop' }
+  const options = { studioOrigin: 'http://localhost:3000', id: 'shop', routePrefix: '/shop', appUi: { button: { defaultVariants: { variant: 'outline' } } } }
   const production = { options: { dev: false, runtimeConfig: { public: {} } } }
   setup(options, production)
   expect(addPlugin).not.toHaveBeenCalled()
@@ -16,6 +16,7 @@ it('registers only the preview plugin in development and nothing in production',
   setup(options, dev)
   expect(addPlugin).toHaveBeenCalledTimes(1)
   expect(dev.options.runtimeConfig.public).toHaveProperty('idStudioPreview.studioOrigin', options.studioOrigin)
+  expect(dev.options.runtimeConfig.public).toHaveProperty('idStudioPreview.appUi', options.appUi)
 })
 
 it('requires exact origins and bounded app routes', () => {
