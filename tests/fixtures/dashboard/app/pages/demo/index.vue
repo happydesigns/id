@@ -9,10 +9,13 @@ const validate = (value: typeof state): FormError[] => value.email.includes('@')
 
 <template>
   <main class="mx-auto max-w-3xl space-y-6 p-8 font-sans">
-    <h1 class="text-3xl font-bold">
+    <h1
+      data-testid="brand-heading"
+      class="text-3xl font-bold"
+    >
       Operations dashboard
     </h1>
-    <UCard>
+    <UCard data-testid="brand-surface">
       <p>Open requests</p><p class="text-3xl font-bold text-primary">
         12
       </p>

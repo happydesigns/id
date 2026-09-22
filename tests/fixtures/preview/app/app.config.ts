@@ -1,1 +1,3 @@
-export default defineAppConfig({ appTitle: 'Catalog workspace', ui: { button: { slots: { base: 'tracking-wide' } } } })
+import { appUi } from './ui'
+
+export default defineAppConfig({ appTitle: 'Catalog workspace', ui: appUi })

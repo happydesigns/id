@@ -16,7 +16,7 @@ for (const brand of ['violet', 'amber']) test('edit, preview and export ' + bran
   document.theme.label = brand
   document.brand.typography = { sans: brand === 'violet' ? 'Georgia, serif' : 'Arial, sans-serif' }
   document.theme.cssVariables = { light: { '--ui-radius': brand === 'violet' ? '0.75rem' : '0rem' } }
-  document.theme.ui!.button = { defaultVariants: { size: brand === 'violet' ? 'lg' : 'sm' } }
+  document.theme.ui!.button = { defaultVariants: { variant: 'solid', size: brand === 'violet' ? 'lg' : 'sm' } }
   const src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a1WQAAAAASUVORK5CYII='
   document.brand.assets = { logos: Object.fromEntries(['wordmark', 'wordmarkInverse'].map(role => [role, { name: role, role, src, alt: brand }])) }
   document.extension = { preserved: 'workflow' }
@@ -31,12 +31,14 @@ for (const brand of ['violet', 'amber']) test('edit, preview and export ' + bran
   await expect.poll(async () => (await appearance(draft)).primary).not.toBe(before)
   const measurements: Record<string, unknown> = {}
   for (const [kind, view] of [['catalog', 'external'], ['dashboard', 'dashboard']] as const) {
-    for (const mode of ['light', 'dark']) {
-      await page.goto('/editor?view=' + view + '&editor=colors&mode=' + mode)
+    for (const width of [390, 960]) for (const mode of ['light', 'dark']) {
+      await page.goto('/editor?view=' + view + '&width=' + width + '&height=900&mode=' + mode)
       await expect(draft.locator('html')).toHaveAttribute('data-id-preview', 'ready', { timeout: 120_000 })
       await expect(draft.locator('html')).toHaveClass(new RegExp(mode))
-      await exerciseApp(draft, kind)
-      measurements[kind + '-' + mode] = await appearance(draft)
+      await expect(draft.locator('html')).toHaveJSProperty('clientWidth', width)
+      const states = await exerciseApp(draft, kind)
+      expect(await draft.locator('body').evaluate(body => body.scrollWidth <= body.ownerDocument.documentElement.clientWidth)).toBe(true)
+      measurements[kind + '-' + width + '-' + mode] = { ...await appearance(draft), states }
       await expect(draft.getByRole('img', { name: brand, exact: true })).toBeVisible()
     }
   }

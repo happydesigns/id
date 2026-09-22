@@ -8,7 +8,10 @@ const filtered = computed(() => products.filter(product => product.toLowerCase()
 
 <template>
   <main class="mx-auto max-w-3xl space-y-6 p-8 font-sans">
-    <h1 class="text-3xl font-bold">
+    <h1
+      data-testid="brand-heading"
+      class="text-3xl font-bold"
+    >
       Independent app
     </h1>
     <p>Find equipment for your workspace.</p>
@@ -20,7 +23,7 @@ const filtered = computed(() => products.filter(product => product.toLowerCase()
         v-for="product in filtered"
         :key="product"
       >
-        <UCard>
+        <UCard data-testid="brand-surface">
           <h2>{{ product }}</h2><UButton
             :aria-label="'Add ' + product"
             @click="count++"

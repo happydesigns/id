@@ -12,15 +12,20 @@ for (const [brand, kind, port] of [
     if (/hydration.*mismatch/i.test(message.text())) errors.push(message.text())
   })
   const expected = JSON.parse(await readFile('.output/workflow/' + brand + '-appearance.json', 'utf8'))
-  await page.goto('http://127.0.0.1:' + port + '/demo')
-  await exerciseApp(page, kind)
-  for (const mode of ['light', 'dark']) {
-    if (mode === 'dark') await page.getByRole('button', { name: 'Toggle mode', exact: true }).click()
-    await expect(page.locator('html')).toHaveClass(new RegExp(mode))
-    await expect.poll(() => appearance(page)).toEqual(expected[kind + '-' + mode])
-    const logo = page.getByRole('img', { name: brand, exact: true })
-    await expect(logo).toBeVisible()
-    await expect.poll(() => logo.evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
+  for (const width of [390, 960]) {
+    await page.setViewportSize({ width, height: 900 })
+    for (const mode of ['light', 'dark']) {
+      await page.goto('http://127.0.0.1:' + port + '/demo')
+      if (await page.locator('html').evaluate(el => el.classList.contains('dark')) !== (mode === 'dark')) await page.getByRole('button', { name: 'Toggle mode', exact: true }).click()
+      await expect(page.locator('html')).toHaveClass(new RegExp(mode))
+      const states = await exerciseApp(page, kind)
+      await expect.poll(async () => ({ ...await appearance(page), states })).toEqual(expected[kind + '-' + width + '-' + mode])
+      const logo = page.getByRole('img', { name: brand, exact: true })
+      await expect(logo).toBeVisible()
+      await expect.poll(() => logo.evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
+    }
+    expect(await page.evaluate(() => document.body.scrollWidth <= innerWidth)).toBe(true)
+    await page.screenshot({ path: '.output/tests/' + kind + '-' + brand + '-' + width + '.png', fullPage: true })
   }
   await expect(page.locator('html')).not.toHaveAttribute('data-id-preview')
   expect(errors).toEqual([])
