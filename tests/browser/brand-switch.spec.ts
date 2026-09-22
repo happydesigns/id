@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 for (const [index, brand] of ['violet', 'amber'].entries()) test('same application with native brand: ' + brand, async ({ page }) => {
   await page.goto('http://127.0.0.1:' + (3440 + index))
+  await expect(page.getByText('Custom application', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Continue 0', exact: true }).click()
   const action = page.getByRole('button', { name: 'Continue 1', exact: true })
   await expect(action).toBeVisible()

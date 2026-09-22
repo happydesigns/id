@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import brand from '../brand.assets.json'
+import generated from '../brand.config'
+
+const brand = generated.brand as { name: string, assets: { logos?: Record<string, Logo> } }
 
 type Logo = { src: string, alt?: string }
 const config = useAppConfig() as unknown as {
   brand?: { name: string, assets?: { logos?: Record<string, Logo> } }
 }
-const assets = computed(() => config.brand?.assets?.logos ?? brand.logos as Record<string, Logo>)
+const assets = computed(() => config.brand?.assets?.logos ?? brand.assets.logos ?? {})
 const light = computed(() => assets.value.wordmark ?? assets.value.logo)
 const dark = computed(() => assets.value.wordmarkInverse ?? assets.value.logoInverse ?? light.value)
 </script>

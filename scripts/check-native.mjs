@@ -70,14 +70,16 @@ run(process.execPath, ['generate.mjs'], author)
 const app = `<script setup lang="ts">
 const count = ref(0)
 const mode = useColorMode()
+const config = useAppConfig()
 </script>
-<template><UApp><main class="font-sans"><BrandLogo /><h1>Independent consumer</h1><UButton @click="count++">Continue {{ count }}</UButton><UButton color="neutral" @click="mode.preference = mode.value === 'dark' ? 'light' : 'dark'">Toggle mode</UButton></main></UApp></template>`
+<template><UApp><main class="font-sans"><BrandLogo /><h1>Independent consumer</h1><p>{{ config.appTitle }}</p><UButton @click="count++">Continue {{ count }}</UButton><UButton color="neutral" @click="mode.preference = mode.value === 'dark' ? 'light' : 'dark'">Toggle mode</UButton></main></UApp></template>`
 for (const name of ['violet', 'amber']) {
   const brand = join(workspace, name)
   const manifest = JSON.parse(readFileSync(join(brand, 'package.json'), 'utf8'))
   manifest.version = '0.0.0'
   manifest.devDependencies['@happydesigns/id'] = 'file:' + archive.replaceAll('\\', '/')
   write(brand, 'package.json', JSON.stringify(manifest))
+  write(brand, 'app/app.config.ts', readFileSync(join(brand, 'app/app.config.ts'), 'utf8').replace('defineAppConfig(brand)', 'defineAppConfig({ ...brand, appTitle: \'Custom application\' })'))
   assert.equal(manifest.dependencies['@happydesigns/id'], undefined)
   assert.equal(manifest.devDependencies.docus, undefined)
   run('npm', ['pack', '--ignore-scripts'], brand)

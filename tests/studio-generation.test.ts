@@ -33,7 +33,7 @@ async function project(guide = false) {
 it.each([false, true])('regenerates only owned files and preserves custom code (guide: %s)', async (guide) => {
   const { directory, document, files, generate } = await project(guide)
   const custom = {
-    'app/app.config.ts': files['app/app.config.ts'] + '\n// Application-owned settings\n',
+    'app/app.config.ts': files['app/app.config.ts']!.replace('defineAppConfig(brand)', 'defineAppConfig({ ...brand, appTitle: \'My application\' })'),
     'app/components/BrandLogo.vue': '<template><span>My logo</span></template>\n',
     'app/pages/custom.vue': '<template><h1>My page</h1></template>\n',
     'app/assets/css/custom.css': '.custom { display: grid; }\n',
@@ -49,7 +49,7 @@ it.each([false, true])('regenerates only owned files and preserves custom code (
   await writeFile(join(directory, 'brand.studio.json'), source)
   await generate()
   const output = createStudioRuntimeFiles(document, { styles: 'fragment', config: 'fragment' })
-  expect(Object.keys(output)).toEqual(['app/brand.config.ts', 'app/assets/css/brand.css', 'app/brand.assets.json'])
+  expect(Object.keys(output)).toEqual(['app/brand.config.ts', 'app/assets/css/brand.css'])
   for (const [path, content] of Object.entries(output)) expect(await readFile(join(directory, path), 'utf8')).toBe(content)
   for (const [path, content] of Object.entries({ ...files, ...custom, 'brand.studio.json': source })) {
     if (!(path in output)) expect(await readFile(join(directory, path), 'utf8')).toBe(content)
@@ -81,7 +81,7 @@ it('validates the entire source before writing output and removes obsolete gener
 
 it('reports unreadable output instead of overwriting it or earlier files', async () => {
   const { directory, document, files, generate } = await project()
-  const target = join(directory, 'app/brand.assets.json')
+  const target = join(directory, 'app/assets/css/brand.css')
   await rm(target)
   await mkdir(target)
   document.theme.ui!.colors!.primary = 'violet'

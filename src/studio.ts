@@ -138,7 +138,7 @@ export function createStudioRuntimeFiles(input: StudioDocument, options: { style
     'app/assets/css/brand.css': options.styles === 'fragment'
       ? `/* Generated from brand.studio.json. Import after Tailwind and Nuxt UI in the host CSS entry. */\n${createStudioCss(doc)}\n`
       : `/* Generated from brand.studio.json. */\n@import "tailwindcss";\n@import "@nuxt/ui";\n@source "../../${options.config === 'fragment' ? 'brand.config.ts' : 'app.config.ts'}";\n${createStudioCss(doc)}\n`,
-    'app/brand.assets.json': `${json({ name: doc.theme.label, logos: doc.brand.assets?.logos ?? {} })}\n`,
+    ...(options.config === 'fragment' ? {} : { 'app/brand.assets.json': `${json({ name: doc.theme.label, logos: doc.brand.assets?.logos ?? {} })}\n` }),
   }
 }
 
