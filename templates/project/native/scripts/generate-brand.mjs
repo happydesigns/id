@@ -7,16 +7,22 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 
 export function generateBrand() {
   const source = JSON.parse(readFileSync(resolve(root, 'brand.studio.json'), 'utf8'))
-  const files = createStudioRuntimeFiles(source, { styles: 'fragment' })
-  for (const [path, content] of Object.entries(files)) {
+  const files = createStudioRuntimeFiles(source, { styles: 'fragment', config: 'fragment' })
+  const changed = Object.entries(files).filter(([path, content]) => {
     const target = resolve(root, path)
-    mkdirSync(dirname(target), { recursive: true })
-    let previous = ''
+    let previous
     try {
       previous = readFileSync(target, 'utf8')
     }
-    catch { /* First generation. */ }
-    if (previous !== content) writeFileSync(target, content, 'utf8')
+    catch (error) {
+      if (error.code !== 'ENOENT') throw error
+    }
+    return previous !== content
+  })
+  for (const [path, content] of changed) {
+    const target = resolve(root, path)
+    mkdirSync(dirname(target), { recursive: true })
+    writeFileSync(target, content, 'utf8')
   }
 }
 
