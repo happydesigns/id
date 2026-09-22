@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
+const documents = resolve('.output/workflow')
+for (const brand of ['violet', 'amber']) assert.ok(existsSync(join(documents, brand + '.json')), 'Run pnpm test:authoring before check:native')
 const archive = resolve(process.argv[2] || '.output/studio-package/id.tgz')
 const workspace = mkdtempSync(join(tmpdir(), 'id-native-consumer-'))
 console.log('Isolated package check:', workspace)
@@ -45,20 +47,17 @@ const entrypoints = Object.entries(manifest.exports).filter(([, entry]) => typeo
 write(author, 'imports.mjs', 'for (const entry of ' + JSON.stringify(entrypoints) + ') await import(entry, entry.endsWith("/package.json") ? { with: { type: "json" } } : {})')
 run(process.execPath, ['imports.mjs'], author)
 write(author, 'generate.mjs', `
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { createBlankStudioDocument, createStudioProject } from '@happydesigns/id/studio/core'
 for (const name of ['violet', 'amber', 'guide']) {
-  const doc = createBlankStudioDocument()
-  doc.brand.name = name
-  doc.brand.packageName = '@id-test/brand'
-  doc.theme.label = name
-  doc.theme.ui.colors.primary = name === 'guide' ? 'violet' : name
-  doc.brand.typography.sans = name === 'violet' ? 'Georgia, serif' : 'Arial, sans-serif'
-  doc.theme.cssVariables = { light: { '--ui-primary': name === 'violet' ? '#7c3aed' : '#b45309' }, dark: { '--ui-primary': name === 'violet' ? '#c4b5fd' : '#fcd34d' } }
-  doc.brand.assets = { logos: Object.fromEntries(['wordmark', 'wordmarkInverse'].map(role => [role, { name: role, role, src: '/' + name + '-' + role + '.svg', alt: name }])) }
+  const doc = name === 'guide' ? createBlankStudioDocument() : JSON.parse(readFileSync(resolve(${JSON.stringify(documents)}, name + '.json'), 'utf8'))
+  if (name === 'guide') {
+    doc.brand.name = name
+    doc.brand.packageName = '@id-test/brand'
+    doc.theme.label = name
+  }
   const files = createStudioProject(doc, { guide: name === 'guide' })
-  for (const asset of Object.values(doc.brand.assets.logos)) files['public' + asset.src] = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="24"><text x="0" y="18">' + name + '</text></svg>'
   for (const [path, value] of Object.entries(files)) {
     const target = resolve('../' + name, path)
     mkdirSync(dirname(target), { recursive: true })
@@ -67,12 +66,6 @@ for (const name of ['violet', 'amber', 'guide']) {
 }
 `)
 run(process.execPath, ['generate.mjs'], author)
-const app = `<script setup lang="ts">
-const count = ref(0)
-const mode = useColorMode()
-const config = useAppConfig()
-</script>
-<template><UApp><main class="font-sans"><BrandLogo /><h1>Independent consumer</h1><p>{{ config.appTitle }}</p><UButton @click="count++">Continue {{ count }}</UButton><UButton color="neutral" @click="mode.preference = mode.value === 'dark' ? 'light' : 'dark'">Toggle mode</UButton></main></UApp></template>`
 for (const name of ['violet', 'amber']) {
   const brand = join(workspace, name)
   const manifest = JSON.parse(readFileSync(join(brand, 'package.json'), 'utf8'))
@@ -83,20 +76,27 @@ for (const name of ['violet', 'amber']) {
   assert.equal(manifest.dependencies['@happydesigns/id'], undefined)
   assert.equal(manifest.devDependencies.docus, undefined)
   run('npm', ['pack', '--ignore-scripts'], brand)
-  const consumer = join(workspace, 'consumer-' + name)
-  write(consumer, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: {
-    '@id-test/brand': 'file:../' + name + '/id-test-brand-0.0.0.tgz', 'nuxt': manifest.devDependencies.nuxt,
-  } }))
-  write(consumer, 'nuxt.config.ts', `export default defineNuxtConfig({ extends: ['@id-test/brand'], css: ['~/assets/css/main.css'], compatibilityDate: '2026-08-01', ui: { fonts: false }, colorMode: { preference: 'light' } })`)
-  write(consumer, 'app/assets/css/main.css', '@import "tailwindcss";\n@import "@nuxt/ui";\n@import "@id-test/brand/styles.css";\n')
-  write(consumer, 'app/app.vue', app)
-  run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], consumer)
-  const lock = JSON.parse(readFileSync(join(consumer, 'package-lock.json'), 'utf8'))
-  for (const dependency of Object.keys(lock.packages)) {
-    assert.ok(!/(?:^|\/)node_modules\/(?:@happydesigns\/id|docus)$/.test(dependency), 'Unexpected authoring runtime: ' + dependency)
+  for (const kind of ['catalog', 'dashboard']) {
+    const outputName = name + (kind === 'dashboard' ? '-dashboard' : '')
+    const consumer = join(workspace, 'consumer-' + outputName)
+    write(consumer, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: {
+      '@id-test/brand': 'file:../' + name + '/id-test-brand-0.0.0.tgz', 'nuxt': manifest.devDependencies.nuxt,
+    } }))
+    write(consumer, 'nuxt.config.ts', `export default defineNuxtConfig({ extends: ['@id-test/brand'], css: ['~/main.css'], compatibilityDate: '2026-08-01', ui: { fonts: false }, colorMode: { preference: 'light' } })`)
+    cpSync(resolve('tests/fixtures', kind === 'catalog' ? 'preview' : 'dashboard', 'app'), join(consumer, 'app'), { recursive: true })
+    const css = readFileSync(join(consumer, 'app/main.css'), 'utf8')
+    write(consumer, 'app/main.css', css + '\n@import "@id-test/brand/styles.css";\n')
+    run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], consumer)
+    const lock = JSON.parse(readFileSync(join(consumer, 'package-lock.json'), 'utf8'))
+    for (const dependency of Object.keys(lock.packages)) {
+      assert.ok(!/(?:^|\/)node_modules\/(?:@happydesigns\/id|docus)$/.test(dependency), 'Unexpected authoring runtime: ' + dependency)
+    }
+    run(process.execPath, ['node_modules/nuxt/bin/nuxt.mjs', 'generate'], consumer)
+    cpSync(join(consumer, '.output/public'), resolve('.output/native-consumers', outputName), { recursive: true })
+    for (const file of readdirSync(join(consumer, '.output/public/_nuxt'))) {
+      if (file.endsWith('.js')) assert.doesNotMatch(readFileSync(join(consumer, '.output/public/_nuxt', file), 'utf8'), /id-studio-route-preview|idStudioPreview/, 'Preview runtime shipped to production')
+    }
   }
-  run(process.execPath, ['node_modules/nuxt/bin/nuxt.mjs', 'generate'], consumer)
-  cpSync(join(consumer, '.output/public'), resolve('.output/native-consumers', name), { recursive: true })
   if (name === 'violet') {
     // Validate the actual exported Studio host without Docus, not just its manifest.
     run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], brand)
@@ -105,8 +105,12 @@ for (const name of ['violet', 'amber']) {
     cpSync(join(brand, 'playground/.output/public'), resolve('.output/native-consumers/studio'), { recursive: true })
   }
 }
-assert.equal(readFileSync(join(workspace, 'consumer-violet/app/app.vue'), 'utf8'), readFileSync(join(workspace, 'consumer-amber/app/app.vue'), 'utf8'))
-console.log('PASS: identical application generated with two packed native brands without ID or Docus; exported Studio generated without Docus.')
+for (const suffix of ['', '-dashboard']) {
+  for (const file of ['app.vue', 'app.config.ts', 'pages/demo/index.vue']) {
+    assert.equal(readFileSync(join(workspace, 'consumer-violet' + suffix, 'app', file), 'utf8'), readFileSync(join(workspace, 'consumer-amber' + suffix, 'app', file), 'utf8'), 'App source changed with brand: ' + file)
+  }
+}
+console.log('PASS: browser-exported brands built in two independent apps without ID, preview runtime or Docus; application source preserved.')
 console.log('Fixture retained for diagnosis:', workspace)
 
 const guide = join(workspace, 'guide')

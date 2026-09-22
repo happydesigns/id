@@ -32,6 +32,9 @@ function recolor(document: DeepReadonly<StudioDocument>, change: (document: Stud
         <UButton @click="recolor(document, change, 'violet')">
           Use violet
         </UButton>
+        <UButton @click="recolor(document, change, 'amber')">
+          Use amber
+        </UButton>
         <UButton @click="recolor(document, change, 'missing-palette')">
           Try invalid palette
         </UButton>

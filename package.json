@@ -101,7 +101,8 @@
     "test:browser": "playwright test",
     "release:preview": "changelogen --no-output",
     "release": "pnpm verify && changelogen --release --no-github --clean",
-    "release:notes": "node scripts/release-notes.mjs"
+    "release:notes": "node scripts/release-notes.mjs",
+    "test:authoring": "playwright test --config playwright.authoring.config.ts"
   },
   "dependencies": {
     "@nuxt/kit": "catalog:",
