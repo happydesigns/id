@@ -19,6 +19,8 @@ The repository's `nuxt.config.ts` is development tooling. Published layer entryp
 
 ## Detailed documentation
 
+- [Product vision](docs/content/2.concepts/4.product-vision.md): intended DevTools and brand-portal workflows, reusable previews and upstream ownership.
+
 - [Architecture](docs/content/5.development/1.architecture.md): directory responsibilities, package entrypoints, editor contracts and generated-file ownership.
 - [Verification](docs/content/5.development/2.verification.md): native workflow proof and framework constraints.
 - [Roadmap](docs/content/5.development/4.roadmap.md): the six-step plan, current assessment and remaining work.
