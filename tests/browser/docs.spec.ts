@@ -7,7 +7,10 @@ test('theme round trip restores component defaults', async ({ page }) => {
   await page.goto(base)
   const theme = page.getByRole('banner').getByRole('combobox', { name: 'Theme', exact: true }).first()
   const mode = page.getByRole('banner').getByRole('button', { name: /Switch to .* mode/ }).first()
+  const footerMode = page.getByRole('contentinfo').getByRole('button', { name: /Switch to .* mode/ }).first()
   await expect(mode).toBeVisible()
+  await expect(footerMode).toBeVisible()
+  const navigationBackgrounds = () => Promise.all([mode, footerMode].map(button => button.evaluate(element => getComputedStyle(element).backgroundColor)))
   const appearance = () => mode.evaluate((element) => {
     const style = getComputedStyle(element)
     return { background: style.backgroundColor, color: style.color, radius: style.borderRadius }
@@ -19,16 +22,17 @@ test('theme round trip restores component defaults', async ({ page }) => {
   await theme.click()
   await page.getByRole('option', { name: 'Sample Brand', exact: true }).click()
   await page.getByRole('heading', { level: 1 }).hover()
-  await expect.poll(async () => (await appearance()).background).toBe('rgba(0, 0, 0, 0)')
+  await expect.poll(navigationBackgrounds).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'])
   await expect.poll(() => page.getByRole('link', { name: 'Read the docs', exact: true }).evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
   await mode.click()
   await page.getByRole('heading', { level: 1 }).hover()
-  await expect.poll(async () => (await appearance()).background).toBe('rgba(0, 0, 0, 0)')
+  await expect.poll(navigationBackgrounds).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'])
   await mode.click()
   await theme.click()
   await page.getByRole('option', { name: 'Nuxt UI', exact: true }).click()
   await page.getByRole('heading', { level: 1 }).hover()
   await expect.poll(appearance).toEqual(original)
+  await expect.poll(navigationBackgrounds).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'])
 })
 
 test('Studio edits follow the selected profile into docs and survive reload', async ({ page }) => {

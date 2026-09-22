@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import DocusHeader from 'docus/app/components/app/AppHeader.vue'
+import DocusFooter from 'docus/app/components/app/AppFooter.vue'
 </script>
 
 <template>
   <AppNavigationTheme>
-    <DocusHeader />
+    <DocusFooter />
   </AppNavigationTheme>
 </template>
