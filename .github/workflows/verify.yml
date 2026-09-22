@@ -31,6 +31,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm build:package
+      - run: pnpm exec nuxt prepare
       - run: pnpm exec vitest run tests/package-types.test.ts tests/studio-project.test.ts tests/studio-http.test.ts tests/studio-package.test.ts
 
   verify:
