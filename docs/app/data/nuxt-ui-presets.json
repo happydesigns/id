@@ -1,0 +1,1112 @@
+{
+  "source": "https://github.com/nuxt/ui/blob/bab8c5af30dd4e6cb14d42144e82b9c8863d2cc6/docs/app/utils/theme/engine/presets.ts",
+  "defaults": {
+    "cssVariables": {
+      "light": {
+        "--ui-primary": "var(--ui-color-primary-500)",
+        "--ui-secondary": "var(--ui-color-secondary-500)",
+        "--ui-success": "var(--ui-color-success-500)",
+        "--ui-info": "var(--ui-color-info-500)",
+        "--ui-warning": "var(--ui-color-warning-500)",
+        "--ui-error": "var(--ui-color-error-500)",
+        "--ui-text-dimmed": "var(--ui-color-neutral-400)",
+        "--ui-text-muted": "var(--ui-color-neutral-500)",
+        "--ui-text-toned": "var(--ui-color-neutral-600)",
+        "--ui-text": "var(--ui-color-neutral-700)",
+        "--ui-text-highlighted": "var(--ui-color-neutral-900)",
+        "--ui-text-inverted": "white",
+        "--ui-bg": "white",
+        "--ui-bg-muted": "var(--ui-color-neutral-50)",
+        "--ui-bg-elevated": "var(--ui-color-neutral-100)",
+        "--ui-bg-accented": "var(--ui-color-neutral-200)",
+        "--ui-bg-inverted": "var(--ui-color-neutral-900)",
+        "--ui-border": "var(--ui-color-neutral-200)",
+        "--ui-border-muted": "var(--ui-color-neutral-200)",
+        "--ui-border-accented": "var(--ui-color-neutral-300)",
+        "--ui-border-inverted": "var(--ui-color-neutral-900)",
+        "--ui-radius": "0.25rem"
+      },
+      "dark": {
+        "--ui-primary": "var(--ui-color-primary-400)",
+        "--ui-secondary": "var(--ui-color-secondary-400)",
+        "--ui-success": "var(--ui-color-success-400)",
+        "--ui-info": "var(--ui-color-info-400)",
+        "--ui-warning": "var(--ui-color-warning-400)",
+        "--ui-error": "var(--ui-color-error-400)",
+        "--ui-text-dimmed": "var(--ui-color-neutral-500)",
+        "--ui-text-muted": "var(--ui-color-neutral-400)",
+        "--ui-text-toned": "var(--ui-color-neutral-300)",
+        "--ui-text": "var(--ui-color-neutral-200)",
+        "--ui-text-highlighted": "white",
+        "--ui-text-inverted": "var(--ui-color-neutral-900)",
+        "--ui-bg": "var(--ui-color-neutral-900)",
+        "--ui-bg-muted": "var(--ui-color-neutral-800)",
+        "--ui-bg-elevated": "var(--ui-color-neutral-800)",
+        "--ui-bg-accented": "var(--ui-color-neutral-700)",
+        "--ui-bg-inverted": "white",
+        "--ui-border": "var(--ui-color-neutral-800)",
+        "--ui-border-muted": "var(--ui-color-neutral-700)",
+        "--ui-border-accented": "var(--ui-color-neutral-700)",
+        "--ui-border-inverted": "white",
+        "--ui-radius": "0.25rem"
+      }
+    },
+    "colors": {
+      "primary": "green",
+      "secondary": "blue",
+      "success": "green",
+      "info": "blue",
+      "warning": "yellow",
+      "error": "red",
+      "neutral": "slate"
+    }
+  },
+  "presets": [
+    {
+      "id": "default",
+      "name": "Default",
+      "description": "The stock theme, everything inherited.",
+      "palettes": {},
+      "typography": {
+        "sans": "'Public Sans', sans-serif"
+      },
+      "cssVariables": {
+        "light": {},
+        "dark": {}
+      },
+      "ui": {
+        "colors": {}
+      },
+      "icons": "lucide"
+    },
+    {
+      "id": "mono",
+      "name": "Mono",
+      "description": "Black on a pure gray neutral, generous radius, quiet surfaces.",
+      "palettes": {},
+      "typography": {
+        "sans": "'Geist', sans-serif",
+        "mono": "'Geist Mono', monospace"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-primary": "black",
+          "--ui-text": "var(--ui-color-neutral-900)",
+          "--ui-text-highlighted": "var(--ui-color-neutral-950)",
+          "--ui-bg-muted": "var(--ui-color-neutral-100)",
+          "--ui-radius": "0.5rem"
+        },
+        "dark": {
+          "--ui-primary": "white",
+          "--ui-text": "var(--ui-color-neutral-100)",
+          "--ui-text-highlighted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-950)",
+          "--ui-bg-muted": "var(--ui-color-neutral-900)",
+          "--ui-bg-elevated": "var(--ui-color-neutral-900)",
+          "--ui-bg-accented": "var(--ui-color-neutral-800)",
+          "--ui-radius": "0.5rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "neutral": "neutral"
+        },
+        "input": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "select": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "textarea": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "selectMenu": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputMenu": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputNumber": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputTags": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputDate": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputTime": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "pinInput": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        }
+      },
+      "icons": "lucide"
+    },
+    {
+      "id": "cobalt",
+      "name": "Cobalt",
+      "description": "Utility blue on cool grays, tight corners, flat bordered surfaces.",
+      "palettes": {
+        "cobalt": {
+          "50": "oklch(95.3% 0.022 260.723)",
+          "100": "oklch(90.8% 0.045 258.763)",
+          "200": "oklch(81.6% 0.091 257.776)",
+          "300": "oklch(72.9% 0.14 258.068)",
+          "400": "oklch(64.7% 0.186 258.256)",
+          "500": "oklch(57.8% 0.228 260.025)",
+          "600": "oklch(49.2% 0.19 259.799)",
+          "700": "oklch(40.2% 0.152 259.656)",
+          "800": "oklch(30.7% 0.109 258.934)",
+          "900": "oklch(20.4% 0.063 257.52)",
+          "950": "oklch(14.7% 0.037 249.929)"
+        },
+        "cobalt-gray": {
+          "50": "oklch(99.1% 0 0)",
+          "100": "oklch(98.2% 0.002 247.839)",
+          "200": "oklch(94.2% 0.005 247.879)",
+          "300": "oklch(91.1% 0.007 247.901)",
+          "400": "oklch(86.7% 0.011 247.949)",
+          "500": "oklch(76.9% 0.015 248.017)",
+          "600": "oklch(55.8% 0.016 244.893)",
+          "700": "oklch(42.8% 0.015 248.172)",
+          "800": "oklch(34.5% 0.013 248.212)",
+          "900": "oklch(26.2% 0.009 248.19)",
+          "950": "oklch(20.7% 0.008 248.192)"
+        }
+      },
+      "typography": {
+        "sans": "'Roboto', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-secondary": "var(--ui-color-secondary-600)",
+          "--ui-text-dimmed": "var(--ui-color-neutral-600)",
+          "--ui-text-muted": "var(--ui-color-neutral-600)",
+          "--ui-text-toned": "var(--ui-color-neutral-700)",
+          "--ui-text": "var(--ui-color-neutral-800)",
+          "--ui-bg": "var(--ui-color-neutral-100)",
+          "--ui-bg-muted": "var(--ui-color-neutral-200)",
+          "--ui-bg-elevated": "var(--ui-color-neutral-200)",
+          "--ui-bg-accented": "var(--ui-color-neutral-300)",
+          "--ui-border": "var(--ui-color-neutral-400)",
+          "--ui-border-muted": "var(--ui-color-neutral-300)",
+          "--ui-radius": "0.125rem"
+        },
+        "dark": {
+          "--ui-primary": "var(--ui-color-primary-500)",
+          "--ui-secondary": "var(--ui-color-secondary-500)",
+          "--ui-success": "var(--ui-color-success-500)",
+          "--ui-info": "var(--ui-color-info-500)",
+          "--ui-warning": "var(--ui-color-warning-500)",
+          "--ui-error": "var(--ui-color-error-500)",
+          "--ui-text": "var(--ui-color-neutral-300)",
+          "--ui-bg-muted": "var(--ui-color-neutral-700)",
+          "--ui-radius": "0.125rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "cobalt",
+          "secondary": "cobalt-gray",
+          "info": "cyan",
+          "warning": "amber",
+          "neutral": "cobalt-gray"
+        }
+      },
+      "icons": "bootstrap"
+    },
+    {
+      "id": "sky",
+      "name": "Sky",
+      "description": "Sky blue on a mist neutral, pastel fills everywhere, airy type.",
+      "palettes": {},
+      "typography": {
+        "sans": "'Figtree', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-text-inverted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-50)",
+          "--ui-bg-muted": "var(--ui-color-neutral-100)",
+          "--ui-radius": "0.75rem"
+        },
+        "dark": {
+          "--ui-text-highlighted": "var(--ui-color-neutral-50)",
+          "--ui-bg-inverted": "var(--ui-color-neutral-50)",
+          "--ui-border-inverted": "var(--ui-color-neutral-50)",
+          "--ui-radius": "0.75rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "sky",
+          "neutral": "mist"
+        },
+        "button": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "badge": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "input": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "select": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "textarea": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "selectMenu": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputMenu": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputNumber": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputTags": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputDate": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputTime": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "pinInput": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        }
+      },
+      "icons": "lucide"
+    },
+    {
+      "id": "mint",
+      "name": "Mint",
+      "description": "Teal on an olive neutral, pill buttons and fields, chunky rounded type, large controls.",
+      "palettes": {},
+      "typography": {
+        "sans": "'Nunito', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-text-inverted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-50)",
+          "--ui-bg-muted": "var(--ui-color-neutral-100)",
+          "--ui-radius": "0.75rem",
+          "--font-weight-normal": "500",
+          "--font-weight-medium": "600",
+          "--font-weight-semibold": "700",
+          "--font-weight-bold": "800"
+        },
+        "dark": {
+          "--ui-text-highlighted": "var(--ui-color-neutral-50)",
+          "--ui-bg-inverted": "var(--ui-color-neutral-50)",
+          "--ui-border-inverted": "var(--ui-color-neutral-50)",
+          "--ui-radius": "0.75rem",
+          "--font-weight-normal": "500",
+          "--font-weight-medium": "600",
+          "--font-weight-semibold": "700",
+          "--font-weight-bold": "800"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "teal",
+          "neutral": "olive"
+        },
+        "input": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          },
+          "slots": {
+            "base": "rounded-full"
+          }
+        },
+        "select": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          },
+          "slots": {
+            "base": "rounded-full"
+          }
+        },
+        "textarea": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          }
+        },
+        "selectMenu": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          },
+          "slots": {
+            "base": "rounded-full"
+          }
+        },
+        "inputMenu": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          },
+          "slots": {
+            "base": "rounded-full"
+          }
+        },
+        "inputNumber": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          }
+        },
+        "inputTags": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          }
+        },
+        "inputDate": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          }
+        },
+        "inputTime": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          }
+        },
+        "pinInput": {
+          "defaultVariants": {
+            "variant": "soft",
+            "size": "lg"
+          }
+        },
+        "button": {
+          "defaultVariants": {
+            "size": "lg"
+          },
+          "slots": {
+            "base": "rounded-full"
+          }
+        },
+        "badge": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "inputRating": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "tabs": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "checkbox": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "checkboxGroup": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "radioGroup": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "switch": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "slider": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "stepper": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "calendar": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "colorPicker": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "fileUpload": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "formField": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "fieldGroup": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "dropdownMenu": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "contextMenu": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "commandPalette": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        },
+        "listbox": {
+          "defaultVariants": {
+            "size": "lg"
+          }
+        }
+      },
+      "icons": "iconoir"
+    },
+    {
+      "id": "iris",
+      "name": "Iris",
+      "description": "Violet outlines on a mauve neutral, fuchsia secondary, tinted fields.",
+      "palettes": {},
+      "typography": {
+        "sans": "'Manrope', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-text-inverted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-50)",
+          "--ui-bg-muted": "var(--ui-color-neutral-100)",
+          "--ui-radius": "0.5rem"
+        },
+        "dark": {
+          "--ui-text-highlighted": "var(--ui-color-neutral-50)",
+          "--ui-bg-inverted": "var(--ui-color-neutral-50)",
+          "--ui-border-inverted": "var(--ui-color-neutral-50)",
+          "--ui-radius": "0.5rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "violet",
+          "secondary": "fuchsia",
+          "neutral": "mauve"
+        },
+        "button": {
+          "defaultVariants": {
+            "variant": "outline"
+          }
+        },
+        "badge": {
+          "defaultVariants": {
+            "variant": "outline"
+          }
+        },
+        "input": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "select": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "textarea": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "selectMenu": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputMenu": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputNumber": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputTags": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputDate": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputTime": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "pinInput": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        }
+      },
+      "icons": "remix"
+    },
+    {
+      "id": "crimson",
+      "name": "Crimson",
+      "description": "Cinema red on pure gray, square corners, filled fields, near-black in dark mode.",
+      "palettes": {},
+      "typography": {
+        "sans": "'Inter', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-primary": "var(--ui-color-primary-600)",
+          "--ui-text-inverted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-50)",
+          "--ui-bg-muted": "var(--ui-color-neutral-100)",
+          "--ui-radius": "0rem",
+          "--font-weight-semibold": "700",
+          "--font-weight-bold": "800"
+        },
+        "dark": {
+          "--ui-primary": "var(--ui-color-primary-500)",
+          "--ui-text-highlighted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-950)",
+          "--ui-bg-muted": "var(--ui-color-neutral-900)",
+          "--ui-bg-elevated": "var(--ui-color-neutral-900)",
+          "--ui-bg-accented": "var(--ui-color-neutral-800)",
+          "--ui-bg-inverted": "var(--ui-color-neutral-50)",
+          "--ui-border-inverted": "var(--ui-color-neutral-50)",
+          "--ui-radius": "0rem",
+          "--font-weight-semibold": "700",
+          "--font-weight-bold": "800"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "red",
+          "neutral": "neutral"
+        },
+        "input": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "select": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "textarea": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "selectMenu": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputMenu": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputNumber": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputTags": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputDate": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "inputTime": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        },
+        "pinInput": {
+          "defaultVariants": {
+            "variant": "soft"
+          }
+        }
+      },
+      "icons": "material"
+    },
+    {
+      "id": "coral",
+      "name": "Coral",
+      "description": "Rose on warm stone, cards floating on shadows, teal for success, neutral focus rings.",
+      "palettes": {},
+      "typography": {
+        "sans": "'Plus Jakarta Sans', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-text-inverted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-50)",
+          "--ui-bg-muted": "var(--ui-color-neutral-100)",
+          "--ui-radius": "0.5rem"
+        },
+        "dark": {
+          "--ui-text-highlighted": "var(--ui-color-neutral-50)",
+          "--ui-bg-inverted": "var(--ui-color-neutral-50)",
+          "--ui-border-inverted": "var(--ui-color-neutral-50)",
+          "--ui-radius": "0.5rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "rose",
+          "success": "teal",
+          "neutral": "stone"
+        },
+        "input": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "select": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "textarea": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "selectMenu": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "inputMenu": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "inputNumber": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "inputTags": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "inputDate": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "inputTime": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "pinInput": {
+          "defaultVariants": {
+            "color": "neutral"
+          }
+        },
+        "card": {
+          "compoundVariants": [
+            {
+              "variant": "outline",
+              "class": {
+                "root": "ring-0 dark:ring shadow-xl shadow-black/5"
+              }
+            }
+          ]
+        }
+      },
+      "icons": "phosphor"
+    },
+    {
+      "id": "sunset",
+      "name": "Sunset",
+      "description": "Orange on a warm taupe neutral, glowing actions, yellow secondary, subtle panels.",
+      "palettes": {},
+      "typography": {
+        "sans": "'Bricolage Grotesque', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-primary": "var(--ui-color-primary-600)",
+          "--ui-text-inverted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-50)",
+          "--ui-bg-muted": "var(--ui-color-neutral-100)",
+          "--ui-radius": "0.625rem"
+        },
+        "dark": {
+          "--ui-text-highlighted": "var(--ui-color-neutral-50)",
+          "--ui-bg-inverted": "var(--ui-color-neutral-50)",
+          "--ui-border-inverted": "var(--ui-color-neutral-50)",
+          "--ui-radius": "0.625rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "orange",
+          "secondary": "yellow",
+          "neutral": "taupe"
+        },
+        "card": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "alert": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "empty": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "button": {
+          "compoundVariants": [
+            {
+              "color": "primary",
+              "variant": "solid",
+              "class": "shadow-md shadow-primary/30"
+            }
+          ]
+        }
+      },
+      "icons": "tabler"
+    },
+    {
+      "id": "carbon",
+      "name": "Carbon",
+      "description": "Amber on a warm carbon neutral, with ink-dark borders throughout.",
+      "palettes": {
+        "carbon": {
+          "50": "oklch(98.5% 0.017 447.457)",
+          "100": "oklch(95.9% 0.036 438.639)",
+          "200": "oklch(92.6% 0.054 428.8)",
+          "300": "oklch(87% 0.053 417.734)",
+          "400": "oklch(70.5% 0.032 405.184)",
+          "500": "oklch(55.3% 0.014 390.836)",
+          "600": "oklch(44.7% 0.001 374.343)",
+          "700": "oklch(35.9% 0 0)",
+          "800": "oklch(28% 0 0)",
+          "900": "oklch(20.8% 0 0)",
+          "950": "oklch(14.1% 0.005 285.805)"
+        }
+      },
+      "typography": {
+        "sans": "'Outfit', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-text-dimmed": "var(--ui-color-neutral-500)",
+          "--ui-text-muted": "var(--ui-color-neutral-800)",
+          "--ui-text-toned": "var(--ui-color-neutral-900)",
+          "--ui-text": "var(--ui-color-neutral-900)",
+          "--ui-text-highlighted": "var(--ui-color-neutral-950)",
+          "--ui-text-inverted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-50)",
+          "--ui-bg-muted": "var(--ui-color-neutral-300)",
+          "--ui-bg-elevated": "var(--ui-color-neutral-300)",
+          "--ui-bg-accented": "var(--ui-color-neutral-400)",
+          "--ui-border": "var(--ui-color-neutral-950)",
+          "--ui-border-muted": "var(--ui-color-neutral-400)",
+          "--ui-border-accented": "var(--ui-color-neutral-950)",
+          "--ui-border-inverted": "var(--ui-color-neutral-500)",
+          "--ui-radius": "0.5rem"
+        },
+        "dark": {
+          "--ui-text-dimmed": "var(--ui-color-neutral-400)",
+          "--ui-text-muted": "var(--ui-color-neutral-300)",
+          "--ui-text-highlighted": "var(--ui-color-neutral-100)",
+          "--ui-bg": "var(--ui-color-neutral-800)",
+          "--ui-bg-muted": "var(--ui-color-neutral-700)",
+          "--ui-bg-elevated": "var(--ui-color-neutral-700)",
+          "--ui-bg-accented": "var(--ui-color-neutral-600)",
+          "--ui-bg-inverted": "var(--ui-color-neutral-50)",
+          "--ui-border": "var(--ui-color-neutral-600)",
+          "--ui-border-accented": "var(--ui-color-neutral-500)",
+          "--ui-border-inverted": "var(--ui-color-neutral-50)",
+          "--ui-radius": "0.5rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "amber",
+          "secondary": "yellow",
+          "neutral": "carbon"
+        },
+        "button": {
+          "defaultVariants": {
+            "variant": "solid"
+          }
+        },
+        "badge": {
+          "defaultVariants": {
+            "variant": "solid"
+          }
+        },
+        "card": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "alert": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "empty": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "input": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "select": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "textarea": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "selectMenu": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputMenu": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputNumber": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputTags": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputDate": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "inputTime": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        },
+        "pinInput": {
+          "defaultVariants": {
+            "variant": "subtle"
+          }
+        }
+      },
+      "icons": "tabler"
+    },
+    {
+      "id": "bubblegum",
+      "name": "Bubblegum",
+      "description": "Pastel pink softness with mauve-tinted grays.",
+      "palettes": {
+        "saturated-mauve": {
+          "50": "oklch(96.1% 0.021 325.68)",
+          "100": "oklch(92.4% 0.039 325.829)",
+          "200": "oklch(88% 0.057 325.83)",
+          "300": "oklch(81.2% 0.073 325.398)",
+          "400": "oklch(66.1% 0.084 323.292)",
+          "500": "oklch(52.4% 0.079 322.443)",
+          "600": "oklch(42.7% 0.064 322.128)",
+          "700": "oklch(34.6% 0.048 322.004)",
+          "800": "oklch(27.4% 0.034 321.983)",
+          "900": "oklch(20.7% 0.02 322.028)",
+          "950": "oklch(14.5% 0.008 322.12)"
+        }
+      },
+      "typography": {
+        "sans": "'Poppins', sans-serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-text-inverted": "var(--ui-color-neutral-50)",
+          "--ui-bg": "var(--ui-color-neutral-50)",
+          "--ui-bg-muted": "var(--ui-color-neutral-100)",
+          "--ui-radius": "0.375rem"
+        },
+        "dark": {
+          "--ui-text-highlighted": "var(--ui-color-neutral-50)",
+          "--ui-bg-inverted": "var(--ui-color-neutral-50)",
+          "--ui-border-inverted": "var(--ui-color-neutral-50)",
+          "--ui-radius": "0.375rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "pink",
+          "secondary": "violet",
+          "neutral": "saturated-mauve"
+        }
+      },
+      "icons": "phosphor"
+    },
+    {
+      "id": "parchment",
+      "name": "Parchment",
+      "description": "Warm parchment neutrals with a book-cloth clay primary.",
+      "palettes": {
+        "clay": {
+          "50": "oklch(97.4% 0.009 48.308)",
+          "100": "oklch(94.2% 0.019 52.207)",
+          "200": "oklch(88.5% 0.036 51.142)",
+          "300": "oklch(82.1% 0.058 50.392)",
+          "400": "oklch(74.1% 0.094 47.255)",
+          "500": "oklch(67.2% 0.131 38.798)",
+          "600": "oklch(58.9% 0.138 37.63)",
+          "700": "oklch(51.4% 0.123 37.45)",
+          "800": "oklch(44.4% 0.103 36.916)",
+          "900": "oklch(38.8% 0.086 36.46)",
+          "950": "oklch(25.9% 0.054 38.197)"
+        },
+        "parchment": {
+          "50": "oklch(98% 0.006 100)",
+          "100": "oklch(96.5% 0.011 99)",
+          "200": "oklch(93.6% 0.014 97.348)",
+          "300": "oklch(85.8% 0.018 100)",
+          "400": "oklch(72.1% 0.015 102.54)",
+          "500": "oklch(57.8% 0.008 88.877)",
+          "600": "oklch(43.2% 0.006 91.526)",
+          "700": "oklch(38.2% 0.003 84.572)",
+          "800": "oklch(29.3% 0.003 106.588)",
+          "900": "oklch(21.7% 0.002 106.561)",
+          "950": "oklch(14.6% 0 0)"
+        }
+      },
+      "typography": {
+        "sans": "'DM Sans', sans-serif",
+        "display": "'Source Serif 4', serif"
+      },
+      "cssVariables": {
+        "light": {
+          "--ui-bg": "var(--ui-color-neutral-100)",
+          "--ui-bg-muted": "var(--ui-color-neutral-200)",
+          "--ui-bg-elevated": "var(--ui-color-neutral-200)",
+          "--ui-bg-accented": "var(--ui-color-neutral-300)",
+          "--ui-border": "var(--ui-color-neutral-300)",
+          "--ui-border-muted": "var(--ui-color-neutral-300)",
+          "--ui-border-accented": "var(--ui-color-neutral-400)",
+          "--ui-radius": "0.375rem"
+        },
+        "dark": {
+          "--ui-primary": "var(--ui-color-primary-500)",
+          "--ui-bg-accented": "var(--ui-color-neutral-800)",
+          "--ui-radius": "0.375rem"
+        }
+      },
+      "ui": {
+        "colors": {
+          "primary": "clay",
+          "neutral": "parchment"
+        }
+      },
+      "icons": "heroicons"
+    }
+  ]
+}

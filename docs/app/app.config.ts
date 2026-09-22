@@ -5,12 +5,15 @@ import {
 } from '../../themes/sample-brand'
 import { idBrandGuide, nuxtUiBrandTheme } from '../../themes/nuxt-ui'
 
+import { docsPresetDocuments } from '../presets'
+
 const docsThumbnail = '/id-studio/templates/docs.png'
 
 const nuxtUiAppConfig = createNuxtUiAppConfig(nuxtUiBrandTheme)
 
 export default defineAppConfig({
   idStudio: {
+    brands: docsPresetDocuments,
     home: '/',
     documentation: '/getting-started/introduction',
     document: createStudioDocument({ name: 'nuxt-ui', colors: {} }, nuxtUiBrandTheme),
@@ -45,6 +48,7 @@ export default defineAppConfig({
     defaultTheme: nuxtUiBrandTheme.name,
     themes: [
       sampleBrandTheme,
+      ...Object.values(docsPresetDocuments).map(document => document.theme),
     ],
     guide: idBrandGuide,
   },

@@ -1,16 +1,21 @@
 import { expect, test } from '@playwright/test'
+import presetData from '../../docs/app/data/nuxt-ui-presets.json' with { type: 'json' }
 import { createBlankStudioDocument } from '../../src/studio'
 
 const base = 'http://127.0.0.1:3443'
 
 test('theme round trip restores component defaults', async ({ page }) => {
   await page.goto(base)
-  const theme = page.getByRole('banner').getByRole('combobox', { name: 'Theme', exact: true }).first()
-  const mode = page.getByRole('banner').getByRole('button', { name: /Switch to .* mode/ }).first()
-  const footerMode = page.getByRole('contentinfo').getByRole('button', { name: /Switch to .* mode/ }).first()
+  const theme = page.getByRole('combobox', { name: 'Theme', exact: true }).first()
+  const mode = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
+  const footer = page.getByRole('contentinfo')
+  const footerGithub = footer.getByRole('link', { name: 'GitHub repository', exact: true })
   await expect(mode).toBeVisible()
-  await expect(footerMode).toBeVisible()
-  const navigationBackgrounds = () => Promise.all([mode, footerMode].map(button => button.evaluate(element => getComputedStyle(element).backgroundColor)))
+  await expect(footerGithub).toBeVisible()
+  await expect(footerGithub).toHaveAttribute('href', 'https://github.com/happydesigns/id')
+  await expect(page.getByRole('banner').getByRole('link', { name: 'GitHub', exact: true })).toBeHidden()
+  await expect(footer.getByRole('button', { name: /Switch to .* mode/ })).toHaveCount(0)
+  const navigationBackgrounds = () => Promise.all([mode, footerGithub].map(button => button.evaluate(element => getComputedStyle(element).backgroundColor)))
   const appearance = () => mode.evaluate((element) => {
     const style = getComputedStyle(element)
     return { background: style.backgroundColor, color: style.color, radius: style.borderRadius }
@@ -25,9 +30,13 @@ test('theme round trip restores component defaults', async ({ page }) => {
   await expect.poll(navigationBackgrounds).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'])
   await expect.poll(() => page.getByRole('link', { name: 'Read the docs', exact: true }).evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
   await mode.click()
+  await page.getByRole('tab', { name: 'Dark', exact: true }).click()
+  await page.keyboard.press('Escape')
   await page.getByRole('heading', { level: 1 }).hover()
   await expect.poll(navigationBackgrounds).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'])
   await mode.click()
+  await page.getByRole('tab', { name: 'System', exact: true }).click()
+  await page.keyboard.press('Escape')
   await theme.click()
   await page.getByRole('option', { name: 'Nuxt UI', exact: true }).click()
   await page.getByRole('heading', { level: 1 }).hover()
@@ -74,4 +83,104 @@ for (const width of [390, 1440]) test('landing shows working code tabs and fits 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.evaluate(() => window.scrollTo(0, 0))
   await page.screenshot({ path: `.output/tests/landing-${width}.png`, fullPage: true })
+})
+
+for (const width of [390, 1440]) test('appearance menu groups brand, mode and Studio controls ' + width, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 })
+  await page.goto(base)
+  const trigger = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
+  await trigger.click()
+  await page.getByRole('menuitem', { name: 'Nuxt UI', exact: true }).focus()
+  await page.keyboard.press('ArrowRight')
+  await page.getByRole('menuitemcheckbox', { name: 'Sample Brand', exact: true }).click()
+  await page.keyboard.press('Escape')
+  await page.keyboard.press('Escape')
+  await expect(trigger).toHaveAccessibleName('Appearance: Sample Brand')
+  await trigger.click()
+  for (const mode of ['Dark', 'Light', 'System']) {
+    await page.getByRole('tab', { name: mode, exact: true }).click()
+    await expect(page.getByRole('tab', { name: mode, exact: true })).toHaveAttribute('aria-selected', 'true')
+    if (mode !== 'System') await expect(page.locator('html')).toHaveClass(new RegExp(mode.toLowerCase()))
+  }
+  await page.screenshot({ path: '.output/tests/appearance-menu-' + width + '.png', animations: 'disabled' })
+  await page.getByRole('menuitem', { name: 'Edit theme', exact: true }).click()
+  await expect(page).toHaveURL(/studio\?/)
+  await expect(page.getByRole('button', { name: 'Brand picker', exact: true })).toBeVisible()
+})
+
+test('preset edits and named copies share the Studio draft and preserve originals', async ({ page }) => {
+  await page.goto(base)
+  const trigger = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
+  async function submenu(label: string | RegExp) {
+    await trigger.click()
+    await page.getByRole('menuitem', { name: label, exact: typeof label === 'string' }).focus()
+    await page.keyboard.press('ArrowRight')
+  }
+  async function choose(label: string) {
+    await page.getByRole('menuitemcheckbox', { name: label, exact: true }).click()
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+  }
+  await submenu('Nuxt UI')
+  await choose('Iris')
+  await expect(trigger).toHaveAccessibleName('Appearance: Iris')
+  await submenu(/^Primary/)
+  await choose('orange')
+  await expect(trigger).toHaveAccessibleName('Appearance: Iris (custom)')
+  const active = () => page.evaluate(() => localStorage.getItem('id-studio:1:nuxt-ui:active'))
+  const firstId = await active()
+  await submenu(/^Radius/)
+  await choose('0.75rem')
+  await submenu(/^Font/)
+  await choose('Georgia')
+  await submenu(/^Icons/)
+  await choose('Lucide')
+  expect(await active()).toBe(firstId)
+  await submenu('Iris (custom)')
+  await page.getByRole('menuitem', { name: 'Create theme…', exact: true }).click()
+  await page.getByRole('textbox', { name: 'Theme name', exact: true }).fill('Team Amber')
+  await page.getByRole('button', { name: 'Create theme', exact: true }).click()
+  await expect(trigger).toHaveAccessibleName('Appearance: Team Amber')
+  await page.reload()
+  await expect(trigger).toHaveAccessibleName('Appearance: Team Amber')
+  const primary = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-color-primary-500').trim())
+  const orange = await primary()
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-radius').trim())).toBe('0.75rem')
+  await submenu('Team Amber')
+  await choose('Iris')
+  expect(await primary()).not.toBe(orange)
+  await submenu('Iris')
+  await choose('Team Amber')
+  await expect.poll(primary).toBe(orange)
+  const savedId = await active()
+  await trigger.click()
+  await page.getByRole('menuitem', { name: 'Edit theme', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Brand picker', exact: true })).toContainText('Team Amber')
+  expect(await active()).toBe(savedId)
+})
+
+test('all Nuxt UI presets resolve their palettes in both color modes', async ({ page }) => {
+  await page.goto(base)
+  const theme = page.getByRole('combobox', { name: 'Theme', exact: true }).first()
+  const trigger = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
+  for (const preset of presetData.presets) {
+    await theme.click()
+    await page.getByRole('option', { name: preset.name, exact: true }).click()
+    await expect(trigger).toHaveAccessibleName('Appearance: ' + preset.name)
+    await trigger.click()
+    for (const mode of ['Light', 'Dark']) {
+      await page.getByRole('tab', { name: mode, exact: true }).click()
+      await expect(page.locator('html')).toHaveClass(new RegExp(mode.toLowerCase()))
+      await expect.poll(() => page.evaluate(() => ['--ui-color-primary-500', '--ui-color-neutral-500'].map(name => getComputedStyle(document.documentElement).getPropertyValue(name).trim()).every(Boolean))).toBe(true)
+    }
+    if (preset.name === 'Iris') {
+      await page.getByRole('menuitem', { name: 'Iris', exact: true }).focus()
+      await page.keyboard.press('ArrowRight')
+      const crimsonIcon = page.getByRole('menuitemcheckbox', { name: 'Crimson', exact: true }).locator('[data-slot=icon]')
+      await expect.poll(() => crimsonIcon.evaluate(element => getComputedStyle(element).maskImage)).not.toBe('none')
+      await page.screenshot({ path: '.output/tests/appearance-presets-dark.png', animations: 'disabled' })
+      await page.keyboard.press('Escape')
+    }
+    await page.keyboard.press('Escape')
+  }
 })

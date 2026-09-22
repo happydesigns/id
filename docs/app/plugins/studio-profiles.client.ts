@@ -1,8 +1,9 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { useBrandTheme } from '../../../app/composables/useBrandTheme'
 import { cssVariablesAdapter } from '../../../src/adapters/css-variables'
-import { projectPrefix } from '../../../studio/app/composables/useStudioProjects'
+import { projectPrefix, useStudioProjects } from '../../../studio/app/composables/useStudioProjects'
 import { parseStudioSession, type StudioSession } from '../../../studio/editor'
+import { parseStudioDocument, type StudioDocument } from '../../../src/studio'
 import type { StudioHostConfig } from '../../../src/studio-host'
 
 export default defineNuxtPlugin(() => {
@@ -15,13 +16,16 @@ export default defineNuxtPlugin(() => {
   const runtime = useBrandTheme()
   const route = useRoute()
   const sessions = ref<StudioSession[]>([])
+  const { saveProject } = useStudioProjects(ref(''))
   let syncing = false
   const themeName = (session: StudioSession) => session.catalogKey?.startsWith(scope + '::brand:')
     ? session.catalogKey.slice((scope + '::brand:').length)
     : 'studio-' + Array.from(session.id, character => character.charCodeAt(0).toString(16)).join('')
+  const selectedSession = computed(() => sessions.value.find(item => themeName(item) === runtime.selectedName.value))
+  const source = computed(() => selectedSession.value?.draft || config.brands?.[runtime.selectedName.value] || seed)
+  const baseline = computed(() => selectedSession.value?.baseline || source.value)
   useHead({ style: [{ key: 'id-docs-profile', textContent: computed(() => {
-    const session = sessions.value.find(item => themeName(item) === runtime.selectedName.value)
-    return session ? cssVariablesAdapter.transform(session.draft.brand, { prefix: '', includeRoles: false, selector: ':root:root' }).css : ''
+    return cssVariablesAdapter.transform(source.value.brand, { prefix: '', includeRoles: false, selector: ':root:root' }).css
   }) }] })
   function sync() {
     try {
@@ -66,4 +70,30 @@ export default defineNuxtPlugin(() => {
     window.removeEventListener('storage', sync)
     window.removeEventListener('id-studio-projects-changed', sync)
   })
+  function edit(change: (document: StudioDocument) => void, copyName?: string) {
+    const existing = copyName ? undefined : selectedSession.value
+    const preset = runtime.selectedName.value === 'nuxt-ui' || runtime.selectedName.value.startsWith('nuxt-ui-')
+    const draft = parseStudioDocument(JSON.parse(JSON.stringify(source.value)))
+    if (!existing && preset) draft.theme.label += ' (custom)'
+    if (copyName) draft.theme.label = copyName
+    change(draft)
+    const session: StudioSession = {
+      ...existing,
+      id: existing?.id || crypto.randomUUID(),
+      baseline: existing?.baseline || parseStudioDocument(JSON.parse(JSON.stringify(source.value))),
+      draft: parseStudioDocument(draft),
+      updatedAt: Date.now(),
+      catalogKey: existing ? existing.catalogKey : (!preset && !copyName ? scope + '::brand:' + runtime.selectedName.value : undefined),
+    }
+    saveProject(session)
+    localStorage.setItem(activeKey, session.id)
+    sync()
+  }
+  function create(name: string) {
+    const label = name.trim()
+    if (!label || label.length > 80) throw new Error('Use a name between 1 and 80 characters.')
+    if (runtime.themes.value.some(theme => theme.label.toLocaleLowerCase() === label.toLocaleLowerCase())) throw new Error('A theme with this name already exists.')
+    edit(() => {}, label)
+  }
+  return { provide: { docsBrandEditor: { document: source, baseline, edit, create } } }
 })

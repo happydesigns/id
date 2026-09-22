@@ -4,6 +4,6 @@ import DocusHeader from 'docus/app/components/app/AppHeader.vue'
 
 <template>
   <AppNavigationTheme>
-    <DocusHeader />
+    <DocusHeader class="[&_a[aria-label=GitHub]]:hidden [&_button[aria-label^=Switch]]:hidden" />
   </AppNavigationTheme>
 </template>

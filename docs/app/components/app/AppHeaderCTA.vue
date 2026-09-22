@@ -1,12 +1,14 @@
 <template>
   <ClientOnly>
-    <IdThemeSelect
-      appearance="header"
-      class="hidden sm:flex"
-    />
-
+    <AppThemeMenu />
     <template #fallback>
-      <div class="hidden h-8 w-44 sm:block" />
+      <UButton
+        icon="i-lucide-palette"
+        color="neutral"
+        variant="ghost"
+        aria-label="Appearance"
+        disabled
+      />
     </template>
   </ClientOnly>
 </template>

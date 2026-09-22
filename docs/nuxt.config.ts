@@ -1,3 +1,4 @@
+import { presetFonts, presetIcons } from './presets'
 import { readFileSync } from 'node:fs'
 import { createStudioDocument } from '../src/studio'
 import { sampleBrandTheme } from '../themes/sample-brand'
@@ -28,6 +29,8 @@ export default defineNuxtConfig({
   } } },
   buildDir: devServer ? '.nuxt-dev' : '.nuxt',
   compatibilityDate: 'latest',
+  fonts: { families: presetFonts.map(name => ({ name })) },
+  icon: { clientBundle: { icons: Object.values(presetIcons) } },
   llms: {
     domain: 'https://id.happydesigns.de',
     title: 'happydesigns id',
