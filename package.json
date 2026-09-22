@@ -124,7 +124,7 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "^4.1.10",
-    "vue": "3.5.41",
+    "vue": "3.5.43",
     "vue-tsc": "catalog:",
     "yaml": "^2.9.0"
   },
