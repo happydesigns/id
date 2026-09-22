@@ -1,8 +1,7 @@
 import { projectTemplates } from './project-templates.generated.js'
 import { z } from 'zod'
 import { brandDefinitionSchema, brandThemeSchema } from './schema.js'
-import { cssVariablesAdapter } from './adapters/css-variables.js'
-import { createThemeCssVars } from './css.js'
+import { createBrandThemeCss } from './studio-css.js'
 import type { BrandDefinition, BrandTheme } from './types.js'
 import { validateBrandDefinition, validateBrandTheme } from './validation.js'
 
@@ -121,10 +120,7 @@ export function diffStudioDocuments(before: StudioDocument, after: StudioDocumen
 
 export function createStudioCss(doc: StudioDocument): string {
   parseStudioDocument(doc)
-  return [
-    cssVariablesAdapter.transform(doc.brand, { prefix: '', selector: '@theme static', includeRoles: false }).css,
-    createThemeCssVars({ ...doc.theme, typography: { ...doc.brand.typography, ...doc.theme.typography } }),
-  ].filter(Boolean).join('\n\n')
+  return createBrandThemeCss(doc.brand, doc.theme)
 }
 
 export function createStudioRuntimeFiles(input: StudioDocument, options: { styles?: 'entry' | 'fragment', config?: 'entry' | 'fragment' } = {}): Record<string, string> {

@@ -3,7 +3,7 @@ import { onMounted, onBeforeUnmount, computed, ref, nextTick } from 'vue'
 import { parseStudioDocument } from '../../../../src/studio'
 import type { StudioDocument, StudioScene } from '../../../../src/studio'
 import { studioTemplates } from '../../../templates'
-import { copyConfig, previewUi, studioPreviewCss } from '../../../preview'
+import { createPreviewBrand, type PreviewAppConfig } from '../../../preview'
 
 defineOptions({ name: 'StudioPreviewPage' })
 definePageMeta({ layout: false, header: false, footer: false })
@@ -27,8 +27,7 @@ function navigate(next: string) {
 const state = ref('default')
 const mode = ref<'light' | 'dark'>('light')
 const error = ref('')
-const originalUi = copyConfig(appConfig.ui) as Record<string, unknown>
-const seedUi = copyConfig((appConfig as unknown as { idStudio?: { document?: StudioDocument } }).idStudio?.document?.theme.ui ?? appConfig.id?.theme?.ui ?? {})
+const applyBrand = createPreviewBrand(appConfig as unknown as PreviewAppConfig)
 const style = ref('')
 useHead({ style: [{ key: 'id-studio-preview', textContent: style }] })
 
@@ -45,15 +44,7 @@ function receive(event: MessageEvent) {
     scene.value = event.data.scene
     page.value = selectedTemplate.value?.pages.find(item => item.id === event.data.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home'
     state.value = event.data.state === 'error' ? 'error' : 'default'
-    Object.assign(appConfig, { ui: previewUi(originalUi, seedUi, doc.theme.ui ?? {}) })
-    // The host runtime follows this source too; it cannot restore an older
-    // brand over the frame when color mode changes.
-    if (appConfig.id) {
-      const identity = appConfig.id as unknown as Record<string, unknown>
-      identity.theme = doc.theme
-      identity.themes = []
-      identity.assets = doc.brand.assets
-    }
+    style.value = applyBrand(doc)
     mode.value = event.data.mode === 'dark' ? 'dark' : 'light'
     applyMode(event.data.preference)
     window.document.documentElement.classList.toggle('dark', mode.value === 'dark')
@@ -61,7 +52,6 @@ function receive(event: MessageEvent) {
     // Remove values the host runtime applied inline; the complete frame CSS
     // below owns the document. No state or styles cross iframe boundaries.
     window.document.documentElement.removeAttribute('style')
-    style.value = studioPreviewCss(doc)
     document.value = doc
     error.value = ''
     nextTick(() => requestAnimationFrame(() => requestAnimationFrame(() => {

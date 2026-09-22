@@ -1,5 +1,5 @@
-import { createThemeCssVars } from '../src/css'
-import { cssVariablesAdapter } from '../src/adapters/css-variables'
+import { createBrandThemeCss } from '../src/studio-css'
+import { copyConfig, replaceThemeUi } from '../src/ui-config'
 import type { StudioDocument } from '../src/studio'
 import { previewDefaults } from './preview-defaults'
 
@@ -27,8 +27,7 @@ export function studioShellCss(doc: StudioDocument): string {
 
 export function studioPreviewCss(doc: StudioDocument): string {
   return [previewDefaults,
-    cssVariablesAdapter.transform(doc.brand, { prefix: '', includeRoles: false, selector: ':root:root' }).css,
-    createThemeCssVars({ ...doc.theme, typography: { ...doc.brand.typography, ...doc.theme.typography } }, { lightSelector: ':root:root', darkSelector: ':root:root.dark' }),
+    createBrandThemeCss(doc.brand, doc.theme, { paletteSelector: ':root:root', lightSelector: ':root:root', darkSelector: ':root:root.dark' }),
     'html { color-scheme: light; overscroll-behavior: contain; } html.dark { color-scheme: dark; } body { background: var(--ui-bg); color: var(--ui-text); }',
   ].join('\n')
 }
@@ -38,4 +37,31 @@ export function docusBrandHeader(doc: StudioDocument, header: Config = {}): Conf
   const light = logos.wordmark ?? logos.logo
   const dark = logos.wordmarkInverse ?? logos.logoInverse ?? light
   return { ...header, title: doc.theme.label, logo: { ...(object(header.logo) ? header.logo : {}), light: light?.src || '', dark: dark?.src || '', alt: light?.alt || doc.theme.label, wordmark: { light: light?.src || '', dark: dark?.src || '' } } }
+}
+
+export interface PreviewAppConfig {
+  ui: Config
+  idStudio?: { templates?: unknown, document?: StudioDocument }
+  id?: { theme: StudioDocument['theme'], themes: StudioDocument['theme'][], assets?: StudioDocument['brand']['assets'] }
+  header?: Config
+  brand?: { name: string, assets?: StudioDocument['brand']['assets'] }
+}
+
+/** Capture the host once so repeated drafts never become their own baseline. */
+export function createPreviewBrand(config: PreviewAppConfig, brandUi?: Config) {
+  const hostUi = copyConfig(config.ui ?? {})
+  const seedUi = copyConfig(brandUi ?? config.idStudio?.document?.theme.ui ?? config.id?.theme.ui ?? {})
+  const header = config.header ? copyConfig(config.header) : undefined
+  return (doc: StudioDocument) => {
+    config.ui = replaceThemeUi(hostUi, seedUi, doc.theme.ui ?? {})
+    config.brand = { name: doc.theme.label ?? doc.brand.name, assets: doc.brand.assets }
+    if (header) config.header = docusBrandHeader(doc, header)
+    if (config.idStudio) config.idStudio.document = doc
+    if (config.id) {
+      config.id.theme = doc.theme
+      config.id.themes = []
+      config.id.assets = doc.brand.assets
+    }
+    return studioPreviewCss(doc)
+  }
 }

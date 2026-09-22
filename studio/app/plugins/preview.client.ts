@@ -1,8 +1,7 @@
 import { defineNuxtPlugin, onNuxtReady, useAppConfig, useColorMode, useHead, useRouter, useRuntimeConfig } from '#imports'
 import { nextTick, ref, watch } from 'vue'
 import { parseStudioDocument } from '../../../src/studio'
-import type { StudioDocument } from '../../../src/studio'
-import { copyConfig, docusBrandHeader, previewUi, studioPreviewCss } from '../../preview'
+import { createPreviewBrand, type PreviewAppConfig } from '../../preview'
 import { studioTemplates, withinStudioRoute } from '../../templates'
 
 export default defineNuxtPlugin({
@@ -13,22 +12,14 @@ export default defineNuxtPlugin({
     const initial = router.currentRoute.value
     const thumbnail = initial.query.frame === 'thumbnail'
     if (window.parent === window || typeof initial.query.idPreview !== 'string') return
-    const config = useAppConfig() as unknown as {
-      ui: Record<string, unknown>
-      idStudio?: { templates?: unknown, document?: StudioDocument }
-      id?: { theme: StudioDocument['theme'], themes: StudioDocument['theme'][], assets?: StudioDocument['brand']['assets'] }
-      header?: Record<string, unknown>
-      brand?: { name: string, assets?: StudioDocument['brand']['assets'] }
-    }
+    const config = useAppConfig() as unknown as PreviewAppConfig
     const remote = useRuntimeConfig().public.idStudioPreview as { studioOrigin: string, id: string, routePrefix: string, brandUi?: Record<string, unknown> } | undefined
     const session = typeof initial.query.idSession === 'string' ? initial.query.idSession : ''
     const external = !!remote && initial.query.idStudioOrigin === remote.studioOrigin && initial.query.idPreview === remote.id && /^[a-f0-9-]{36}$/.test(session) && withinStudioRoute(initial.path, remote.routePrefix)
     const parentOrigin = external ? remote!.studioOrigin : window.location.origin
     const template = external ? { id: remote!.id, routePrefix: remote!.routePrefix } : studioTemplates(config.idStudio?.templates).find(item => item.id === initial.query.idPreview && item.routePrefix && withinStudioRoute(initial.path, item.routePrefix))
     if (!template?.routePrefix) return
-    const hostUi = copyConfig(config.ui ?? {})
-    const seedUi = copyConfig(remote?.brandUi ?? config.idStudio?.document?.theme?.ui ?? config.id?.theme?.ui ?? {})
-    const header = copyConfig(config.header ?? {})
+    const applyBrand = createPreviewBrand(config, remote?.brandUi)
     const style = ref('')
     const status = ref('loading')
     const colorMode = useColorMode()
@@ -76,17 +67,7 @@ export default defineNuxtPlugin({
       try {
         const doc = parseStudioDocument(event.data.document)
         applying = true
-        config.ui = previewUi(hostUi, seedUi, doc.theme.ui ?? {})
-        config.header = docusBrandHeader(doc, header)
-        config.brand = { name: doc.theme.label ?? doc.brand.name, assets: doc.brand.assets }
-        // Guide components must describe the same source as the rendered draft.
-        if (config.idStudio) config.idStudio.document = doc
-        if (config.id) {
-          config.id.theme = doc.theme
-          config.id.themes = []
-          config.id.assets = doc.brand.assets
-        }
-        style.value = studioPreviewCss(doc)
+        style.value = applyBrand(doc)
         applyMode(event.data)
         active = true
         if (withinStudioRoute(event.data.path, template!.routePrefix!) && router.currentRoute.value.path !== event.data.path) await router.replace({ path: event.data.path, query: initial.query })
