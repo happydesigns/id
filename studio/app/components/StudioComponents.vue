@@ -23,7 +23,7 @@ import PlaygroundPrompt from './playground/PlaygroundPrompt.vue'
 import PlaygroundCard from './playground/PlaygroundCard.vue'
 import { computed, onMounted, onBeforeUnmount, ref, useTemplateRef } from 'vue'
 
-defineProps<{ state: string }>()
+defineProps<{ state: string, embedded?: boolean }>()
 
 // Adapted from Nuxt UI. See playground/NOTICE.md for source and changes.
 const tiles = [
@@ -76,7 +76,27 @@ const visibleTiles = tiles
 </script>
 
 <template>
+  <div
+    v-if="embedded"
+    class="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
+    role="region"
+    aria-label="Interactive component examples"
+  >
+    <div
+      v-for="item in tiles"
+      :key="item.name"
+      class="mb-4 break-inside-avoid"
+    >
+      <PlaygroundCard :data-example="item.name">
+        <component
+          :is="item.component"
+          :state="state"
+        />
+      </PlaygroundCard>
+    </div>
+  </div>
   <UScrollArea
+    v-else
     ref="scrollArea"
     aria-label="Interactive component examples"
     :items="visibleTiles"

@@ -1,15 +1,26 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import presetData from '../../docs/app/data/nuxt-ui-presets.json' with { type: 'json' }
 import { createBlankStudioDocument } from '../../src/studio'
 
 const base = 'http://127.0.0.1:3443'
+const appearanceTrigger = (page: Page) => page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
+
+async function selectTheme(page: Page, label: string) {
+  const trigger = appearanceTrigger(page)
+  await expect(trigger).toHaveAttribute('aria-label', /^Appearance:/)
+  const current = (await trigger.getAttribute('aria-label'))!.slice('Appearance: '.length)
+  await trigger.click()
+  await page.getByRole('menuitem', { name: current, exact: true }).focus()
+  await page.keyboard.press('ArrowRight')
+  await page.getByRole('menuitemcheckbox', { name: label, exact: true }).click()
+  await page.keyboard.press('Escape')
+  await page.keyboard.press('Escape')
+}
 
 test('saved docs brand paints before hydration and resets to the baseline', async ({ page }) => {
   await page.goto(base)
-  await page.waitForFunction(() => Boolean((document.querySelector('#__nuxt') as Element & { __vue_app__?: unknown })?.__vue_app__))
-  const theme = page.getByRole('combobox', { name: 'Theme', exact: true }).first()
-  await theme.click()
-  await page.getByRole('option', { name: 'Iris', exact: true }).click()
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Nuxt UI')
+  await selectTheme(page, 'Iris')
   const primary = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-color-primary-500').trim())
   const selectedColor = await primary()
   expect(selectedColor).toBeTruthy()
@@ -22,7 +33,7 @@ test('saved docs brand paints before hydration and resets to the baseline', asyn
 
   await page.unrouteAll()
   await page.reload()
-  await expect(theme).toContainText('Iris')
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Iris')
   await expect.poll(primary).toBe(selectedColor)
   const appearance = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
   await appearance.click()
@@ -34,11 +45,11 @@ test('saved docs brand paints before hydration and resets to the baseline', asyn
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-bg').trim())).toBe(darkBackground)
   await page.unrouteAll()
   await page.reload()
-  await theme.click()
-  await page.getByRole('option', { name: 'Nuxt UI', exact: true }).click()
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Iris')
+  await selectTheme(page, 'Nuxt UI')
   await expect.poll(() => page.evaluate(() => localStorage.getItem('id-studio:1:nuxt-ui:first-paint'))).toBeNull()
   await page.reload()
-  await expect(theme).toContainText('Nuxt UI')
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Nuxt UI')
   await expect(page.locator('#id-theme-first-paint')).toHaveCount(0)
 })
 
@@ -73,7 +84,6 @@ test('first-paint bridge ignores stale and unsafe CSS declarations', async ({ pa
 
 test('theme round trip restores component defaults', async ({ page }) => {
   await page.goto(base)
-  const theme = page.getByRole('combobox', { name: 'Theme', exact: true }).first()
   const mode = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
   const footer = page.getByRole('contentinfo')
   const footerGithub = footer.getByRole('link', { name: 'GitHub repository', exact: true })
@@ -87,12 +97,10 @@ test('theme round trip restores component defaults', async ({ page }) => {
     const style = getComputedStyle(element)
     return { background: style.backgroundColor, color: style.color, radius: style.borderRadius }
   })
-  await theme.click()
-  await page.getByRole('option', { name: 'Nuxt UI', exact: true }).click()
+  await selectTheme(page, 'Nuxt UI')
   await page.getByRole('heading', { level: 1 }).hover()
   const original = await appearance()
-  await theme.click()
-  await page.getByRole('option', { name: 'Sample Brand', exact: true }).click()
+  await selectTheme(page, 'Cobalt')
   await page.getByRole('heading', { level: 1 }).hover()
   await expect.poll(navigationBackgrounds).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'])
   await expect.poll(() => page.getByRole('link', { name: 'Read the docs', exact: true }).evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
@@ -104,8 +112,7 @@ test('theme round trip restores component defaults', async ({ page }) => {
   await mode.click()
   await page.getByRole('tab', { name: 'System', exact: true }).click()
   await page.keyboard.press('Escape')
-  await theme.click()
-  await page.getByRole('option', { name: 'Nuxt UI', exact: true }).click()
+  await selectTheme(page, 'Nuxt UI')
   await page.getByRole('heading', { level: 1 }).hover()
   await expect.poll(appearance).toEqual(original)
   await expect.poll(navigationBackgrounds).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'])
@@ -122,19 +129,19 @@ test('Studio edits follow the selected profile into docs and survive reload', as
     localStorage.setItem('test-profile-seeded', 'true')
   }, doc)
   await page.goto(base)
-  await expect(page.getByRole('combobox', { name: 'Theme', exact: true }).first()).toContainText('My profile')
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: My profile')
   await page.getByRole('link', { name: 'Open Studio', exact: true }).click()
   await page.getByRole('button', { name: 'Colors', exact: true }).click()
   await page.getByRole('button', { name: 'Primary', exact: true }).click()
   await page.getByRole('button', { name: 'rose', exact: true }).click()
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('id-studio:project:2:test-profile')!).draft.theme.ui.colors.primary)).toBe('rose')
   await page.getByRole('link', { name: 'happydesigns/id home', exact: true }).click()
-  await expect(page.getByRole('combobox', { name: 'Theme', exact: true }).first()).toContainText('My profile')
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: My profile')
   const primary = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-color-primary-500').trim())
   const rose = 'oklch(64.5% 0.246 16.439)'
   await expect.poll(primary).toBe(rose)
   await page.reload()
-  await expect(page.getByRole('combobox', { name: 'Theme', exact: true }).first()).toContainText('My profile')
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: My profile')
   await expect.poll(primary).toBe(rose)
   await page.route('**/_nuxt/*.js', route => route.abort())
   await page.reload({ waitUntil: 'domcontentloaded' })
@@ -163,10 +170,10 @@ for (const width of [390, 1440]) test('appearance menu groups brand, mode and St
   await trigger.click()
   await page.getByRole('menuitem', { name: 'Nuxt UI', exact: true }).focus()
   await page.keyboard.press('ArrowRight')
-  await page.getByRole('menuitemcheckbox', { name: 'Sample Brand', exact: true }).click()
+  await page.getByRole('menuitemcheckbox', { name: 'Cobalt', exact: true }).click()
   await page.keyboard.press('Escape')
   await page.keyboard.press('Escape')
-  await expect(trigger).toHaveAccessibleName('Appearance: Sample Brand')
+  await expect(trigger).toHaveAccessibleName('Appearance: Cobalt')
   await trigger.click()
   for (const mode of ['Dark', 'Light', 'System']) {
     await page.getByRole('tab', { name: mode, exact: true }).click()
@@ -232,11 +239,10 @@ test('preset edits and named copies share the Studio draft and preserve original
 
 test('all Nuxt UI presets resolve their palettes in both color modes', async ({ page }) => {
   await page.goto(base)
-  const theme = page.getByRole('combobox', { name: 'Theme', exact: true }).first()
   const trigger = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
-  for (const preset of presetData.presets) {
-    await theme.click()
-    await page.getByRole('option', { name: preset.name, exact: true }).click()
+  await expect(trigger).toHaveAccessibleName('Appearance: Nuxt UI')
+  for (const preset of presetData.presets.filter(preset => preset.id !== 'default')) {
+    await selectTheme(page, preset.name)
     await expect(trigger).toHaveAccessibleName('Appearance: ' + preset.name)
     await trigger.click()
     for (const mode of ['Light', 'Dark']) {
@@ -254,4 +260,29 @@ test('all Nuxt UI presets resolve their palettes in both color modes', async ({ 
     }
     await page.keyboard.press('Escape')
   }
+})
+
+for (const width of [390, 1440]) test('landing presets and template previews preserve component input ' + width, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 })
+  await page.goto(base)
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Nuxt UI')
+  const presets = page.getByRole('group', { name: 'Brand presets', exact: true })
+  await expect(presets.getByRole('button')).toHaveCount(12)
+  await expect(page.getByRole('combobox', { name: 'Theme', exact: true })).toHaveCount(0)
+  const email = page.getByPlaceholder('john@example.com').first()
+  await email.fill('preview@example.com')
+  await presets.getByRole('button', { name: 'Apply Iris preset', exact: true }).click()
+  await expect(presets.getByRole('button', { name: 'Apply Iris preset', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Iris')
+  for (const template of ['Landing', 'Docs']) {
+    await page.getByRole('button', { name: 'Templates', exact: true }).click()
+    await page.getByRole('button', { name: template, exact: true }).click()
+    const frame = page.locator('iframe[title="' + template + ' template preview"]')
+    await expect(frame).toBeVisible()
+    await expect(frame.locator('..')).toHaveAttribute('data-preview-state', 'ready')
+    await expect(page.frameLocator('iframe[title="' + template + ' template preview"]').locator('h1').first()).toBeVisible()
+  }
+  await page.getByRole('button', { name: 'Components', exact: true }).click()
+  await expect(email).toHaveValue('preview@example.com')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
