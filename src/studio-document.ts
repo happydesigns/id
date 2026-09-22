@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { builtinPaletteNames } from './palettes.js'
 import { brandDefinitionSchema, brandThemeSchema } from './schema.js'
 import type { BrandDefinition, BrandTheme } from './types.js'
 import { validateBrandDefinition, validateBrandTheme } from './validation.js'
@@ -20,7 +21,7 @@ const documentSchema = z.object({
   theme: brandThemeSchema,
 }).passthrough()
 
-export const studioBuiltinPalettes = ['slate', 'gray', 'zinc', 'neutral', 'stone', 'mauve', 'olive', 'mist', 'taupe', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
+export const studioBuiltinPalettes = builtinPaletteNames
 
 export const studioScenes = ['components', 'landing', 'docs'] as const
 export type StudioScene = typeof studioScenes[number]

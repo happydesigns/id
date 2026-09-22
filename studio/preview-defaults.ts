@@ -1,8 +1,8 @@
-import colors from 'tailwindcss/colors'
+import { builtinPalettes } from '../src/palettes'
 
 // Nuxt UI 4 defaults, reapplied outside layers so a host brand cannot leak
 // into a new identity. The edited document overrides these defaults afterward.
-const palettes = Object.entries(colors).filter(([, value]) => typeof value === 'object')
+const palettes = Object.entries(builtinPalettes)
 const declarations = palettes.flatMap(([name, shades]) => Object.entries(shades).map(([shade, value]) => `--color-${name === 'neutral' ? 'old-neutral' : name}-${shade}: ${value};`))
 const roles = ['primary', 'secondary', 'success', 'info', 'warning', 'error']
 export const previewDefaults = `

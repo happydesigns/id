@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { neutralPalettes } from '../../palette'
 import { useStudioGuard } from '../composables/useStudioGuard'
 import { useStudioFrames } from '../composables/useStudioFrames'
 import { useStudioProjects } from '../composables/useStudioProjects'
@@ -422,7 +423,7 @@ function randomize() {
     if (['colors', 'all'].includes(randomScope.value)) {
       doc.theme.ui ??= {}
       doc.theme.ui.colors ??= {}
-      for (const [role, options] of Object.entries({ primary: ['blue', 'violet', 'rose', 'teal', 'orange', 'emerald', 'indigo'], neutral: ['slate', 'gray', 'zinc', 'neutral', 'stone', 'mauve', 'olive', 'mist', 'taupe'] })) {
+      for (const [role, options] of Object.entries({ primary: ['blue', 'violet', 'rose', 'teal', 'orange', 'emerald', 'indigo'], neutral: neutralPalettes })) {
         doc.theme.ui.colors[role] = pick(options, doc.theme.ui.colors[role])
       }
     }
