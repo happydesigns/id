@@ -37,7 +37,7 @@ The optional Studio module registers `/api/id-studio/source` only in Nuxt develo
 
 The writer accepts validated public brand JSON, preserves unknown safe fields, checks the current source hash and performs a same-directory atomic replacement. It rejects a stale revision and serializes writes within the process. It cannot lock unrelated external editors across the final filesystem replacement. It does not evaluate TypeScript, update arbitrary CSS, commit files or deploy. Production builds do not register the endpoint.
 
-Route previews accept only configured same-origin subtrees. Messages verify the parent window and origin. Draft styling is applied after hydration and cannot replace the editor shell's configuration.
+Route previews accept only configured subtrees. Separately running apps opt into the development-only `@happydesigns/id/preview` module with an exact Studio origin; Studio explicitly configures the app origin. Both sides check window identity, exact origin and the connection session. No wildcard message targets or source-writing endpoints are added by this module. This is a trusted development connection, not user authentication. Draft styling is applied after hydration and cannot replace the editor shell's configuration.
 
 ## Size and storage limits
 
