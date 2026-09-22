@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import type { DeepReadonly } from 'vue'
 import type { StudioDocument } from '../../../src/studio'
 import { studioBuiltinPalettes, studioRoles } from '../../../src/studio'
-import { createStudioPalette } from '../../editor'
+import { createStudioPalette, studioFontPresets as fontPresets, studioRadiusPresets } from '../../editor'
 import { paletteRamp } from '../../palette'
 import { useStudioIcon } from '../../playground-icons'
 import StudioPaletteSelect from './StudioPaletteSelect.vue'
@@ -62,7 +62,6 @@ function fontOptions(role: string) {
   const stacks = [...new Set([draft.value.theme.typography?.[role], draft.value.brand.typography?.[role], baseline.value.theme.typography?.[role], baseline.value.brand.typography?.[role]])]
   return [...stacks.filter((stack): stack is string => !!stack && !fontPresets.some(item => item.value === stack)).map(stack => ({ label: stack.split(',')[0]!.replace(/["']/g, ''), value: stack })), ...fontPresets]
 }
-const fontPresets = [{ label: 'System sans', value: 'system-ui, sans-serif' }, { label: 'System serif', value: 'Georgia, serif' }, { label: 'System mono', value: 'ui-monospace, monospace' }]
 const newColorName = ref('')
 const paletteOpen = ref(false)
 const paletteTarget = ref('')
@@ -372,7 +371,7 @@ onBeforeUnmount(() => emit('busy', false))
       >
         <UInputMenu
           :model-value="draft.theme.cssVariables?.[mode]?.['--ui-radius'] || ''"
-          :items="['0rem', '0.125rem', '0.25rem', '0.375rem', '0.5rem', '0.625rem', '0.75rem']"
+          :items="studioRadiusPresets"
           create-item="always"
           open-on-click
           clear

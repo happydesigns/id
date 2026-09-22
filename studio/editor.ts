@@ -32,3 +32,6 @@ export function contrastRatio(foreground: string, background: string): number | 
   const a = luminance(foreground), b = luminance(background)
   return a === undefined || b === undefined ? undefined : (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
 }
+
+export const studioFontPresets = [{ label: 'System sans', value: 'system-ui, sans-serif' }, { label: 'System serif', value: 'Georgia, serif' }, { label: 'System mono', value: 'ui-monospace, monospace' }]
+export const studioRadiusPresets = ['0rem', '0.125rem', '0.25rem', '0.375rem', '0.5rem', '0.625rem', '0.75rem']
