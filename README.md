@@ -70,7 +70,7 @@ pnpm docs:build
 
 ## Scope
 
-`id` owns reusable identity contracts and application mechanics. It does not own a specific brand expression, product domain behavior, authorization, storage, API contracts, runtime credentials, or customer-specific copy.
+`id` complements Nuxt UI with brand authoring, app previews and native layer generation. Prefer public upstream capabilities as they become available; framework-neutral adapters are not a product goal. It does not own a specific brand expression, product domain behavior, authorization, storage, API contracts, runtime credentials, or customer-specific copy.
 
 ## Reference
 

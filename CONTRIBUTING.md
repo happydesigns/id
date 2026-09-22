@@ -10,7 +10,7 @@ The [verification guide](docs/content/5.development/2.verification.md) owns the 
 
 ## Contribution standards
 
-Keep changes focused and reviewable. Preserve existing behavior unless a change explicitly modifies it. Prefer precise types, explicit data, validation at boundaries, meaningful errors, Nuxt UI semantics and CSS variables. Keep portable contracts framework-independent and domain behavior outside branding.
+Keep changes focused and reviewable. Preserve existing behavior unless a change explicitly modifies it. Prefer precise types, explicit data, validation at boundaries, meaningful errors, Nuxt UI semantics and CSS variables. Reuse public Nuxt and Nuxt UI contracts. Keep generation independent of an active app and domain behavior outside branding.
 
 Add meaningful regression coverage for changed logic. Avoid speculative packages, unnecessary dependencies, silently swallowed failures and brand-specific coupling. Comments should explain non-obvious constraints, compatibility decisions or safety boundaries, rather than narrate statements. Public identity data must never contain secrets or sensitive customer data.
 

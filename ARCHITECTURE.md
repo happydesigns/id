@@ -13,7 +13,7 @@ ID is optional authoring and verification for native Nuxt UI brands. The support
 
 ## Repository boundaries
 
-`src/` holds portable contracts and generation. It must not depend on Vue, Nuxt, Docus or concrete apps. `app/` is the compatibility Nuxt runtime, not the repository's documentation app. `studio/` and `guide/` are optional Nuxt layers. `docs/` and `playground/` consume the package; runtime code must not import them or the templates.
+`src/` holds Nuxt UI brand contracts and side-effect-free generation. Public Nuxt and Nuxt UI types are welcome; generation must not require an active Nuxt app, Vue component state, Docus or concrete applications. `app/` is the compatibility Nuxt runtime, not the repository's documentation app. `studio/` and `guide/` are optional Nuxt layers. `docs/` and `playground/` consume the package; runtime code must not import them or the templates.
 
 The repository's `nuxt.config.ts` is development tooling. Published layer entrypoints own consumer configuration. Keep one versioned package until independently useful usage justifies a split.
 
