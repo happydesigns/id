@@ -73,7 +73,7 @@ const paletteNameError = computed(() => {
   const name = newColorName.value.trim()
   if (!name) return 'Enter a palette name.'
   if (!/^[a-z][a-z0-9-]*$/.test(name)) return 'Use lowercase letters, numbers and hyphens.'
-  if (studioBuiltinPalettes.includes(name) || Object.keys(draft.value.brand.colors).some(key => key !== paletteTarget.value && key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase() === name)) return 'This palette name is already in use.'
+  if (Object.keys(draft.value.brand.colors).some(key => key !== paletteTarget.value && key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase() === name)) return 'This palette name is already in use.'
   return ''
 })
 function paletteUses(name: string) {
@@ -160,6 +160,14 @@ function addPalette() {
   paletteOpen.value = false
   paletteExpanded.value = paletteAction.value === 'delete' ? undefined : name
   emit('notice', paletteAction.value === 'create' ? 'Palette created. Select it under Primary or Neutral to use it.' : paletteAction.value === 'rename' ? 'Palette renamed.' : 'Palette deleted.')
+}
+
+function resetPalette(name: string) {
+  edit((doc) => {
+    // Brand aliases cannot refer to an upstream-only palette.
+    if (Object.values(doc.brand.roles ?? {}).includes(name)) throw new Error('Remove brand role references before resetting this palette.')
+    Reflect.deleteProperty(doc.brand.colors, name)
+  }, 'new-palette')
 }
 
 function paletteColor(name: string, shade: string, color: string) {
@@ -262,7 +270,24 @@ onBeforeUnmount(() => emit('busy', false))
         </template>
         <template #body="{ item }">
           <div class="space-y-3">
+            <p
+              v-if="studioBuiltinPalettes.includes(item.value)"
+              class="studio-help"
+            >
+              Overrides the standard palette. Unspecified shades keep their standard values.
+            </p>
             <div class="flex justify-end">
+              <UButton
+                v-if="studioBuiltinPalettes.includes(item.value)"
+                color="neutral"
+                variant="ghost"
+                :disabled="Object.values(draft.brand.roles || {}).includes(item.value)"
+                :title="Object.values(draft.brand.roles || {}).includes(item.value) ? 'Remove brand role references before resetting.' : undefined"
+                :aria-label="`Reset palette ${item.value}`"
+                @click="resetPalette(item.value)"
+              >
+                Reset to standard
+              </UButton>
               <UDropdownMenu :items="[{ label: 'Rename', icon: resolveIcon('i-lucide-pencil'), onSelect: () => openPalette('rename', item.value) }, { label: 'Delete palette', icon: resolveIcon('i-lucide-trash-2'), color: 'error', onSelect: () => openPalette('delete', item.value) }]">
                 <UButton
                   color="neutral"
