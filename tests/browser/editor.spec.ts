@@ -71,3 +71,26 @@ for (const width of [390, 1440]) test('default editor keeps palette editing and 
   await expect(page.getByRole('button', { name: width < 1100 ? 'Editor' : 'Colors', exact: true })).toBeFocused()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
+
+test('a failed browser save requires a decision before leaving Studio', async ({ page }) => {
+  await page.goto('/editor?editor=colors&mode=light')
+  await expect(page.getByTestId('alternative-editor')).toBeVisible()
+  await page.evaluate(() => {
+    Storage.prototype.setItem = () => {
+      throw new DOMException('Storage is full', 'QuotaExceededError')
+    }
+  })
+  await page.getByRole('button', { name: 'Use violet', exact: true }).click()
+  await expect(page.getByRole('status')).toHaveText('Accepted')
+  await page.getByRole('link', { name: 'Guide fixture home', exact: true }).click()
+  const dialog = page.getByRole('dialog').filter({ has: page.getByRole('heading', { name: 'Leave Studio?', exact: true }) })
+  await expect(dialog).toBeVisible()
+  await dialog.getByRole('button', { name: 'Keep editing', exact: true }).click()
+  await expect(dialog).toBeHidden()
+  await expect(page).toHaveURL(/\/editor(?:\?|$)/)
+  await page.getByRole('button', { name: 'Colors', exact: true }).click()
+  await expect(page.getByTestId('alternative-editor')).toContainText('Primary: violet')
+  await page.getByRole('link', { name: 'Guide fixture home', exact: true }).click()
+  await dialog.getByRole('button', { name: 'Leave Studio', exact: true }).click()
+  await expect(page).toHaveURL('http://127.0.0.1:3439/')
+})

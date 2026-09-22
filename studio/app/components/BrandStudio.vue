@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useStudioGuard } from '../composables/useStudioGuard'
 import { useStudioFrames } from '../composables/useStudioFrames'
 import { useStudioProjects } from '../composables/useStudioProjects'
 import { download, exportStudioProject } from '../../export'
@@ -106,19 +107,8 @@ const askAiOpen = ref(false)
 const exportTab = ref('changes')
 const codeFormat = ref('source')
 const busy = ref(false)
-const pending = ref<(() => void) | null>(null)
-const leaving = ref<((leave: boolean) => void) | null>(null)
-function finishLeaving(leave: boolean) {
-  const resolve = leaving.value
-  leaving.value = null
-  resolve?.(leave)
-}
-onBeforeRouteLeave(() => {
-  if (!needsExport.value || storedLocally.value) return true
-  return new Promise<boolean>((resolve) => {
-    leaving.value = resolve
-  })
-})
+const { pending, leaving, guard, acceptReplacement, finishLeaving, requestLeave, beforeUnload } = useStudioGuard(() => needsExport.value && !storedLocally.value)
+onBeforeRouteLeave(requestLeave)
 const input = ref<HTMLInputElement>()
 const storageReady = ref(false)
 const { originalFrame, draftFrame, cacheFrame, loadedFrames, failedFrames, previewAttempt, retryPreview, frameLoaded } = useStudioFrames(previewRuntime, scene, compare, storageReady, send)
@@ -564,15 +554,6 @@ function restoreEditorFocus() {
     else (window.document.querySelector<HTMLButtonElement>(`.studio-categories button[data-editor-category="${panel.value}"]`) || window.document.querySelector<HTMLButtonElement>('[aria-label="Brand picker"]'))?.focus()
   })
 }
-function guard(action: () => void) {
-  if (needsExport.value && !storedLocally.value) pending.value = action
-  else action()
-}
-function acceptReplacement() {
-  const action = pending.value
-  pending.value = null
-  action?.()
-}
 function value(event: Event) {
   return (event.target as HTMLInputElement).value
 }
@@ -653,12 +634,6 @@ function ready(event: MessageEvent) {
   if (event.data?.type !== 'id-studio-ready') return
   if (event.source === originalFrame.value?.contentWindow) send(originalFrame.value, baseline.value)
   if (event.source === draftFrame.value?.contentWindow) send(draftFrame.value, draft.value)
-}
-function beforeUnload(event: BeforeUnloadEvent) {
-  if (needsExport.value && !storedLocally.value) {
-    event.preventDefault()
-    event.returnValue = ''
-  }
 }
 const includeGuide = ref(false)
 async function exportProject() {
@@ -830,6 +805,7 @@ watch([mode, preference], ([value, selected]) => {
   }
 }, { flush: 'sync' })
 onBeforeUnmount(() => {
+  finishLeaving(false)
   window.removeEventListener('message', ready)
   window.removeEventListener('beforeunload', beforeUnload)
 })
