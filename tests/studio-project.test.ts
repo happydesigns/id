@@ -24,10 +24,16 @@ async function source() {
 }
 
 describe('connected brand source', () => {
-  it('rejects oversized UTF-8 documents even when their string length is smaller', () => {
+  it('keeps local document parsing independent of the browser transfer limit', () => {
     const doc = createBlankStudioDocument()
     doc.notes = 'ä'.repeat(4_000_001)
-    expect(() => parseStudioDocument(JSON.stringify(doc))).toThrow('8 MB')
+    expect(parseStudioDocument(JSON.stringify(doc))).toEqual(parseStudioDocument(doc))
+  })
+  it('bounds connected source reads by UTF-8 bytes before parsing', async () => {
+    const item = await source()
+    item.document.notes = 'ä'.repeat(4_000_001)
+    await writeFile(item.path, JSON.stringify(item.document))
+    await expect(readStudioSource(item.path)).rejects.toThrow('smaller than 8 MB')
   })
   it('preserves exact bytes when nothing changed', async () => {
     const item = await source()

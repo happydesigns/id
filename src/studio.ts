@@ -6,6 +6,7 @@ import { createThemeCssVars } from './css.js'
 import type { BrandDefinition, BrandTheme } from './types.js'
 import { validateBrandDefinition, validateBrandTheme } from './validation.js'
 
+/** Browser import and local HTTP writer transfer guard; not a schema limit. */
 export const studioDocumentMaxBytes = 8_000_000
 
 /** The editable source. Unknown JSON fields survive an unchanged round trip. */
@@ -40,7 +41,6 @@ function inspectJson(value: unknown, depth = 0): void {
 }
 
 export function parseStudioDocument(input: string | unknown): StudioDocument {
-  if (typeof input === 'string' && new TextEncoder().encode(input).byteLength > studioDocumentMaxBytes) throw new Error('Brand document exceeds 8 MB.')
   const value: unknown = typeof input === 'string' ? JSON.parse(input) : input
   inspectJson(value)
   documentSchema.parse(value)
