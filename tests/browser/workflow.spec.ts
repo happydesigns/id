@@ -23,6 +23,7 @@ for (const brand of ['violet', 'amber']) test('edit, preview and export ' + bran
   await page.goto('/editor?view=external&editor=colors&docked=true&mode=light')
   await page.locator('input[type="file"][accept=".json,application/json"]').setInputFiles({ name: brand + '.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(document)) })
   const draft = page.frameLocator('iframe[title="Draft brand preview"]')
+  await expect(draft.locator('html')).toHaveAttribute('data-id-preview', 'ready', { timeout: 120_000 })
   await expect(draft.getByRole('img', { name: brand, exact: true })).toBeVisible()
   const before = (await appearance(draft)).primary
   await page.getByRole('button', { name: 'Use ' + brand, exact: true }).click()
