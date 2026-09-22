@@ -20,6 +20,11 @@ export default defineConfig({
     env: { PORT: '3443' },
     reuseExistingServer: false,
     timeout: 60_000,
+  }, {
+    command: 'node node_modules/nuxt/bin/nuxt.mjs dev tests/fixtures/preview --host 127.0.0.1 --port 3444',
+    url: 'http://127.0.0.1:3444/demo',
+    reuseExistingServer: false,
+    timeout: 180_000,
   }, ...['violet', 'amber', 'studio'].map((name, index) => ({
     command: 'node tests/helpers/serve-static.mjs .output/native-consumers/' + name,
     url: 'http://127.0.0.1:' + (3440 + index),
