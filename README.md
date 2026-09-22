@@ -19,7 +19,7 @@ The supported path is Studio source → generated native brand → consuming Nux
 
 ## Compatibility
 
-The Node requirement and dependency contracts are declared in [`package.json`](package.json). Shared dependency ranges are maintained in the catalog in [`pnpm-workspace.yaml`](pnpm-workspace.yaml). The optional guide uses the Docus development dependency; [`pnpm-lock.yaml`](pnpm-lock.yaml) records the exact tested versions.
+The Node requirement and dependency contracts are declared in [`package.json`](package.json). Shared dependency ranges are maintained in the catalog in [`pnpm-workspace.yaml`](https://github.com/happydesigns/id/blob/main/pnpm-workspace.yaml). The optional guide uses the Docus development dependency; [`pnpm-lock.yaml`](https://github.com/happydesigns/id/blob/main/pnpm-lock.yaml) records the exact tested versions.
 
 CI checks the locked dependency set on Linux, plus package types and source operations on the minimum supported Node release and Windows. Isolated package consumers resolve their own dependencies. Newer major versions are not implicitly supported.
 
@@ -39,47 +39,11 @@ export default defineNuxtConfig({
 })
 ```
 
-Open `/studio`. Register the project's brand source and optional route previews as described in the [Studio guide](docs/content/3.guides/6.brand-studio.md).
+Open `/studio`. Register the project's brand source and optional route previews as described in the [Studio guide](https://id.happydesigns.de/guides/brand-studio).
 
-### Existing identity runtime
+### Existing integrations
 
-The identity module and runtime helpers remain supported for projects that already use them:
-
-```bash
-pnpm add @happydesigns/id tailwindcss
-```
-
-Use the Nuxt layer when a brand repository wants the default identity runtime:
-
-```ts [nuxt.config.ts]
-export default defineNuxtConfig({
-  extends: ['@happydesigns/id/nuxt']
-})
-```
-
-Use the module when a project wants explicit module options:
-
-```ts [nuxt.config.ts]
-export default defineNuxtConfig({
-  modules: ['@happydesigns/id/module'],
-  id: {
-    name: 'client',
-    componentPrefix: 'Id'
-  }
-})
-```
-
-The layer export uses the standard `Id` component prefix. The module can register the same runtime components under another global prefix when a host app needs to avoid naming collisions.
-
-Brand guides add the guide helpers separately so ordinary applications do not inherit documentation-only components:
-
-```ts [docs/nuxt.config.ts]
-export default defineNuxtConfig({
-  extends: ['@example/brand', '@happydesigns/id/guide', 'docus']
-})
-```
-
-`@happydesigns/id/guide` is an add-on to an existing identity runtime or brand layer. It does not select a brand or configure a theme by itself.
+The identity runtime remains supported through the Nuxt layer or configurable module. See [Installation](https://id.happydesigns.de/getting-started/installation) for both options and the separate optional Guide integration. New projects use native brand exports; compatibility exports explicitly select `legacyRuntime: true`.
 
 ## Development commands
 
@@ -110,11 +74,9 @@ pnpm docs:build
 
 ## Reference
 
-- [Studio and template integration](docs/content/3.guides/6.brand-studio.md)
-- [Public API](docs/content/4.reference/1.api.md)
-- [Architecture and repository layout](ARCHITECTURE.md)
-- [Contribution and verification](CONTRIBUTING.md)
-- [Security boundaries](SECURITY.md)
-- [Release workflow](RELEASING.md)
-
-Studio's default export is a native brand with a minimal Studio playground. Docus is an explicit extension (`guide: true`). Existing identity-runtime projects remain supported (`legacyRuntime: true`). The examples under `templates/` cover compatibility and integration; use Studio's New project export for a new brand.
+- [Studio and template integration](https://id.happydesigns.de/guides/brand-studio)
+- [Public API](https://id.happydesigns.de/reference/api)
+- [Architecture and repository layout](https://github.com/happydesigns/id/blob/main/ARCHITECTURE.md)
+- [Contribution and verification](https://github.com/happydesigns/id/blob/main/CONTRIBUTING.md)
+- [Security boundaries](https://github.com/happydesigns/id/blob/main/SECURITY.md)
+- [Release workflow](https://github.com/happydesigns/id/blob/main/RELEASING.md)
