@@ -37,6 +37,8 @@ export default defineNuxtPlugin(() => {
   }
   if (brandTheme.currentTheme.value) {
     if (import.meta.server) {
+      // Match Nuxt UI's app config and CSS variables to the request's theme before rendering.
+      brandTheme.applyTheme(brandTheme.currentTheme.value)
       useHead({
         style: [
           {

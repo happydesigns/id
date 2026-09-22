@@ -47,6 +47,10 @@ function persistThemeName(config: IdentityAppConfig, themeName: string) {
 
 function resolveInitialThemeName(config: IdentityAppConfig) {
   const themes = getThemeList(config)
+  const persistedName = useThemeCookie(config).value
+  if (persistedName && themes.some(theme => theme.name === persistedName)) {
+    return persistedName
+  }
   return resolveBrandThemeName(config.id, themes)
 }
 

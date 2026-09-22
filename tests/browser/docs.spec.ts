@@ -4,6 +4,73 @@ import { createBlankStudioDocument } from '../../src/studio'
 
 const base = 'http://127.0.0.1:3443'
 
+test('saved docs brand paints before hydration and resets to the baseline', async ({ page }) => {
+  await page.goto(base)
+  await page.waitForFunction(() => Boolean((document.querySelector('#__nuxt') as Element & { __vue_app__?: unknown })?.__vue_app__))
+  const theme = page.getByRole('combobox', { name: 'Theme', exact: true }).first()
+  await theme.click()
+  await page.getByRole('option', { name: 'Iris', exact: true }).click()
+  const primary = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-color-primary-500').trim())
+  const selectedColor = await primary()
+  expect(selectedColor).toBeTruthy()
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('id-studio:1:nuxt-ui:first-paint')!).light['--ui-color-primary-500'])).toBe(selectedColor)
+
+  await page.route('**/_nuxt/*.js', route => route.abort())
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await expect(page.locator('#id-theme-first-paint')).toHaveCount(1)
+  await expect.poll(primary).toBe(selectedColor)
+
+  await page.unrouteAll()
+  await page.reload()
+  await expect(theme).toContainText('Iris')
+  await expect.poll(primary).toBe(selectedColor)
+  const appearance = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
+  await appearance.click()
+  await page.getByRole('tab', { name: 'Dark', exact: true }).click()
+  const darkBackground = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-bg').trim())
+  await page.route('**/_nuxt/*.js', route => route.abort())
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-bg').trim())).toBe(darkBackground)
+  await page.unrouteAll()
+  await page.reload()
+  await theme.click()
+  await page.getByRole('option', { name: 'Nuxt UI', exact: true }).click()
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('id-studio:1:nuxt-ui:first-paint'))).toBeNull()
+  await page.reload()
+  await expect(theme).toContainText('Nuxt UI')
+  await expect(page.locator('#id-theme-first-paint')).toHaveCount(0)
+})
+
+test('invalid first-paint cache leaves prerendered docs intact', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('id-studio:1:nuxt-ui:active', 'catalog:brand:nuxt-ui-iris')
+    localStorage.setItem('id-studio:1:nuxt-ui:first-paint', '{invalid')
+  })
+  await page.route('**/_nuxt/*.js', route => route.abort())
+  await page.goto(base, { waitUntil: 'domcontentloaded' })
+  await expect(page.locator('#id-theme-first-paint')).toHaveCount(0)
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+})
+
+test('first-paint bridge ignores stale and unsafe CSS declarations', async ({ page }) => {
+  await page.goto(base)
+  const revision = (await page.locator('head script').first().textContent())?.match(/cache\?\.revision !== '([a-f0-9]{12})'/)?.[1]
+  expect(revision).toBeTruthy()
+  await page.route('**/_nuxt/*.js', route => route.abort())
+  const cache = (value: string, rev: string) => page.evaluate(({ value, rev }) => {
+    localStorage.setItem('id-studio:1:nuxt-ui:active', 'catalog:brand:nuxt-ui-iris')
+    localStorage.setItem('id-studio:1:nuxt-ui:first-paint', JSON.stringify({ active: 'catalog:brand:nuxt-ui-iris', revision: rev, light: { '--ui-bg': value }, dark: {} }))
+  }, { value, rev })
+  await cache('red', 'old-revision')
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await expect(page.locator('#id-theme-first-paint')).toHaveCount(0)
+  await cache('red;body{display:none}', revision!)
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await expect(page.locator('#id-theme-first-paint')).toHaveCount(0)
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+})
+
 test('theme round trip restores component defaults', async ({ page }) => {
   await page.goto(base)
   const theme = page.getByRole('combobox', { name: 'Theme', exact: true }).first()
@@ -68,6 +135,10 @@ test('Studio edits follow the selected profile into docs and survive reload', as
   await expect.poll(primary).toBe(rose)
   await page.reload()
   await expect(page.getByRole('combobox', { name: 'Theme', exact: true }).first()).toContainText('My profile')
+  await expect.poll(primary).toBe(rose)
+  await page.route('**/_nuxt/*.js', route => route.abort())
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await expect(page.locator('#id-theme-first-paint')).toHaveCount(1)
   await expect.poll(primary).toBe(rose)
 })
 

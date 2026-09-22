@@ -7,6 +7,8 @@ export interface StudioHostConfig {
   sourcePath?: string
   home?: string
   documentation?: string
+  /** Optional revision for the docs-only first-paint presentation cache. */
+  firstPaintRevision?: string
   host?: {
     name: string
     logo?: { light: string, dark: string, kind?: 'symbol' | 'wordmark' }

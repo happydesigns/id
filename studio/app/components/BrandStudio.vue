@@ -18,6 +18,7 @@ import { editorCategories } from '../../editor-categories'
 import { themeIcons, type ThemeIcons } from '../../icon-sets'
 import StudioBrandThumbnail from './StudioBrandThumbnail.vue'
 import { copyConfig, previewUi, studioShellCss } from '../../preview'
+import { createFirstPaintTheme, firstPaintThemeKey } from '../../first-paint'
 import StudioViewport from './StudioViewport.vue'
 import StudioViewportControls from './StudioViewportControls.vue'
 import { createBlankStudioDocument, createStudioDocument, createStudioProject, diffStudioDocuments, parseStudioDocument, studioDocumentMaxBytes } from '../../../src/studio'
@@ -486,6 +487,11 @@ function replace(doc: StudioDocument, key?: string) {
   if (key && storageReady.value) {
     try {
       localStorage.setItem(lastProjectKey, `catalog:${key}`)
+      if (config.idStudio?.firstPaintRevision) {
+        const firstPaintKey = firstPaintThemeKey(seed.brand.packageName || seed.brand.name)
+        if (key === 'nuxt-ui') localStorage.removeItem(firstPaintKey)
+        else localStorage.setItem(firstPaintKey, JSON.stringify(createFirstPaintTheme(`catalog:${key}`, doc.brand, doc.theme, config.idStudio.firstPaintRevision)))
+      }
     }
     catch {
       notice.value = 'The selected brand could not be remembered in this browser.'
@@ -662,6 +668,7 @@ function persist() {
     const session: StudioSession = { id: projectId.value, baseline: clone(baseline.value), draft: clone(draft.value), exported: exported.value ? clone(exported.value) : undefined, updatedAt: Date.now(), catalogKey: catalogKey.value }
     saveProject(session)
     localStorage.setItem(lastProjectKey, projectId.value)
+    if (config.idStudio?.firstPaintRevision) localStorage.setItem(firstPaintThemeKey(seed.brand.packageName || seed.brand.name), JSON.stringify(createFirstPaintTheme(projectId.value, draft.value.brand, draft.value.theme, config.idStudio.firstPaintRevision)))
     storedLocally.value = true
     listProjects()
   }

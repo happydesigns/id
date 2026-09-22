@@ -4,6 +4,7 @@ import { cssVariablesAdapter } from '../../../src/adapters/css-variables'
 import { projectPrefix, useStudioProjects } from '../../../studio/app/composables/useStudioProjects'
 import { parseStudioSession, type StudioSession } from '../../../studio/editor'
 import { parseStudioDocument, type StudioDocument } from '../../../src/studio'
+import { createFirstPaintTheme, firstPaintThemeKey } from '../../../studio/first-paint'
 import type { StudioHostConfig } from '../../../src/studio-host'
 
 export default defineNuxtPlugin(() => {
@@ -13,6 +14,7 @@ export default defineNuxtPlugin(() => {
   if (!seed) return
   const scope = seed.brand.packageName || seed.brand.name
   const activeKey = 'id-studio:1:' + scope + ':active'
+  const firstPaintKey = firstPaintThemeKey(scope)
   const runtime = useBrandTheme()
   const route = useRoute()
   const sessions = ref<StudioSession[]>([])
@@ -50,15 +52,31 @@ export default defineNuxtPlugin(() => {
       const selected = session ? themeName(session) : active === 'catalog:nuxt-ui' ? 'nuxt-ui' : active?.startsWith('catalog:brand:') ? active.slice(14) : runtime.selectedName.value
       if (runtime.themes.value.some(theme => theme.name === selected)) runtime.setTheme(selected)
       else runtime.setTheme('nuxt-ui')
+      cacheFirstPaint()
     }
     catch { /* Browsing the docs remains available without local storage. */ }
-    finally { syncing = false }
+    finally {
+      syncing = false
+      // Let Nuxt's reactive head styles catch up before releasing the first-paint bridge.
+      nextTick(() => requestAnimationFrame(() => document.getElementById('id-theme-first-paint')?.remove()))
+    }
+  }
+  function cacheFirstPaint() {
+    const active = localStorage.getItem(activeKey)
+    if (active === 'catalog:nuxt-ui') {
+      localStorage.removeItem(firstPaintKey)
+      return
+    }
+    const theme = runtime.currentTheme.value
+    if (!active || !theme) return
+    localStorage.setItem(firstPaintKey, JSON.stringify(createFirstPaintTheme(active, source.value.brand, theme, config.firstPaintRevision)))
   }
   watch(runtime.selectedName, (name) => {
     if (syncing || route.path.startsWith('/studio')) return
     try {
       const session = sessions.value.find(item => themeName(item) === name)
       localStorage.setItem(activeKey, session?.id || (name === 'nuxt-ui' ? 'catalog:nuxt-ui' : 'catalog:brand:' + name))
+      cacheFirstPaint()
     }
     catch { /* Theme selection still works for this page. */ }
   }, { flush: 'sync' })
