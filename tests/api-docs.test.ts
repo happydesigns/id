@@ -24,6 +24,13 @@ function getPublicValueExports() {
 }
 
 describe('api docs', () => {
+  it('documents every published entrypoint', () => {
+    const manifest = JSON.parse(readFileSync('package.json', 'utf8'))
+    const reference = readFileSync('docs/content/4.reference/1.api.md', 'utf8')
+    const missing = Object.keys(manifest.exports).map(path => manifest.name + (path === '.' ? '' : path.slice(1)))
+      .filter(path => !reference.includes('`' + path + '`'))
+    expect(missing).toEqual([])
+  })
   it('documents every root value export in the public reference page', () => {
     const apiReference = readFileSync('docs/content/4.reference/1.api.md', 'utf8')
     const missingExports = getPublicValueExports()

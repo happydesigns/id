@@ -2,7 +2,7 @@
 
 Run pnpm exec nuxt dev tests/fixtures/guide from the ID root. The / route renders shared examples through MDC, /smoke renders the same examples directly in Vue, and /hydration renders only native Nuxt UI FormField/Input/Textarea/Tabs. No ClientOnly boundary or explicit input IDs are used.
 
-For production regression checks, run pnpm exec nuxt generate tests/fixtures/guide followed by pnpm test:browser. The tests exercise translation, keyboard scrolling, Studio startup/history, label focus and active tab panels. They are required success checks, not expected failures. This is a focused smoke suite, not a full visual matrix.
+For production regression checks, follow the ordered [verification pipeline](../../../docs/content/5.development/2.verification.md), which also prepares the independent consumers used by the browser suite. This fixture checks translation, keyboard scrolling, Studio startup/history, label focus and active tab panels. These are required success checks, not expected failures.
 
 ## GUIDE-001: resolved production ID mismatch
 
