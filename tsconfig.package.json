@@ -23,7 +23,8 @@
     "src/**/*.ts",
     "themes/**/*.ts",
     "module.ts",
-    "preview-module.ts"
+    "preview-module.ts",
+    "devtools-module.ts"
   ],
   "exclude": [
     "dist",

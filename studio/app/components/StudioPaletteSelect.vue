@@ -55,7 +55,7 @@ const resolveIcon = useStudioIcon()
     </UButton>
     <template #content>
       <div
-        class="grid w-80 max-w-[calc(100vw-2rem)] grid-cols-3 gap-1 p-2 max-h-[min(65dvh,28rem)] overflow-y-auto"
+        class="grid w-80 max-w-[calc(100vw-2rem)] grid-cols-3 gap-1 p-2 max-h-[min(65dvh,28rem,var(--reka-popover-content-available-height))] overflow-y-auto"
         :aria-label="`${label} palettes`"
       >
         <UButton

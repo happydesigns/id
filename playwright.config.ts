@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests/browser',
-  testIgnore: '**/workflow.spec.ts',
+  testIgnore: ['**/workflow.spec.ts', '**/devtools.spec.ts'],
   outputDir: '.output/tests/results',
   timeout: 60_000,
   retries: 0,

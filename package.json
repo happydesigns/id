@@ -61,7 +61,11 @@
       "import": "./dist/themes/sample-brand/index.js"
     },
     "./themes/sample-brand/tokens.css": "./dist/themes/sample-brand/tokens.css",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./devtools": {
+      "types": "./dist/devtools-module.d.ts",
+      "import": "./dist/devtools-module.js"
+    }
   },
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
@@ -105,12 +109,13 @@
     "test:authoring": "playwright test --config playwright.authoring.config.ts"
   },
   "dependencies": {
+    "@nuxt/devtools-kit": "^3.4.1",
     "@nuxt/kit": "catalog:",
     "@nuxt/schema": "catalog:",
     "@nuxt/ui": "catalog:",
+    "h3": "^1.15.11",
     "nuxt": "catalog:",
-    "zod": "^4.4.3",
-    "h3": "^1.15.11"
+    "zod": "^4.4.3"
   },
   "peerDependencies": {
     "tailwindcss": "^4.0.0",

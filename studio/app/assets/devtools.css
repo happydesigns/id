@@ -1,0 +1,8 @@
+@reference "tailwindcss";
+@reference "@nuxt/ui";
+@tailwind utilities source(none);
+@source "../components/StudioThemeEditor.vue";
+@source "../components/StudioPaletteSelect.vue";
+@source "../components/StudioIconPicker.vue";
+@source "../components/StudioColorField.vue";
+@source "../views/DevtoolsTheme.vue";

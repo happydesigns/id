@@ -6,6 +6,7 @@ import { studioBuiltinPalettes, studioRoles } from '../../../src/studio'
 import { createStudioPalette, studioFontPresets as fontPresets, studioRadiusPresets } from '../../editor'
 import { paletteRamp } from '../../palette'
 import { useStudioIcon } from '../../playground-icons'
+import IdStudioColorField from './StudioColorField.vue'
 import StudioPaletteSelect from './StudioPaletteSelect.vue'
 import StudioIconPicker from './StudioIconPicker.vue'
 
