@@ -110,33 +110,40 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
           v-if="!expanded"
           class="hidden min-w-0 flex-1 sm:flex"
         />
-        <UButton
-          v-if="!expanded"
-          to="/studio?browse=true"
-          color="neutral"
-          variant="link"
-          size="sm"
-          trailing-icon="i-lucide-arrow-up-right"
-          class="ms-auto shrink-0"
+        <div
+          class="flex shrink-0 items-center gap-2"
+          :class="{ 'ms-auto': !expanded }"
         >
-          {{ studioLabel }}
-        </UButton>
-        <UButton
-          v-if="expanded"
-          :icon="mode === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
-          aria-label="Toggle preview color mode"
-          color="neutral"
-          variant="ghost"
-          @click="colorMode.preference = mode === 'dark' ? 'light' : 'dark'"
-        />
-        <UButton
-          :icon="expanded ? 'i-lucide-minimize' : 'i-lucide-maximize'"
-          :aria-label="expanded ? 'Close expanded preview' : 'Expand preview'"
-          :title="expanded ? 'Close expanded preview' : 'Expand preview'"
-          color="neutral"
-          variant="ghost"
-          @click="expanded ? collapse() : expand($event)"
-        />
+          <UButton
+            v-if="!expanded"
+            to="/studio?browse=true"
+            color="neutral"
+            variant="soft"
+            size="sm"
+            icon="i-lucide-palette"
+            :aria-label="studioLabel"
+            :title="studioLabel"
+          >
+            Studio
+          </UButton>
+          <UButton
+            v-if="expanded"
+            :icon="mode === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
+            aria-label="Toggle preview color mode"
+            color="neutral"
+            variant="ghost"
+            @click="colorMode.preference = mode === 'dark' ? 'light' : 'dark'"
+          />
+          <UButton
+            :icon="expanded ? 'i-lucide-minimize' : 'i-lucide-maximize'"
+            :aria-label="expanded ? 'Close expanded preview' : 'Expand preview'"
+            :title="expanded ? 'Close expanded preview' : 'Expand preview'"
+            color="neutral"
+            :variant="expanded ? 'ghost' : 'soft'"
+            size="sm"
+            @click="expanded ? collapse() : expand($event)"
+          />
+        </div>
       </div>
       <div
         v-show="scene === 'components'"
