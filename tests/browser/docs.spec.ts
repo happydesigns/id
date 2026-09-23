@@ -65,10 +65,11 @@ test('invalid first-paint cache leaves prerendered docs intact', async ({ page }
 })
 
 test('first-paint bridge ignores stale and unsafe CSS declarations', async ({ page }) => {
+  // Keep hydration from replacing the deliberately invalid cache during this check.
+  await page.route('**/_nuxt/*.js', route => route.abort())
   await page.goto(base)
   const revision = (await page.locator('head script').first().textContent())?.match(/cache\?\.revision !== '([a-f0-9]{12})'/)?.[1]
   expect(revision).toBeTruthy()
-  await page.route('**/_nuxt/*.js', route => route.abort())
   const cache = (value: string, rev: string) => page.evaluate(({ value, rev }) => {
     localStorage.setItem('id-studio:1:nuxt-ui:active', 'catalog:brand:nuxt-ui-iris')
     localStorage.setItem('id-studio:1:nuxt-ui:first-paint', JSON.stringify({ active: 'catalog:brand:nuxt-ui-iris', revision: rev, light: { '--ui-bg': value }, dark: {} }))
@@ -86,11 +87,11 @@ test('theme round trip restores component defaults', async ({ page }) => {
   await page.goto(base)
   const mode = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
   const footer = page.getByRole('contentinfo')
-  const footerGithub = footer.getByRole('link', { name: 'GitHub repository', exact: true })
+  const footerGithub = footer.getByRole('link', { name: 'Open on GitHub', exact: true })
   await expect(mode).toBeVisible()
   await expect(footerGithub).toBeVisible()
   await expect(footerGithub).toHaveAttribute('href', 'https://github.com/happydesigns/id')
-  await expect(page.getByRole('banner').getByRole('link', { name: 'GitHub', exact: true })).toBeHidden()
+  await expect(page.getByRole('banner').getByRole('link', { name: 'Open on GitHub', exact: true })).toBeVisible()
   await expect(footer.getByRole('button', { name: /Switch to .* mode/ })).toHaveCount(0)
   const navigationBackgrounds = () => Promise.all([mode, footerGithub].map(button => button.evaluate(element => getComputedStyle(element).backgroundColor)))
   const appearance = () => mode.evaluate((element) => {

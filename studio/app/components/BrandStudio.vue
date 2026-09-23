@@ -1374,8 +1374,8 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
                 :notify="notifyEditor"
               >
                 <StudioThemeEditor
-                  :document="draft"
-                  :baseline="baseline"
+                  :document="readonly(draft)"
+                  :baseline="readonly(baseline)"
                   :category="section.value"
                   :mode="mode"
                   :errors="fieldErrors"
