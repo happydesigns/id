@@ -26,9 +26,6 @@ const appConfig = useAppConfig()
         <USeparator class="my-4" />
         <AppHeaderBody />
       </template>
-      <template #bottom>
-        <AppHeaderBottom />
-      </template>
     </UHeader>
   </AppNavigationTheme>
 </template>

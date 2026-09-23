@@ -28,9 +28,6 @@ export default defineAppConfig({
       { label: 'Studio', to: '/studio' },
     ],
   },
-  navigation: {
-    sub: 'header',
-  },
   github: {
     url: 'https://github.com/happydesigns/id',
     branch: 'main',
