@@ -10,8 +10,7 @@ import StudioTemplatePreview from './StudioTemplatePreview.vue'
 const props = withDefaults(defineProps<{
   document?: StudioDocument
   title?: string
-  studioLabel?: string
-}>(), { title: 'Brand previews', studioLabel: 'Open Studio' })
+}>(), { title: 'Brand previews' })
 const expanded = ref(false)
 const container = ref<HTMLDialogElement>()
 provide(portalTargetInjectionKey, computed(() => container.value ?? 'body'))
@@ -117,18 +116,6 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
           class="flex shrink-0 items-center gap-2"
           :class="{ 'ms-auto': !expanded }"
         >
-          <UButton
-            v-if="!expanded"
-            to="/studio?browse=true"
-            color="neutral"
-            variant="soft"
-            size="md"
-            icon="i-lucide-palette"
-            :aria-label="studioLabel"
-            :title="studioLabel"
-          >
-            Studio
-          </UButton>
           <UButton
             v-if="expanded"
             :icon="mode === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"

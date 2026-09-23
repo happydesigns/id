@@ -53,6 +53,6 @@ for (const width of [1440, 390]) test('brand showcase separates browsing from au
   await expect(gallery).toBeHidden()
   await showcase.getByRole('button', { name: 'Components', exact: true }).click()
   await expect(email).toHaveValue('preserved@example.com')
-  await expect(showcase.getByRole('link', { name: 'Open Studio', exact: true })).toHaveAttribute('href', '/studio?browse=true')
+  await expect(showcase.locator('a[href^="/studio"]')).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
