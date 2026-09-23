@@ -137,6 +137,7 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
             :mode="mode"
             class="landing-template-picker"
           />
+          <USeparator class="hidden min-w-0 flex-1 sm:flex" />
           <UButton
             to="/studio"
             color="neutral"
