@@ -478,3 +478,45 @@ test('Studio masks the preview from its first frame until the themed render is r
   await expect(frame.contentFrame().getByText('Transfer funds', { exact: true })).toBeVisible()
   await expect(page.locator('.viewport-loading')).toHaveCount(0)
 })
+
+test('Studio initializes the preview once even when iframe load follows readiness', async ({ page }) => {
+  await page.goto(base)
+  await expect(appearanceTrigger(page)).toBeVisible()
+  const initialRenders = page.evaluate(() => new Promise<number>((resolve) => {
+    let loaded = false
+    let rendered = 0
+    let sampling = false
+    function finish() {
+      if (!loaded || !rendered || sampling) return
+      sampling = true
+      let frames = 12
+      function sample() {
+        if (--frames) requestAnimationFrame(sample)
+        else {
+          window.removeEventListener('message', message)
+          document.removeEventListener('load', load, true)
+          resolve(rendered)
+        }
+      }
+      requestAnimationFrame(sample)
+    }
+    function message(event: MessageEvent) {
+      const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Draft brand preview"]')
+      if (event.source === frame?.contentWindow && event.data?.type === 'id-studio-rendered') {
+        rendered++
+        finish()
+      }
+    }
+    function load(event: Event) {
+      if (event.target instanceof HTMLIFrameElement && event.target.title === 'Draft brand preview') {
+        loaded = true
+        finish()
+      }
+    }
+    window.addEventListener('message', message)
+    document.addEventListener('load', load, true)
+  }))
+  await page.getByRole('link', { name: 'Open Studio', exact: true }).click()
+  expect(await initialRenders).toBe(1)
+  await expect(page.frameLocator('iframe[title="Draft brand preview"]').getByText('Transfer funds', { exact: true })).toBeVisible()
+})

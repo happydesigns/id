@@ -7,8 +7,7 @@ import { download, exportStudioProject } from '../../export'
 import { useStudioHistory } from '../composables/useStudioHistory'
 import { useStudioIcon } from '../../playground-icons'
 
-import { computed, nextTick, onBeforeUnmount, onMounted, readonly, ref, watch } from 'vue'
-import StudioThemeEditor from './StudioThemeEditor.vue'
+import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, readonly, ref, watch } from 'vue'
 import StudioTemplatePicker from './StudioTemplatePicker.vue'
 import StudioColorMode from './StudioColorMode.vue'
 import StudioAskAi from './StudioAskAi.vue'
@@ -28,6 +27,8 @@ import type { StudioSession } from '../../editor'
 import { studioTemplates, withinStudioRoute, studioFrameUrl, acceptsStudioFrame } from '../../templates'
 import type { StudioDocument } from '../../../src/studio'
 import type { StudioHostConfig } from '../../../src/studio-host'
+
+const StudioThemeEditor = defineAsyncComponent(() => import('./StudioThemeEditor.vue'))
 
 const route = useRoute()
 const router = useRouter()
@@ -115,7 +116,7 @@ const { pending, leaving, guard, acceptReplacement, finishLeaving, requestLeave,
 onBeforeRouteLeave(requestLeave)
 const input = ref<HTMLInputElement>()
 const storageReady = ref(false)
-const { originalFrame, draftFrame, cacheFrame, loadedFrames, failedFrames, previewAttempt, retryPreview, frameLoaded } = useStudioFrames(previewRuntime, scene, compare, storageReady, send)
+const { originalFrame, draftFrame, cacheFrame, loadedFrames, failedFrames, previewAttempt, retryPreview } = useStudioFrames(previewRuntime, scene, compare, storageReady)
 const { history, future, record, undo: undoDocument, redo: redoDocument, clear: clearHistory } = useStudioHistory(draft)
 const recovery = ref<StudioSession>()
 watch(recovery, (session) => {
@@ -1188,7 +1189,6 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
               :src="frameSrc('original', runtime)"
               :title="runtime === previewRuntime ? 'Original brand preview' : `Cached original ${runtime}`"
               :style="frameStyle"
-              @load="runtime === previewRuntime && frameLoaded(originalFrame, baseline, 'original')"
             />
           </StudioViewport>
         </section>
@@ -1213,7 +1213,6 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
               :src="frameSrc('draft', runtime)"
               :title="runtime === previewRuntime ? 'Draft brand preview' : `Cached draft ${runtime}`"
               :style="frameStyle"
-              @load="runtime === previewRuntime && frameLoaded(draftFrame, draft, 'draft')"
             />
           </StudioViewport>
         </section>

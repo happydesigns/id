@@ -1,9 +1,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
-import type { StudioDocument } from '../../../src/studio'
 
 export function useStudioFrames(
   previewRuntime: Ref<string>, scene: Ref<string>, compare: Ref<boolean>, storageReady: Ref<boolean>,
-  send: (frame: HTMLIFrameElement | undefined, document: StudioDocument) => void,
 ) {
   const frameCache = ref<Record<string, HTMLIFrameElement | undefined>>({})
   const originalFrame = computed(() => frameCache.value[`original:${previewRuntime.value}`])
@@ -18,13 +16,6 @@ export function useStudioFrames(
     failedFrames.value = { original: false, draft: false }
     loadedFrames.value = { original: false, draft: false }
     previewAttempt.value++
-  }
-  function frameLoaded(frame: HTMLIFrameElement | undefined, doc: StudioDocument, key: 'original' | 'draft') {
-    if (!frame?.contentWindow) {
-      failedFrames.value[key] = true
-      return
-    }
-    send(frame, doc)
   }
   watch(scene, () => {
     failedFrames.value = { original: false, draft: false }
@@ -62,5 +53,5 @@ export function useStudioFrames(
       })
     }
   })
-  return { originalFrame, draftFrame, cacheFrame, loadedFrames, failedFrames, previewAttempt, retryPreview, frameLoaded }
+  return { originalFrame, draftFrame, cacheFrame, loadedFrames, failedFrames, previewAttempt, retryPreview }
 }
