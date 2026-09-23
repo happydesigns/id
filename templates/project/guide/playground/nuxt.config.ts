@@ -9,6 +9,7 @@ const bundledPackage = packageJson.devDependencies['@happydesigns/id'].startsWit
 
 export default defineNuxtConfig({
   extends: ['..', '@happydesigns/id/studio', '@happydesigns/id/guide', 'docus'],
+  colorMode: { disableTransition: true },
   appConfig: {
     idStudio: {
       document,

@@ -11,17 +11,17 @@ links:
   - label: Read the guide
     to: /docs/introduction
     icon: i-lucide-book-open
-  - label: Open Studio
-    to: /studio
+  - label: View previews
+    to: /#preview
     color: neutral
     variant: outline
 ---
 ::
 
-::u-page-section
+::u-container
 ---
-title: Try your brand
-description: Explore your brand on real components and application previews. Open Studio to edit it.
+id: preview
+class: py-10 sm:py-12
 ---
   ::id-studio-showcase
   ::

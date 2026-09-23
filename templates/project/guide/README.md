@@ -9,3 +9,5 @@ Regeneration owns only app/brand.config.ts and app/assets/css/brand.css. Keep th
 {{packageNote}}
 
 Fonts must be available to the consuming build. Custom domain components and capabilities are not included in the brand.
+
+The generated homepage already includes read-only component and template previews at #preview. Studio opens separately from the header or showcase. The ID Guide layer supplies reduced-motion-aware anchor scrolling; keep Docus layout defaults and customize its native slots for brand-owned navigation and footer content.
