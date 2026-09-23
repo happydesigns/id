@@ -23,3 +23,16 @@ for (const width of [1440, 390]) test('embedded Studio preserves input across ho
   await expect.poll(() => studio.locator('html').evaluate(element => element.scrollWidth <= innerWidth)).toBe(true)
   expect(errors).toEqual([])
 })
+
+test('Docus Markdown activates its Studio embed after page scroll restoration', async ({ page }) => {
+  await page.goto('/embed-guide')
+  const embed = page.locator('[data-studio-embed]')
+  // Docus restores its initial scroll position after hydrating the content page.
+  await expect.poll(async () => {
+    await embed.scrollIntoViewIfNeeded()
+    return embed.getAttribute('data-studio-embed')
+  }, { timeout: 60000 }).toBe('ready')
+  const studio = page.frameLocator('iframe[title="Brand Studio"]')
+  await expect(studio.getByRole('button', { name: 'Brand picker', exact: true })).toBeVisible()
+  await expect(studio.frameLocator('iframe[title="Draft brand preview"]').locator('input[type="email"]').first()).toBeVisible()
+})
