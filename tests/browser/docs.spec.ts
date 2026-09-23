@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import presetData from '../../docs/app/data/nuxt-ui-presets.json' with { type: 'json' }
 import { createBlankStudioDocument } from '../../src/studio'
 
-const base = 'http://127.0.0.1:3443'
+const base = process.env.ID_DOCS_TEST_URL || 'http://127.0.0.1:3443'
 const appearanceTrigger = (page: Page) => page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
 
 async function selectTheme(page: Page, label: string) {
@@ -337,4 +337,20 @@ for (const template of ['Landing', 'Docs']) test('theme changes replace preview 
     }
   }
   await expect(frame.locator('#id-theme-first-paint')).toHaveCount(0)
+})
+
+for (const label of ['Nuxt UI', ...presetData.presets.filter(preset => preset.id !== 'default').map(preset => preset.name)]) test('preset survives Studio navigation without reload: ' + label, async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.goto(base)
+  await selectTheme(page, label)
+  const primary = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ui-color-primary-500').trim())
+  const color = await primary()
+  await page.getByRole('link', { name: 'Open Studio', exact: true }).click()
+  await expect(page.getByRole('main', { name: 'Brand Studio', exact: true })).toBeVisible()
+  await expect.poll(primary).toBe(color)
+  await page.getByRole('link', { name: 'happydesigns/id home', exact: true }).click()
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: ' + label)
+  await expect.poll(primary).toBe(color)
+  expect(errors).toEqual([])
 })

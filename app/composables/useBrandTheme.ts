@@ -72,9 +72,13 @@ export function useBrandTheme() {
   const localThemes = useState<BrandTheme[]>(createBrandThemeStateKey(appConfig.id?.name) + ':local', () => [])
   const themes = computed(() => [...getThemeList(appConfig).filter(theme => !localThemes.value.some(local => local.name === theme.name)), ...localThemes.value])
   if (!hostConfigs.has(appConfig)) hostConfigs.set(appConfig, { ui: copyConfig(appConfig.ui ?? {}), seed: copyConfig(appConfig.id?.theme?.ui ?? {}) })
-  function updateNuxtUiAppConfig(config: NuxtUiAppConfig) {
+  // Resolve against the original host, never against an already applied theme.
+  function resolveUi(ui: Record<string, unknown> = {}) {
     const host = hostConfigs.get(appConfig)!
-    appConfig.ui = replaceThemeUi(host.ui, host.seed, config.ui ?? {})
+    return replaceThemeUi(host.ui, host.seed, ui)
+  }
+  function updateNuxtUiAppConfig(config: NuxtUiAppConfig) {
+    appConfig.ui = resolveUi(config.ui)
   }
   const currentTheme = computed(() => resolveTheme(themes.value, currentName.value))
   const selectedName = computed(() => currentTheme.value?.name ?? '')
@@ -130,6 +134,7 @@ export function useBrandTheme() {
     currentTheme,
     setTheme,
     applyTheme,
+    resolveUi,
     restorePersistedTheme,
   }
 }
