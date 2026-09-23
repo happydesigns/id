@@ -3,6 +3,8 @@ import { useStudioIcon } from '../../playground-icons'
 
 import { computed, ref, watch } from 'vue'
 import { paletteRamp, paletteSwatch, rolePalettes } from '../../palette'
+import { studioPaletteLabel } from '../../color-catalog'
+import type { StudioHostConfig } from '../../../src/studio-host'
 
 const props = defineProps<{
   label: string
@@ -10,6 +12,10 @@ const props = defineProps<{
   options: string[]
   colors: Record<string, string | Record<string, string | undefined>>
 }>()
+const config = useAppConfig() as unknown as { idStudio?: StudioHostConfig }
+function paletteLabel(name: string) {
+  return studioPaletteLabel(name, config.idStudio?.colorCatalog)
+}
 const model = defineModel<string>({ required: true })
 const open = ref(false)
 const all = ref(false)
@@ -51,7 +57,7 @@ const resolveIcon = useStudioIcon()
           :style="{ background: paletteSwatch(model, colors) }"
         />
       </template>
-      <span class="capitalize">{{ model === '__default' ? 'Nuxt UI default' : model }}</span>
+      <span>{{ model === '__default' ? 'Nuxt UI default' : paletteLabel(model) }}</span>
     </UButton>
     <template #content>
       <div
@@ -82,7 +88,7 @@ const resolveIcon = useStudioIcon()
             color="neutral"
             variant="ghost"
             size="sm"
-            :aria-label="name"
+            :aria-label="paletteLabel(name)"
             :aria-pressed="model === name"
             :active="model === name"
             active-variant="soft"
@@ -95,7 +101,7 @@ const resolveIcon = useStudioIcon()
                 :style="{ background: paletteRamp(name, colors) }"
               />
             </template>
-            <span class="break-all whitespace-normal capitalize">{{ name }}</span>
+            <span class="break-words whitespace-normal">{{ paletteLabel(name) }}</span>
           </UButton>
         </template>
         <UButton

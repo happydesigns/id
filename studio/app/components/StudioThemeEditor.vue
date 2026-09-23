@@ -5,6 +5,8 @@ import type { StudioDocument } from '../../../src/studio'
 import { studioBuiltinPalettes, studioRoles } from '../../../src/studio'
 import { createStudioPalette, studioFontPresets as fontPresets, studioRadiusPresets } from '../../editor'
 import { paletteRamp } from '../../palette'
+import { studioPaletteGroups } from '../../color-catalog'
+import type { StudioHostConfig } from '../../../src/studio-host'
 import { useStudioIcon } from '../../playground-icons'
 import IdStudioColorField from './StudioColorField.vue'
 import StudioPaletteSelect from './StudioPaletteSelect.vue'
@@ -93,6 +95,8 @@ function openPalette(action: 'create' | 'rename' | 'delete', name = '') {
 const replacementOptions = computed(() => paletteOptions.value.filter(name => name !== paletteTarget.value && (!Object.values(draft.value.brand.roles || {}).includes(paletteTarget.value) || typeof draft.value.brand.colors[name] === 'object')))
 
 const colors = computed(() => Object.keys(draft.value.brand.colors))
+const appConfig = useAppConfig() as unknown as { idStudio?: StudioHostConfig }
+const paletteGroups = computed(() => studioPaletteGroups(draft.value.brand.colors, appConfig.idStudio?.colorCatalog))
 const paletteOptions = computed(() => [...new Set([...colors.value.filter(name => typeof draft.value.brand.colors[name] === 'object'), ...studioBuiltinPalettes])])
 const customComponents = computed(() => Object.keys(draft.value.theme.ui ?? {}).filter(key => !['colors', 'icons'].includes(key)))
 
@@ -236,7 +240,7 @@ onBeforeUnmount(() => emit('busy', false))
       </UFormField>
       <div class="flex items-center justify-between gap-2">
         <h3 class="text-sm font-semibold">
-          Brand palettes
+          Color library
         </h3><UButton
           color="neutral"
           variant="soft"
@@ -247,67 +251,82 @@ onBeforeUnmount(() => emit('busy', false))
           New palette
         </UButton>
       </div>
-      <UAccordion
-        v-model="paletteExpanded"
-        :items="Object.entries(draft.brand.colors).map(([name, palette]) => ({ label: name, value: name, palette }))"
+      <section
+        v-for="group in paletteGroups"
+        :key="group.label"
+        class="space-y-3"
       >
-        <template #leading="{ item }">
-          <span
-            class="h-3 w-8 shrink-0 rounded ring ring-default"
-            :style="{ background: paletteRamp(item.value, draft.brand.colors) }"
-          />
-        </template>
-        <template #trailing="{ item, open }">
-          <span
-            v-if="paletteUses(item.value).length"
-            class="ml-auto max-w-24 truncate text-xs text-muted"
-            :title="[...new Set(paletteUses(item.value))].join(', ')"
-          >{{ paletteUses(item.value)[0] }}<span v-if="paletteUses(item.value).length > 1"> +{{ paletteUses(item.value).length - 1 }}</span></span><UIcon
-            :name="resolveIcon('i-lucide-chevron-down')"
-            class="size-4 shrink-0"
-            :class="{ 'rotate-180': open }"
-          />
-        </template>
-        <template #body="{ item }">
-          <div class="space-y-3">
-            <p
-              v-if="studioBuiltinPalettes.includes(item.value)"
-              class="studio-help"
-            >
-              Overrides the standard palette. Unspecified shades keep their standard values.
-            </p>
-            <div class="flex justify-end">
-              <UButton
+        <h4
+          v-if="group.label"
+          class="text-xs font-medium text-muted"
+        >
+          {{ group.label }}
+        </h4>
+        <UAccordion
+          v-model="paletteExpanded"
+          :items="group.items"
+        >
+          <template #leading="{ item }">
+            <span
+              class="h-3 w-8 shrink-0 rounded ring ring-default"
+              :style="{ background: paletteRamp(item.value, draft.brand.colors) }"
+            />
+          </template>
+          <template #trailing="{ item, open }">
+            <span
+              v-if="paletteUses(item.value).length"
+              class="ml-auto max-w-24 truncate text-xs text-muted"
+              :title="[...new Set(paletteUses(item.value))].join(', ')"
+            >{{ paletteUses(item.value)[0] }}<span v-if="paletteUses(item.value).length > 1"> +{{ paletteUses(item.value).length - 1 }}</span></span><UIcon
+              :name="resolveIcon('i-lucide-chevron-down')"
+              class="size-4 shrink-0"
+              :class="{ 'rotate-180': open }"
+            />
+          </template>
+          <template #body="{ item }">
+            <div class="space-y-3">
+              <p class="font-mono text-xs text-muted">
+                {{ item.value }}
+              </p>
+              <p
                 v-if="studioBuiltinPalettes.includes(item.value)"
-                color="neutral"
-                variant="ghost"
-                :disabled="Object.values(draft.brand.roles || {}).includes(item.value)"
-                :title="Object.values(draft.brand.roles || {}).includes(item.value) ? 'Remove brand role references before resetting.' : undefined"
-                :aria-label="`Reset palette ${item.value}`"
-                @click="resetPalette(item.value)"
+                class="studio-help"
               >
-                Reset to standard
-              </UButton>
-              <UDropdownMenu :items="[{ label: 'Rename', icon: resolveIcon('i-lucide-pencil'), onSelect: () => openPalette('rename', item.value) }, { label: 'Delete palette', icon: resolveIcon('i-lucide-trash-2'), color: 'error', onSelect: () => openPalette('delete', item.value) }]">
+                Overrides the standard palette. Unspecified shades keep their standard values.
+              </p>
+              <div class="flex justify-end">
                 <UButton
+                  v-if="studioBuiltinPalettes.includes(item.value)"
                   color="neutral"
                   variant="ghost"
-                  :icon="resolveIcon('i-lucide-ellipsis')"
-                  :aria-label="`Actions for palette ${item.value}`"
-                />
-              </UDropdownMenu>
+                  :disabled="Object.values(draft.brand.roles || {}).includes(item.value)"
+                  :title="Object.values(draft.brand.roles || {}).includes(item.value) ? 'Remove brand role references before resetting.' : undefined"
+                  :aria-label="`Reset palette ${item.value}`"
+                  @click="resetPalette(item.value)"
+                >
+                  Reset to standard
+                </UButton>
+                <UDropdownMenu :items="[{ label: 'Rename', icon: resolveIcon('i-lucide-pencil'), onSelect: () => openPalette('rename', item.value) }, { label: 'Delete palette', icon: resolveIcon('i-lucide-trash-2'), color: 'error', onSelect: () => openPalette('delete', item.value) }]">
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    :icon="resolveIcon('i-lucide-ellipsis')"
+                    :aria-label="`Actions for palette ${item.value}`"
+                  />
+                </UDropdownMenu>
+              </div>
+              <IdStudioColorField
+                v-for="(color, shade) in typeof item.palette === 'string' ? { base: item.palette } : item.palette"
+                :key="shade"
+                :label="`${item.value} ${shade}`"
+                :model-value="color || ''"
+                :error="fieldErrors[`palette:${item.value}:${shade}`]"
+                @change="paletteColor(item.value, String(shade), $event)"
+              />
             </div>
-            <IdStudioColorField
-              v-for="(color, shade) in typeof item.palette === 'string' ? { base: item.palette } : item.palette"
-              :key="shade"
-              :label="`${item.label} ${shade}`"
-              :model-value="color || ''"
-              :error="fieldErrors[`palette:${item.label}:${shade}`]"
-              @change="paletteColor(item.label, String(shade), $event)"
-            />
-          </div>
-        </template>
-      </UAccordion>
+          </template>
+        </UAccordion>
+      </section>
     </template>
     <template v-if="category === 'icons'">
       <StudioIconPicker

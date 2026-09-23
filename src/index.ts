@@ -145,4 +145,4 @@ export type { ComponentExampleMessages, ComponentExampleMessageKey } from './com
 export { resolveComponentCoverageStatus } from './component-coverage.js'
 export type { ComponentCoverageLabels } from './component-coverage.js'
 
-export type { StudioHostConfig } from './studio-host.js'
+export type { StudioHostConfig, StudioColorCatalog } from './studio-host.js'

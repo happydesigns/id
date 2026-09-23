@@ -1,7 +1,11 @@
 import type { StudioDocument } from './studio.js'
 
+/** Presentation metadata; palette keys remain the editing/export identity. */
+export type StudioColorCatalog = Record<string, { label: string, group?: string }>
+
 /** Trusted host configuration, separate from portable brand JSON. */
 export interface StudioHostConfig {
+  colorCatalog?: StudioColorCatalog
   document?: StudioDocument
   brands?: Record<string, StudioDocument>
   sourcePath?: string
