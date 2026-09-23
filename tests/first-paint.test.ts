@@ -17,19 +17,23 @@ it('caches resolved role colors and explicitly authored palettes without a full 
 })
 
 it('rejects stale revisions and invalid CSS declarations as a whole', () => {
-  function appliedStyle(revision: string, value: string) {
+  function appliedStyle(revision: string, value: string, iframe = false) {
     const styles: { id: string, textContent: string }[] = []
     const storage = {
       'id-studio:1:nuxt-ui:active': 'draft-id',
       'id-studio:1:nuxt-ui:first-paint': JSON.stringify({ active: 'draft-id', revision, light: { '--ui-bg': value }, dark: {} }),
     }
+    const window: { parent?: unknown } = {}
+    window.parent = iframe ? {} : window
     runInNewContext(createFirstPaintScript('abc123def456'), {
+      window,
       localStorage: { getItem: (key: keyof typeof storage) => storage[key] },
       document: { createElement: () => ({ id: '', textContent: '' }), head: { appendChild: (style: typeof styles[number]) => styles.push(style) } },
     })
     return styles
   }
 
+  expect(appliedStyle('abc123def456', 'red', true)).toEqual([])
   expect(appliedStyle('old-revision', 'red')).toEqual([])
   expect(appliedStyle('abc123def456', 'red;body{display:none}')).toEqual([])
   expect(appliedStyle('abc123def456', 'red')[0]?.textContent).toContain('--ui-bg:red;')

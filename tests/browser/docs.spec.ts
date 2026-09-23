@@ -314,3 +314,27 @@ test('a rendered template can report an error and recover on retry', async ({ pa
   await page.getByRole('button', { name: 'Retry preview', exact: true }).click()
   await expect(frame.locator('..')).toHaveAttribute('data-preview-state', 'ready')
 })
+
+for (const template of ['Landing', 'Docs']) test('theme changes replace preview colors in ' + template, async ({ page }) => {
+  await page.goto(base)
+  await selectTheme(page, 'Iris')
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('id-studio:1:nuxt-ui:first-paint'))).not.toBeNull()
+  await page.getByRole('button', { name: 'Templates', exact: true }).click()
+  await page.getByRole('button', { name: template, exact: true }).click()
+  const frame = page.frameLocator('iframe[title="' + template + ' template preview"]')
+  const colors = (element: Element) => {
+    const style = getComputedStyle(element)
+    return ['--ui-primary', '--ui-bg', '--ui-color-primary-500', '--ui-color-neutral-500'].map(name => style.getPropertyValue(name).trim())
+  }
+  for (const theme of ['Coral', 'Nuxt UI', 'Iris']) {
+    await selectTheme(page, theme)
+    for (const mode of ['Dark', 'Light']) {
+      await appearanceTrigger(page).click()
+      await page.getByRole('tab', { name: mode, exact: true }).click()
+      await page.keyboard.press('Escape')
+      await expect(page.locator('html')).toHaveClass(new RegExp(mode.toLowerCase()))
+      await expect.poll(() => frame.locator('html').evaluate(colors)).toEqual(await page.locator('html').evaluate(colors))
+    }
+  }
+  await expect(frame.locator('#id-theme-first-paint')).toHaveCount(0)
+})

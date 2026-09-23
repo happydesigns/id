@@ -4,6 +4,7 @@ export function createFirstPaintScript(revision: string) {
   if (!/^[a-f0-9]{12}$/.test(revision)) throw new Error('Invalid first-paint revision')
   return `(() => {
   try {
+    if (window.parent !== window) return
     const active = localStorage.getItem('id-studio:1:nuxt-ui:active')
     const raw = localStorage.getItem('id-studio:1:nuxt-ui:first-paint')
     if (!active || !raw || raw.length > 100000) return
