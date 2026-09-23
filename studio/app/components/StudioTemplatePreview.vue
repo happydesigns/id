@@ -10,6 +10,7 @@ const props = defineProps<{
 }>()
 
 const frame = ref<HTMLIFrameElement>()
+const page = ref(props.template.pages[0]?.id || 'home')
 const ready = ref(false)
 const failed = ref(false)
 const attempt = ref(0)
@@ -39,7 +40,7 @@ function send() {
     session,
     document: JSON.parse(JSON.stringify(props.document)),
     scene: props.template.id,
-    page: props.template.pages[0]?.id || 'home',
+    page: page.value,
     path: props.template.route,
     mode: props.mode,
     preference: props.mode,
@@ -49,6 +50,10 @@ function send() {
 
 function receive(event: MessageEvent) {
   if (!acceptsStudioFrame(event, frame.value)) return
+  if (event.data?.type === 'id-studio-navigate' && event.data.scene === props.template.id && props.template.pages.some(item => item.id === event.data.page)) {
+    page.value = event.data.page
+    send()
+  }
   if (event.data?.type === 'id-studio-ready') send()
   if (event.data?.type === 'id-studio-rendered') {
     stopTimeout()
