@@ -21,8 +21,8 @@ links:
 ::u-page-section
 ---
 title: Try your brand
-description: Explore and edit your brand on real components and application previews.
+description: Explore your brand on real components and application previews. Open Studio to edit it.
 ---
-  ::id-studio-embed
+  ::id-studio-showcase
   ::
 ::

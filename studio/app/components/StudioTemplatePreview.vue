@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { StudioDocument } from '../../../src/studio'
-import { acceptsStudioFrame, studioFrameUrl, type StudioTemplate } from '../../../studio/templates'
+import { acceptsStudioFrame, studioFrameUrl, type StudioTemplate } from '../../templates'
 
 const props = defineProps<{
   template: StudioTemplate
@@ -65,7 +65,15 @@ function retry() {
   startTimeout()
 }
 
-watch(() => [props.document, props.mode], send, { deep: true })
+watch(() => props.document, send, { deep: true })
+watch(() => props.mode, (mode) => {
+  const target = frame.value
+  if (!target?.contentWindow) return
+  const root = target.contentDocument?.documentElement
+  root?.classList.toggle('dark', mode === 'dark')
+  root?.classList.toggle('light', mode === 'light')
+  target.contentWindow.postMessage({ type: 'id-studio-color-mode', session, mode, preference: mode }, new URL(target.src).origin)
+}, { flush: 'sync' })
 onMounted(() => {
   window.addEventListener('message', receive)
   startTimeout()

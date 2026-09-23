@@ -1,0 +1,32 @@
+import { expect, test } from '@playwright/test'
+
+for (const width of [1440, 390]) test('brand showcase separates browsing from authoring at ' + width, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 })
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await page.goto('/showcase')
+  await expect(page.getByRole('button', { name: 'Toggle host mode' })).toBeEnabled()
+  const showcase = page.locator('[data-studio-showcase]')
+  const content = showcase.locator('[data-showcase-components]')
+  await expect(content.getByRole('region', { name: 'Interactive component examples' })).toBeVisible()
+  await expect(showcase.getByRole('button', { name: 'Export', exact: true })).toHaveCount(0)
+  await expect(showcase.getByRole('button', { name: 'Brand picker', exact: true })).toHaveCount(0)
+  await expect(showcase.locator('iframe')).toHaveCount(0)
+  const pickerBox = (await showcase.getByRole('group', { name: 'Preview type', exact: true }).boundingBox())!
+  const contentBox = (await content.boundingBox())!
+  expect(pickerBox.y + pickerBox.height).toBeLessThan(contentBox.y)
+  expect(await content.evaluate(element => parseFloat(getComputedStyle(element).paddingLeft))).toBe(width < 640 ? 16 : 24)
+  const email = content.locator('input[type="email"]').first()
+  await email.fill('preserved@example.com')
+  await showcase.getByRole('button', { name: 'Templates', exact: true }).click()
+  await page.getByRole('button', { name: 'Landing', exact: true }).click()
+  await expect(showcase.locator('[data-preview-state]')).toHaveAttribute('data-preview-state', 'ready', { timeout: 60000 })
+  const preview = showcase.frameLocator('iframe[title="Landing template preview"]')
+  await expect(preview.getByRole('heading', { name: 'Your projects, in one place' })).toBeVisible()
+  await page.getByRole('button', { name: 'Toggle host mode' }).click()
+  await expect(page.locator('html')).toHaveClass(/light/)
+  await expect(preview.locator('html')).toHaveClass(/light/)
+  await showcase.getByRole('button', { name: 'Components', exact: true }).click()
+  await expect(email).toHaveValue('preserved@example.com')
+  await expect(showcase.getByRole('link', { name: 'Open Studio', exact: true })).toHaveAttribute('href', '/studio?browse=true')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+})

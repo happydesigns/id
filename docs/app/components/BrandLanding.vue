@@ -2,20 +2,12 @@
 import { useBrandTheme } from '../../../app/composables/useBrandTheme'
 import type { StudioDocument } from '../../../src/studio'
 import type { StudioHostConfig } from '../../../src/studio-host'
-import { studioTemplates } from '../../../studio/templates'
-import StudioTemplatePicker from '../../../studio/app/components/StudioTemplatePicker.vue'
 import { docsPresetAvatar, docsPresetDocuments } from '../../presets'
-import BrandLandingTemplatePreview from './BrandLandingTemplatePreview.vue'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const brandTheme = useBrandTheme()
 const appConfig = useAppConfig() as unknown as { idStudio: StudioHostConfig & { document: StudioDocument } }
 const editor = useNuxtApp().$docsBrandEditor
-const colorMode = useColorMode()
-const mode = computed<'light' | 'dark'>(() => colorMode.value === 'dark' ? 'dark' : 'light')
-const templates = studioTemplates(appConfig.idStudio.templates)
-const scene = ref('components')
-const selectedTemplate = computed(() => templates.find(item => item.id === scene.value))
 const previewDocument = computed(() => editor?.document.value
   ?? appConfig.idStudio.brands?.[brandTheme.selectedName.value]
   ?? appConfig.idStudio.document)
@@ -120,49 +112,12 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
 
     <section
       class="border-b border-default bg-elevated/30"
-      aria-labelledby="landing-showcase-title"
+      aria-label="Brand previews"
     >
-      <UContainer class="pb-10">
-        <div class="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h2
-            id="landing-showcase-title"
-            class="sr-only"
-          >
-            Brand previews
-          </h2>
-          <StudioTemplatePicker
-            v-model="scene"
-            :templates="templates"
-            :document="previewDocument"
-            :mode="mode"
-            class="landing-template-picker"
-          />
-          <USeparator class="hidden min-w-0 flex-1 sm:flex" />
-          <UButton
-            to="/studio"
-            color="neutral"
-            variant="link"
-            trailing-icon="i-lucide-arrow-up-right"
-            size="sm"
-          >
-            Explore in Studio
-          </UButton>
-        </div>
-        <div
-          v-show="scene === 'components'"
-          class="rounded-xl border border-default bg-muted/40 p-3 sm:p-5"
-        >
-          <LazyIdStudioComponents
-            state="default"
-            embedded
-          />
-        </div>
-        <BrandLandingTemplatePreview
-          v-if="selectedTemplate"
-          :key="selectedTemplate.id"
-          :template="selectedTemplate"
+      <UContainer class="py-8 sm:py-10">
+        <IdStudioShowcase
           :document="previewDocument"
-          :mode="mode"
+          studio-label="Explore in Studio"
         />
       </UContainer>
     </section>
@@ -180,24 +135,5 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
 
 .landing-installation :deep(.my-5) {
   margin-block: 0;
-}
-
-.landing-template-picker {
-  width: min(100%, 320px);
-  padding: 4px;
-  border-radius: calc(var(--ui-radius) + 4px);
-  background: var(--ui-bg-elevated);
-}
-
-.landing-template-picker :deep(.studio-scene-trigger) {
-  min-height: 32px;
-  border-radius: var(--ui-radius);
-  padding-inline: 12px;
-  color: var(--ui-text-muted);
-}
-
-.landing-template-picker :deep(.studio-scene-trigger[aria-pressed="true"]) {
-  background: var(--ui-bg);
-  color: var(--ui-text-highlighted);
 }
 </style>
