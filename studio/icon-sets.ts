@@ -175,7 +175,7 @@ export const themeIcons = {
     info: 'i-material-symbols-info-outline-rounded',
     // colon form: the dashed name would resolve against the separate
     // material-symbols-light collection and never load
-    light: 'i-material-symbols-light-mode-outline-rounded',
+    light: 'material-symbols:light-mode-outline-rounded',
     loading: 'i-material-symbols-progress-activity',
     menu: 'i-material-symbols-menu-rounded',
     minus: 'i-material-symbols-remove-rounded',

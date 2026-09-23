@@ -354,3 +354,26 @@ for (const label of ['Nuxt UI', ...presetData.presets.filter(preset => preset.id
   await expect.poll(primary).toBe(color)
   expect(errors).toEqual([])
 })
+
+test('preset icons survive reload without icon API requests or SSR warnings', async ({ page }) => {
+  test.setTimeout(120_000)
+  const warnings: string[] = []
+  const requests: string[] = []
+  page.on('console', (message) => {
+    if (/\[Icon\].*(failed|timed out)/.test(message.text())) warnings.push(message.text())
+  })
+  await page.route(url => /iconify\.design|simplesvg\.com|unisvg\.com/.test(url.hostname) || url.pathname.includes('/_nuxt_icon/'), (route) => {
+    requests.push(route.request().url())
+    return route.abort()
+  })
+  await page.goto(base)
+  await expect(appearanceTrigger(page)).toBeVisible({ timeout: 30_000 })
+  for (const preset of presetData.presets.filter(preset => preset.id !== 'default')) {
+    await selectTheme(page, preset.name)
+    await page.reload()
+    await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: ' + preset.name)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  }
+  expect(warnings).toEqual([])
+  expect(requests).toEqual([])
+})
