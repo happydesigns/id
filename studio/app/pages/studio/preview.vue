@@ -74,16 +74,21 @@ function receive(event: MessageEvent) {
     window.parent.postMessage({ type: 'id-studio-preview-error' }, window.location.origin)
   }
 }
+function notifyEscape(event: KeyboardEvent) {
+  if (event.key === 'Escape' && !event.defaultPrevented) window.parent.postMessage({ type: 'id-studio-escape' }, window.location.origin)
+}
 function notifyPointer() {
   window.parent.postMessage({ type: 'id-studio-pointer' }, window.location.origin)
 }
 onMounted(() => {
   window.document.addEventListener('pointerdown', notifyPointer, true)
   window.addEventListener('message', receive)
+  window.addEventListener('keydown', notifyEscape)
   window.parent.postMessage({ type: 'id-studio-ready', frame: route.query.frame }, window.location.origin)
 })
 onBeforeUnmount(() => {
   window.removeEventListener('message', receive)
+  window.removeEventListener('keydown', notifyEscape)
   window.document.removeEventListener('pointerdown', notifyPointer, true)
 })
 </script>

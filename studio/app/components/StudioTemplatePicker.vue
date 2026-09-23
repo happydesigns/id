@@ -6,7 +6,7 @@ import type { StudioTemplate } from '../../templates'
 import type { StudioDocument } from '../../../src/studio'
 import StudioTemplateThumbnail from './StudioTemplateThumbnail.vue'
 
-const props = defineProps<{ templates: StudioTemplate[], document: StudioDocument, mode: 'light' | 'dark' }>()
+const props = defineProps<{ templates: StudioTemplate[], document: StudioDocument, mode: 'light' | 'dark', portal?: HTMLElement }>()
 const model = defineModel<string>({ required: true })
 const open = defineModel<boolean>('open', { default: false })
 const items = computed(() => props.templates)
@@ -42,6 +42,7 @@ const resolveIcon = useStudioIcon()
     </UButton>
     <UPopover
       v-model:open="open"
+      :portal="portal"
       :content="{ align: 'center', sideOffset: 8 }"
     >
       <UButton

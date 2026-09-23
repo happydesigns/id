@@ -82,6 +82,10 @@ export default defineNuxtPlugin({
         applying = false
       }
     }
+    const notifyEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !event.defaultPrevented) post({ type: 'id-studio-escape' })
+    }
+    window.addEventListener('keydown', notifyEscape)
     const notifyPointer = () => post({ type: 'id-studio-pointer' })
     window.document.addEventListener('pointerdown', notifyPointer, true)
     window.addEventListener('message', receive)
@@ -95,6 +99,7 @@ export default defineNuxtPlugin({
     if (import.meta.hot) import.meta.hot.dispose(() => {
       window.document.removeEventListener('pointerdown', notifyPointer, true)
       window.removeEventListener('message', receive)
+      window.removeEventListener('keydown', notifyEscape)
       stopNavigation()
       stopAfter()
       stopMode()

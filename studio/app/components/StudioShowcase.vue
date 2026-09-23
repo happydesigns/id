@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import { createBlankStudioDocument, type StudioDocument } from '../../../src/studio'
 import type { StudioHostConfig } from '../../../src/studio-host'
 import { studioTemplates } from '../../templates'
@@ -11,6 +11,32 @@ const props = withDefaults(defineProps<{
   title?: string
   studioLabel?: string
 }>(), { title: 'Brand previews', studioLabel: 'Open Studio' })
+const expanded = ref(false)
+const container = ref<HTMLDialogElement>()
+let returnFocus: HTMLElement | undefined
+let previousOverflow = ''
+function expand(event: MouseEvent) {
+  const dialog = container.value
+  if (!dialog) return
+  returnFocus = event.currentTarget as HTMLElement
+  previousOverflow = window.document.body.style.overflow
+  window.document.body.style.overflow = 'hidden'
+  expanded.value = true
+  dialog.close()
+  dialog.showModal()
+}
+async function collapse() {
+  if (!expanded.value) return
+  expanded.value = false
+  container.value?.close()
+  container.value?.show()
+  window.document.body.style.overflow = previousOverflow
+  await nextTick()
+  returnFocus?.focus({ preventScroll: true })
+}
+onBeforeUnmount(() => {
+  if (expanded.value) window.document.body.style.overflow = previousOverflow
+})
 const config = useAppConfig() as unknown as { idStudio?: StudioHostConfig }
 const colorMode = useColorMode()
 const mode = computed<'light' | 'dark'>(() => colorMode.value === 'dark' ? 'dark' : 'light')
@@ -21,9 +47,16 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
 </script>
 
 <template>
-  <section
+  <dialog
+    ref="container"
+    open
+    :role="expanded ? 'dialog' : 'region'"
+    :aria-modal="expanded || undefined"
+    class="showcase-shell"
+    :class="{ 'showcase-expanded': expanded }"
     :aria-label="title"
     data-studio-showcase
+    @cancel.prevent="collapse"
   >
     <div class="mb-6 flex flex-wrap items-center gap-4 sm:mb-8 sm:gap-6">
       <StudioTemplatePicker
@@ -31,6 +64,7 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
         :templates="templates"
         :document="document"
         :mode="mode"
+        :portal="container"
         class="showcase-picker"
       />
       <USeparator class="hidden min-w-0 flex-1 sm:flex" />
@@ -44,6 +78,22 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
       >
         {{ studioLabel }}
       </UButton>
+      <UButton
+        v-if="expanded"
+        :icon="mode === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
+        aria-label="Toggle preview color mode"
+        color="neutral"
+        variant="ghost"
+        @click="colorMode.preference = mode === 'dark' ? 'light' : 'dark'"
+      />
+      <UButton
+        :icon="expanded ? 'i-lucide-minimize' : 'i-lucide-maximize'"
+        :aria-label="expanded ? 'Close expanded preview' : 'Expand preview'"
+        :title="expanded ? 'Close expanded preview' : 'Expand preview'"
+        color="neutral"
+        variant="ghost"
+        @click="expanded ? collapse() : expand($event)"
+      />
     </div>
     <div
       v-show="scene === 'components'"
@@ -61,11 +111,20 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
       :template="selectedTemplate"
       :document="document"
       :mode="mode"
+      @escape="collapse"
     />
-  </section>
+  </dialog>
 </template>
 
 <style scoped>
+.showcase-shell { position: static; width: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; color: inherit; background: transparent; overflow: visible; }
+.showcase-expanded { position: fixed; inset: 0; display: flex; flex-direction: column; width: 100%; height: 100dvh; padding: 16px; overflow: hidden; background: var(--ui-bg); color: var(--ui-text); }
+.showcase-expanded > :first-child { flex-shrink: 0; margin-bottom: 16px; }
+.showcase-expanded > [data-showcase-components] { min-height: 0; overflow: auto; }
+.showcase-expanded > [data-preview-state] { flex: 1; min-height: 0; }
+.showcase-expanded :deep(iframe) { height: 100%; min-height: 0; }
+@media (min-width: 640px) { .showcase-expanded { padding: 24px; } }
+
 .showcase-picker {
   width: min(100%, 320px);
   padding: 4px;

@@ -9,6 +9,7 @@ const props = defineProps<{
   mode: 'light' | 'dark'
 }>()
 
+const emit = defineEmits<{ escape: [] }>()
 const frame = ref<HTMLIFrameElement>()
 const page = ref(props.template.pages[0]?.id || 'home')
 const ready = ref(false)
@@ -50,6 +51,7 @@ function send() {
 
 function receive(event: MessageEvent) {
   if (!acceptsStudioFrame(event, frame.value)) return
+  if (event.data?.type === 'id-studio-escape') emit('escape')
   if (event.data?.type === 'id-studio-navigate' && event.data.scene === props.template.id && props.template.pages.some(item => item.id === event.data.page)) {
     page.value = event.data.page
     send()
