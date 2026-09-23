@@ -5,8 +5,9 @@ import { builtinPalettes } from '../src/palettes'
 const palettes = Object.entries(builtinPalettes)
 const declarations = palettes.flatMap(([name, shades]) => Object.entries(shades).map(([shade, value]) => `--color-${name === 'neutral' ? 'old-neutral' : name}-${shade}: ${value};`))
 const roles = ['primary', 'secondary', 'success', 'info', 'warning', 'error']
-export const previewDefaults = `
-:root:root {
+export function createPreviewDefaultsCss(selector: string) {
+  return `
+${selector} {
   ${declarations.join('\n')}
   --font-sans: system-ui, sans-serif; --font-mono: ui-monospace, monospace; --font-display: var(--font-sans);
   --ui-radius: 0.25rem; --ui-container: 80rem;
@@ -19,7 +20,7 @@ export const previewDefaults = `
   --ui-border: var(--ui-color-neutral-200); --ui-border-muted: var(--ui-color-neutral-200);
   --ui-border-accented: var(--ui-color-neutral-300); --ui-border-inverted: var(--ui-color-neutral-900);
 }
-:root:root.dark {
+${selector}.dark {
   ${roles.map(role => `--ui-${role}: var(--ui-color-${role}-400);`).join('\n')}
   --ui-text-dimmed: var(--ui-color-neutral-500); --ui-text-muted: var(--ui-color-neutral-400);
   --ui-text-toned: var(--ui-color-neutral-300); --ui-text: var(--ui-color-neutral-200);
@@ -30,3 +31,4 @@ export const previewDefaults = `
   --ui-border-accented: var(--ui-color-neutral-700); --ui-border-inverted: #fff;
 }
 `
+}

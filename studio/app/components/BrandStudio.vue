@@ -29,7 +29,6 @@ import { studioTemplates, withinStudioRoute, studioFrameUrl, acceptsStudioFrame 
 import type { StudioDocument } from '../../../src/studio'
 import type { StudioHostConfig } from '../../../src/studio-host'
 
-useHead({ bodyAttrs: { class: 'id-studio-page' } })
 const route = useRoute()
 const router = useRouter()
 const config = useAppConfig() as unknown as { idStudio?: StudioHostConfig }
@@ -1750,7 +1749,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
 </template>
 
 <style>
-body.id-studio-page { margin: 0; overflow: hidden; }
+html[data-id-studio-theme] body { margin: 0; overflow: hidden; }
 /* Source inspection must stay readable even when the brand mono token is being edited. */
 .studio-source-code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 </style>
@@ -1816,6 +1815,6 @@ iframe { display: block; width: 100%; flex: 1; min-height: 0; border: 0; backgro
 </style>
 
 <style>
-body.id-studio-page { background: color-mix(in srgb, var(--ui-bg) 45%, var(--ui-bg-muted)); }
-html.dark body.id-studio-page { background: color-mix(in srgb, var(--ui-bg) 64%, black); }
+html[data-id-studio-theme] body { background: color-mix(in srgb, var(--ui-bg) 45%, var(--ui-bg-muted)); }
+html.dark[data-id-studio-theme] body { background: color-mix(in srgb, var(--ui-bg) 64%, black); }
 </style>

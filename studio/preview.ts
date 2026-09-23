@@ -1,13 +1,13 @@
 import { createBrandThemeCss } from '../src/studio-css'
 import { copyConfig, replaceThemeUi } from '../src/ui-config'
 import type { StudioDocument } from '../src/studio'
-import { previewDefaults } from './preview-defaults'
+import { createPreviewDefaultsCss } from './preview-defaults'
 
 export { copyConfig, replaceThemeUi as previewUi } from '../src/ui-config'
 type Config = Record<string, unknown>
 const object = (value: unknown): value is Config => !!value && typeof value === 'object' && !Array.isArray(value)
 
-/** Keep authoring controls usable while previews retain the full brand radius. */
+/** Clamp editor radii and scope its resets to the synchronously managed Studio lifetime. */
 export function studioShellCss(doc: StudioDocument): string {
   const variables = doc.theme.cssVariables
   const light = variables?.light?.['--ui-radius'] || '0.25rem'
@@ -22,13 +22,13 @@ export function studioShellCss(doc: StudioDocument): string {
         dark: { ...variables?.dark, '--ui-radius': `clamp(0rem, ${dark}, 0.25rem)` },
       },
     },
-  })
+  }, ':root:root[data-id-studio-theme]')
 }
 
-export function studioPreviewCss(doc: StudioDocument): string {
-  return [previewDefaults,
-    createBrandThemeCss(doc.brand, doc.theme, { paletteSelector: ':root:root', lightSelector: ':root:root', darkSelector: ':root:root.dark' }),
-    'html { color-scheme: light; overscroll-behavior: contain; } html.dark { color-scheme: dark; } body { background: var(--ui-bg); color: var(--ui-text); }',
+export function studioPreviewCss(doc: StudioDocument, selector = ':root:root'): string {
+  return [createPreviewDefaultsCss(selector),
+    createBrandThemeCss(doc.brand, doc.theme, { paletteSelector: selector, lightSelector: selector, darkSelector: `${selector}.dark` }),
+    `${selector} { color-scheme: light; overscroll-behavior: contain; } ${selector}.dark { color-scheme: dark; } :where(${selector}) body { background: var(--ui-bg); color: var(--ui-text); }`,
   ].join('\n')
 }
 

@@ -405,3 +405,34 @@ test('hero typography and generated code follow the selected preset', async ({ p
   await expect(page.getByRole('tabpanel').first()).not.toContainText('Source Serif 4')
   expect(errors).toEqual([])
 })
+
+for (const width of [390, 1440]) test('Studio return paints the host layout without a transient reset ' + width, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 })
+  await page.goto(base)
+  await selectTheme(page, 'Parchment')
+  await page.evaluate(() => document.fonts.ready)
+  const heading = page.locator('.landing-hero h1')
+  const original = await heading.boundingBox()
+  await page.getByRole('link', { name: 'Open Studio', exact: true }).click()
+  await expect(page.getByRole('main', { name: 'Brand Studio', exact: true })).toBeVisible()
+  // Observe the first painted frames, not just the settled destination layout.
+  const frames = page.evaluate(() => new Promise<Array<{ x: number, width: number, studio: boolean }>>((resolve) => {
+    const samples: Array<{ x: number, width: number, studio: boolean }> = []
+    function sample() {
+      const title = document.querySelector('.landing-hero h1')
+      if (title) {
+        const box = title.getBoundingClientRect()
+        samples.push({ x: box.x, width: box.width, studio: document.documentElement.hasAttribute('data-id-studio-theme') })
+      }
+      if (samples.length === 12) resolve(samples)
+      else requestAnimationFrame(sample)
+    }
+    requestAnimationFrame(sample)
+  }))
+  await page.getByRole('link', { name: 'happydesigns/id home', exact: true }).click()
+  for (const frame of await frames) {
+    expect(frame.studio).toBe(false)
+    expect(frame.x).toBeCloseTo(original!.x, 0)
+    expect(frame.width).toBeCloseTo(original!.width, 0)
+  }
+})
