@@ -23,6 +23,8 @@ export default defineNuxtConfig({
     },
   ],
 
+  css: [resolve(currentDir, './app/assets/css/navigation.css')],
+
   hooks: {
     'components:extend'(components) {
       // MDC needs the reference globally; other guide components stay auto-imported.

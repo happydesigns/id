@@ -1,0 +1,2 @@
+/* Native Nuxt hash navigation includes this offset without animating page changes. */
+html { scroll-padding-top: calc(var(--ui-header-height, 4rem) + 1rem); }
