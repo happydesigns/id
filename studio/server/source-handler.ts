@@ -1,4 +1,4 @@
-import { studioDocumentMaxBytes } from '../../src/studio-document'
+import { studioDocumentMaxBytes } from '@happydesigns/id/studio/core'
 import { createError, defineEventHandler, getHeader, getMethod, getRequestURL, readBody } from 'h3'
 import type { H3Event } from 'h3'
 import { basename } from 'node:path'
