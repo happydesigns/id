@@ -1,18 +1,29 @@
+<script setup lang="ts">
+import AppGithubLink from './AppGithubLink.vue'
+
+const appConfig = useAppConfig()
+</script>
+
 <template>
   <AppNavigationTheme>
     <UHeader
-      :ui="{ center: 'flex-1' }"
       class="flex flex-col"
     >
-      <AppHeaderCenter />
+      <UNavigationMenu :items="appConfig.header.links" />
       <template #left>
         <AppHeaderLeft />
       </template>
       <template #right>
-        <UContentSearchButton class="lg:hidden" />
+        <UContentSearchButton />
         <AppHeaderCTA />
+        <AppGithubLink />
       </template>
       <template #body>
+        <UNavigationMenu
+          :items="appConfig.header.links"
+          orientation="vertical"
+        />
+        <USeparator class="my-4" />
         <AppHeaderBody />
       </template>
       <template #bottom>

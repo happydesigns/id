@@ -23,6 +23,10 @@ export default defineAppConfig({
   },
   header: {
     title: 'happydesigns/id',
+    links: [
+      { label: 'Docs', to: '/getting-started/introduction' },
+      { label: 'Studio', to: '/studio' },
+    ],
   },
   navigation: {
     sub: 'header',
