@@ -90,7 +90,11 @@ const resolveIcon = useStudioIcon()
       class="viewport-frame"
       :style="width ? { width: `${width * scale}px`, height: `${height * scale}px` } : { width: '100%', height: '100%' }"
     >
-      <div class="viewport-clip">
+      <div
+        class="viewport-clip"
+        :class="{ 'viewport-pending': loading || failed }"
+        :aria-busy="!!loading && !failed"
+      >
         <slot :frame-style="frameStyle" />
         <div
           v-if="failed"
@@ -114,11 +118,12 @@ const resolveIcon = useStudioIcon()
           </div>
         </div>
         <div
-          v-else-if="showLoading"
+          v-else-if="loading"
           class="viewport-loading"
           role="status"
         >
           <UIcon
+            v-if="showLoading"
             :name="resolveIcon('i-lucide-loader-circle')"
             class="size-5 animate-spin"
           /><span class="sr-only">Loading preview</span>
@@ -154,6 +159,8 @@ const resolveIcon = useStudioIcon()
 .viewport-frame { position: relative; flex: none; }
 .viewport-clip { position: absolute; inset: 0; overflow: hidden; border-radius: calc(var(--ui-radius) * 4.5); isolation: isolate; background: var(--ui-bg); }
 .viewport-frame::after { content: ''; position: absolute; inset: 0; border: 1px solid var(--ui-border); border-radius: calc(var(--ui-radius) * 4.5); pointer-events: none; z-index: 3; }
+/* Keep the initial iframe canvas hidden until its themed render is acknowledged. */
+.viewport-pending :deep(iframe) { visibility: hidden; }
 .viewport-loading { position: absolute; inset: 0; display: grid; place-items: center; background: var(--ui-bg); color: var(--ui-text-muted); z-index: 2; }
 .viewport-handle { position: absolute; display: flex; align-items: center; justify-content: center; color: var(--ui-text-dimmed); border: 0; background: transparent; touch-action: none; z-index: 1; }
 .viewport-handle:hover, .viewport-handle:focus-visible { color: var(--ui-primary); background: var(--ui-bg-accented); border-radius: calc(var(--ui-radius) * 1.5); outline: none; }

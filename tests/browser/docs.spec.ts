@@ -436,3 +436,45 @@ for (const width of [390, 1440]) test('Studio return paints the host layout with
     expect(frame.width).toBeCloseTo(original!.width, 0)
   }
 })
+
+test('Studio masks the preview from its first frame until the themed render is ready', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' })
+  let releasePreview!: () => void
+  const responseGate = new Promise<void>((resolve) => {
+    releasePreview = resolve
+  })
+  await page.route('**/studio/preview?**', async (route) => {
+    await responseGate
+    await route.continue()
+  })
+  await page.goto(base)
+  await expect(appearanceTrigger(page)).toBeVisible()
+  const firstFrames = page.evaluate(() => new Promise<Array<{ visibility: string, covered: boolean }>>((resolve) => {
+    const samples: Array<{ visibility: string, covered: boolean }> = []
+    function sample() {
+      const frame = document.querySelector('iframe[title="Draft brand preview"]')
+      const clip = frame?.closest('.viewport-clip')
+      if (frame && clip) {
+        const cover = clip.querySelector('.viewport-loading')
+        samples.push({ visibility: getComputedStyle(frame).visibility, covered: !!cover && getComputedStyle(cover).backgroundColor === getComputedStyle(clip).backgroundColor })
+      }
+      if (samples.length === 12) resolve(samples)
+      else requestAnimationFrame(sample)
+    }
+    requestAnimationFrame(sample)
+  }))
+  try {
+    await page.getByRole('link', { name: 'Open Studio', exact: true }).click()
+    for (const frame of await firstFrames) {
+      expect(frame.visibility).toBe('hidden')
+      expect(frame.covered).toBe(true)
+    }
+  }
+  finally {
+    releasePreview()
+  }
+  const frame = page.locator('iframe[title="Draft brand preview"]')
+  await expect(frame).toBeVisible()
+  await expect(frame.contentFrame().getByText('Transfer funds', { exact: true })).toBeVisible()
+  await expect(page.locator('.viewport-loading')).toHaveCount(0)
+})
