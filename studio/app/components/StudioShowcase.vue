@@ -13,7 +13,6 @@ const props = withDefaults(defineProps<{
   studioLabel?: string
 }>(), { title: 'Brand previews', studioLabel: 'Open Studio' })
 const expanded = ref(false)
-const controlsVisible = ref(true)
 const container = ref<HTMLDialogElement>()
 provide(portalTargetInjectionKey, computed(() => container.value ?? 'body'))
 const inlineHeight = ref(0)
@@ -37,7 +36,6 @@ function expand(event: MouseEvent) {
   returnFocus = event.currentTarget as HTMLElement
   previousOverflow = window.document.body.style.overflow
   window.document.body.style.overflow = 'hidden'
-  controlsVisible.value = true
   expanded.value = true
   dialog.close()
   dialog.showModal()
@@ -70,11 +68,7 @@ const document = computed(() => props.document ?? config.idStudio?.document ?? c
 const templates = computed(() => studioTemplates(config.idStudio?.templates))
 const scene = ref('components')
 const previewOptions = computed(() => [{ label: 'Components', value: 'components' }, ...templates.value.map(item => ({ label: item.label, value: item.id }))])
-async function toggleControls() {
-  controlsVisible.value = !controlsVisible.value
-  await nextTick()
-  container.value?.querySelector<HTMLElement>('[data-controls-toggle]')?.focus({ preventScroll: true })
-}
+
 const selectedTemplate = computed(() => templates.value.find(template => template.id === scene.value))
 </script>
 
@@ -94,7 +88,6 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
     >
       <div
         class="showcase-toolbar mb-6 flex flex-wrap items-center gap-4 sm:mb-8 sm:gap-6"
-        :class="{ 'showcase-controls-hidden': expanded && !controlsVisible }"
       >
         <StudioTemplatePicker
           v-if="!expanded"
@@ -107,7 +100,6 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
         />
         <USelect
           v-if="expanded"
-          v-show="controlsVisible"
           v-model="scene"
           :items="previewOptions"
           aria-label="Preview"
@@ -131,7 +123,6 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
         </UButton>
         <UButton
           v-if="expanded"
-          v-show="controlsVisible"
           :icon="mode === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
           aria-label="Toggle preview color mode"
           color="neutral"
@@ -139,23 +130,12 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
           @click="colorMode.preference = mode === 'dark' ? 'light' : 'dark'"
         />
         <UButton
-          v-show="!expanded || controlsVisible"
           :icon="expanded ? 'i-lucide-minimize' : 'i-lucide-maximize'"
           :aria-label="expanded ? 'Close expanded preview' : 'Expand preview'"
           :title="expanded ? 'Close expanded preview' : 'Expand preview'"
           color="neutral"
           variant="ghost"
           @click="expanded ? collapse() : expand($event)"
-        />
-        <UButton
-          v-if="expanded"
-          data-controls-toggle
-          :icon="controlsVisible ? 'i-lucide-chevron-down' : 'i-lucide-sliders-horizontal'"
-          :aria-label="controlsVisible ? 'Hide preview controls' : 'Show preview controls'"
-          :aria-expanded="controlsVisible"
-          color="neutral"
-          variant="ghost"
-          @click="toggleControls"
         />
       </div>
       <div
