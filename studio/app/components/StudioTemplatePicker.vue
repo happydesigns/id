@@ -43,6 +43,7 @@ const resolveIcon = useStudioIcon()
     <UPopover
       v-model:open="open"
       :portal="portal"
+      :ui="{ content: 'relative z-30' }"
       :content="{ align: 'center', sideOffset: 8 }"
     >
       <UButton

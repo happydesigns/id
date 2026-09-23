@@ -73,7 +73,10 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
 </script>
 
 <template>
-  <div :style="expanded ? { height: `${inlineHeight}px` } : undefined">
+  <div
+    class="min-w-0 w-full"
+    :style="expanded ? { height: `${inlineHeight}px` } : undefined"
+  >
     <dialog
       ref="container"
       open

@@ -17,6 +17,11 @@ onMounted(() => {
     >
       Toggle host mode
     </UButton>
-    <IdStudioShowcase />
+    <div
+      class="grid"
+      data-showcase-grid
+    >
+      <IdStudioShowcase />
+    </div>
   </UContainer>
 </template>

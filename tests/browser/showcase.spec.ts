@@ -15,6 +15,9 @@ for (const width of [1440, 390]) test('brand showcase separates browsing from au
   const contentBox = (await content.boundingBox())!
   expect(pickerBox.y + pickerBox.height).toBeLessThan(contentBox.y)
   expect(await content.evaluate(element => parseFloat(getComputedStyle(element).paddingLeft))).toBe(width < 640 ? 16 : 24)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
+  const gridBox = (await page.locator('[data-showcase-grid]').boundingBox())!
+  expect(contentBox.width).toBeLessThanOrEqual(gridBox.width)
   const email = content.locator('input[type="email"]').first()
   await email.fill('preserved@example.com')
   const expand = showcase.getByRole('button', { name: 'Expand preview', exact: true })
@@ -43,6 +46,11 @@ for (const width of [1440, 390]) test('brand showcase separates browsing from au
   await page.getByRole('button', { name: 'Toggle host mode' }).click()
   await expect(page.locator('html')).toHaveClass(/light/)
   await expect(preview.locator('html')).toHaveClass(/light/)
+  // Reopening the picker above an existing iframe must keep choices clickable.
+  await showcase.getByRole('button', { name: 'Templates', exact: true }).click()
+  const gallery = showcase.getByRole('group', { name: 'Choose a template', exact: true })
+  await gallery.getByRole('button', { name: 'Landing', exact: true }).click({ timeout: 5000 })
+  await expect(gallery).toBeHidden()
   await showcase.getByRole('button', { name: 'Components', exact: true }).click()
   await expect(email).toHaveValue('preserved@example.com')
   await expect(showcase.getByRole('link', { name: 'Open Studio', exact: true })).toHaveAttribute('href', '/studio?browse=true')

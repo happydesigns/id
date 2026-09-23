@@ -12,7 +12,7 @@ const available = computed(() => router.getRoutes().some(route => route.path ===
   <UButton
     v-if="available"
     to="/studio?browse=true"
-    :label="label"
+    :label="label || undefined"
     icon="i-lucide-palette"
     color="neutral"
     variant="ghost"
