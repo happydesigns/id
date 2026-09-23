@@ -76,7 +76,11 @@ watch(scene, () => {
   templatePage.value = selectedTemplate.value?.pages[0]?.id || 'home'
 }, { flush: 'sync' })
 const colorMode = useColorMode()
-const preference = ref<'light' | 'dark' | 'system'>(route.query.mode === 'dark' ? 'dark' : route.query.mode === 'light' ? 'light' : 'system')
+function modePreference(value: unknown): 'light' | 'dark' | 'system' | undefined {
+  return value === 'light' || value === 'dark' || value === 'system' ? value : undefined
+}
+// Opening Studio without a mode override inherits the host's user preference.
+const preference = ref(modePreference(route.query.mode) ?? modePreference(colorMode.preference) ?? 'system')
 const mode = computed<'light' | 'dark'>(() => preference.value === 'system' ? colorMode.value === 'dark' ? 'dark' : 'light' : preference.value)
 const previewZoom = ref(1)
 const state = ref(route.query.state === 'error' ? 'error' : 'default')
@@ -759,7 +763,7 @@ watch(() => route.query, (query) => {
   editorPinned.value = query.docked === 'true'
   scene.value = templates.some(item => item.id === query.view) ? String(query.view) : 'components'
   templatePage.value = selectedTemplate.value?.pages.find(page => page.id === query.page)?.id || selectedTemplate.value?.pages[0]?.id || 'home'
-  preference.value = query.mode === 'dark' ? 'dark' : query.mode === 'light' ? 'light' : 'system'
+  preference.value = modePreference(query.mode) ?? preference.value
   if (selectedTemplate.value?.routePrefix && withinStudioRoute(query.path, selectedTemplate.value.routePrefix)) paths.value[scene.value] = query.path
   state.value = query.state === 'error' ? 'error' : 'default'
   compare.value = query.compare === 'true'

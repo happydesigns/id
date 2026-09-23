@@ -9,6 +9,7 @@ const mode = useColorMode()
     <UButton @click="mode.preference = mode.value === 'dark' ? 'light' : 'dark'">
       Toggle host mode
     </UButton>
+    <IdStudioLink />
     <IdStudioEmbed title="Embedded brand editor" />
   </UContainer>
 </template>
