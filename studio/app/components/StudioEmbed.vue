@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { embeddedModeEvent } from '../../embedded-mode'
 
 defineProps<{ title?: string }>()
 const colorMode = useColorMode()
@@ -13,7 +14,13 @@ const attempt = ref(0)
 let observer: IntersectionObserver | undefined
 let timer: ReturnType<typeof setTimeout> | undefined
 function sendMode() {
-  frame.value?.contentWindow?.postMessage({ type: 'id-studio-embed-mode', mode: colorMode.value === 'dark' ? 'dark' : 'light' }, window.location.origin)
+  const target = frame.value?.contentWindow
+  if (!target) return
+  const mode = colorMode.value === 'dark' ? 'dark' : 'light'
+  // Same-origin Studio can update its shell and previews before the host's next
+  // paint. A message remains the fallback while the child is still mounting.
+  if (frame.value?.contentDocument && !target.dispatchEvent(new CustomEvent(embeddedModeEvent, { detail: mode, cancelable: true }))) return
+  target.postMessage({ type: 'id-studio-embed-mode', mode }, window.location.origin)
 }
 function start() {
   clearTimeout(timer)
@@ -37,7 +44,7 @@ function receive(event: MessageEvent) {
 }
 watch(() => colorMode.value, () => {
   if (src.value) sendMode()
-})
+}, { flush: 'sync' })
 onMounted(() => {
   window.addEventListener('message', receive)
   observer = new IntersectionObserver((entries) => {

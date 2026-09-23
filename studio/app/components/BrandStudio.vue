@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { neutralPalettes } from '../../palette'
+import { embeddedModeEvent } from '../../embedded-mode'
 import { useStudioGuard } from '../composables/useStudioGuard'
 import { useStudioFrames } from '../composables/useStudioFrames'
 import { useStudioProjects } from '../composables/useStudioProjects'
@@ -609,6 +610,12 @@ function refresh() {
   send(originalFrame.value, baseline.value)
   send(draftFrame.value, draft.value)
 }
+function receiveEmbeddedMode(event: Event) {
+  const value = (event as CustomEvent).detail
+  if (!embedded.value || !['light', 'dark'].includes(value)) return
+  preference.value = value
+  event.preventDefault()
+}
 function ready(event: MessageEvent) {
   if (embedded.value && event.source === window.parent && event.origin === window.location.origin && event.data?.type === 'id-studio-embed-mode' && ['light', 'dark'].includes(event.data.mode)) {
     preference.value = event.data.mode
@@ -794,7 +801,8 @@ onMounted(() => {
   // including when a shared URL overrides a saved or system preference.
   watch([preference, () => colorMode.unknown], ([value, unknown]) => {
     if (!unknown) colorMode.preference = value
-  }, { immediate: true })
+  }, { immediate: true, flush: 'sync' })
+  window.addEventListener(embeddedModeEvent, receiveEmbeddedMode)
   window.addEventListener('message', ready)
   window.addEventListener('beforeunload', beforeUnload)
   nextTick(refresh)
@@ -851,6 +859,7 @@ watch([mode, preference], ([value, selected]) => {
 }, { flush: 'sync' })
 onBeforeUnmount(() => {
   finishLeaving(false)
+  window.removeEventListener(embeddedModeEvent, receiveEmbeddedMode)
   window.removeEventListener('message', ready)
   window.removeEventListener('beforeunload', beforeUnload)
 })
