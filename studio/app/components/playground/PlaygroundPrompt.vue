@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { usePlaygroundKbd } from '../../../playground-kbd'
 import { useStudioIcon, useStudioIcons } from '../../../playground-icons'
 import { usePlaygroundToast } from '../../../playground-toast'
 import type { DropdownMenuItem } from '@nuxt/ui'
+
+const kbd = usePlaygroundKbd()
 
 const studioIcons = useStudioIcons()
 
@@ -77,7 +80,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
   [
     { label: 'Add files or photos', get icon() {
       return studioIcons.paperclip
-    }, kbds: ['meta', 'U'] },
+    }, kbds: [kbd('meta'), 'U'] },
     {
       label: 'Add to project',
       icon: appConfig.ui.icons.folder,

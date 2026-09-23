@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { usePlaygroundKbd } from '../../../playground-kbd'
+
+const kbd = usePlaygroundKbd()
 const shortcuts = [
   { label: 'Search', keys: ['meta', 'K'] },
   { label: 'Quick actions', keys: ['meta', 'J'] },
@@ -32,7 +35,7 @@ const shortcuts = [
           <UKbd
             v-for="key in shortcut.keys"
             :key="key"
-            :value="key"
+            :value="kbd(key)"
           />
         </div>
       </li>

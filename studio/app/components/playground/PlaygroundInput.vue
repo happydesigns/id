@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { usePlaygroundKbd } from '../../../playground-kbd'
 import { useStudioIcons } from '../../../playground-icons'
+
+const kbd = usePlaygroundKbd()
 
 const studioIcons = useStudioIcons()
 const appConfig = useAppConfig()
@@ -33,7 +36,7 @@ defineProps<{ state?: string }>()
         class="w-full"
       >
         <template #trailing>
-          <UKbd value="meta" />
+          <UKbd :value="kbd('meta')" />
           <UKbd value="K" />
         </template>
       </UInput>

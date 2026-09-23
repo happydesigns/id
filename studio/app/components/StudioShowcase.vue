@@ -119,7 +119,7 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
             to="/studio?browse=true"
             color="neutral"
             variant="soft"
-            size="sm"
+            size="md"
             icon="i-lucide-palette"
             :aria-label="studioLabel"
             :title="studioLabel"
@@ -140,7 +140,7 @@ const selectedTemplate = computed(() => templates.value.find(template => templat
             :title="expanded ? 'Close expanded preview' : 'Expand preview'"
             color="neutral"
             :variant="expanded ? 'ghost' : 'soft'"
-            size="sm"
+            size="md"
             @click="expanded ? collapse() : expand($event)"
           />
         </div>

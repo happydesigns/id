@@ -80,19 +80,13 @@ const progress = ref(75)
     <div class="flex items-center justify-between">
       <UAvatarGroup size="xs">
         <UAvatar
-          src="https://github.com/benjamincanac.png"
           alt="Benjamin Canac"
-          loading="lazy"
         />
         <UAvatar
-          src="https://github.com/romhml.png"
           alt="Romain Hamel"
-          loading="lazy"
         />
         <UAvatar
-          src="https://github.com/noook.png"
           alt="Neil Richter"
-          loading="lazy"
         />
       </UAvatarGroup>
       <span class="text-xs text-muted">+8 active now</span>

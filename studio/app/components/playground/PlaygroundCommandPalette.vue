@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { usePlaygroundKbd } from '../../../playground-kbd'
 import { usePlaygroundToast } from '../../../playground-toast'
 import { useStudioIcons } from '../../../playground-icons'
 import type { CommandPaletteGroup, CommandPaletteItem } from '@nuxt/ui'
+
+const kbd = usePlaygroundKbd()
 
 const studioIcons = useStudioIcons()
 
@@ -22,17 +25,17 @@ const groups = ref<CommandPaletteGroup<CommandPaletteItem>[]>([
       {
         label: 'Benjamin Canac',
         suffix: 'benjamincanac',
-        avatar: { src: 'https://github.com/benjamincanac.png', alt: '', loading: 'lazy' },
+        avatar: { alt: 'Benjamin Canac' },
       },
       {
         label: 'Romain Hamel',
         suffix: 'romhml',
-        avatar: { src: 'https://github.com/romhml.png', alt: '', loading: 'lazy' },
+        avatar: { alt: 'Romain Hamel' },
       },
       {
         label: 'Neil Richter',
         suffix: 'noook',
-        avatar: { src: 'https://github.com/noook.png', alt: '', loading: 'lazy' },
+        avatar: { alt: 'Neil Richter' },
       },
     ],
   },
@@ -45,7 +48,7 @@ const groups = ref<CommandPaletteGroup<CommandPaletteItem>[]>([
         get icon() {
           return studioIcons.filePlus
         },
-        kbds: ['meta', 'N'],
+        get kbds() { return [kbd('meta'), 'N'] },
         onSelect() {
           toast.add({ title: 'Add new file' })
         },
@@ -56,7 +59,7 @@ const groups = ref<CommandPaletteGroup<CommandPaletteItem>[]>([
         get icon() {
           return studioIcons.folderPlus
         },
-        kbds: ['meta', 'F'],
+        get kbds() { return [kbd('meta'), 'F'] },
         onSelect() {
           toast.add({ title: 'Add new folder' })
         },
@@ -67,7 +70,7 @@ const groups = ref<CommandPaletteGroup<CommandPaletteItem>[]>([
         get icon() {
           return studioIcons.tag
         },
-        kbds: ['meta', 'L'],
+        get kbds() { return [kbd('meta'), 'L'] },
         onSelect() {
           toast.add({ title: 'Add label' })
         },
