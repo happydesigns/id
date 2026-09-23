@@ -17,3 +17,12 @@ links:
     variant: outline
 ---
 ::
+
+::u-page-section
+---
+title: Try your brand
+description: Explore and edit your brand on real components and application previews.
+---
+  ::id-studio-embed
+  ::
+::

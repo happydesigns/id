@@ -1,0 +1,25 @@
+import { expect, test } from '@playwright/test'
+
+for (const width of [1440, 390]) test('embedded Studio preserves input across host mode changes at ' + width, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 })
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.goto('/embed')
+  const embed = page.locator('[data-studio-embed]')
+  await embed.scrollIntoViewIfNeeded()
+  await expect(embed).toHaveAttribute('data-studio-embed', 'ready', { timeout: 60000 })
+  const studio = page.frameLocator('iframe[title="Embedded brand editor"]')
+  const preview = studio.frameLocator('iframe[title="Draft brand preview"]')
+  const email = preview.locator('input[type="email"]').first()
+  await email.fill('preserved@example.com')
+  const oldMode = await studio.locator('main').getAttribute('data-mode')
+  await page.getByRole('button', { name: 'Toggle host mode' }).click()
+  await expect(studio.locator('main')).toHaveAttribute('data-mode', oldMode === 'dark' ? 'light' : 'dark')
+  await expect(email).toHaveValue('preserved@example.com')
+  const picker = studio.getByRole('button', { name: 'Brand picker', exact: true })
+  await expect(picker).toBeVisible()
+  expect((await picker.boundingBox())!.width).toBeGreaterThan(100)
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await expect.poll(() => studio.locator('html').evaluate(element => element.scrollWidth <= innerWidth)).toBe(true)
+  expect(errors).toEqual([])
+})

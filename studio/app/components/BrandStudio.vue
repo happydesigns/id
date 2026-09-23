@@ -32,6 +32,7 @@ const StudioThemeEditor = defineAsyncComponent(() => import('./StudioThemeEditor
 
 const route = useRoute()
 const router = useRouter()
+const embedded = computed(() => route.query.embed === 'true')
 const config = useAppConfig() as unknown as { idStudio?: StudioHostConfig }
 const productName = config.idStudio?.host?.name || 'happydesigns/id'
 const productSlash = productName.lastIndexOf('/')
@@ -609,6 +610,10 @@ function refresh() {
   send(draftFrame.value, draft.value)
 }
 function ready(event: MessageEvent) {
+  if (embedded.value && event.source === window.parent && event.origin === window.location.origin && event.data?.type === 'id-studio-embed-mode' && ['light', 'dark'].includes(event.data.mode)) {
+    preference.value = event.data.mode
+    return
+  }
   if (!acceptsStudioFrame(event, originalFrame.value) && !acceptsStudioFrame(event, draftFrame.value)) return
   if (event.data?.type === 'id-studio-pointer') {
     brandPickerOpen.value = false
@@ -645,6 +650,9 @@ function ready(event: MessageEvent) {
   if (event.source === originalFrame.value?.contentWindow) send(originalFrame.value, baseline.value)
   if (event.source === draftFrame.value?.contentWindow) send(draftFrame.value, draft.value)
 }
+watch([storageReady, () => loadedFrames.value.draft], ([stored, rendered]) => {
+  if (embedded.value && stored && rendered) window.parent.postMessage({ type: 'id-studio-embed-ready' }, window.location.origin)
+})
 const includeGuide = ref(false)
 async function exportProject() {
   busy.value = true
@@ -680,6 +688,16 @@ function persist() {
   }
 }
 function restore(session: StudioSession) {
+  const staleHost = session.catalogKey === catalogPrefix + 'host' && diffStudioDocuments(session.baseline, seed).length > 0
+  if (staleHost && diffStudioDocuments(session.baseline, session.draft).length === 0) {
+    // Keep the previous snapshot available without allowing it to shadow the current source.
+    saveProject({ ...session, catalogKey: undefined })
+    listProjects()
+    replace(seed, 'host')
+    notice.value = 'The brand source has changed. Studio now uses the current brand; the previous snapshot remains saved in this browser.'
+    loadSource()
+    return
+  }
   persistPristine.value = true
   connected.value = false
   error.value = ''
@@ -696,7 +714,21 @@ function restore(session: StudioSession) {
   brandPickerOpen.value = false
   editing.value = !readOnly.value && (typeof route.query.editor === 'string' || route.query.browse === 'false')
   persist()
+  if (staleHost) {
+    sourceConflict.value = true
+    notice.value = 'This saved draft differs from the current brand source. Your edits have been preserved.'
+  }
   if (catalogKey.value === catalogPrefix + 'host') loadSource()
+}
+function reopenCurrentBrand() {
+  persist()
+  const saved = projects.value.find(project => project.id === projectId.value)
+  if (saved) {
+    saveProject({ ...saved, catalogKey: undefined })
+    listProjects()
+  }
+  replace(seed, 'host')
+  loadSource()
 }
 function exportSource() {
   download('brand.studio.json', JSON.stringify(draft.value, null, 2) + '\n')
@@ -834,11 +866,15 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
   <main
     v-if="storageReady"
     class="studio-shell"
+    :class="{ 'studio-embedded': embedded }"
     :data-mode="mode"
     aria-label="Brand Studio"
   >
     <header class="studio-header">
-      <div class="studio-product inline-flex items-center gap-2.5">
+      <div
+        v-if="!embedded"
+        class="studio-product inline-flex items-center gap-2.5"
+      >
         <NuxtLink
           :to="config.idStudio?.home || '/'"
           class="inline-flex items-center gap-2.5 rounded-md font-semibold tracking-tight text-highlighted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
@@ -926,7 +962,7 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
       </div>
       <div class="studio-review flex items-center gap-2">
         <UTooltip
-          v-if="config.idStudio?.documentation || config.idStudio?.home"
+          v-if="!embedded && (config.idStudio?.documentation || config.idStudio?.home)"
           text="Documentation"
         >
           <UButton
@@ -964,6 +1000,23 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
         @change="openDocument"
       >
     </header>
+    <UAlert
+      v-if="sourceConflict"
+      title="Saved draft"
+      description="The brand source has changed. Your saved edits are preserved separately from the current brand."
+      color="warning"
+      variant="soft"
+    >
+      <template #actions>
+        <UButton
+          color="warning"
+          variant="outline"
+          @click="reopenCurrentBrand"
+        >
+          Use current brand
+        </UButton>
+      </template>
+    </UAlert>
     <UModal
       v-model:open="manageOpen"
       :title="manageTarget ? manageAction === 'delete' ? 'Delete brand' : 'Rename brand' : 'Manage brands'"
@@ -1759,6 +1812,10 @@ html[data-id-studio-theme] body { margin: 0; overflow: hidden; }
 .studio-product { justify-self: start; white-space: nowrap; font-size: 20px; }
 
 .studio-scenes { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 19rem); align-items: center; gap: 12px; margin: auto; width: 30.75rem; min-width: 0; max-width: 70vw; --studio-scene-radius: calc(var(--ui-radius) * 3.5); }.studio-scenes > * { width: 100%; min-width: 0; }
+.studio-embedded { padding: 0 12px 12px; }
+.studio-embedded .studio-header { display: flex; flex-wrap: wrap; padding-inline: 0; gap: 8px; }
+.studio-embedded .studio-scenes { margin: 0; flex: 1 1 360px; max-width: none; }
+.studio-embedded .studio-review { margin-left: auto; }
 .studio-project-menu, .studio-mobile-control, .studio-view-mobile { display: none; }
 .studio-scenes :deep(.studio-scene-pill) { padding: 4px; border-radius: var(--studio-scene-radius); background: var(--ui-bg-elevated); }
 .studio-scenes :deep(.studio-scene-trigger) { width: 100%; min-height: 32px; padding-inline: 12px; border-radius: max(0px, calc(var(--studio-scene-radius) - 4px)); background: transparent; color: var(--ui-text-muted); cursor: pointer; transition: background-color 150ms, color 150ms; }
