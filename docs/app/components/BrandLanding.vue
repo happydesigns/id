@@ -69,17 +69,17 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
         </template>
 
         <UCard
-          class="min-w-0"
-          :ui="{ body: 'p-0 sm:p-0', footer: 'p-0 sm:p-0' }"
+          class="min-w-0 @container"
+          :ui="{ body: 'p-4 sm:p-6', footer: 'p-4 sm:p-6' }"
         >
-          <div class="landing-installation min-w-0 overflow-hidden px-3 pb-6 pt-2 sm:px-5">
+          <div class="landing-installation min-w-0 overflow-hidden">
             <slot name="installation" />
           </div>
 
           <template #footer>
-            <div class="border-t border-default px-3 py-2.5 sm:px-4">
+            <div class="min-w-0">
               <div
-                class="grid grid-cols-6 justify-items-center gap-x-1 gap-y-2 sm:grid-cols-12"
+                class="grid grid-cols-6 justify-items-center gap-x-1 gap-y-2 @min-[30rem]:grid-cols-12"
                 role="group"
                 aria-label="Brand presets"
               >
@@ -185,12 +185,13 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
 .landing-template-picker {
   width: min(100%, 320px);
   padding: 4px;
-  border-radius: var(--ui-radius);
+  border-radius: calc(var(--ui-radius) + 4px);
   background: var(--ui-bg-elevated);
 }
 
 .landing-template-picker :deep(.studio-scene-trigger) {
   min-height: 32px;
+  border-radius: var(--ui-radius);
   padding-inline: 12px;
   color: var(--ui-text-muted);
 }
