@@ -152,11 +152,12 @@ test('Studio edits follow the selected profile into docs and survive reload', as
 for (const width of [390, 1440]) test('landing shows working code tabs and fits viewport ' + width, async ({ page }) => {
   await page.setViewportSize({ width, height: 1000 })
   await page.goto(base)
+  await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Nuxt UI')
   await expect(page.getByRole('link', { name: 'Read the docs', exact: true })).toHaveAttribute('href', '/getting-started/introduction')
-  await expect(page.getByRole('tabpanel').first()).toContainText('extends:')
-  await expect.poll(() => page.getByRole('tabpanel').first().locator('code .line span').evaluateAll(elements => new Set(elements.map(element => getComputedStyle(element).color)).size)).toBeGreaterThan(1)
-  await page.getByRole('tab', { name: 'main.css', exact: true }).click()
   await expect(page.getByRole('tabpanel').first()).toContainText('@import')
+  await expect.poll(() => page.getByRole('tabpanel').first().locator('code .line span').evaluateAll(elements => new Set(elements.map(element => getComputedStyle(element).color)).size)).toBeGreaterThan(1)
+  await page.getByRole('tab', { name: 'app.config.ts', exact: true }).click()
+  await expect(page.getByRole('tabpanel').first()).toContainText('defineAppConfig')
   await expect.poll(() => page.getByRole('tabpanel').first().locator('code .line span').evaluateAll(elements => new Set(elements.map(element => getComputedStyle(element).color)).size)).toBeGreaterThan(1)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.evaluate(() => window.scrollTo(0, 0))
@@ -384,4 +385,23 @@ test('preset icons survive reload without icon API requests or SSR warnings', as
   }
   expect(warnings).toEqual([])
   expect(requests).toEqual([])
+})
+
+test('hero typography and generated code follow the selected preset', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.route('**/api/_mdc/highlight**', route => route.abort())
+  await page.goto(base)
+  await selectTheme(page, 'Parchment')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCSS('font-family', /Source Serif 4/)
+  await expect(page.getByRole('tabpanel').first()).toContainText('Source Serif 4')
+  await expect.poll(() => page.evaluate(async () => {
+    const faces = await document.fonts.load('700 48px "Source Serif 4"')
+    return faces.length > 0 && faces.every(face => face.status === 'loaded')
+  })).toBe(true)
+  await selectTheme(page, 'Iris')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCSS('font-family', /Manrope/)
+  await expect(page.getByRole('tabpanel').first()).toContainText('Manrope')
+  await expect(page.getByRole('tabpanel').first()).not.toContainText('Source Serif 4')
+  expect(errors).toEqual([])
 })

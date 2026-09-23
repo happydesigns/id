@@ -39,7 +39,7 @@ export default defineNuxtConfig({
   appConfig: { idStudio: { firstPaintRevision } },
   buildDir: devServer ? '.nuxt-dev' : '.nuxt',
   compatibilityDate: 'latest',
-  fonts: { families: presetFonts.map(name => ({ name })) },
+  fonts: { families: presetFonts.map(name => ({ name, global: true })) },
   icon: {
     clientBundle: {
       sizeLimitKb: 512,
@@ -53,6 +53,11 @@ export default defineNuxtConfig({
         ...ICON_PACKS.map(pack => pack.icon),
         'vscode-icons:file-type-nuxt',
         'vscode-icons:file-type-css',
+        'vscode-icons:file-type-typescript',
+        'vscode-icons:file-type-markdown',
+        ...['vue', 'pnpm', 'npm', 'yarn', 'bun'].map(type => `vscode-icons:file-type-${type}`),
+        'lucide:network',
+        'lucide:book-marked',
       ].map(bundleIcon))],
     },
   },

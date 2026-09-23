@@ -40,7 +40,7 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
         description="Develop your Nuxt UI apps independently of their visual identity. One native brand layer gives them a shared look, while each app keeps its own features and release cycle."
         :ui="{
           container: 'min-h-[560px] gap-12 py-16 sm:py-20 lg:gap-16 lg:py-20',
-          title: 'text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.07] tracking-tight',
+          title: '[font-family:var(--font-display,var(--font-sans))] text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.07] tracking-tight',
           description: 'max-w-xl text-lg leading-relaxed sm:text-xl',
           links: 'mt-8 gap-3',
         }"
@@ -70,16 +70,16 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
 
         <UCard
           class="min-w-0 @container"
-          :ui="{ body: 'p-4 sm:p-6', footer: 'p-4 sm:p-6' }"
+          :ui="{ root: 'ring-0 divide-y-0 bg-muted/60', body: 'p-2 sm:p-2', footer: 'px-2 pb-2 pt-0 sm:px-2 sm:pb-2 sm:pt-0' }"
         >
           <div class="landing-installation min-w-0 overflow-hidden">
-            <slot name="installation" />
+            <BrandCodePreview :document="previewDocument" />
           </div>
 
           <template #footer>
             <div class="min-w-0">
               <div
-                class="grid grid-cols-6 justify-items-center gap-x-1 gap-y-2 @min-[30rem]:grid-cols-12"
+                class="flex flex-wrap items-center gap-1"
                 role="group"
                 aria-label="Brand presets"
               >
@@ -94,12 +94,12 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
                     color="neutral"
                     variant="ghost"
                     size="xs"
-                    class="size-8 shrink-0 justify-center rounded-md p-0"
+                    class="size-8 shrink-0 justify-center rounded-full p-0"
                     :class="brandTheme.selectedName.value === preset.name ? 'ring-1 ring-primary/60 bg-primary/10' : ''"
                     @click="brandTheme.setTheme(preset.name)"
                   >
                     <span
-                      class="flex size-6 items-center justify-center rounded-md"
+                      class="flex size-6 items-center justify-center rounded-full"
                       :style="preset.avatar.style"
                     >
                       <UIcon
