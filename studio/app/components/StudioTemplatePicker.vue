@@ -6,7 +6,7 @@ import type { StudioTemplate } from '../../templates'
 import type { StudioDocument } from '../../../src/studio'
 import StudioTemplateThumbnail from './StudioTemplateThumbnail.vue'
 
-const props = withDefaults(defineProps<{ templates: StudioTemplate[], document: StudioDocument, mode: 'light' | 'dark', liveThumbnails?: boolean }>(), { liveThumbnails: true })
+const props = defineProps<{ templates: StudioTemplate[], document: StudioDocument, mode: 'light' | 'dark' }>()
 const model = defineModel<string>({ required: true })
 const open = defineModel<boolean>('open', { default: false })
 const items = computed(() => props.templates)
@@ -74,7 +74,7 @@ const resolveIcon = useStudioIcon()
             @click="select(item.id)"
           >
             <StudioTemplateThumbnail
-              v-if="open && liveThumbnails"
+              v-if="open"
               :template="item"
               :document="document"
               :mode="mode"

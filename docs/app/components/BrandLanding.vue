@@ -133,7 +133,6 @@ const presets = computed(() => ['nuxt-ui', ...Object.keys(docsPresetDocuments)].
           <StudioTemplatePicker
             v-model="scene"
             :templates="templates"
-            :live-thumbnails="false"
             :document="previewDocument"
             :mode="mode"
             class="landing-template-picker"

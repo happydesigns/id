@@ -269,6 +269,7 @@ for (const width of [390, 1440]) test('landing presets and template previews pre
   const presets = page.getByRole('group', { name: 'Brand presets', exact: true })
   await expect(presets.getByRole('button')).toHaveCount(12)
   await expect(page.getByRole('combobox', { name: 'Theme', exact: true })).toHaveCount(0)
+  await expect(page.locator('iframe[title$="thumbnail"]')).toHaveCount(0)
   const email = page.getByPlaceholder('john@example.com').first()
   await email.fill('preview@example.com')
   await presets.getByRole('button', { name: 'Apply Iris preset', exact: true }).click()
@@ -276,8 +277,15 @@ for (const width of [390, 1440]) test('landing presets and template previews pre
   await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Iris')
   for (const template of ['Landing', 'Docs']) {
     await page.getByRole('button', { name: 'Templates', exact: true }).click()
-    await expect(page.locator('iframe[title$="thumbnail"]')).toHaveCount(0)
+    for (const thumbnail of ['Landing', 'Docs']) {
+      const selector = 'iframe[title="' + thumbnail + ' thumbnail"]'
+      await expect(page.locator(selector).locator('..')).toHaveAttribute('data-preview-state', 'ready')
+      const colors = () => ['--ui-primary', '--ui-bg', '--ui-color-primary-500', '--ui-color-neutral-500'].map(name => getComputedStyle(document.documentElement).getPropertyValue(name).trim())
+      const expected = await page.evaluate(colors)
+      await expect.poll(() => page.frameLocator(selector).locator('html').evaluate(colors)).toEqual(expected)
+    }
     await page.getByRole('button', { name: template, exact: true }).click()
+    await expect(page.locator('iframe[title$="thumbnail"]')).toHaveCount(0)
     const frame = page.locator('iframe[title="' + template + ' template preview"]')
     await expect(frame).toBeVisible()
     await expect(frame.locator('..')).toHaveAttribute('data-preview-state', 'ready')
