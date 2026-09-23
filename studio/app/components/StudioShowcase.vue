@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, provide, ref } from 'vue'
+import { portalTargetInjectionKey } from '@nuxt/ui/composables/usePortal'
 import { createBlankStudioDocument, type StudioDocument } from '../../../src/studio'
 import type { StudioHostConfig } from '../../../src/studio-host'
 import { studioTemplates } from '../../templates'
@@ -12,27 +13,52 @@ const props = withDefaults(defineProps<{
   studioLabel?: string
 }>(), { title: 'Brand previews', studioLabel: 'Open Studio' })
 const expanded = ref(false)
+const controlsVisible = ref(true)
 const container = ref<HTMLDialogElement>()
+provide(portalTargetInjectionKey, computed(() => container.value ?? 'body'))
+const inlineHeight = ref(0)
+let pageScroll = { left: 0, top: 0 }
 let returnFocus: HTMLElement | undefined
 let previousOverflow = ''
+let nestedEscape = false
+function captureEscape(event: KeyboardEvent) {
+  if (event.key !== 'Escape') return
+  nestedEscape = !!container.value?.querySelector('[role="listbox"][data-state="open"], [role="menu"][data-state="open"], [data-reka-popper-content-wrapper] [data-state="open"]')
+}
+function cancel() {
+  if (!nestedEscape) void collapse()
+  nestedEscape = false
+}
 function expand(event: MouseEvent) {
   const dialog = container.value
   if (!dialog) return
+  inlineHeight.value = dialog.getBoundingClientRect().height
+  pageScroll = { left: window.scrollX, top: window.scrollY }
   returnFocus = event.currentTarget as HTMLElement
   previousOverflow = window.document.body.style.overflow
   window.document.body.style.overflow = 'hidden'
+  controlsVisible.value = true
   expanded.value = true
   dialog.close()
   dialog.showModal()
 }
 async function collapse() {
   if (!expanded.value) return
+  const closingLayers = Array.from(container.value?.querySelectorAll('[data-reka-popper-content-wrapper]') ?? [])
+  const transitions = closingLayers.flatMap(layer => layer.getAnimations({ subtree: true })).filter(animation => animation.effect?.getTiming().iterations !== Infinity)
   expanded.value = false
   container.value?.close()
   container.value?.show()
   window.document.body.style.overflow = previousOverflow
   await nextTick()
-  returnFocus?.focus({ preventScroll: true })
+  await Promise.allSettled(transitions.map(animation => animation.finished))
+  await nextTick()
+  // Let nested Reka focus scopes finish restoring their trigger first.
+  await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+  if (expanded.value) return
+  window.scrollTo({ ...pageScroll, behavior: 'instant' })
+  const trigger = container.value?.querySelector<HTMLElement>('[aria-label="Expand preview"]') ?? returnFocus
+  trigger?.focus({ preventScroll: true })
 }
 onBeforeUnmount(() => {
   if (expanded.value) window.document.body.style.overflow = previousOverflow
@@ -43,87 +69,124 @@ const mode = computed<'light' | 'dark'>(() => colorMode.value === 'dark' ? 'dark
 const document = computed(() => props.document ?? config.idStudio?.document ?? createBlankStudioDocument())
 const templates = computed(() => studioTemplates(config.idStudio?.templates))
 const scene = ref('components')
+const previewOptions = computed(() => [{ label: 'Components', value: 'components' }, ...templates.value.map(item => ({ label: item.label, value: item.id }))])
+async function toggleControls() {
+  controlsVisible.value = !controlsVisible.value
+  await nextTick()
+  container.value?.querySelector<HTMLElement>('[data-controls-toggle]')?.focus({ preventScroll: true })
+}
 const selectedTemplate = computed(() => templates.value.find(template => template.id === scene.value))
 </script>
 
 <template>
-  <dialog
-    ref="container"
-    open
-    :role="expanded ? 'dialog' : 'region'"
-    :aria-modal="expanded || undefined"
-    class="showcase-shell"
-    :class="{ 'showcase-expanded': expanded }"
-    :aria-label="title"
-    data-studio-showcase
-    @cancel.prevent="collapse"
-  >
-    <div class="mb-6 flex flex-wrap items-center gap-4 sm:mb-8 sm:gap-6">
-      <StudioTemplatePicker
-        v-model="scene"
-        :templates="templates"
+  <div :style="expanded ? { height: `${inlineHeight}px` } : undefined">
+    <dialog
+      ref="container"
+      open
+      :role="expanded ? 'dialog' : 'region'"
+      :aria-modal="expanded || undefined"
+      class="showcase-shell"
+      :class="{ 'showcase-expanded': expanded }"
+      :aria-label="title"
+      data-studio-showcase
+      @keydown.capture="captureEscape"
+      @cancel.prevent="cancel"
+    >
+      <div
+        class="showcase-toolbar mb-6 flex flex-wrap items-center gap-4 sm:mb-8 sm:gap-6"
+        :class="{ 'showcase-controls-hidden': expanded && !controlsVisible }"
+      >
+        <StudioTemplatePicker
+          v-if="!expanded"
+          v-model="scene"
+          :templates="templates"
+          :document="document"
+          :mode="mode"
+          :portal="container"
+          class="showcase-picker"
+        />
+        <USelect
+          v-if="expanded"
+          v-show="controlsVisible"
+          v-model="scene"
+          :items="previewOptions"
+          aria-label="Preview"
+          variant="ghost"
+          class="w-36"
+        />
+        <USeparator
+          v-if="!expanded"
+          class="hidden min-w-0 flex-1 sm:flex"
+        />
+        <UButton
+          v-if="!expanded"
+          to="/studio?browse=true"
+          color="neutral"
+          variant="link"
+          size="sm"
+          trailing-icon="i-lucide-arrow-up-right"
+          class="ms-auto shrink-0"
+        >
+          {{ studioLabel }}
+        </UButton>
+        <UButton
+          v-if="expanded"
+          v-show="controlsVisible"
+          :icon="mode === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
+          aria-label="Toggle preview color mode"
+          color="neutral"
+          variant="ghost"
+          @click="colorMode.preference = mode === 'dark' ? 'light' : 'dark'"
+        />
+        <UButton
+          v-show="!expanded || controlsVisible"
+          :icon="expanded ? 'i-lucide-minimize' : 'i-lucide-maximize'"
+          :aria-label="expanded ? 'Close expanded preview' : 'Expand preview'"
+          :title="expanded ? 'Close expanded preview' : 'Expand preview'"
+          color="neutral"
+          variant="ghost"
+          @click="expanded ? collapse() : expand($event)"
+        />
+        <UButton
+          v-if="expanded"
+          data-controls-toggle
+          :icon="controlsVisible ? 'i-lucide-chevron-down' : 'i-lucide-sliders-horizontal'"
+          :aria-label="controlsVisible ? 'Hide preview controls' : 'Show preview controls'"
+          :aria-expanded="controlsVisible"
+          color="neutral"
+          variant="ghost"
+          @click="toggleControls"
+        />
+      </div>
+      <div
+        v-show="scene === 'components'"
+        class="rounded-xl border border-default bg-muted/40 p-4 sm:p-6"
+        data-showcase-components
+      >
+        <LazyIdStudioComponents
+          state="default"
+          embedded
+        />
+      </div>
+      <StudioTemplatePreview
+        v-if="selectedTemplate"
+        :key="selectedTemplate.id"
+        :template="selectedTemplate"
         :document="document"
         :mode="mode"
-        :portal="container"
-        class="showcase-picker"
+        @escape="collapse"
       />
-      <USeparator class="hidden min-w-0 flex-1 sm:flex" />
-      <UButton
-        to="/studio?browse=true"
-        color="neutral"
-        variant="link"
-        size="sm"
-        trailing-icon="i-lucide-arrow-up-right"
-        class="ms-auto shrink-0"
-      >
-        {{ studioLabel }}
-      </UButton>
-      <UButton
-        v-if="expanded"
-        :icon="mode === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
-        aria-label="Toggle preview color mode"
-        color="neutral"
-        variant="ghost"
-        @click="colorMode.preference = mode === 'dark' ? 'light' : 'dark'"
-      />
-      <UButton
-        :icon="expanded ? 'i-lucide-minimize' : 'i-lucide-maximize'"
-        :aria-label="expanded ? 'Close expanded preview' : 'Expand preview'"
-        :title="expanded ? 'Close expanded preview' : 'Expand preview'"
-        color="neutral"
-        variant="ghost"
-        @click="expanded ? collapse() : expand($event)"
-      />
-    </div>
-    <div
-      v-show="scene === 'components'"
-      class="rounded-xl border border-default bg-muted/40 p-4 sm:p-6"
-      data-showcase-components
-    >
-      <LazyIdStudioComponents
-        state="default"
-        embedded
-      />
-    </div>
-    <StudioTemplatePreview
-      v-if="selectedTemplate"
-      :key="selectedTemplate.id"
-      :template="selectedTemplate"
-      :document="document"
-      :mode="mode"
-      @escape="collapse"
-    />
-  </dialog>
+    </dialog>
+  </div>
 </template>
 
 <style scoped>
 .showcase-shell { position: static; width: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; color: inherit; background: transparent; overflow: visible; }
-.showcase-expanded { position: fixed; inset: 0; display: flex; flex-direction: column; width: 100%; height: 100dvh; padding: 16px; overflow: hidden; background: var(--ui-bg); color: var(--ui-text); }
-.showcase-expanded > :first-child { flex-shrink: 0; margin-bottom: 16px; }
-.showcase-expanded > [data-showcase-components] { min-height: 0; overflow: auto; }
-.showcase-expanded > [data-preview-state] { flex: 1; min-height: 0; }
-.showcase-expanded :deep(iframe) { height: 100%; min-height: 0; }
-@media (min-width: 640px) { .showcase-expanded { padding: 24px; } }
+.showcase-expanded { position: fixed; inset: 0; display: flex; flex-direction: column; width: 100%; height: 100dvh; overflow: hidden; background: var(--ui-bg); color: var(--ui-text); }
+.showcase-expanded > .showcase-toolbar { position: absolute; z-index: 20; bottom: max(12px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); display: flex; flex-wrap: nowrap; gap: 4px; width: max-content; max-width: calc(100% - 24px); margin: 0; padding: 4px; border: 1px solid var(--ui-border); border-radius: calc(var(--ui-radius) + 8px); background: color-mix(in srgb, var(--ui-bg-elevated) 92%, transparent); backdrop-filter: blur(12px); box-shadow: 0 4px 20px #0002; }
+.showcase-expanded > [data-showcase-components] { flex: 1; min-height: 0; overflow: auto; border: 0; border-radius: 0; padding-bottom: 80px; }
+.showcase-expanded > [data-preview-state] { flex: 1; min-height: 0; border: 0; border-radius: 0; }
+.showcase-expanded :deep(iframe) { height: 100%; min-height: 0; border-radius: 0; }
 
 .showcase-picker {
   width: min(100%, 320px);
