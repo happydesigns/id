@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.2.3
+
+[compare changes](https://github.com/happydesigns/id/compare/v0.2.2...v0.2.3)
+
+### 🩹 Fixes
+
+- **test:** Prerender Markdown Studio embed fixture ([601510e](https://github.com/happydesigns/id/commit/601510e))
+
+### ❤️ Contributors
+
+- Jan Fröhlich ([@janfrl](https://github.com/janfrl))
+
 ## v0.2.2
 
 [compare changes](https://github.com/happydesigns/id/compare/v0.2.1...v0.2.2)
