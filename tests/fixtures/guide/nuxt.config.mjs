@@ -17,6 +17,8 @@ export default defineNuxtConfig({
       }
     : {}),
   compatibilityDate: '2026-08-01',
+  // Markdown regression routes must exist in the static browser-test build.
+  nitro: { prerender: { routes: ['/embed-guide'] } },
   image: { provider: 'none' },
   llms: { domain: 'http://localhost:3428' },
 })

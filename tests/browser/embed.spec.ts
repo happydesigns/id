@@ -45,7 +45,8 @@ for (const width of [1440, 390]) test('embedded Studio preserves input across ho
 })
 
 test('Docus Markdown activates its Studio embed after page scroll restoration', async ({ page }) => {
-  await page.goto('/embed-guide')
+  const response = await page.goto('/embed-guide')
+  expect(response?.status(), 'The Markdown fixture must be prerendered').toBe(200)
   const embed = page.locator('[data-studio-embed]')
   // Docus restores its initial scroll position after hydrating the content page.
   await expect.poll(async () => {
