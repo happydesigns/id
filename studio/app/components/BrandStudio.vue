@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { neutralPalettes } from '../../palette'
 import { embeddedModeEvent } from '../../embedded-mode'
+import { syncStudioMode } from '../../mode'
 import { useStudioGuard } from '../composables/useStudioGuard'
 import { useStudioFrames } from '../composables/useStudioFrames'
 import { useStudioProjects } from '../composables/useStudioProjects'
@@ -803,9 +804,7 @@ onMounted(() => {
   })
   // The shell and its teleported controls must follow the same mode as the frames,
   // including when a shared URL overrides a saved or system preference.
-  watch([preference, () => colorMode.unknown], ([value, unknown]) => {
-    if (!unknown) colorMode.preference = value
-  }, { immediate: true, flush: 'sync' })
+  syncStudioMode(preference, colorMode, modePreference(route.query.mode))
   window.addEventListener(embeddedModeEvent, receiveEmbeddedMode)
   window.addEventListener('message', ready)
   window.addEventListener('beforeunload', beforeUnload)
