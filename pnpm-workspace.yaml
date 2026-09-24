@@ -11,7 +11,7 @@ catalog:
   'docus': '^5.12.3'
   'typescript': '^6.0.3'
   'vue-tsc': '^3.3.10'
-  '@iconify-json/lucide': '^1.2.123'
+  '@iconify-json/lucide': '^1.2.135'
   '@iconify-json/vscode-icons': '1.2.61'
 
 overrides:
