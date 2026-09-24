@@ -123,20 +123,20 @@
   },
   "devDependencies": {
     "@iconify-json/lucide": "catalog:",
-    "@iconify-json/simple-icons": "^1.2.93",
+    "@iconify-json/simple-icons": "^1.2.97",
     "@iconify-json/vscode-icons": "catalog:",
     "@nuxt/eslint": "^1.17.0",
     "@playwright/test": "1.63.0",
-    "@vue/compiler-sfc": "^3.5.41",
+    "@vue/compiler-sfc": "^3.5.43",
     "changelogen": "^0.6.2",
     "docus": "catalog:",
-    "eslint": "^10.8.1",
+    "eslint": "^10.11.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "^4.1.10",
-    "vue": "3.5.41",
+    "vue": "3.5.43",
     "vue-tsc": "catalog:",
-    "yaml": "^2.9.0"
+    "yaml": "^2.9.1"
   },
   "bin": {
     "id-studio-package": "./scripts/prepare-studio-package.mjs"
