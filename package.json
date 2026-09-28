@@ -109,7 +109,7 @@
     "test:authoring": "playwright test --config playwright.authoring.config.ts"
   },
   "dependencies": {
-    "@nuxt/devtools-kit": "^3.4.1",
+    "@nuxt/devtools-kit": "^3.4.2",
     "@nuxt/kit": "catalog:",
     "@nuxt/schema": "catalog:",
     "@nuxt/ui": "catalog:",
@@ -134,7 +134,7 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "^4.1.10",
-    "vue": "3.5.41",
+    "vue": "3.5.43",
     "vue-tsc": "catalog:",
     "yaml": "^2.9.0"
   },
