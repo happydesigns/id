@@ -12,7 +12,6 @@ import { useStudioIcon } from '../../playground-icons'
 import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, readonly, ref, watch } from 'vue'
 import StudioTemplatePicker from './StudioTemplatePicker.vue'
 import StudioColorMode from './StudioColorMode.vue'
-import StudioAskAi from './StudioAskAi.vue'
 import StudioEditorPanel from './StudioEditorPanel.vue'
 import StudioControlGroup from './StudioControlGroup.vue'
 import { editorCategories } from '../../editor-categories'
@@ -115,7 +114,6 @@ watch(error, (message) => {
   else toast.remove('studio-error')
 })
 const exportOpen = ref(false)
-const askAiOpen = ref(false)
 const exportTab = ref('changes')
 const codeFormat = ref('source')
 const busy = ref(false)
@@ -990,13 +988,6 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
         </UTooltip>
         <UButton
           color="neutral"
-          variant="outline"
-          @click="askAiOpen = true"
-        >
-          Ask AI
-        </UButton>
-        <UButton
-          color="neutral"
           variant="solid"
           @click="exportTab = 'download'; exportOpen = true"
         >
@@ -1675,10 +1666,6 @@ function documentIcons(doc: StudioDocument): Record<string, string> | undefined 
         </UButton>
       </template>
     </UModal>
-    <StudioAskAi
-      v-model:open="askAiOpen"
-      :document="draft"
-    />
     <UModal
       v-model:open="exportOpen"
       title="Export brand"

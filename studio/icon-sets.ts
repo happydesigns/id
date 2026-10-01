@@ -397,7 +397,7 @@ export function iconSetSamples(setName: string): string[] {
 
 /**
  * Every glyph the studio renders outside the 43 semantic keys: its own chrome
- * (toolbar, Ask AI, preset picker), the view switcher and the demo content.
+ * (toolbar, preset picker), the view switcher and the demo content.
  * Lucide is the default, `studioIconOverrides` swaps in a pack's own glyph
  * where it has one. Kept out of `themeIcons` on purpose, none of this rides
  * the export's icon config. Import and the group-picker chevron reuse the
