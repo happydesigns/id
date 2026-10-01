@@ -40,7 +40,7 @@ const names = ['action-hierarchy-pattern', 'badge', 'tooltip', 'form-pattern', '
       <h2>{{ name }}</h2>
       <IdComponentExample
         :name="name"
-        :context="{ messages }"
+        :context="{ messages, paths: { docs: '/embed-guide', components: '/embed-guide', colors: '/embed-guide', typography: '/embed-guide' } }"
       />
     </section>
     <IdComponentCoverageTable
