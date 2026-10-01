@@ -4,7 +4,8 @@ import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
 describe('published module types', () => {
-  it.each([ts.ModuleResolutionKind.NodeNext, ts.ModuleResolutionKind.Bundler])('types the public Nuxt config with resolution %s', (resolution) => {
+  // Each case compiles two real consumer programs, including Nuxt's declaration graph.
+  it.each([ts.ModuleResolutionKind.NodeNext, ts.ModuleResolutionKind.Bundler])('types the public Nuxt config with resolution %s', { timeout: 30_000 }, (resolution) => {
     const file = resolve('.tmp/package-type-consumer.ts')
     const moduleExample = `import { defineNuxtConfig } from 'nuxt/config'
 import id from '@happydesigns/id/module'

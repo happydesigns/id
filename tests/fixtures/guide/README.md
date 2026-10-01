@@ -18,4 +18,4 @@ Nuxt removes onServerPrefetch calls in its production composable tree-shaking de
 
 The correction is build-time only and deliberately lives in the optional Guide layer, not in brand data. Plain Nuxt/Docus hosts without the Guide can apply the same module callback from guide/nuxt.config.ts. Remove the correction only after the unmodified upstream stack passes these production tests. Brand portals may remove targeted form ClientOnly wrappers after upgrading and verifying their consuming build; actual tab content slots remain independently necessary.
 
-The workspace also aligns Tiptap's editor peer graph at 3.30.1 after a mixed core/extension graph failed production bundling. A fresh consumer validates its own lockfile.
+The earlier Tiptap override list was removed when the updated Nuxt UI dependency graph resolved core and extensions consistently. Production editor builds remain part of the regression checks. A fresh consumer validates its own lockfile.

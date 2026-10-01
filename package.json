@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.2.3",
   "private": false,
-  "packageManager": "pnpm@11.9.0",
+  "packageManager": "pnpm@12.8.1",
   "author": "happydesigns",
   "description": "Brand authoring, app previews and native brand layers for Nuxt UI.",
   "homepage": "https://id.happydesigns.de",
@@ -112,13 +112,13 @@
     "release:notes": "node scripts/release-notes.mjs"
   },
   "dependencies": {
-    "@nuxt/devtools-kit": "^3.4.1",
+    "@nuxt/devtools-kit": "^3.4.2",
     "@nuxt/kit": "catalog:",
     "@nuxt/schema": "catalog:",
     "@nuxt/ui": "catalog:",
     "h3": "^1.15.11",
     "nuxt": "catalog:",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "peerDependencies": {
     "tailwindcss": "^4.0.0",
@@ -126,21 +126,21 @@
   },
   "devDependencies": {
     "@iconify-json/lucide": "catalog:",
-    "@iconify-json/simple-icons": "^1.2.93",
+    "@iconify-json/simple-icons": "^1.2.98",
     "@iconify-json/vscode-icons": "catalog:",
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/test-utils": "^4.3.2",
     "@playwright/test": "1.63.0",
-    "@vue/compiler-sfc": "^3.5.41",
+    "@vue/compiler-sfc": "3.5.43",
     "changelogen": "^0.6.2",
     "docus": "catalog:",
-    "eslint": "^10.8.1",
+    "eslint": "^10.11.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vitest": "^4.1.10",
-    "vue": "3.5.41",
+    "vitest": "^5.0.2",
+    "vue": "3.5.43",
     "vue-tsc": "catalog:",
-    "yaml": "^2.9.0"
+    "yaml": "^2.9.1"
   },
   "bin": {
     "id-studio-package": "./scripts/prepare-studio-package.mjs"

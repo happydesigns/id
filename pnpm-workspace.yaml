@@ -6,53 +6,16 @@ catalog:
   'nuxt': '^4.5.2'
   '@nuxt/kit': '^4.5.2'
   '@nuxt/schema': '^4.5.2'
-  '@nuxt/ui': '^4.10.0'
+  '@nuxt/ui': '^4.11.2'
   'tailwindcss': '^4.3.3'
-  'docus': '^5.12.3'
+  'docus': '^5.13.0'
   'typescript': '^6.0.3'
-  'vue-tsc': '^3.3.10'
-  '@iconify-json/lucide': '^1.2.123'
-  '@iconify-json/vscode-icons': '1.2.61'
+  'vue-tsc': '^3.3.11'
+  '@iconify-json/lucide': '^1.2.137'
+  '@iconify-json/vscode-icons': '1.2.83'
 
 overrides:
   '@happydesigns/id': workspace:*
-  '@tiptap/core': &tiptap-version 3.30.1
-  '@tiptap/extension-blockquote': *tiptap-version
-  '@tiptap/extension-bold': *tiptap-version
-  '@tiptap/extension-bubble-menu': *tiptap-version
-  '@tiptap/extension-bullet-list': *tiptap-version
-  '@tiptap/extension-code': *tiptap-version
-  '@tiptap/extension-code-block': *tiptap-version
-  '@tiptap/extension-collaboration': *tiptap-version
-  '@tiptap/extension-document': *tiptap-version
-  '@tiptap/extension-drag-handle': *tiptap-version
-  '@tiptap/extension-drag-handle-vue-3': *tiptap-version
-  '@tiptap/extension-dropcursor': *tiptap-version
-  '@tiptap/extension-floating-menu': *tiptap-version
-  '@tiptap/extension-gapcursor': *tiptap-version
-  '@tiptap/extension-hard-break': *tiptap-version
-  '@tiptap/extension-heading': *tiptap-version
-  '@tiptap/extension-horizontal-rule': *tiptap-version
-  '@tiptap/extension-image': *tiptap-version
-  '@tiptap/extension-italic': *tiptap-version
-  '@tiptap/extension-link': *tiptap-version
-  '@tiptap/extension-list': *tiptap-version
-  '@tiptap/extension-list-item': *tiptap-version
-  '@tiptap/extension-list-keymap': *tiptap-version
-  '@tiptap/extension-mention': *tiptap-version
-  '@tiptap/extension-node-range': *tiptap-version
-  '@tiptap/extension-ordered-list': *tiptap-version
-  '@tiptap/extension-paragraph': *tiptap-version
-  '@tiptap/extension-placeholder': *tiptap-version
-  '@tiptap/extension-strike': *tiptap-version
-  '@tiptap/extension-text': *tiptap-version
-  '@tiptap/extension-underline': *tiptap-version
-  '@tiptap/extensions': *tiptap-version
-  '@tiptap/markdown': *tiptap-version
-  '@tiptap/pm': *tiptap-version
-  '@tiptap/starter-kit': *tiptap-version
-  '@tiptap/suggestion': *tiptap-version
-  '@tiptap/vue-3': *tiptap-version
 allowBuilds:
   '@parcel/watcher': false
   better-sqlite3: false
