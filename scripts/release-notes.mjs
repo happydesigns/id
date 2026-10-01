@@ -11,6 +11,9 @@ export function releaseNotes(changelog, version) {
   if (entries.length !== 1 || !entries[0].body.trim()) {
     throw new Error(`Expected exactly one nonempty changelog entry for ${version}`)
   }
+  if (/^##\s/m.test(entries[0].body)) {
+    throw new Error(`Unexpected level-two heading inside release ${version}; use level-three subsections`)
+  }
   return entries[0].body.trim() + '\n'
 }
 

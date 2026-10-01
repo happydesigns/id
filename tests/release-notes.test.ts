@@ -15,6 +15,13 @@ describe('release notes', () => {
   it('supports prereleases', () => {
     expect(releaseNotes('## v0.3.0-beta.1\n\n- Preview\n', '0.3.0-beta.1')).toContain('Preview')
   })
+  it('preserves editorial text in the same version section', () => {
+    const body = '> A focused update.\n\n### Upgrade notes\n\nRegenerate the brand.\n\n### Changelog\n\n- Fix exports'
+    expect(releaseNotes(`## v0.3.0\n\n${body}\n\n## v0.2.0\n\n- Old`, '0.3.0')).toBe(body + '\n')
+  })
+  it('rejects stray headings instead of publishing an Unreleased section', () => {
+    expect(() => releaseNotes('## v0.3.0\n\n- Fix\n\n## Unreleased\n', '0.3.0')).toThrow('Unexpected level-two heading')
+  })
   it('rejects absent, duplicate, empty and invalid entries', () => {
     expect(() => releaseNotes(changelog, '0.4.0')).toThrow()
     expect(() => releaseNotes(changelog + '\n## v0.3.0\n\n- Duplicate\n', '0.3.0')).toThrow()
