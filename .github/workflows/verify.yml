@@ -77,7 +77,6 @@ jobs:
           path: |
             .output/tests/report/
             .output/tests/results/
-            .output/tests/authoring/
             .output/workflow/
 
   release:

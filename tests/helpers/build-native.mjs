@@ -5,7 +5,7 @@ import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
 const documents = resolve('.output/workflow')
-for (const brand of ['violet', 'amber']) assert.ok(existsSync(join(documents, brand + '.json')), 'Run pnpm test:authoring before check:native')
+for (const brand of ['violet', 'amber']) assert.ok(existsSync(join(documents, brand + '.json')), 'Missing browser export from the authoring project: ' + brand)
 const archive = resolve(process.argv[2] || '.output/studio-package/id.tgz')
 const workspace = mkdtempSync(join(tmpdir(), 'id-native-consumer-'))
 console.log('Isolated package check:', workspace)

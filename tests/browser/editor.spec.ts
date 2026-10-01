@@ -100,6 +100,8 @@ test('standard palettes can be overridden and reset in the editor', async ({ pag
   const preview = page.frameLocator('iframe[title="Draft brand preview"]')
   await expect(preview.locator('html')).toBeVisible()
   const blue = () => preview.locator('html').evaluate(element => getComputedStyle(element).getPropertyValue('--color-blue-500').trim())
+  // The iframe element can be visible before its stylesheet has loaded.
+  await expect.poll(blue).not.toBe('')
   const original = await blue()
   await page.getByRole('button', { name: 'New palette', exact: true }).click()
   const modal = page.getByRole('dialog').filter({ has: page.getByRole('heading', { name: 'New palette', exact: true }) })
