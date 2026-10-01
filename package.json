@@ -100,11 +100,12 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "verify": "pnpm lint && pnpm test && pnpm typecheck",
+    "verify:full": "pnpm verify && pnpm pack:studio && pnpm exec nuxt generate tests/fixtures/guide && pnpm docs:build && pnpm test:authoring && pnpm check:native && pnpm test:browser",
     "pack:studio": "pnpm build:package && pnpm --config.ignore-scripts=true pack --out .output/studio-package/id.tgz",
     "check:native": "node scripts/check-native.mjs",
     "test:browser": "playwright test",
     "release:preview": "changelogen --no-output",
-    "release": "pnpm verify && changelogen --release --no-github --clean",
+    "release": "pnpm verify:full && changelogen --release --no-github --clean",
     "release:notes": "node scripts/release-notes.mjs",
     "test:authoring": "playwright test --config playwright.authoring.config.ts"
   },

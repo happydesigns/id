@@ -47,14 +47,8 @@ jobs:
           node-version-file: package.json
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm verify
-      - run: pnpm pack:studio
-      - run: pnpm exec nuxt generate tests/fixtures/guide
-      - run: pnpm docs:build
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:authoring
-      - run: pnpm check:native
-      - run: pnpm test:browser
+      - run: pnpm verify:full
       - name: Check release tag and write checksum
         shell: bash
         run: |
