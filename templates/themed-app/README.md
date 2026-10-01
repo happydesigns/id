@@ -8,6 +8,7 @@ Starter for a Nuxt app that uses `@happydesigns/id` directly.
 npx giget@latest gh:happydesigns/id/templates/themed-app my-app
 cd my-app
 pnpm install
+pnpm dev:prepare
 pnpm dev
 ```
 

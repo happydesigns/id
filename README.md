@@ -49,7 +49,7 @@ The identity runtime remains supported through the Nuxt layer or configurable mo
 
 ```bash
 pnpm install
-pnpm prepare
+pnpm dev:prepare
 pnpm build:package
 pnpm dev
 pnpm docs

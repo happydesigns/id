@@ -47,8 +47,10 @@ jobs:
           node-version-file: package.json
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm dev:prepare
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm verify:full
+      - run: pnpm verify
+      - run: pnpm test:browser
       - name: Check release tag and write checksum
         shell: bash
         run: |
@@ -79,9 +81,33 @@ jobs:
             .output/tests/results/
             .output/workflow/
 
+  integrations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [nuxt, devtools, preview]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - if: matrix.suite != 'nuxt'
+        run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:${{ matrix.suite }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: integration-diagnostics-${{ matrix.suite }}
+          path: .output/tests/
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [verify, compatibility]
+    needs: [verify, compatibility, integrations]
     runs-on: ubuntu-latest
     permissions:
       contents: write

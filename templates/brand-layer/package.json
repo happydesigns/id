@@ -14,7 +14,7 @@
     "build": "nuxt build playground",
     "build:layer": "nuxt build",
     "preview": "nuxt preview playground",
-    "prepare": "nuxt prepare playground",
+    "dev:prepare": "nuxt prepare playground",
     "typecheck": "nuxt typecheck",
     "verify": "pnpm typecheck && pnpm build"
   },

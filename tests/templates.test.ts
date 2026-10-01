@@ -45,14 +45,6 @@ describe('starter templates', () => {
     expect(packageJson.files).not.toContain('nuxt.config.ts')
     expect(packageJson.files).not.toContain('modules')
   })
-  it('keeps the module path self-contained for direct app usage', () => {
-    const moduleSource = readFileSync(join(rootDir, 'module.ts'), 'utf8')
-    expect(moduleSource).toContain('moduleDependencies')
-    expect(moduleSource).toContain('\'@nuxt/ui\'')
-    expect(moduleSource).not.toContain('installModule')
-    expect(moduleSource).toContain('addComponentsDir')
-    expect(moduleSource).toContain('addImportsDir')
-  })
   it('keeps the brand-layer template shaped like an external brand repo', () => {
     expectTemplateFile('brand-layer', 'playground/nuxt.config.ts')
     expect(readTemplateFile('brand-layer', 'playground/nuxt.config.ts')).not.toContain('docus')

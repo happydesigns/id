@@ -4,7 +4,7 @@ Read [README](README.md) and the relevant [architecture](ARCHITECTURE.md), [desi
 
 ## Working locally
 
-Run `pnpm install` and `pnpm prepare`. Use `pnpm dev` for the playground and `pnpm docs` for documentation. `pnpm lint:fix` applies the Nuxt ESLint configuration; `pnpm verify` runs lint, unit tests and type checks.
+Run `pnpm install` and `pnpm dev:prepare`. Use `pnpm dev` for the playground and `pnpm docs` for documentation. `pnpm lint:fix` applies the Nuxt ESLint configuration; `pnpm verify` runs lint, unit tests and type checks.
 
 The [verification guide](docs/content/5.development/2.verification.md) owns the ordered package, authoring and browser checks, their scope and failure diagnostics. Run checks appropriate to the change and report any relevant checks skipped.
 

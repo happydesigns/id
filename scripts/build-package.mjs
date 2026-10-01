@@ -107,15 +107,3 @@ writeFileSync(join(rootDir, 'src/project-templates.generated.ts'),
 
 run(process.execPath, [tscBin, '-p', 'tsconfig.package.json'])
 copyRuntimeFiles()
-
-// This example consumes the public generator; its runtime is not hand-maintained.
-const { createStudioDocument, createStudioRuntimeFiles } = await import('../dist/src/studio.js')
-const { brandIdentity, brandTheme } = await import('../templates/brand-layer/brand.ts')
-const document = createStudioDocument(brandIdentity, brandTheme)
-const templateDir = join(rootDir, 'templates/brand-layer')
-writeFileSync(join(templateDir, 'brand.studio.json'), JSON.stringify(document, null, 2) + '\n')
-for (const [path, contents] of Object.entries(createStudioRuntimeFiles(document, { styles: 'fragment', config: 'fragment' }))) {
-  const target = join(templateDir, path)
-  mkdirSync(dirname(target), { recursive: true })
-  writeFileSync(target, contents)
-}
