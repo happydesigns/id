@@ -1,5 +1,42 @@
 # Changelog
 
+## v0.2.4
+
+> Fixes Studio color-mode restoration, removes the inactive Ask AI control, updates dependencies and simplifies verification and release tooling.
+
+### Changelog
+
+[compare changes](https://github.com/happydesigns/id/compare/v0.2.3...v0.2.4)
+
+### 🩹 Fixes
+
+- **studio:** Retain restored color mode during hydration ([d59c036](https://github.com/happydesigns/id/commit/d59c036))
+- **studio:** Remove unimplemented Ask AI entry ([af677a9](https://github.com/happydesigns/id/commit/af677a9))
+- **release:** Share complete verification with CI ([98b4f52](https://github.com/happydesigns/id/commit/98b4f52))
+- **test:** Prepare shared Nuxt types for isolated integrations ([07f35ad](https://github.com/happydesigns/id/commit/07f35ad))
+- **release:** Unify changelog and published release notes ([e49e603](https://github.com/happydesigns/id/commit/e49e603))
+
+### 💅 Refactors
+
+- **test:** Let Playwright own integration preparation ([fefb355](https://github.com/happydesigns/id/commit/fefb355))
+- **tooling:** Clarify package lifecycle and integration gates ([c3470e3](https://github.com/happydesigns/id/commit/c3470e3))
+
+### 📦 Build
+
+- **deps:** Update Nuxt stack and test tooling ([695f956](https://github.com/happydesigns/id/commit/695f956))
+
+### ✅ Tests
+
+- **guide:** Link examples to an existing fixture route ([c5b1332](https://github.com/happydesigns/id/commit/c5b1332))
+
+### 🤖 CI
+
+- Update verification actions ([0592eb3](https://github.com/happydesigns/id/commit/0592eb3))
+
+### ❤️ Contributors
+
+- Jan Fröhlich ([@janfrl](https://github.com/janfrl))
+
 ## v0.2.3
 
 > Corrects the prerendered Markdown embed fixture used by the browser verification suite.
