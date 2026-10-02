@@ -1,14 +1,10 @@
 import { defineConfig } from '@playwright/test'
+import shared from './tests/playwright.shared'
 
-export default defineConfig({
-  testDir: './tests/browser',
+export default defineConfig(shared, {
   outputDir: '.output/tests/results',
-  timeout: 60_000,
-  retries: 0,
-  workers: 1,
-  reporter: [['list'], ['html', { open: 'never', outputFolder: '.output/tests/report' }]],
-  use: { baseURL: 'http://127.0.0.1:3439', trace: 'retain-on-failure' },
-  testIgnore: ['**/docs.spec.ts', '**/brand-switch.spec.ts', '**/devtools.spec.ts', '**/capabilities.spec.ts'],
+  use: { baseURL: 'http://127.0.0.1:3439' },
+  testIgnore: ['**/docs.spec.ts', '**/brand-switch.spec.ts', '**/devtools.spec.ts', '**/capabilities.spec.ts', '**/external-preview.spec.ts'],
   webServer: [{
     command: 'pnpm exec nuxt generate tests/fixtures/guide && node tests/helpers/serve-static.mjs',
     stdout: 'pipe',

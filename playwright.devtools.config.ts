@@ -1,12 +1,11 @@
 import { defineConfig } from '@playwright/test'
+import shared from './tests/playwright.shared'
 
-export default defineConfig({
-  testDir: './tests/browser',
+export default defineConfig(shared, {
   testMatch: 'devtools.spec.ts',
   outputDir: '.output/tests/devtools',
   timeout: 120_000,
-  workers: 1,
-  use: { baseURL: 'http://127.0.0.1:3450', trace: 'retain-on-failure' },
+  use: { baseURL: 'http://127.0.0.1:3450' },
   webServer: {
     command: 'node node_modules/nuxt/bin/nuxt.mjs dev tests/fixtures/preview --host 127.0.0.1 --port 3450',
     stdout: 'pipe',

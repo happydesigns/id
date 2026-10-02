@@ -1,12 +1,10 @@
 import { defineConfig } from '@playwright/test'
+import shared from './tests/playwright.shared'
 
-export default defineConfig({
-  testDir: './tests/browser',
+export default defineConfig(shared, {
   testMatch: 'external-preview.spec.ts',
   outputDir: '.output/tests/published-preview',
-  timeout: 60_000,
-  workers: 1,
-  use: { baseURL: 'http://127.0.0.1:3439', trace: 'retain-on-failure' },
+  use: { baseURL: 'http://127.0.0.1:3439' },
   webServer: [{
     command: 'pnpm exec nuxt generate tests/fixtures/guide && node tests/helpers/serve-static.mjs',
     stdout: 'pipe',

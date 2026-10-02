@@ -1,11 +1,8 @@
 import { defineConfig } from '@playwright/test'
+import shared from './tests/playwright.shared'
 
-export default defineConfig({
-  testDir: './tests/browser',
+export default defineConfig(shared, {
   outputDir: '.output/tests/package',
-  timeout: 60_000,
-  workers: 1,
-  use: { trace: 'retain-on-failure' },
   projects: [{
     name: 'build',
     testDir: './tests/setup',
