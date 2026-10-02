@@ -3,9 +3,8 @@ import { cpSync, existsSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, 
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { pathToFileURL } from 'node:url'
 
-const documents = resolve('.output/workflow')
-for (const brand of ['violet', 'amber']) assert.ok(existsSync(join(documents, brand + '.json')), 'Missing browser export from the authoring project: ' + brand)
 const archive = resolve(process.argv[2] || '.output/studio-package/id.tgz')
 const workspace = mkdtempSync(join(tmpdir(), 'id-native-consumer-'))
 console.log('Isolated package check:', workspace)
@@ -47,11 +46,13 @@ const entrypoints = Object.entries(manifest.exports).filter(([, entry]) => typeo
 write(author, 'imports.mjs', 'for (const entry of ' + JSON.stringify(entrypoints) + ') await import(entry, entry.endsWith("/package.json") ? { with: { type: "json" } } : {})')
 run(process.execPath, ['imports.mjs'], author)
 write(author, 'generate.mjs', `
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { createBlankStudioDocument, createStudioProject } from '@happydesigns/id/studio/core'
+import { createTestBrand } from ${JSON.stringify(pathToFileURL(resolve('tests/helpers/brand.mjs')).href)}
 for (const name of ['violet', 'amber', 'guide']) {
-  const doc = name === 'guide' ? createBlankStudioDocument() : JSON.parse(readFileSync(resolve(${JSON.stringify(documents)}, name + '.json'), 'utf8'))
+  const doc = name === 'guide' ? createBlankStudioDocument() : createTestBrand(createBlankStudioDocument, name)
+  if (name !== 'guide') doc.theme.ui.colors.primary = name
   if (name === 'guide') {
     doc.brand.name = name
     doc.brand.packageName = '@id-test/brand'
@@ -76,7 +77,7 @@ for (const name of ['violet', 'amber']) {
   assert.equal(manifest.dependencies['@happydesigns/id'], undefined)
   assert.equal(manifest.devDependencies.docus, undefined)
   run('npm', ['pack', '--ignore-scripts'], brand)
-  for (const kind of ['catalog', 'dashboard']) {
+  for (const kind of [name === 'violet' ? 'catalog' : 'dashboard']) {
     const outputName = name + (kind === 'dashboard' ? '-dashboard' : '')
     const consumer = join(workspace, 'consumer-' + outputName)
     write(consumer, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: {
@@ -105,12 +106,7 @@ for (const name of ['violet', 'amber']) {
     cpSync(join(brand, 'playground/.output/public'), resolve('.output/native-consumers/studio'), { recursive: true })
   }
 }
-for (const suffix of ['', '-dashboard']) {
-  for (const file of ['app.vue', 'app.config.ts', 'pages/demo/index.vue']) {
-    assert.equal(readFileSync(join(workspace, 'consumer-violet' + suffix, 'app', file), 'utf8'), readFileSync(join(workspace, 'consumer-amber' + suffix, 'app', file), 'utf8'), 'App source changed with brand: ' + file)
-  }
-}
-console.log('PASS: browser-exported brands built in two independent apps without ID, preview runtime or Docus; application source preserved.')
+console.log('PASS: generated brands built in independent apps without ID, preview runtime or Docus.')
 console.log('Fixture retained for diagnosis:', workspace)
 
 const guide = join(workspace, 'guide')

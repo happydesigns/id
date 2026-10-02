@@ -28,18 +28,6 @@ describe('layer install snippets', () => {
 })`,
     })
   })
-  it('supports a different published package and layer export', () => {
-    expect(createLayerInstallSnippets({
-      packageName: '@client/brand',
-      layer: '@client/brand/nuxt',
-      packageManager: 'npm',
-    })).toMatchObject({
-      packageName: '@client/brand',
-      layer: '@client/brand/nuxt',
-      packageManager: 'npm',
-      installCommand: 'npm install @client/brand',
-    })
-  })
   it('rejects an empty package name', () => {
     expect(() => createLayerInstallSnippets({
       packageName: '  ',

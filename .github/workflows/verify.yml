@@ -9,9 +9,11 @@ permissions:
   contents: read
 concurrency:
   group: verify-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 jobs:
   compatibility:
+    if: >-
+      github.event_name != 'push' || github.ref_type == 'tag' || !startsWith(github.event.head_commit.message, 'chore(release): v')
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
@@ -35,6 +37,8 @@ jobs:
       - run: pnpm exec vitest run tests/package-types.test.ts tests/studio-project.test.ts tests/studio-generation.test.ts tests/studio-http.test.ts tests/studio-package.test.ts
 
   verify:
+    if: >-
+      github.event_name != 'push' || github.ref_type == 'tag' || !startsWith(github.event.head_commit.message, 'chore(release): v')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -48,10 +52,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm dev:prepare
-      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm verify
-      - run: pnpm test:browser
-      - name: Check release tag and write checksum
+      - run: pnpm test:nuxt
+      - name: Check release tag
+        if: github.ref_type == 'tag'
         shell: bash
         run: |
           VERSION=$(node -p "require('./package.json').version")
@@ -64,29 +68,16 @@ jobs:
               echo "Release tag must point to the Changelogen release commit"; exit 1
             fi
           fi
-          cd .output/studio-package
-          mv id.tgz "id-$VERSION.tgz"
-          sha256sum "id-$VERSION.tgz" > SHA256SUMS
-      - uses: actions/upload-artifact@v7
-        with:
-          name: id-package-${{ github.sha }}
-          path: .output/studio-package/
-      - uses: actions/upload-artifact@v7
-        if: failure()
-        with:
-          name: browser-diagnostics
-          path: |
-            .output/tests/report/
-            .output/tests/results/
-            .output/workflow/
 
   integrations:
-    runs-on: ubuntu-latest
+    if: >-
+      github.event_name != 'push' || github.ref_type == 'tag' || !startsWith(github.event.head_commit.message, 'chore(release): v')
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        suite: [nuxt, devtools, preview]
+        suite: [browser, docs, package, devtools, preview]
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -95,9 +86,24 @@ jobs:
           node-version-file: package.json
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - if: matrix.suite != 'nuxt'
-        run: pnpm exec playwright install --with-deps chromium
+      # The Azure mirror repeatedly timed out while installing Chromium system dependencies.
+      - name: Use the Ubuntu archive for browser dependencies
+        run: sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
+      - run: pnpm exec playwright install --with-deps --only-shell chromium
       - run: pnpm test:${{ matrix.suite }}
+      - name: Write package checksum
+        if: matrix.suite == 'package'
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          cd .output/studio-package
+          mv id.tgz "id-$VERSION.tgz"
+          sha256sum "id-$VERSION.tgz" > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        if: matrix.suite == 'package'
+        with:
+          name: id-package-${{ github.sha }}
+          path: .output/studio-package/
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

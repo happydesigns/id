@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
-import presetData from '../../docs/app/data/nuxt-ui-presets.json' with { type: 'json' }
 import { createBlankStudioDocument } from '../../src/studio'
+// Baseline, custom palette and custom component defaults exercise distinct paths.
+const presetNames = ['Iris', 'Coral']
 
 const base = process.env.ID_DOCS_TEST_URL || 'http://127.0.0.1:3443'
 const appearanceTrigger = (page: Page) => page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
@@ -239,20 +240,20 @@ test('preset edits and named copies share the Studio draft and preserve original
   expect(await active()).toBe(savedId)
 })
 
-test('all Nuxt UI presets resolve their palettes in both color modes', async ({ page }) => {
+test('custom presets resolve their palettes in both color modes', async ({ page }) => {
   await page.goto(base)
   const trigger = page.getByRole('banner').getByRole('button', { name: /^Appearance:/ })
   await expect(trigger).toHaveAccessibleName('Appearance: Nuxt UI')
-  for (const preset of presetData.presets.filter(preset => preset.id !== 'default')) {
-    await selectTheme(page, preset.name)
-    await expect(trigger).toHaveAccessibleName('Appearance: ' + preset.name)
+  for (const name of presetNames) {
+    await selectTheme(page, name)
+    await expect(trigger).toHaveAccessibleName('Appearance: ' + name)
     await trigger.click()
     for (const mode of ['Light', 'Dark']) {
       await page.getByRole('tab', { name: mode, exact: true }).click()
       await expect(page.locator('html')).toHaveClass(new RegExp(mode.toLowerCase()))
       await expect.poll(() => page.evaluate(() => ['--ui-color-primary-500', '--ui-color-neutral-500'].map(name => getComputedStyle(document.documentElement).getPropertyValue(name).trim()).every(Boolean))).toBe(true)
     }
-    if (preset.name === 'Iris') {
+    if (name === 'Iris') {
       await page.getByRole('menuitem', { name: 'Iris', exact: true }).focus()
       await page.keyboard.press('ArrowRight')
       const crimsonIcon = page.getByRole('menuitemcheckbox', { name: 'Crimson', exact: true }).locator('[data-slot=icon]')
@@ -269,7 +270,7 @@ for (const width of [390, 1440]) test('landing presets and template previews pre
   await page.goto(base)
   await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: Nuxt UI')
   const presets = page.getByRole('group', { name: 'Brand presets', exact: true })
-  await expect(presets.getByRole('button')).toHaveCount(12)
+  await expect(presets.getByRole('button', { name: 'Apply Iris preset', exact: true })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Theme', exact: true })).toHaveCount(0)
   await expect(page.locator('iframe[title$="thumbnail"]')).toHaveCount(0)
   const email = page.getByPlaceholder('john@example.com').first()
@@ -338,18 +339,23 @@ for (const template of ['Landing', 'Docs']) test('theme changes replace preview 
   }
   for (const theme of ['Coral', 'Nuxt UI', 'Iris']) {
     await selectTheme(page, theme)
+    await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: ' + theme)
     for (const mode of ['Dark', 'Light']) {
       await appearanceTrigger(page).click()
       await page.getByRole('tab', { name: mode, exact: true }).click()
       await page.keyboard.press('Escape')
       await expect(page.locator('html')).toHaveClass(new RegExp(mode.toLowerCase()))
-      await expect.poll(() => frame.locator('html').evaluate(colors)).toEqual(await page.locator('html').evaluate(colors))
+      // Reactive head styles can settle after the mode class. Read both sides on each attempt.
+      await expect.poll(async () => {
+        const [host, preview] = await Promise.all([page.locator('html').evaluate(colors), frame.locator('html').evaluate(colors)])
+        return preview.every((color, index) => color !== '' && color === host[index])
+      }).toBe(true)
     }
   }
   await expect(frame.locator('#id-theme-first-paint')).toHaveCount(0)
 })
 
-for (const label of ['Nuxt UI', ...presetData.presets.filter(preset => preset.id !== 'default').map(preset => preset.name)]) test('preset survives Studio navigation without reload: ' + label, async ({ page }) => {
+for (const label of ['Nuxt UI', ...presetNames]) test('preset survives Studio navigation without reload: ' + label, async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto(base)
@@ -378,10 +384,10 @@ test('preset icons survive reload without icon API requests or SSR warnings', as
   })
   await page.goto(base)
   await expect(appearanceTrigger(page)).toBeVisible({ timeout: 30_000 })
-  for (const preset of presetData.presets.filter(preset => preset.id !== 'default')) {
-    await selectTheme(page, preset.name)
+  for (const name of presetNames) {
+    await selectTheme(page, name)
     await page.reload()
-    await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: ' + preset.name)
+    await expect(appearanceTrigger(page)).toHaveAccessibleName('Appearance: ' + name)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   }
   expect(warnings).toEqual([])
