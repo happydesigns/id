@@ -20,6 +20,7 @@ Add meaningful regression coverage for changed logic. Avoid speculative packages
 - Root Markdown files provide durable topic overviews and essential policies, with links to details.
 - `docs/content/` owns detailed product usage, architecture, verification and release guidance. The [roadmap](docs/content/5.development/4.roadmap.md) is the single plan/status record.
 - `package.json` owns package version and dependency contracts; the pnpm catalog owns shared ranges and the lockfile owns tested resolutions. Link rather than repeat version lists.
+- Use `catalog:` for centrally coordinated dependencies shared with workspace packages or generated templates. It is shorthand for the default catalog. Package-specific dependencies may declare their ranges directly; peer ranges describe consumer compatibility and need not match development pins. Do not add named catalogs unless different version groups are actually needed.
 - File-based project scaffolds own new-project boilerplate. Their bundled READMEs must remain usable outside this repository.
 
 Update the canonical page when behavior changes. Explain concepts, usage and tradeoffs; derive exact tables from source where supported. Link to an existing explanation instead of copying it. Keep task logs and temporary planning in tasks, issues or PRs. Preserve generated changelog history, fixture reproduction notes and license notices in their appropriate locations.

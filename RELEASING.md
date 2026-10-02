@@ -6,8 +6,8 @@ ID uses Changelogen for its single versioned package. Conventional Commits deter
 
 1. Complete the setup described in [Verification](docs/content/5.development/2.verification.md), including Playwright's Chromium browser.
 2. Run `pnpm release:preview` to review proposed entries and version without changing files.
-3. From a clean worktree, run `pnpm release`. It runs `pnpm verify:full`, including native consumer builds and browser checks, before creating the version, generated `CHANGELOG.md`, release commit and annotated tag together. A failed check stops preparation. It does not push or publish.
-4. Review the result. An authorized tag push triggers CI verification and GitHub release publication with the exact built archive, checksum and changelog entries. Registry publication requires separate authorization.
+3. When publication is authorized, run `nr release` (or `pnpm release`) from a clean worktree. It checks npm authentication, opens `npm login` if needed, runs full verification and Changelogen, publishes with pnpm, then pushes the branch and annotated tags. Each step must succeed before the next starts.
+4. Tag CI verifies the release and publishes the GitHub release with its built archive, checksum and changelog entries. To prepare and review a version without authentication, publication or pushing, use `pnpm release:prepare` instead.
 
 Do not manually rewrite released tags or replace released archive bytes. Keep release history in `CHANGELOG.md`, not parallel notes.
 
