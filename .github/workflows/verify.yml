@@ -11,9 +11,61 @@ concurrency:
   group: verify-${{ github.ref }}
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.scope.outputs.skip }}
+      full: ${{ steps.scope.outputs.full }}
+      suites: ${{ steps.scope.outputs.suites }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: scope
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          skip=false
+          full=true
+          suites='["browser","docs","package","devtools","preview"]'
+
+          # Only an existing version tag can delegate a branch run to release CI.
+          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF_TYPE" == branch ]]; then
+            version=$(node -p "require('./package.json').version")
+            tagged=$(git rev-parse --verify "refs/tags/v$version^{commit}" 2>/dev/null || true)
+            if [[ "$tagged" == "$GITHUB_SHA" ]]; then
+              skip=true
+            fi
+          fi
+
+          # Unknown comparisons, manual runs and tags always retain full coverage.
+          if [[ "$GITHUB_REF_TYPE" != tag && "$GITHUB_EVENT_NAME" != workflow_dispatch ]] &&
+             git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            if [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
+              BASE_SHA=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
+            fi
+            git diff --name-only --no-renames -z "$BASE_SHA" "$HEAD_SHA" > "$RUNNER_TEMP/changed-files"
+            if [[ -s "$RUNNER_TEMP/changed-files" ]]; then
+              full=false
+              while IFS= read -r -d '' path; do
+                case "$path" in
+                  docs/content/4.reference/1.api.md) full=true; break ;;
+                  docs/content/*.md|README.md|CHANGELOG.md) ;;
+                  *) full=true; break ;;
+                esac
+              done < "$RUNNER_TEMP/changed-files"
+            fi
+            if [[ "$full" == false ]]; then
+              suites='["docs"]'
+            fi
+          fi
+          printf 'skip=%s\nfull=%s\nsuites=%s\n' "$skip" "$full" "$suites" >> "$GITHUB_OUTPUT"
+
   compatibility:
-    if: >-
-      github.event_name != 'push' || github.ref_type == 'tag' || !startsWith(github.event.head_commit.message, 'chore(release): v')
+    needs: changes
+    if: needs.changes.outputs.skip != 'true' && needs.changes.outputs.full == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
@@ -37,8 +89,8 @@ jobs:
       - run: pnpm exec vitest run tests/package-types.test.ts tests/studio-project.test.ts tests/studio-generation.test.ts tests/studio-http.test.ts tests/studio-package.test.ts
 
   verify:
-    if: >-
-      github.event_name != 'push' || github.ref_type == 'tag' || !startsWith(github.event.head_commit.message, 'chore(release): v')
+    needs: changes
+    if: needs.changes.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -52,8 +104,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm dev:prepare
+        if: needs.changes.outputs.full == 'true'
       - run: pnpm verify
-      - run: pnpm test:nuxt
+        if: needs.changes.outputs.full == 'true'
+      - run: pnpm test:prepare && pnpm lint
+        if: needs.changes.outputs.full != 'true'
+        # Nuxt generates the ESLint configuration during preparation.
+      - run: pnpm exec vitest run --config vitest.nuxt.config.ts
+        if: needs.changes.outputs.full == 'true'
       - name: Check release tag
         if: github.ref_type == 'tag'
         shell: bash
@@ -70,14 +128,14 @@ jobs:
           fi
 
   integrations:
-    if: >-
-      github.event_name != 'push' || github.ref_type == 'tag' || !startsWith(github.event.head_commit.message, 'chore(release): v')
+    needs: changes
+    if: needs.changes.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        suite: [browser, docs, package, devtools, preview]
+        suite: ${{ fromJSON(needs.changes.outputs.suites) }}
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6

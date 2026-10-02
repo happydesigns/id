@@ -107,7 +107,7 @@
     "test:nuxt": "pnpm test:prepare && vitest run --config vitest.nuxt.config.ts",
     "test:browser": "pnpm test:prepare && playwright test",
     "test:docs": "pnpm test:prepare && playwright test --config playwright.docs.config.ts",
-    "test:package": "pnpm test:prepare && pnpm pack:studio && playwright test --config playwright.package.config.ts",
+    "test:package": "pnpm pack:studio && nuxt prepare && playwright test --config playwright.package.config.ts",
     "test:devtools": "pnpm test:prepare && playwright test --config playwright.devtools.config.ts",
     "test:preview": "pnpm test:prepare && playwright test --config playwright.preview.config.ts",
     "release:preview": "changelogen --no-output",
