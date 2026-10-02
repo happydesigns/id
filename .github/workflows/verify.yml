@@ -63,7 +63,6 @@ jobs:
             if [[ "$SUBJECT" != "chore(release): v$VERSION" ]]; then
               echo "Release tag must point to the Changelogen release commit"; exit 1
             fi
-            node scripts/release-notes.mjs "$VERSION" > .output/studio-package/RELEASE_NOTES.md
           fi
           cd .output/studio-package
           mv id.tgz "id-$VERSION.tgz"
@@ -113,6 +112,12 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: package.json
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - uses: actions/download-artifact@v8
         with:
           name: id-package-${{ github.sha }}
@@ -122,8 +127,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          cd release-package
-          sha256sum --check SHA256SUMS
-          FLAGS=()
-          if [[ "$GITHUB_REF_NAME" == *-* ]]; then FLAGS+=(--prerelease); fi
-          gh release create "$GITHUB_REF_NAME" id-*.tgz SHA256SUMS --verify-tag --title "$GITHUB_REF_NAME" --notes-file RELEASE_NOTES.md "${FLAGS[@]}"
+          (cd release-package && sha256sum --check SHA256SUMS)
+          pnpm exec changelogen gh release "$GITHUB_REF_NAME"
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            gh release edit "$GITHUB_REF_NAME" --prerelease --latest=false
+          fi
+          gh release upload "$GITHUB_REF_NAME" release-package/id-*.tgz release-package/SHA256SUMS

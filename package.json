@@ -110,8 +110,7 @@
     "test:preview": "pnpm test:prepare && playwright test --config playwright.preview.config.ts",
     "release:preview": "changelogen --no-output",
     "release": "(npm whoami || npm login) && pnpm release:prepare && pnpm publish && git push --follow-tags",
-    "release:prepare": "pnpm verify:full && changelogen --release --no-github --clean",
-    "release:notes": "node scripts/release-notes.mjs"
+    "release:prepare": "pnpm verify:full && changelogen --release --no-github --clean"
   },
   "dependencies": {
     "@nuxt/devtools-kit": "^3.4.2",
