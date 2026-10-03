@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.2.5
+
+[compare changes](https://github.com/happydesigns/id/compare/v0.2.4...v0.2.5)
+
+### 🩹 Fixes
+
+- **release:** Publish with pnpm ([54c807b](https://github.com/happydesigns/id/commit/54c807b))
+
+### 💅 Refactors
+
+- **release:** Use changelogen for GitHub release notes ([9339065](https://github.com/happydesigns/id/commit/9339065))
+
+### ✅ Tests
+
+- Streamline coverage and parallelize CI suites ([f5c27ef](https://github.com/happydesigns/id/commit/f5c27ef))
+- Share Playwright defaults and remove duplicate preview runs ([64a47fa](https://github.com/happydesigns/id/commit/64a47fa))
+
+### 🤖 CI
+
+- Scope documentation checks and avoid duplicate preparation ([4e8c3bc](https://github.com/happydesigns/id/commit/4e8c3bc))
+
+### ❤️ Contributors
+
+- Jan Fröhlich
+
 ## v0.2.4
 
 > Fixes Studio color-mode restoration, removes the inactive Ask AI control, updates dependencies and simplifies verification and release tooling.
