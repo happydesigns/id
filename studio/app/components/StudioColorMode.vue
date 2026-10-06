@@ -22,6 +22,7 @@ function select(value: string | number) {
     :content="false"
     color="neutral"
     size="xs"
+    variant="pill"
     class="shrink-0"
     :ui="{
       label: 'sr-only',

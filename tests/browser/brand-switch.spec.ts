@@ -37,6 +37,18 @@ test('exported Studio runs without a Docus host', async ({ page }) => {
   await page.goto('http://127.0.0.1:3442/studio?browse=true')
   await expect(page.getByRole('main', { name: 'Brand Studio', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Documentation (opens in a new tab)', exact: true })).toHaveCount(0)
+  // Host tabs use `link`; Studio's mode selector must keep its filled selection.
+  for (const mode of ['Dark', 'Light', 'System']) {
+    const tab = page.getByRole('tab', { name: mode, exact: true })
+    await tab.click()
+    await expect(tab).toHaveAttribute('aria-selected', 'true')
+    if (mode !== 'System') await expect(page.locator('html')).toHaveClass(new RegExp(mode.toLowerCase()))
+    await expect.poll(() => tab.evaluate((element) => {
+      const list = element.closest('[role="tablist"]')!
+      const indicator = list.querySelector('[data-slot="indicator"]')!
+      return indicator.getBoundingClientRect().height / list.getBoundingClientRect().height
+    })).toBeGreaterThan(0.5)
+  }
   await page.getByRole('button', { name: 'Brand picker', exact: true }).click()
   await expect(page.getByRole('menu', { name: 'Brand picker', exact: true })).toBeVisible()
 })

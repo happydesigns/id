@@ -100,6 +100,7 @@ for (const name of ['violet', 'amber']) {
   }
   if (name === 'violet') {
     // Validate the actual exported Studio host without Docus, not just its manifest.
+    write(brand, 'playground/app/app.config.ts', 'export default defineAppConfig({ ui: { tabs: { defaultVariants: { variant: \'link\' } } } })\n')
     run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], brand)
     write(brand, 'playground/nuxt.config.ts', readFileSync(join(brand, 'playground/nuxt.config.ts'), 'utf8').replace('compatibilityDate:', 'ui: { fonts: false }, compatibilityDate:'))
     run(process.execPath, ['node_modules/nuxt/bin/nuxt.mjs', 'generate', 'playground'], brand)
