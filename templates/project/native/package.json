@@ -2,15 +2,15 @@
   "name": "@example/brand",
   "private": true,
   "type": "module",
-  "main": "./nuxt.config.ts",
+  "main": "./nuxt.config.mjs",
   "exports": {
-    ".": "./nuxt.config.ts",
+    ".": "./nuxt.config.mjs",
     "./styles.css": "./app/assets/css/brand.css"
   },
   "files": [
     "app",
     "public",
-    "nuxt.config.ts",
+    "nuxt.config.mjs",
     "README.md"
   ],
   "scripts": {
