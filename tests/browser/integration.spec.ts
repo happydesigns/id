@@ -1,5 +1,17 @@
 import { expect, test } from '@playwright/test'
 
+test('guide advertises a generated PNG social image', async ({ page, request }) => {
+  await page.goto('/')
+  const image = page.locator('meta[property="og:image"]')
+  await expect(image).toHaveAttribute('content', /\S+/)
+  const imageUrl = new URL((await image.getAttribute('content'))!, page.url())
+  expect(imageUrl.origin).toBe(new URL(page.url()).origin)
+  const response = await request.get(imageUrl.href)
+  expect(response.status()).toBe(200)
+  expect(response.headers()['content-type']).toMatch(/^image\/png(?:;|$)/)
+  expect([...(await response.body()).subarray(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10])
+})
+
 test('guide controls: translated Select and keyboard coverage', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
