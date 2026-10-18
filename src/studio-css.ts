@@ -9,7 +9,7 @@ export function createBrandThemeCss(brand: BrandDefinition, theme: BrandTheme, o
   const paletteCss = cssVariablesAdapter.transform({ ...brand, colors: resolveBrandPalettes(brand.colors), typography }, { prefix: '', selector: options.paletteSelector ?? '@theme static', includeRoles: false }).css
   return [
     // Nuxt UI reserves neutral for its semantic role and aliases the original palette.
-    paletteCss.replaceAll('--color-neutral-', '--color-old-neutral-'),
+    paletteCss.replace(/^(\s*)--color-neutral-(\d+):/gm, '$1--color-old-neutral-$2:'),
     createThemeCssVars({ ...theme, typography }, options),
   ].filter(Boolean).join('\n\n')
 }

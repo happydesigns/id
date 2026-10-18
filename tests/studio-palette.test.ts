@@ -1,5 +1,5 @@
 import colors from 'tailwindcss/colors'
-import { createBlankStudioDocument, createStudioCss, parseStudioDocument, studioBuiltinPalettes } from '../src/studio'
+import { createBlankStudioDocument, createStudioCss, createStudioRuntimeFiles, parseStudioDocument, studioBuiltinPalettes } from '../src/studio'
 import { studioPreviewCss } from '../studio/preview'
 import { describe, expect, it } from 'vitest'
 import { paletteRamp, paletteSwatch, rolePalettes } from '../studio/palette'
@@ -64,4 +64,22 @@ it('writes neutral overrides to the palette alias used by Nuxt UI', () => {
     expect(css).toContain('--color-old-neutral-500: #123456;')
     expect(css).not.toContain('--color-neutral-500: #123456;')
   }
+})
+
+it.each(['neutral-brand', 'neutral-500'])('preserves the custom %s palette beside the neutral alias in native output and preview', (name) => {
+  const doc = createBlankStudioDocument()
+  doc.brand.colors.neutral = { 500: '#654321' }
+  doc.brand.colors[name] = { 500: '#123456' }
+  doc.theme.ui!.colors = { primary: name, neutral: 'neutral' }
+  const before = JSON.stringify(doc)
+  const native = createStudioRuntimeFiles(doc, { styles: 'fragment', config: 'fragment' })
+  for (const css of [native['app/assets/css/brand.css']!, studioPreviewCss(doc)]) {
+    expect.soft(css).toContain(`--color-${name}-500: #123456;`)
+    expect.soft(css).toContain(`--color-${name}-400: #123456;`)
+    expect.soft(css).not.toContain(`--color-old-${name}-500:`)
+    expect.soft(css).toContain('--color-old-neutral-500: #654321;')
+    expect.soft(css).not.toContain('--color-neutral-500: #654321;')
+  }
+  expect(native['app/brand.config.ts']).toContain(`"primary": "${name}"`)
+  expect(JSON.stringify(doc)).toBe(before)
 })
