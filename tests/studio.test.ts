@@ -70,6 +70,8 @@ describe('editable Nuxt UI brand documents', () => {
     expect(view.getUint16(end + 10, true)).toBe(2)
     expect(view.getUint32(view.getUint32(end + 16, true), true)).toBe(0x02014b50)
     expect(zip).toEqual(createStudioArchive({ 'brand.studio.json': 'Farbe für alle', 'public/logo.png': new Uint8Array([1, 2, 3]) }))
-    expect(() => createStudioArchive({ '../outside': '' })).toThrow()
+  })
+  it.each(['../outside', 'public/../outside', 'public\\..\\outside', '/outside'])('rejects unsafe archive path %s', (path) => {
+    expect(() => createStudioArchive({ [path]: '' })).toThrow('Unsafe archive path.')
   })
 })

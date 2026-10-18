@@ -52,4 +52,22 @@ describe('project export', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<html>Fallback</html>', { headers: { 'content-type': 'text/html' } })))
     await expect(exportStudioProject(doc)).rejects.toThrow('Asset unavailable: /logo.svg')
   })
+  it('exports accepted local asset filenames containing consecutive dots', async () => {
+    const doc = createBlankStudioDocument()
+    doc.brand.assets = { logos: { logo: { name: 'Logo', src: '/logos/logo..svg', role: 'logo' } } }
+    const content = '<svg xmlns="http://www.w3.org/2000/svg"><title>Brand</title></svg>'
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(content, { headers: { 'content-type': 'image/svg+xml' } })))
+    const zip = await exportStudioProject(doc)
+    const view = new DataView(zip.buffer, zip.byteOffset, zip.byteLength)
+    const entries: Record<string, string> = {}
+    for (let offset = 0; view.getUint32(offset, true) === 0x04034b50;) {
+      const size = view.getUint32(offset + 18, true)
+      const nameEnd = offset + 30 + view.getUint16(offset + 26, true)
+      const dataStart = nameEnd + view.getUint16(offset + 28, true)
+      entries[new TextDecoder().decode(zip.subarray(offset + 30, nameEnd))] = new TextDecoder().decode(zip.subarray(dataStart, dataStart + size))
+      offset = dataStart + size
+    }
+    expect(entries['public/logos/logo..svg']).toBe(content)
+    expect(fetch).toHaveBeenCalledWith('/logos/logo..svg', { credentials: 'omit', redirect: 'error' })
+  })
 })

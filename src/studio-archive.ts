@@ -5,7 +5,7 @@ export function createStudioArchive(files: Record<string, string | Uint8Array>):
   const central: Uint8Array[] = []
   let offset = 0
   for (const [path, content] of Object.entries(files)) {
-    if (path.startsWith('/') || path.includes('..') || path.includes('\\')) throw new Error('Unsafe archive path.')
+    if (path.startsWith('/') || path.split('/').includes('..') || path.includes('\\')) throw new Error('Unsafe archive path.')
     const name = encode.encode(path)
     const data = typeof content === 'string' ? encode.encode(content) : content
     let crc = 0xffffffff
