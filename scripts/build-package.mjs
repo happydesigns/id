@@ -78,8 +78,9 @@ for (const variant of ['native', 'guide', 'legacy']) {
   ]))
 }
 // Resolve catalog and workspace references before bundling so browser exports stay self-contained.
-for (const files of Object.values(projectTemplates)) {
+for (const [variant, files] of Object.entries(projectTemplates)) {
   const manifest = JSON.parse(files['package.json'])
+  if (variant === 'native') manifest.packageManager = packageManifest.packageManager
   for (const group of ['dependencies', 'devDependencies']) {
     for (const [name, version] of Object.entries(manifest[group] ?? {})) {
       if (version === 'workspace:^' && name === packageManifest.name) {

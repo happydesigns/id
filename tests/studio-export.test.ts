@@ -1,10 +1,26 @@
+import { readFile } from 'node:fs/promises'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { parse } from 'yaml'
 import { createBlankStudioDocument, createStudioProject } from '../src/studio'
 import { exportStudioProject } from '../studio/export'
 
 afterEach(() => vi.unstubAllGlobals())
 
 describe('project export', () => {
+  it.each([{}, { guide: true }, { bundledPackage: true }, { bundledPackage: true, guide: true }])('exports a pinned package manager and restricted build decisions: %j', async (options) => {
+    const root = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
+    const files = createStudioProject(createBlankStudioDocument(), options)
+    expect.soft(JSON.parse(files['package.json']!).packageManager).toBe(root.packageManager)
+    expect.soft(files['pnpm-workspace.yaml']).toBeDefined()
+    if (files['pnpm-workspace.yaml']) {
+      expect(parse(files['pnpm-workspace.yaml'])).toEqual({ allowBuilds: { 'better-sqlite3': false, 'esbuild': false, 'vue-demi': false } })
+    }
+  })
+  it.each([{ legacyRuntime: true }, { legacyRuntime: true, guide: true }])('preserves the legacy scaffold installation contract: %j', (options) => {
+    const files = createStudioProject(createBlankStudioDocument(), options)
+    expect(JSON.parse(files['package.json']!).packageManager).toBeUndefined()
+    expect(files['pnpm-workspace.yaml']).toBeUndefined()
+  })
   it.each([{}, { guide: true }, { legacyRuntime: true }, { legacyRuntime: true, guide: true }])('keeps brand data separate from scaffold code: %j', (options) => {
     const doc = createBlankStudioDocument()
     doc.theme.label = 'Brand {{packageName}} "sample"'

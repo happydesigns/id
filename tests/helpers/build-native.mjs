@@ -22,6 +22,20 @@ function run(command, args, cwd) {
   if (result.error) throw result.error
   assert.equal(result.status, 0, command + ' ' + args.join(' '))
 }
+function installAuthoringProject(cwd) {
+  const entry = process.env.npm_execpath
+  assert.ok(entry, 'Run package verification through pnpm')
+  const javascript = /\.[cm]?js$/.test(entry)
+  const command = javascript ? process.execPath : entry
+  const prefix = javascript ? [entry] : []
+  const version = spawnSync(command, [...prefix, '--version'], { cwd, encoding: 'utf8', env: { ...process.env, CI: 'true' } })
+  if (version.error) throw version.error
+  assert.equal(version.status, 0, 'Read exported project pnpm version')
+  const actual = 'pnpm@' + version.stdout.trim()
+  console.log('Exported project package manager:', cwd, actual)
+  assert.equal(actual, JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')).packageManager)
+  run(command, [...prefix, 'install'], cwd)
+}
 const author = join(workspace, 'author')
 write(author, 'package.json', JSON.stringify({ private: true, type: 'module', dependencies: { '@happydesigns/id': 'file:' + archive.replaceAll('\\', '/') } }))
 run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], author)
@@ -101,7 +115,7 @@ for (const name of ['violet', 'amber']) {
   if (name === 'violet') {
     // Validate the actual exported Studio host without Docus, not just its manifest.
     write(brand, 'playground/app/app.config.ts', 'export default defineAppConfig({ ui: { tabs: { defaultVariants: { variant: \'link\' } } } })\n')
-    run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], brand)
+    installAuthoringProject(brand)
     write(brand, 'playground/nuxt.config.ts', readFileSync(join(brand, 'playground/nuxt.config.ts'), 'utf8').replace('compatibilityDate:', 'ui: { fonts: false }, compatibilityDate:'))
     run(process.execPath, ['node_modules/nuxt/bin/nuxt.mjs', 'generate', 'playground'], brand)
     cpSync(join(brand, 'playground/.output/public'), resolve('.output/native-consumers/studio'), { recursive: true })
@@ -115,7 +129,7 @@ const guideManifest = JSON.parse(readFileSync(join(guide, 'package.json'), 'utf8
 guideManifest.devDependencies['@happydesigns/id'] = 'file:' + archive.replaceAll('\\', '/')
 write(guide, 'package.json', JSON.stringify(guideManifest))
 write(guide, 'playground/nuxt.config.ts', readFileSync(join(guide, 'playground/nuxt.config.ts'), 'utf8').replace('compatibilityDate:', 'ui: { fonts: false }, compatibilityDate:'))
-run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], guide)
+installAuthoringProject(guide)
 run(process.execPath, ['node_modules/nuxt/bin/nuxt.mjs', 'generate', 'playground'], guide)
 assert.match(readFileSync(join(guide, 'playground/.output/public/docs/introduction.html'), 'utf8'), /Use your brand/, 'Exported introduction missing')
 assert.match(readFileSync(join(guide, 'playground/.output/public/docs/brand-reference.html'), 'utf8'), /Brand reference/, 'Exported reference missing')
