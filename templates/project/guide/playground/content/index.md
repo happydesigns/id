@@ -1,11 +1,11 @@
 ---
-title: '{{brandName}}'
+title: {{brandNameYaml}}
 description: Explore the identity and use it in your Nuxt applications.
 ---
 
 ::u-page-hero
 ---
-title: '{{brandName}}'
+title: {{brandNameYaml}}
 description: Explore the identity and use it in your Nuxt applications.
 links:
   - label: Read the guide

@@ -36,13 +36,14 @@ export function createStudioProject(input: StudioDocument, options: StudioProjec
   else Object.assign(files, createStudioRuntimeFiles(doc, { styles: 'fragment', config: 'fragment' }))
   const text: Record<string, string> = {
     brandName: doc.theme.label,
+    brandNameYaml: JSON.stringify(doc.theme.label),
     packageName: manifest.name,
     packageNote: options.bundledPackage
       ? 'The reviewed id development package is bundled in vendor/id.tgz.'
       : 'Install the reviewed id package as the development dependency.',
   }
   for (const path of Object.keys(files)) {
-    if (path.endsWith('.md')) files[path] = files[path]!.replace(/\{\{(brandName|packageName|packageNote)\}\}/g, (_, key: string) => text[key]!)
+    if (path.endsWith('.md')) files[path] = files[path]!.replace(/\{\{(brandName|brandNameYaml|packageName|packageNote)\}\}/g, (_, key: string) => text[key]!)
   }
   return files
 }

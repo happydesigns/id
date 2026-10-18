@@ -2,6 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
+import { parseDocument } from 'yaml'
 import { createBlankStudioDocument, parseStudioDocument, createStudioProject, createStudioRuntimeFiles } from '../src/studio'
 import { readStudioSource, writeStudioSource } from '../studio/source'
 import { previewUi } from '../studio/preview'
@@ -79,6 +80,21 @@ describe('connected brand source', () => {
 })
 
 describe('native runtime and real previews', () => {
+  it.each(['O\'Reilly', 'Studio: "Hello"\nO\'Reilly'])('preserves the guide title as valid YAML for %j', (label) => {
+    const document = createBlankStudioDocument()
+    document.theme.label = label
+    const files = createStudioProject(document, { guide: true })
+    const homepage = files['playground/content/index.md']!
+    const blocks = [...homepage.matchAll(/^---\n([\s\S]*?)^---$/gm)].slice(0, 2)
+    expect(blocks).toHaveLength(2)
+    for (const block of blocks) {
+      const yaml = parseDocument(block[1]!)
+      expect(yaml.errors).toEqual([])
+      expect(yaml.get('title')).toBe(label)
+    }
+    expect(files['README.md']).toContain(`# ${label}\n`)
+  })
+
   it.each([{}, { guide: true }, { legacyRuntime: true }])('exports release and installed dependency versions for %j', async (options) => {
     const root = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
     const files = createStudioProject(createBlankStudioDocument(), options)
