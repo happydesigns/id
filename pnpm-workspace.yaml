@@ -12,7 +12,7 @@ catalog:
   'typescript': '^6.0.3'
   'vue-tsc': '^3.3.11'
   '@iconify-json/lucide': '^1.2.137'
-  '@iconify-json/vscode-icons': '1.2.83'
+  '@iconify-json/vscode-icons': '1.2.89'
 
 overrides:
   '@happydesigns/id': workspace:*
