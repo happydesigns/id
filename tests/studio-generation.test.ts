@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import { afterEach, expect, it } from 'vitest'
 import { createBlankStudioDocument, createStudioProject, createStudioRuntimeFiles } from '../src/studio'
+import { studioPreviewCss } from '../studio/preview'
 
 const exec = promisify(execFile)
 const directories: string[] = []
@@ -29,6 +30,23 @@ async function project(guide = false) {
   const generate = () => exec(process.execPath, [join(directory, 'scripts/generate-brand.mjs')], { cwd: tmpdir() })
   return { directory, document, files, generate }
 }
+
+it('preserves custom typography overrides in native output and scoped previews', () => {
+  const document = createBlankStudioDocument()
+  document.brand.typography = { editorial: 'Brand Serif, serif', caption: 'Brand Caption, sans-serif' }
+  document.theme.typography = { editorial: 'Theme Serif, serif', readingText: 'Theme Reading, serif' }
+  document.theme.cssVariables = { dark: { '--font-editorial': 'Dark Serif, serif' } }
+  const native = createStudioRuntimeFiles(document, { styles: 'fragment', config: 'fragment' })['app/assets/css/brand.css']!
+  const preview = studioPreviewCss(document, '[data-brand-preview]')
+  for (const css of [native, preview]) {
+    expect.soft(css).toContain('--font-editorial: Theme Serif, serif;')
+    expect.soft(css).toContain('--font-reading-text: Theme Reading, serif;')
+    expect.soft(css).toContain('--font-caption: Brand Caption, sans-serif;')
+    expect.soft(css).not.toContain('--font-editorial: Brand Serif, serif;')
+  }
+  expect(native).toContain('.dark {\n  --font-editorial: Dark Serif, serif;\n}')
+  expect(preview).toContain('[data-brand-preview].dark {\n  --font-editorial: Dark Serif, serif;\n}')
+})
 
 it.each([false, true])('regenerates only owned files and preserves custom code (guide: %s)', async (guide) => {
   const { directory, document, files, generate } = await project(guide)
