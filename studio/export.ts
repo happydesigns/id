@@ -26,7 +26,7 @@ export async function exportStudioProject(document: StudioDocument, options: { p
   for (const asset of assets) {
     if (!asset || !asset.src.startsWith('/') || files[`public${asset.src}`]) continue
     const response = await fetch(asset.src, { credentials: 'omit', redirect: 'error' })
-    if (!response.ok || response.headers.get('content-type')?.includes('text/html')) throw new Error(`Asset unavailable: ${asset.src}. Restore this file before exporting a complete project.`)
+    if (!response.ok || response.headers.get('content-type')?.toLowerCase().includes('text/html')) throw new Error(`Asset unavailable: ${asset.src}. Restore this file before exporting a complete project.`)
     const bytes = new Uint8Array(await response.arrayBuffer())
     if (bytes.length > 5_000_000) throw new Error(`Asset too large: ${asset.src}`)
     files[`public${asset.src}`] = bytes

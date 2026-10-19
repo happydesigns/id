@@ -46,10 +46,10 @@ describe('project export', () => {
     await expect(exportStudioProject(createBlankStudioDocument(), { packageAsset: '//other.test/id.tgz' })).rejects.toThrow('Invalid host package')
     expect(fetch).not.toHaveBeenCalled()
   })
-  it('fails a complete export when an asset URL returns an HTML fallback', async () => {
+  it.each(['text/html', 'Text/HTML; charset=UTF-8', 'TEXT/HTML'])('fails a complete export when an asset URL returns an HTML fallback: %s', async (contentType) => {
     const doc = createBlankStudioDocument()
     doc.brand.assets = { logos: { logo: { name: 'Logo', src: '/logo.svg', role: 'logo' } } }
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<html>Fallback</html>', { headers: { 'content-type': 'text/html' } })))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<html>Fallback</html>', { headers: { 'content-type': contentType } })))
     await expect(exportStudioProject(doc)).rejects.toThrow('Asset unavailable: /logo.svg')
   })
   it('exports accepted local asset filenames containing consecutive dots', async () => {
