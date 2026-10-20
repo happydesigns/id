@@ -66,10 +66,21 @@ for (const system of ['dark', 'light'] as const) test('Studio navigation preserv
   await page.getByRole('button', { name: 'Toggle host mode' }).click()
   const selected = system === 'dark' ? 'light' : 'dark'
   await expect(page.locator('html')).toHaveClass(new RegExp(selected))
+  // SPA navigation keeps this listener alive while the new frame hydrates.
+  await page.evaluate(() => {
+    ;(window as unknown as { previewModeWrites: string[] }).previewModeWrites = []
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'nuxt-color-mode' && new URL(event.url).pathname.endsWith('/studio/preview')) {
+        (window as unknown as { previewModeWrites: string[] }).previewModeWrites.push(String(event.newValue))
+      }
+    })
+  })
   await page.getByRole('link', { name: 'Open Studio', exact: true }).click()
   await expect(page).toHaveURL(/\/studio/)
   await expect(page.locator('main[data-mode]')).toHaveAttribute('data-mode', selected)
   await expect(page.locator('html')).toHaveClass(new RegExp(selected))
+  await expect(page.frameLocator('iframe[title="Draft brand preview"]').locator('input[type="email"]').first()).toBeVisible()
+  expect(await page.evaluate(() => (window as unknown as { previewModeWrites: string[] }).previewModeWrites)).toEqual([])
   await page.reload()
   await expect(page.locator('main[data-mode]')).toHaveAttribute('data-mode', selected)
   await page.goBack()

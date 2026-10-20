@@ -1,6 +1,19 @@
 import { expect, it } from 'vitest'
 import { reactive, ref } from 'vue'
-import { syncStudioMode } from '../studio/mode'
+import { syncPreviewMode, syncStudioMode } from '../studio/mode'
+
+it('applies a frame mode after hydration without changing the saved host preference', () => {
+  const colorMode = reactive({ value: 'light', preference: 'system', unknown: true })
+  const mode = ref<'light' | 'dark'>('dark')
+  const stop = syncPreviewMode(mode, colorMode)
+  expect(colorMode.value).toBe('light')
+  colorMode.unknown = false
+  expect(colorMode.value).toBe('dark')
+  mode.value = 'light'
+  expect(colorMode.value).toBe('light')
+  expect(colorMode.preference).toBe('system')
+  stop()
+})
 
 for (const saved of ['light', 'dark'] as const) it(`retains saved ${saved} when Color Mode resolves after Studio mounts`, () => {
   const colorMode = reactive({ preference: 'system', unknown: true })

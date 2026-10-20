@@ -4,17 +4,15 @@ import { parseStudioDocument } from '../../../../src/studio'
 import type { StudioDocument, StudioScene } from '../../../../src/studio'
 import { studioTemplates } from '../../../templates'
 import { createPreviewBrand, type PreviewAppConfig } from '../../../preview'
+import { syncPreviewMode } from '../../../mode'
 
 defineOptions({ name: 'StudioPreviewPage' })
-definePageMeta({ layout: false, header: false, footer: false })
+// The frame displays the parent's mode without owning its persisted preference.
+definePageMeta({ layout: false, header: false, footer: false, colorMode: 'light' })
 useSeoMeta({ robots: 'noindex, nofollow' })
 const route = useRoute()
 const appConfig = useAppConfig()
 const colorMode = useColorMode()
-function applyMode(preference: unknown) {
-  // Thumbnails must not overwrite the user's persisted System preference.
-  if (route.query.frame !== 'thumbnail') colorMode.preference = ['light', 'dark', 'system'].includes(String(preference)) ? String(preference) : mode.value
-}
 const document = ref<StudioDocument>()
 const templates = studioTemplates((appConfig as unknown as { idStudio?: { templates?: unknown } }).idStudio?.templates)
 const scene = ref('components')
@@ -25,7 +23,8 @@ function navigate(next: string) {
   if (selectedTemplate.value?.pages.some(item => item.id === next)) window.parent.postMessage({ type: 'id-studio-navigate', scene: scene.value, page: next }, window.location.origin)
 }
 const state = ref('default')
-const mode = ref<'light' | 'dark'>('light')
+const mode = ref<'light' | 'dark'>(colorMode.value === 'dark' ? 'dark' : 'light')
+syncPreviewMode(mode, colorMode)
 const error = ref('')
 const applyBrand = createPreviewBrand(appConfig as unknown as PreviewAppConfig)
 const style = ref('')
@@ -34,7 +33,6 @@ useHead({ style: [{ key: 'id-studio-preview', textContent: style }] })
 function receive(event: MessageEvent) {
   if (event.origin === window.location.origin && event.source === window.parent && event.data?.type === 'id-studio-color-mode') {
     mode.value = event.data.mode === 'dark' ? 'dark' : 'light'
-    applyMode(event.data.preference)
     return
   }
   if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'id-studio-preview') return
@@ -46,7 +44,6 @@ function receive(event: MessageEvent) {
     state.value = event.data.state === 'error' ? 'error' : 'default'
     style.value = applyBrand(doc)
     mode.value = event.data.mode === 'dark' ? 'dark' : 'light'
-    applyMode(event.data.preference)
     window.document.documentElement.classList.toggle('dark', mode.value === 'dark')
     window.document.documentElement.classList.toggle('light', mode.value === 'light')
     // Remove values the host runtime applied inline; the complete frame CSS

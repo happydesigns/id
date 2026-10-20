@@ -2,6 +2,12 @@ import { watch, type Ref } from 'vue'
 
 type Mode = 'light' | 'dark' | 'system'
 
+export function syncPreviewMode(mode: Ref<'light' | 'dark'>, colorMode: { value: string, unknown: boolean }) {
+  return watch([mode, () => colorMode.unknown], ([value, unknown]) => {
+    if (!unknown) colorMode.value = value
+  }, { immediate: true, flush: 'sync' })
+}
+
 export function syncStudioMode(preference: Ref<Mode>, colorMode: { preference: string, unknown: boolean }, override?: Mode) {
   let initialized = false
   return watch([preference, () => colorMode.unknown], ([, unknown]) => {
